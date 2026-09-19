@@ -4,15 +4,72 @@ import math
 from typing import Any
 
 import numpy as np
-from sklearn.metrics import (
-    accuracy_score,
-    confusion_matrix,
-    f1_score,
-    matthews_corrcoef,
-    precision_score,
-    recall_score,
-    roc_auc_score,
-)
+try:
+    from sklearn.metrics import (
+        accuracy_score,
+        confusion_matrix,
+        f1_score,
+        matthews_corrcoef,
+        precision_score,
+        recall_score,
+        roc_auc_score,
+    )
+except Exception:
+    def accuracy_score(y_true, y_pred):
+        y_true, y_pred = np.asarray(y_true), np.asarray(y_pred)
+        return float(np.mean(y_true == y_pred)) if len(y_true) > 0 else 0.0
+
+    def confusion_matrix(y_true, y_pred, labels=None):
+        y_true, y_pred = np.asarray(y_true), np.asarray(y_pred)
+        if labels is None:
+            labels = sorted(list(set(y_true).union(set(y_pred))))
+        matrix = np.zeros((len(labels), len(labels)), dtype=int)
+        label_to_idx = {l: i for i, l in enumerate(labels)}
+        for t, p in zip(y_true, y_pred):
+            if t in label_to_idx and p in label_to_idx:
+                matrix[label_to_idx[t], label_to_idx[p]] += 1
+        return matrix
+
+    def precision_score(y_true, y_pred, average="weighted", zero_division=0):
+        y_true, y_pred = np.asarray(y_true), np.asarray(y_pred)
+        tp = int(np.sum((y_true == 1) & (y_pred == 1)))
+        fp = int(np.sum((y_true == 0) & (y_pred == 1)))
+        return float(tp / (tp + fp)) if (tp + fp) > 0 else float(zero_division)
+
+    def recall_score(y_true, y_pred, average="weighted", zero_division=0):
+        y_true, y_pred = np.asarray(y_true), np.asarray(y_pred)
+        tp = int(np.sum((y_true == 1) & (y_pred == 1)))
+        fn = int(np.sum((y_true == 1) & (y_pred == 0)))
+        return float(tp / (tp + fn)) if (tp + fn) > 0 else float(zero_division)
+
+    def f1_score(y_true, y_pred, average="weighted", zero_division=0):
+        prec = precision_score(y_true, y_pred, zero_division=zero_division)
+        rec = recall_score(y_true, y_pred, zero_division=zero_division)
+        return float(2 * prec * rec / (prec + rec)) if (prec + rec) > 0 else float(zero_division)
+
+    def matthews_corrcoef(y_true, y_pred):
+        y_true, y_pred = np.asarray(y_true), np.asarray(y_pred)
+        tp = int(np.sum((y_true == 1) & (y_pred == 1)))
+        tn = int(np.sum((y_true == 0) & (y_pred == 0)))
+        fp = int(np.sum((y_true == 0) & (y_pred == 1)))
+        fn = int(np.sum((y_true == 1) & (y_pred == 0)))
+        denom = math.sqrt(float((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn)))
+        return float(((tp * tn) - (fp * fn)) / denom) if denom > 0 else 0.0
+
+    def roc_auc_score(y_true, y_score, multi_class="ovr", average="weighted"):
+        try:
+            y_true, y_score = np.asarray(y_true), np.asarray(y_score)
+            if y_score.ndim == 2:
+                y_score = y_score[:, 1]
+            # Mann-Whitney U test statistic for AUC
+            pos = y_score[y_true == 1]
+            neg = y_score[y_true == 0]
+            if len(pos) == 0 or len(neg) == 0:
+                return 0.5
+            return float(np.mean([p > n for p in pos for n in neg]))
+        except Exception:
+            return 0.5
+
 
 
 def evaluate_classification_metrics(

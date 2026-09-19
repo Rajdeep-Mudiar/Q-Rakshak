@@ -511,5 +511,9 @@ def init_database():
     logger.info(f"Database initialized successfully (Engine: {'PostgreSQL' if is_postgres else 'SQLite'})")
 
 
+# Alias for compatibility
+init_db = init_database
+
 # Auto-initialize on load
 init_database()
+

@@ -292,26 +292,42 @@ export default function UserManagementConsole() {
                     <td>{u.hospital_affiliation || "—"}</td>
                     <td><code style={{ fontSize: "0.70rem" }}>{u.license_number || "—"}</code></td>
                     <td style={{ textAlign: "right" }}>
-                      <div style={{ display: "inline-flex", gap: "4px" }}>
-                        <button
-                          type="button"
-                          className="btn-secondary"
-                          onClick={() => setEditUser(u)}
-                          style={{ padding: "3px 8px", fontSize: "0.68rem", borderRadius: "var(--radius-sm)" }}
-                          title="Edit user profile & authority"
+                      {u.role === "patient" ? (
+                        <span
+                          style={{
+                            fontSize: "0.68rem",
+                            color: "var(--text-muted)",
+                            padding: "3px 8px",
+                            background: "var(--bg-surface-alt)",
+                            borderRadius: "var(--radius-sm)",
+                            border: "1px solid var(--border-default)",
+                            fontStyle: "italic",
+                          }}
                         >
-                          <Edit2 size={12} />
-                        </button>
-                        <button
-                          type="button"
-                          className="btn-secondary"
-                          onClick={() => setDeleteUserModal(u)}
-                          style={{ padding: "3px 8px", fontSize: "0.68rem", color: "var(--risk-high)", borderColor: "var(--risk-high)", borderRadius: "var(--radius-sm)" }}
-                          title="Delete user account"
-                        >
-                          <Trash2 size={12} />
-                        </button>
-                      </div>
+                          Protected (Patient)
+                        </span>
+                      ) : (
+                        <div style={{ display: "inline-flex", gap: "4px" }}>
+                          <button
+                            type="button"
+                            className="btn-secondary"
+                            onClick={() => setEditUser(u)}
+                            style={{ padding: "3px 8px", fontSize: "0.68rem", borderRadius: "var(--radius-sm)" }}
+                            title="Edit user profile & authority"
+                          >
+                            <Edit2 size={12} />
+                          </button>
+                          <button
+                            type="button"
+                            className="btn-secondary"
+                            onClick={() => setDeleteUserModal(u)}
+                            style={{ padding: "3px 8px", fontSize: "0.68rem", color: "var(--risk-high)", borderColor: "var(--risk-high)", borderRadius: "var(--radius-sm)" }}
+                            title="Delete user account"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))

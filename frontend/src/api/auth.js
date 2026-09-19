@@ -2,6 +2,24 @@ import apiClient from "./client";
 import { ENDPOINTS } from "./config";
 
 export const authApi = {
+  async login(username, password, role = "patient") {
+    const data = await apiClient.post(ENDPOINTS.AUTH_LOGIN, { username, password, role });
+    if (data.access_token) {
+      localStorage.setItem("qmed_token", data.access_token);
+      localStorage.setItem("qmed_user", JSON.stringify(data.user));
+    }
+    return data;
+  },
+
+  async register(registrationData) {
+    const data = await apiClient.post(ENDPOINTS.AUTH_REGISTER, registrationData);
+    if (data.access_token) {
+      localStorage.setItem("qmed_token", data.access_token);
+      localStorage.setItem("qmed_user", JSON.stringify(data.user));
+    }
+    return data;
+  },
+
   async loginWithGoogleToken(token) {
     if (!token) return null;
     localStorage.setItem("qmed_token", token);

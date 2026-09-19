@@ -82,12 +82,14 @@ app.include_router(skin_cancer_router)
 app.include_router(pneumonia_router)
 app.include_router(graphs_router)
 app.include_router(consultations_router)
+import time
+
 app.include_router(notifications_router)
 app.include_router(emergency_router)
 app.include_router(ai_doctor_router)
 
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 def root():
     return {
         "platform": "Q-RAKSHAK",
@@ -97,3 +99,16 @@ def root():
         "quantum_engine": "PennyLane + Qiskit Aer",
         "docs": "/docs",
     }
+
+
+@app.api_route("/health", methods=["GET", "HEAD"])
+@app.api_route("/api/health", methods=["GET", "HEAD"])
+@app.api_route("/api/v1/health", methods=["GET", "HEAD"])
+def health_check():
+    return {
+        "status": "healthy",
+        "service": "Q-RAKSHAK Backend API",
+        "version": "2.0.0",
+        "timestamp": time.time(),
+    }
+

@@ -1278,14 +1278,20 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
             <p style={{ fontSize: "0.78rem", color: "#9F1239", lineHeight: 1.5, marginBottom: "14px" }}>
               Permanently purge all patient profile data, telemetry history, diagnostic inferences, and emergency passes from the database. This action is irreversible.
             </p>
-            <button
-              type="button"
-              className="btn-danger"
-              onClick={() => setDeleteConfirmOpen(true)}
-              style={{ fontSize: "0.78rem", padding: "8px 16px" }}
-            >
-              <Trash2 size={14} /> Delete Patient Account
-            </button>
+            {currentUser?.role === "admin" ? (
+              <button
+                type="button"
+                className="btn-danger"
+                onClick={() => setDeleteConfirmOpen(true)}
+                style={{ fontSize: "0.78rem", padding: "8px 16px" }}
+              >
+                <Trash2 size={14} /> Delete Patient Account
+              </button>
+            ) : (
+              <div style={{ fontSize: "0.74rem", color: "#B91C1C", background: "#FEE2E2", padding: "8px 12px", borderRadius: "var(--radius-sm)", border: "1px solid #FCA5A5" }}>
+                <strong>Administrative Governance:</strong> Patient account deletion and medical record purges must be executed by an authorized System Administrator in accordance with DPDP Act 2023 and HIPAA retention policies.
+              </div>
+            )}
           </div>
         </div>
       )}
