@@ -213,10 +213,35 @@ def init_database():
         explainability_json TEXT NOT NULL,
         inference_ms REAL NOT NULL,
         fallback_used INTEGER DEFAULT 0,
+        risk_score REAL,
+        probability REAL,
+        input_features_json TEXT,
+        model_version TEXT DEFAULT '1.0.0',
+        analysis_status TEXT DEFAULT 'completed',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (patient_id) REFERENCES patients (id)
     );
     """)
+
+    # Dynamic migration & indexing for SQLite
+    if not is_postgres:
+        try:
+            existing_cols = {row[1] for row in cursor.execute("PRAGMA table_info(diagnostic_records);").fetchall()}
+            if "risk_score" not in existing_cols:
+                cursor.execute("ALTER TABLE diagnostic_records ADD COLUMN risk_score REAL;")
+            if "probability" not in existing_cols:
+                cursor.execute("ALTER TABLE diagnostic_records ADD COLUMN probability REAL;")
+            if "input_features_json" not in existing_cols:
+                cursor.execute("ALTER TABLE diagnostic_records ADD COLUMN input_features_json TEXT;")
+            if "model_version" not in existing_cols:
+                cursor.execute("ALTER TABLE diagnostic_records ADD COLUMN model_version TEXT DEFAULT '1.0.0';")
+            if "analysis_status" not in existing_cols:
+                cursor.execute("ALTER TABLE diagnostic_records ADD COLUMN analysis_status TEXT DEFAULT 'completed';")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_diag_patient_created ON diagnostic_records(patient_id, created_at DESC);")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_diag_patient ON diagnostic_records(patient_id);")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_diag_created ON diagnostic_records(created_at);")
+        except Exception:
+            pass
 
     # Audit Logs Table
     cursor.execute("""

@@ -4,6 +4,7 @@ from ml.preprocessing.validation import validate_clinical_sample, validate_datas
 from ml.preprocessing.splitting import PatientGroupedSplitter, audit_leakage
 from ml.preprocessing.reduction import DimensionalityReducer
 from ml.preprocessing.embedding_cache import EmbeddingCache
+from ml.preprocessing.tabular import ClinicalTabularPreprocessor
 
 __all__ = [
     "validate_clinical_sample",
@@ -12,4 +13,5 @@ __all__ = [
     "audit_leakage",
     "DimensionalityReducer",
     "EmbeddingCache",
+    "ClinicalTabularPreprocessor",
 ]

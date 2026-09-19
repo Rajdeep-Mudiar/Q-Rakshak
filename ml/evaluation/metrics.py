@@ -100,6 +100,7 @@ def evaluate_clinical_metrics(
         "mcc": round(mcc, 4),
         "brier_score": round(brier, 4),
         "calibration_error": round(ece, 4),
+        "confusion_matrix": cm.tolist(),
     }
 
     if inference_time_sec is not None:

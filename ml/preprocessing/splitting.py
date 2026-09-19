@@ -39,12 +39,15 @@ class PatientGroupedSplitter:
             df_test = df.iloc[test_idx].copy()
 
             # 2. Split (Train + Val) into Train and Val
-            val_ratio_adjusted = self.val_size / (self.train_size + self.val_size)
-            gss_val = GroupShuffleSplit(n_splits=1, test_size=val_ratio_adjusted, random_state=self.random_state)
-            train_sub_idx, val_sub_idx = next(gss_val.split(df_train_val, df_train_val[target_column], df_train_val[patient_id_column].values))
-            
-            df_train = df_train_val.iloc[train_sub_idx].copy()
-            df_val = df_train_val.iloc[val_sub_idx].copy()
+            if self.val_size > 0.0:
+                val_ratio_adjusted = self.val_size / (self.train_size + self.val_size)
+                gss_val = GroupShuffleSplit(n_splits=1, test_size=val_ratio_adjusted, random_state=self.random_state)
+                train_sub_idx, val_sub_idx = next(gss_val.split(df_train_val, df_train_val[target_column], df_train_val[patient_id_column].values))
+                df_train = df_train_val.iloc[train_sub_idx].copy()
+                df_val = df_train_val.iloc[val_sub_idx].copy()
+            else:
+                df_train = df_train_val
+                df_val = pd.DataFrame(columns=df.columns)
 
         else:
             # Stratified Split (one record per patient assumption)
@@ -55,12 +58,15 @@ class PatientGroupedSplitter:
             df_train_val = df.iloc[train_val_idx].copy()
             df_test = df.iloc[test_idx].copy()
 
-            val_ratio_adjusted = self.val_size / (self.train_size + self.val_size)
-            sss_val = StratifiedShuffleSplit(n_splits=1, test_size=val_ratio_adjusted, random_state=self.random_state)
-            train_sub_idx, val_sub_idx = next(sss_val.split(df_train_val, df_train_val[target_column].values))
-
-            df_train = df_train_val.iloc[train_sub_idx].copy()
-            df_val = df_train_val.iloc[val_sub_idx].copy()
+            if self.val_size > 0.0:
+                val_ratio_adjusted = self.val_size / (self.train_size + self.val_size)
+                sss_val = StratifiedShuffleSplit(n_splits=1, test_size=val_ratio_adjusted, random_state=self.random_state)
+                train_sub_idx, val_sub_idx = next(sss_val.split(df_train_val, df_train_val[target_column].values))
+                df_train = df_train_val.iloc[train_sub_idx].copy()
+                df_val = df_train_val.iloc[val_sub_idx].copy()
+            else:
+                df_train = df_train_val
+                df_val = pd.DataFrame(columns=df.columns)
 
         # Run Leakage Audit
         audit = audit_leakage(df_train, df_val, df_test, patient_id_column)
@@ -111,6 +117,7 @@ def audit_leakage(
     passed = len(violations) == 0
     return {
         "passed": passed,
+        "leakage_detected": not passed,
         "violations": violations,
         "train_samples": len(train_df),
         "val_samples": len(val_df),

@@ -145,5 +145,32 @@ def load_disease_benchmark(disease_id: str, multiclass: bool = False) -> tuple[p
         return get_framingham_dataset()
     if d_clean in {"pima", "diabetes", "metabolic"}:
         return get_pima_diabetes_dataset()
+    if d_clean in {"parkinsons_updrs", "updrs", "parkinsons_regression"}:
+        return get_parkinsons_updrs_regression_dataset()
     raise ValueError(f"Unknown benchmark dataset: {disease_id}")
+
+
+def get_parkinsons_updrs_regression_dataset(
+    target_col: str = "total_UPDRS",
+) -> tuple[pd.DataFrame, pd.Series, list[str]]:
+    """Loads Parkinson's Disease Telemonitoring UPDRS Continuous Regression Dataset.
+    Features: 16 acoustic vocal biomarkers + age + sex + test_time.
+    Target: continuous UPDRS progression score (motor_UPDRS or total_UPDRS).
+    Patient grouping column: subject# (used for zero-leakage PatientGroupedSplitter).
+    """
+    raw_path = DATA_DIR / "parkinsons" / "telemonitoring" / "parkinsons_updrs.data"
+    if not raw_path.exists():
+        raise FileNotFoundError(f"Parkinson's UPDRS dataset not found at {raw_path}")
+
+    df_raw = pd.read_csv(raw_path)
+    if target_col not in df_raw.columns:
+        target_col = "total_UPDRS"
+
+    targets_to_drop = ["motor_UPDRS", "total_UPDRS"]
+    features = [c for c in df_raw.columns if c not in targets_to_drop]
+
+    X = df_raw[features].copy()
+    y = df_raw[target_col].astype(np.float32)
+    return X, y, features
+
 

@@ -16,7 +16,7 @@ from backend.app.core.qr_service import (
     generate_qr_png_bytes,
     generate_qr_svg_string,
 )
-from backend.app.core.security import check_inference_rate_limit
+from backend.app.core.security import check_inference_rate_limit, get_optional_user
 from backend.app.core.config import settings
 from backend.app.db.repository import DatabaseRepository
 from ml.data.dataset_registry import load_disease_benchmark
@@ -107,8 +107,12 @@ def get_trained_module(disease: str):
 
 
 @router.post("/diagnose", dependencies=[Depends(check_inference_rate_limit)])
-async def run_clinical_diagnosis(req: DiagnosticRequest):
+async def run_clinical_diagnosis(req: DiagnosticRequest, current_user: dict[str, Any] = Depends(get_optional_user)):
     """Executes hybrid quantum-classical clinical diagnostic pipeline with explainability and fallback."""
+    user_role = current_user.get("role", "patient")
+    user_id = current_user.get("user_id", "")
+    if user_role == "patient" and user_id not in ("GUEST-USER", "") and user_id:
+        req.patient_id = user_id
     start_time = time.perf_counter()
     disease_key = req.disease.lower()
 
@@ -331,15 +335,43 @@ async def run_clinical_diagnosis(req: DiagnosticRequest):
 
 
 @router.get("/timeline/{patient_id}")
-async def get_patient_timeline_trajectory(patient_id: str):
+async def get_patient_timeline_trajectory(
+    patient_id: str,
+    time_filter: str = "30 Days",
+    disease: str | None = None,
+    start_date: str | None = None,
+    end_date: str | None = None,
+    current_user: dict[str, Any] = Depends(get_optional_user),
+):
     """Retrieves patient longitudinal diagnostic history, 90% threshold trajectory, and early disease detection forecasting."""
-    timeline = DatabaseRepository.get_patient_timeline(patient_id)
+    user_role = current_user.get("role", "patient")
+    user_id = current_user.get("user_id", "")
+    if user_role == "patient" and user_id not in ("GUEST-USER", "") and user_id != patient_id:
+        raise HTTPException(
+            status_code=403,
+            detail="Forbidden: You are authorized to access only your own longitudinal health records.",
+        )
+    timeline = DatabaseRepository.get_patient_timeline(
+        patient_id=patient_id,
+        time_filter=time_filter,
+        disease=disease,
+        start_date=start_date,
+        end_date=end_date,
+    )
     return {"status": "success", "timeline": timeline}
 
 
 @router.post("/record")
-async def persist_clinical_diagnostic_record(record: dict[str, Any]):
+async def persist_clinical_diagnostic_record(
+    record: dict[str, Any],
+    current_user: dict[str, Any] = Depends(get_optional_user),
+):
     """Persists an evaluated diagnostic record from any modality into SQLite and returns the record ID."""
+    user_role = current_user.get("role", "patient")
+    user_id = current_user.get("user_id", "")
+    if user_role == "patient" and user_id not in ("GUEST-USER", "") and user_id:
+        record["patient_id"] = user_id
+
     rid = DatabaseRepository.save_diagnostic_record(record)
     DatabaseRepository.add_audit_log(
         actor=f"Patient ({record.get('patient_id', 'USR-5EF52B')})",

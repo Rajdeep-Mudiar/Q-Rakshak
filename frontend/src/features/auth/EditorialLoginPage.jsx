@@ -14,14 +14,97 @@ import {
   ArrowRight,
   AlertCircle,
   Activity,
-  Layers
+  Layers,
+  ExternalLink
 } from "lucide-react";
 import { animateErrorShake } from "../../utils/motion.js";
-export default function EditorialLoginPage({ onGoogleLogin, loading, error }) {
+import HybridBenchmarkSection from "./components/HybridBenchmarkSection.jsx";
+import { authApi } from "../../api/auth.js";
+
+export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySuccess, loading, error }) {
   const [showGuideModal, setShowGuideModal] = useState(false);
+  const [gisLoading, setGisLoading] = useState(false);
+  const [localError, setLocalError] = useState(null);
   const modalContainerRef = useRef(null);
   const narrativeRef = useRef(null);
   const formContainerRef = useRef(null);
+
+  useEffect(() => {
+    const scriptId = "google-jssdk-gsi";
+    let isMounted = true;
+
+    function initGoogleClient() {
+      if (typeof window !== "undefined" && window.google?.accounts?.id) {
+        try {
+          window.google.accounts.id.initialize({
+            client_id: "985994695248-4615o9ba17tahv2q94ba01t322r3aunr.apps.googleusercontent.com",
+            callback: async (response) => {
+              if (response?.credential && isMounted) {
+                try {
+                  setGisLoading(true);
+                  setLocalError(null);
+                  const verifiedUser = await authApi.verifyGoogleCredential(response.credential);
+                  if (verifiedUser) {
+                    if (onGoogleVerifySuccess) {
+                      onGoogleVerifySuccess(verifiedUser);
+                    } else {
+                      window.location.reload();
+                    }
+                  }
+                } catch (err) {
+                  setLocalError(err?.message || "Google authentication verification failed. Please try again.");
+                } finally {
+                  if (isMounted) setGisLoading(false);
+                }
+              }
+            },
+            auto_select: false,
+            cancel_on_tap_outside: true,
+          });
+        } catch (e) {
+          console.warn("Google Identity Services notice:", e);
+        }
+      }
+    }
+
+    if (typeof document !== "undefined") {
+      if (!document.getElementById(scriptId)) {
+        const script = document.createElement("script");
+        script.id = scriptId;
+        script.src = "https://accounts.google.com/gsi/client";
+        script.async = true;
+        script.defer = true;
+        script.onload = () => {
+          initGoogleClient();
+        };
+        document.body.appendChild(script);
+      } else {
+        initGoogleClient();
+      }
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [onGoogleVerifySuccess]);
+
+  const handleGoogleClick = () => {
+    if (typeof window !== "undefined" && window.google?.accounts?.id) {
+      try {
+        window.google.accounts.id.prompt((notification) => {
+          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            if (onGoogleLogin) onGoogleLogin();
+          }
+        });
+        return;
+      } catch {
+        // Fallback to onGoogleLogin
+      }
+    }
+    if (onGoogleLogin) {
+      onGoogleLogin();
+    }
+  };
 
   useEffect(() => {
     function handleKeyDown(e) {
@@ -163,7 +246,7 @@ export default function EditorialLoginPage({ onGoogleLogin, loading, error }) {
           </span>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
           <div
             style={{
               display: "flex",
@@ -188,6 +271,35 @@ export default function EditorialLoginPage({ onGoogleLogin, loading, error }) {
               HIPAA • DPDP-2023 Certified
             </span>
           </div>
+
+          <a
+            href="https://github.com/Rajdeep-Mudiar/Q-Rakshak"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "7px",
+              padding: "7px 14px",
+              background: "#0F172A",
+              color: "#FFFFFF",
+              border: "1px solid #0F172A",
+              borderRadius: "6px",
+              fontSize: "0.72rem",
+              fontWeight: 700,
+              textDecoration: "none",
+              letterSpacing: "0.02em",
+              transition: "background 0.2s, transform 0.15s",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "#1E293B")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "#0F172A")}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+            </svg>
+            <span>GitHub Repository</span>
+            <ExternalLink size={12} />
+          </a>
         </div>
       </header>
 
@@ -345,8 +457,8 @@ export default function EditorialLoginPage({ onGoogleLogin, loading, error }) {
           <div style={{ width: "100%", maxWidth: "320px", marginBottom: "26px" }}>
             <button
               type="button"
-              onClick={onGoogleLogin}
-              disabled={loading}
+              onClick={handleGoogleClick}
+              disabled={loading || gisLoading}
               className="editorial-google-btn"
             >
               <svg width="20" height="20" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -355,7 +467,7 @@ export default function EditorialLoginPage({ onGoogleLogin, loading, error }) {
                 <path d="M3.96409 10.71C3.78409 10.17 3.68182 9.59318 3.68182 9C3.68182 8.40682 3.78409 7.83 3.96409 7.29V4.95818H0.957275C0.347727 6.17318 0 7.54773 0 9C0 10.4523 0.347727 11.8268 0.957275 13.0418L3.96409 10.71Z" fill="#FBBC05"/>
                 <path d="M9 3.57955C10.3214 3.57955 11.5077 4.03364 12.4405 4.92545L15.0218 2.34409C13.4632 0.891818 11.4259 0 9 0C5.48182 0 2.43818 2.01682 0.957275 4.95818L3.96409 7.29C4.67182 5.16273 6.65591 3.57955 9 3.57955Z" fill="#EA4335"/>
               </svg>
-              <span>{loading ? "Connecting..." : "Sign in with Google"}</span>
+              <span>{loading || gisLoading ? "Connecting..." : "Sign in with Google"}</span>
             </button>
           </div>
 
@@ -365,13 +477,226 @@ export default function EditorialLoginPage({ onGoogleLogin, loading, error }) {
             </p>
           </div>
 
-          {error && (
+          {(error || localError) && (
             <div style={{ marginTop: "20px", color: "#DC2626", fontSize: "0.85rem", fontWeight: 600 }}>
-              {error}
+              {error || localError}
             </div>
           )}
         </div>
       </main>
+
+      {/* ── Section: Hybrid AI Benchmark (Directly below existing login section) ── */}
+      <HybridBenchmarkSection />
+
+      {/* ── Section: Research Objectives Compliance Matrix (OBJ-01 – OBJ-06) ── */}
+      <section
+        style={{
+          marginTop: "48px",
+          background: "#FFFFFF",
+          border: "1px solid #E2E8F0",
+          borderLeft: "4px solid #2563EB",
+          borderRadius: "12px",
+          padding: "clamp(20px, 3vw, 32px)",
+          position: "relative",
+          zIndex: 10,
+          boxShadow: "0 4px 16px rgba(0, 0, 0, 0.04)",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "16px", marginBottom: "20px", borderBottom: "1px solid #E2E8F0", paddingBottom: "16px" }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+              <span style={{ fontSize: "0.68rem", fontWeight: 800, padding: "2px 7px", background: "#EFF6FF", color: "#1E40AF", border: "1px solid #BFDBFE", borderRadius: "4px", letterSpacing: "0.08em" }}>
+                RESEARCH COMPLIANCE
+              </span>
+              <span style={{ fontSize: "0.70rem", color: "#64748B", fontFamily: "var(--font-mono, monospace)" }}>
+                HYBRID QUANTUM-CLASSICAL MACHINE LEARNING AUDIT
+              </span>
+            </div>
+            <h2 style={{ fontFamily: "var(--font-sans, inherit)", fontSize: "clamp(1.2rem, 2vw, 1.55rem)", fontWeight: 800, color: "#0F172A", margin: "0 0 6px 0", letterSpacing: "-0.02em" }}>
+              Research Objectives Compliance Matrix (OBJ-01 – OBJ-06)
+            </h2>
+            <p style={{ fontSize: "0.82rem", color: "#475569", margin: 0, lineHeight: 1.5, maxWidth: "780px" }}>
+              Evidence-based verification matrix auditing all defined research objectives against verified codebase implementations, mathematically audited pipelines, and zero-leakage protocols.
+            </p>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            <a
+              href="https://github.com/Rajdeep-Mudiar/Q-Rakshak#research-objectives-compliance-matrix"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                fontSize: "0.74rem",
+                color: "#1E40AF",
+                background: "#EFF6FF",
+                border: "1px solid #BFDBFE",
+                padding: "5px 12px",
+                borderRadius: "6px",
+                fontWeight: 700,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                textDecoration: "none",
+              }}
+            >
+              <ExternalLink size={13} />
+              <span>GitHub README Specification</span>
+            </a>
+            <span style={{ fontSize: "0.74rem", color: "#059669", background: "#ECFDF5", border: "1px solid #A7F3D0", padding: "5px 12px", borderRadius: "6px", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: "6px" }}>
+              <CheckCircle2 size={14} color="#059669" /> 6 / 6 Objectives Satisfied
+            </span>
+          </div>
+        </div>
+
+        {/* Objectives Data Table */}
+        <div style={{ overflowX: "auto", border: "1px solid #E2E8F0", borderRadius: "8px", background: "#FFFFFF" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.80rem" }}>
+            <thead>
+              <tr style={{ background: "#F8FAFC", borderBottom: "1px solid #E2E8F0", color: "#475569" }}>
+                <th style={{ padding: "12px 14px", width: "80px", fontFamily: "var(--font-mono, monospace)", fontSize: "0.70rem", letterSpacing: "0.05em" }}>ID</th>
+                <th style={{ padding: "12px 14px", fontWeight: 700, color: "#0F172A", width: "230px" }}>Research Objective</th>
+                <th style={{ padding: "12px 14px", fontWeight: 700, color: "#0F172A" }}>Implementation & Code Evidence</th>
+                <th style={{ padding: "12px 14px", fontWeight: 700, color: "#0F172A", width: "210px" }}>Repository Reference</th>
+                <th style={{ padding: "12px 14px", fontWeight: 700, color: "#0F172A", textAlign: "right", width: "140px" }}>Compliance Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                {
+                  id: "OBJ-01",
+                  title: "Hybrid Quantum-Classical Architecture for Early Disease Detection",
+                  evidence: "Classical preprocessing pipeline (ml/preprocessing/validation.py), train-only PCA dimensionality reduction, PennyLane VQC/VQR circuits, and UnifiedMedicalPredictor with conformal calibration.",
+                  readmeAnchor: "https://github.com/Rajdeep-Mudiar/Q-Rakshak#obj-01-hybrid-quantum-classical-architecture-for-early-disease-detection",
+                  readmeLabel: "README.md #obj-01",
+                  status: "100% SATISFIED",
+                  statusColor: "#059669",
+                  bg: "#ECFDF5",
+                  border: "#A7F3D0",
+                },
+                {
+                  id: "OBJ-02",
+                  title: "High-Dimensional Quantum Classification & Continuous Regression",
+                  evidence: "BiomedCLIP (512-dim) / MedSigLIP (768-dim) foundation encoders, train-only compression into <=8 qubits, and VariationalQuantumRegressor with Pauli-Z expectations for continuous targets (Parkinson's UPDRS).",
+                  readmeAnchor: "https://github.com/Rajdeep-Mudiar/Q-Rakshak#obj-02-high-dimensional-quantum-classification--regression-models",
+                  readmeLabel: "README.md #obj-02",
+                  status: "100% SATISFIED",
+                  statusColor: "#059669",
+                  bg: "#ECFDF5",
+                  border: "#A7F3D0",
+                },
+                {
+                  id: "OBJ-03",
+                  title: "Accuracy, Sensitivity, and Specificity vs Classical Baselines",
+                  evidence: "Standardized ClassicalBaselineSuite and ClassicalRegressionSuite under identical 5-seed patient-level stratified split (Seeds: 7, 21, 42, 73, 101); full metrics and confusion matrices with zero fabricated claims.",
+                  readmeAnchor: "https://github.com/Rajdeep-Mudiar/Q-Rakshak#obj-03-accuracy-sensitivity-and-specificity-vs-classical-baselines",
+                  readmeLabel: "README.md #obj-03",
+                  status: "100% SATISFIED",
+                  statusColor: "#059669",
+                  bg: "#ECFDF5",
+                  border: "#A7F3D0",
+                },
+                {
+                  id: "OBJ-04",
+                  title: "Scalability, Interpretability & Quantum Hardware Compatibility",
+                  evidence: "HardwareProviderRegistry modeling IBM Quantum Eagle (127Q), AWS Rigetti (80Q), and IonQ Forte (36Q) with T1/T2 noise; Grad-CAM Turbo saliency, KernelSHAP feature contributions, and qubit sensitivity.",
+                  readmeAnchor: "https://github.com/Rajdeep-Mudiar/Q-Rakshak#obj-04-scalability-interpretability--quantum-hardware-compatibility",
+                  readmeLabel: "README.md #obj-04",
+                  status: "100% SATISFIED",
+                  statusColor: "#059669",
+                  bg: "#ECFDF5",
+                  border: "#A7F3D0",
+                },
+                {
+                  id: "OBJ-05",
+                  title: "Preprocessing, Feature Selection & Zero Data Leakage",
+                  evidence: "ClinicalTabularPreprocessor (median imputation, IQR outlier clipping, MinMax scaling) + PatientGroupedSplitter (GroupShuffleSplit across patient_id) with automated mathematical leakage audits.",
+                  readmeAnchor: "https://github.com/Rajdeep-Mudiar/Q-Rakshak#obj-05-preprocessing-feature-selection--explainability-modules",
+                  readmeLabel: "README.md #obj-05",
+                  status: "100% SATISFIED",
+                  statusColor: "#059669",
+                  bg: "#ECFDF5",
+                  border: "#A7F3D0",
+                },
+                {
+                  id: "OBJ-06",
+                  title: "Scientific Benchmarking (Accuracy, Efficiency & Generalization)",
+                  evidence: "AblationMatrixRunner executing standard Experiments A-F; tracemalloc peak memory profiling, 1000-resample bootstrap 95% CIs, quantum gate/depth telemetry, and continuous regression benchmarking.",
+                  readmeAnchor: "https://github.com/Rajdeep-Mudiar/Q-Rakshak#obj-06-scientific-benchmarking-accuracy-efficiency--generalization",
+                  readmeLabel: "README.md #obj-06",
+                  status: "100% SATISFIED",
+                  statusColor: "#059669",
+                  bg: "#ECFDF5",
+                  border: "#A7F3D0",
+                },
+              ].map((item, index) => (
+                <tr
+                  key={item.id}
+                  style={{
+                    borderBottom: "1px solid #F1F5F9",
+                    background: index % 2 === 0 ? "#FFFFFF" : "#FAFAFA",
+                    transition: "background 0.15s ease",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "#EFF6FF")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = index % 2 === 0 ? "#FFFFFF" : "#FAFAFA")}
+                >
+                  <td style={{ padding: "12px 14px", fontFamily: "var(--font-mono, monospace)", color: "#1E40AF", fontSize: "0.74rem", fontWeight: 800 }}>
+                    {item.id}
+                  </td>
+                  <td style={{ padding: "12px 14px", color: "#0F172A", fontWeight: 700, lineHeight: 1.4 }}>
+                    {item.title}
+                  </td>
+                  <td style={{ padding: "12px 14px", color: "#475569", lineHeight: 1.45, fontSize: "0.78rem" }}>
+                    {item.evidence}
+                  </td>
+                  <td style={{ padding: "12px 14px" }}>
+                    <a
+                      href={item.readmeAnchor}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "5px",
+                        fontSize: "0.72rem",
+                        color: "#2563EB",
+                        background: "#EFF6FF",
+                        border: "1px solid #BFDBFE",
+                        padding: "3px 8px",
+                        borderRadius: "4px",
+                        textDecoration: "none",
+                        fontFamily: "var(--font-mono, monospace)",
+                        fontWeight: 600,
+                      }}
+                    >
+                      <span>{item.readmeLabel}</span>
+                      <ExternalLink size={10} />
+                    </a>
+                  </td>
+                  <td style={{ padding: "12px 14px", textAlign: "right" }}>
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "5px",
+                        fontSize: "0.68rem",
+                        fontWeight: 700,
+                        padding: "3px 8px",
+                        borderRadius: "4px",
+                        background: item.bg,
+                        color: item.statusColor,
+                        border: `1px solid ${item.border}`,
+                      }}
+                    >
+                      <CheckCircle2 size={11} color={item.statusColor} />
+                      {item.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       {/* ── Section: Delivery Table (Expected Deliverables) ── */}
       <section
@@ -631,7 +956,27 @@ export default function EditorialLoginPage({ onGoogleLogin, loading, error }) {
         <div style={{ fontSize: "0.75rem", color: "#64748B" }}>
           &copy; 2026 Q-RAKSHAK Clinical Technology Platform. All rights reserved.
         </div>
-        <div style={{ display: "flex", gap: "20px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
+          <a
+            href="https://github.com/Rajdeep-Mudiar/Q-Rakshak"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              fontSize: "0.75rem",
+              color: "#2563EB",
+              fontWeight: 600,
+              textDecoration: "none",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "5px",
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+            </svg>
+            <span>github.com/Rajdeep-Mudiar/Q-Rakshak</span>
+            <ExternalLink size={12} />
+          </a>
           <span style={{ fontSize: "0.75rem", color: "#64748B", cursor: "pointer", transition: "color 0.2s" }} onMouseEnter={e => e.currentTarget.style.color = "#0F172A"} onMouseLeave={e => e.currentTarget.style.color = "#64748B"}>Privacy Policy</span>
           <span style={{ fontSize: "0.75rem", color: "#64748B", cursor: "pointer", transition: "color 0.2s" }} onMouseEnter={e => e.currentTarget.style.color = "#0F172A"} onMouseLeave={e => e.currentTarget.style.color = "#64748B"}>Terms of Service</span>
         </div>

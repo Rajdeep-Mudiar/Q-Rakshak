@@ -20,6 +20,17 @@ export const authApi = {
     return data;
   },
 
+  async verifyGoogleCredential(credential, role = "patient") {
+    if (!credential) return null;
+    const data = await apiClient.post(ENDPOINTS.AUTH_GOOGLE_VERIFY, { credential, role });
+    if (data && data.access_token) {
+      localStorage.setItem("qmed_token", data.access_token);
+      localStorage.setItem("qmed_user", JSON.stringify(data.user));
+      return data.user;
+    }
+    return null;
+  },
+
   async loginWithGoogleToken(token) {
     if (!token) return null;
     localStorage.setItem("qmed_token", token);

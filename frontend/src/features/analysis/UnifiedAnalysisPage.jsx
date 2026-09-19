@@ -58,6 +58,7 @@ import EditorialHomePage from "../home/EditorialHomePage.jsx";
 import EmptyState from "../../components/common/EmptyState.jsx";
 import SquareLoader from "../../components/common/SquareLoader.jsx";
 import { AIDoctorConsultationPage } from "../ai_doctor/index.js";
+import PredictionTimeline from "./components/PredictionTimeline.jsx";
 
 import { clinicalApi } from "../../api/clinical";
 import { reportsApi } from "../../api/reports";
@@ -977,7 +978,14 @@ export default function UnifiedAnalysisPage() {
   if (!currentUser) {
     return (
       <EditorialLoginPage
-        onGoogleLogin={() => { window.location.href = ENDPOINTS.AUTH_GOOGLE; }}
+        onGoogleLogin={() => {
+          const returnUrl = encodeURIComponent(window.location.origin + window.location.pathname);
+          window.location.href = `${ENDPOINTS.AUTH_GOOGLE}?redirect_url=${returnUrl}`;
+        }}
+        onGoogleVerifySuccess={(user) => {
+          setCurrentUser(user);
+          setPatientId(resolvePatientId(user));
+        }}
         loading={loading}
         error={error}
       />
@@ -1102,7 +1110,7 @@ export default function UnifiedAnalysisPage() {
 
           {/* ── 3-COLUMN UNIFIED DIAGNOSTIC COCKPIT ────────────────────────── */}
           {activeTab === "diagnostic" && (
-            <div style={{ display: "flex", flexDirection: "column", height: "100%", gap: "6px" }}>
+            <div style={{ display: "flex", flexDirection: "column", height: "100%", overflowY: "auto", gap: "10px", paddingRight: "4px" }}>
               {/* Step Workflow Guide */}
               <div className="workflow-stepper">
                 <div className={`step-chip ${study ? "active" : ""}`}>
@@ -1121,8 +1129,8 @@ export default function UnifiedAnalysisPage() {
                 style={{
                   gridTemplateColumns: twinCollapsed ? "1fr 44px" : "1fr 420px",
                   transition: "grid-template-columns 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
-                  flex: 1,
-                  minHeight: 0,
+                  minHeight: "580px",
+                  flexShrink: 0,
                 }}
               >
                 {/* COLUMN 1: Clinical Checkup & Diagnostic Intelligence */}
@@ -1673,6 +1681,14 @@ export default function UnifiedAnalysisPage() {
                 </div>
                 )}
               </div>
+
+              {/* Longitudinal Health Prediction Timeline & OLS Trend Analysis */}
+              <PredictionTimeline
+                patientId={patientId}
+                currentUser={currentUser}
+                lastPredictionResult={result}
+                activeStudy={study}
+              />
             </div>
           )}
 

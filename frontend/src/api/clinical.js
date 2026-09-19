@@ -26,8 +26,14 @@ export const clinicalApi = {
     return apiClient.get(ENDPOINTS.CLINICAL_FEATURES(patientId, disease));
   },
 
-  async getPatientTimeline(patientId = "USR-5EF52B") {
-    return apiClient.get(ENDPOINTS.CLINICAL_TIMELINE(patientId));
+  async getPatientTimeline(patientId = "USR-5EF52B", timeFilter = "30 Days", startDate = null, endDate = null, disease = null) {
+    const params = new URLSearchParams();
+    if (timeFilter) params.append("time_filter", timeFilter);
+    if (disease && disease !== "all" && disease !== "All Diseases") params.append("disease", disease);
+    if (startDate) params.append("start_date", startDate);
+    if (endDate) params.append("end_date", endDate);
+    const query = params.toString() ? `?${params.toString()}` : "";
+    return apiClient.get(`${ENDPOINTS.CLINICAL_TIMELINE(patientId)}${query}`);
   },
 
   async saveDiagnosticRecord(record) {
