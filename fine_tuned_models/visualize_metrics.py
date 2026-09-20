@@ -168,7 +168,7 @@ def plot_master_dashboard(base_dirs: list[str | Path], save_path: str | Path):
 
 
 def plot_benchmark_bars(benchmark_path: str | Path, output_dir: str | Path):
-    """Generates comparison bar charts from benchmark_summary.json."""
+    """Generates clean, non-overlapping comparison bar charts from benchmark_summary.json."""
     bp = Path(benchmark_path)
     if not bp.exists():
         return
@@ -186,25 +186,43 @@ def plot_benchmark_bars(benchmark_path: str | Path, output_dir: str | Path):
             
         model_names = list(models.keys())
         n_models = len(model_names)
-        x = np.arange(len(metric_labels))
-        width = 0.8 / max(1, n_models)
+        x = np.arange(len(metric_labels)) * 1.3
+        width = min(0.24, 0.9 / max(1, n_models))
         
-        fig, ax = plt.subplots(figsize=(10, 5.5), dpi=140)
+        fig, ax = plt.subplots(figsize=(11, 5.8), dpi=140)
         
         for i, model in enumerate(model_names):
             vals = [models[model].get(k, 0.0) for k in metrics_keys]
             offset = (i - n_models / 2 + 0.5) * width
-            bars = ax.bar(x + offset, vals, width, label=model, color=colors[i % len(colors)], alpha=0.9, edgecolor='black', linewidth=0.6)
+            bars = ax.bar(x + offset, vals, width, label=model, color=colors[i % len(colors)], alpha=0.9, edgecolor='#222222', linewidth=0.7)
             for bar in bars:
                 h = bar.get_height()
-                ax.text(bar.get_x() + bar.get_width() / 2, h + 0.015, f"{h:.2f}", ha='center', va='bottom', fontsize=8)
+                ax.text(
+                    bar.get_x() + bar.get_width() / 2,
+                    h + 0.015,
+                    f"{h:.2f}",
+                    ha='center',
+                    va='bottom',
+                    fontsize=8.5,
+                    fontweight='semibold',
+                    color='#333333'
+                )
                 
         ax.set_ylabel("Score (0.00 - 1.00)", fontsize=11, fontweight="bold")
-        ax.set_title(f"Clinical Model Benchmark Comparison — {disease.replace('_', ' ').title()}", fontsize=12, fontweight="bold")
+        ax.set_title(f"Clinical Model Benchmark Comparison — {disease.replace('_', ' ').title()}", fontsize=13, fontweight="bold", pad=35)
         ax.set_xticks(x)
-        ax.set_xticklabels(metric_labels, fontsize=10, fontweight="bold")
-        ax.set_ylim(0, 1.15)
-        ax.legend(frameon=True, facecolor='white', loc='upper right')
+        ax.set_xticklabels(metric_labels, fontsize=10.5, fontweight="bold")
+        ax.set_ylim(0, 1.12)
+        ax.legend(
+            bbox_to_anchor=(0.5, 1.13),
+            loc='upper center',
+            ncol=min(4, n_models),
+            frameon=True,
+            facecolor='white',
+            framealpha=0.98,
+            edgecolor='#cccccc',
+            fontsize=9.5,
+        )
         ax.grid(True, linestyle=':', alpha=0.6, axis='y')
         
         save_file = Path(output_dir) / disease / "benchmark_comparison.png"
