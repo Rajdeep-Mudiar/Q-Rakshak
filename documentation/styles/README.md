@@ -4,7 +4,7 @@ This directory documents Q-RAKSHAK's aesthetic design system, typography tokens,
 
 ---
 
-## 🎨 Design Principles
+## Design Principles
 - **Clinical Clarity First**: High legibility, strict contrast ratios, unambiguous diagnostic states.
 - **Quantum Editorial Elegance**: Clean Swiss typography paired with subtle quantum ambient glows and dark cybernetic accents.
 - **Continuous Fluid Motion**: GSAP ScrollTrigger timelines dynamically interpolating background colors across clinical sections.

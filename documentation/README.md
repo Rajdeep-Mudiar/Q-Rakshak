@@ -18,97 +18,97 @@
 
 ---
 
-## 📑 Master Table of Contents
+## Master Table of Contents
 
 ```
 documentation/
-├── README.md                           # Master Architecture Portal (this document)
-│
-├── apis/                               # Complete Backend REST & WebSocket Specifications
-│   ├── README.md                       # API Catalog, Conventions, and Error Schemas
-│   ├── clinical_api.md                 # Triage Assessment, Longitudinal History, Emergency Card
-│   ├── quantum_endpoints.md            # VQC Inference, QSVM Overlaps, Noise Telemetry
-│   └── auth_and_users.md               # Google OAuth 2.0, RS256 Verification, JWT Lifecycle & RBAC
-│
-├── models/                             # Mathematical Formulations, Architectures & Evaluations
-│   ├── README.md                       # Machine Learning & Quantum Overview
-│   ├── breast_cancer.md                # WDBC Cohort: OncoPulse-VQC/QSVM vs Sentinel-RF/SVM
-│   ├── heart_disease.md                # Cleveland Cohort: CardioWave-VQC vs Sentinel-XGB/MLP
-│   ├── parkinsons.md                   # Phonation Cohort: NeuroSynapse-VQC vs Sentinel-RF/LogReg
-│   ├── diabetes.md                     # Pima Cohort: Diabetes-VQC vs Sentinel-RF/XGB
-│   ├── quantum_algorithms.md           # PennyLane Topologies, Angle Maps, Pauli-Z Measurements
-│   ├── benchmarks_and_metrics.md       # Consolidated 13-Model Cross-Disease Benchmark Matrix
-│   └── safety_and_fallback.md          # Classical Sentinel Fallback Protocols & OOD Gating
-│
-├── features/                           # Clinical Feature Implementations
-│   ├── README.md                       # Clinical Capabilities Index
-│   ├── triage_engine.md                # 5-Tier ESI Deterministic Algorithm & Danger Thresholds
-│   ├── digital_twin_3d.md              # Three.js / React-Three-Fiber Anatomical Simulation
-│   ├── emergency_passport.md           # Zero-Network Offline Emergency Medical Passport
-│   └── longitudinal_tracker.md         # OLS Regression, Trend Alerts, Same-Day Aggregation
-│
-├── styles/                             # Editorial UI Design System & GSAP Transitions
-│   ├── README.md                       # UI Style Philosophy
-│   ├── design_system.md                # Typography, Grid, Glassmorphic Panels, Breakpoints
-│   └── color_palettes.md               # Disease Ambient Themes & GSAP ScrollTrigger Specs
-│
-└── guide/                              # Governance, Compliance & Developer Runbooks
-    ├── README.md                       # Operational Hub
-    ├── quickstart.md                   # Setup Runbook, Conda/venv, Database Seeding, Tests
-    ├── research_objectives.md          # Formal Proofs & Code Evidence for OBJ-01 to OBJ-06
-    ├── compliance_hipaa_dpdp.md        # DPDP Act 2023 & HIPAA Security/Privacy Compliance
-    └── database_schema.md              # Prisma ER Models, SQLite/Postgres Tables & Indexes
+ README.md                           # Master Architecture Portal (this document)
+
+ apis/                               # Complete Backend REST & WebSocket Specifications
+    README.md                       # API Catalog, Conventions, and Error Schemas
+    clinical_api.md                 # Triage Assessment, Longitudinal History, Emergency Card
+    quantum_endpoints.md            # VQC Inference, QSVM Overlaps, Noise Telemetry
+    auth_and_users.md               # Google OAuth 2.0, RS256 Verification, JWT Lifecycle & RBAC
+
+ models/                             # Mathematical Formulations, Architectures & Evaluations
+    README.md                       # Machine Learning & Quantum Overview
+    breast_cancer.md                # WDBC Cohort: OncoPulse-VQC/QSVM vs Sentinel-RF/SVM
+    heart_disease.md                # Cleveland Cohort: CardioWave-VQC vs Sentinel-XGB/MLP
+    parkinsons.md                   # Phonation Cohort: NeuroSynapse-VQC vs Sentinel-RF/LogReg
+    diabetes.md                     # Pima Cohort: Diabetes-VQC vs Sentinel-RF/XGB
+    quantum_algorithms.md           # PennyLane Topologies, Angle Maps, Pauli-Z Measurements
+    benchmarks_and_metrics.md       # Consolidated 13-Model Cross-Disease Benchmark Matrix
+    safety_and_fallback.md          # Classical Sentinel Fallback Protocols & OOD Gating
+
+ features/                           # Clinical Feature Implementations
+    README.md                       # Clinical Capabilities Index
+    triage_engine.md                # 5-Tier ESI Deterministic Algorithm & Danger Thresholds
+    digital_twin_3d.md              # Three.js / React-Three-Fiber Anatomical Simulation
+    emergency_passport.md           # Zero-Network Offline Emergency Medical Passport
+    longitudinal_tracker.md         # OLS Regression, Trend Alerts, Same-Day Aggregation
+
+ styles/                             # Editorial UI Design System & GSAP Transitions
+    README.md                       # UI Style Philosophy
+    design_system.md                # Typography, Grid, Glassmorphic Panels, Breakpoints
+    color_palettes.md               # Disease Ambient Themes & GSAP ScrollTrigger Specs
+
+ guide/                              # Governance, Compliance & Developer Runbooks
+     README.md                       # Operational Hub
+     quickstart.md                   # Setup Runbook, Conda/venv, Database Seeding, Tests
+     research_objectives.md          # Formal Proofs & Code Evidence for OBJ-01 to OBJ-06
+     compliance_hipaa_dpdp.md        # DPDP Act 2023 & HIPAA Security/Privacy Compliance
+     database_schema.md              # Prisma ER Models, SQLite/Postgres Tables & Indexes
 ```
 
 ---
 
-## 🏛️ System Architecture Overview
+## System Architecture Overview
 
 Q-RAKSHAK bridges deep classical feature extractors and PennyLane quantum variational circuits through an audited 7-stage pipeline:
 
 ```
 [Clinical Modality Input (Tabular / Image / Phonation / Vitals)]
-                             │
-                             ▼
+                             
+                             
      [Stage 1: Validation & Integrity Gate] (ml.preprocessing.validation)
      - Type enforcement, missing value bounds, IQR boundary clipping
-                             │
-                             ▼
+                             
+                             
      [Stage 2: 11-Modality Router] (ml.models.router)
      - Direct Tabular  |  BiomedCLIP (512-dim)  |  MedSigLIP (768-dim)
-                             │
-                             ▼
+                             
+                             
      [Stage 3: Train-Only Dimensionality Reduction] (ml.preprocessing.reduction)
      - PCA & Mutual Information compression into N_q <= 8 Qubit Budgets
-                             │
-        ┌────────────────────┴────────────────────┐
-        ▼                                         ▼
+                             
+        
+                                                 
  [Stage 4A: Quantum Suite]               [Stage 4B: Classical Sentinel Suite]
  - Variational Quantum Classifier (VQC)   - Random Forest (Sentinel-RF)
  - Quantum Kernel Engine (QSVM)           - Support Vector Machine (Sentinel-SVM)
  - Pauli-Z Expectation Readings           - Gradient Boosted Trees (Sentinel-XGB)
  - Barren Plateau Telemetry Monitoring    - Multi-Layer Perceptron (Sentinel-MLP)
-        │                                         │
-        └────────────────────┬────────────────────┘
-                             ▼
+                                                 
+        
+                             
      [Stage 5: Uncertainty & OOD Calibration Gate] (ml.uncertainty)
      - Pooled Mahalanobis Distance Gating (D_M > threshold -> Abstention)
      - Temperature Scaling (Minimizing Negative Log-Likelihood & ECE)
      - Inductive Split-Conformal Prediction Sets (1 - alpha Coverage)
-                             │
-                             ▼
+                             
+                             
      [Stage 6: Clinical Decision & Fallback Routing]
      - Evaluates Specificity >= 0.80 & ECE <= 0.10
      - Autonomous Fallback to Classical Sentinel if Quantum Specificity Fails
-                             │
-                             ▼
+                             
+                             
      [Stage 7: Unified Clinical Output Contract & Explainability Pass]
      - Grad-CAM Lesion Heatmaps, KernelSHAP Biomarkers, Parameter Gradients
 ```
 
 ---
 
-## 📊 Core Evaluated Disease Benchmarks
+## Core Evaluated Disease Benchmarks
 
 Summary of verified empirical evaluations across the 4 primary clinical tracks:
 
@@ -151,7 +151,7 @@ Summary of verified empirical evaluations across the 4 primary clinical tracks:
 
 ---
 
-## 🔬 Research Objectives Audit (OBJ-01 to OBJ-06)
+## Research Objectives Audit (OBJ-01 to OBJ-06)
 
 Every objective was subjected to rigorous empirical testing:
 
@@ -164,7 +164,7 @@ Every objective was subjected to rigorous empirical testing:
 
 ---
 
-## 🏥 Clinical Capabilities
+## Clinical Capabilities
 
 - **Emergency Severity Index (ESI 1–5)**: Deterministic rule-based clinical prioritization ensuring critical patients receive immediate life-saving care within 0 to 10 minutes.
 - **3D Anatomical Digital Twin**: Real-time Three.js spatial visualization highlighting multi-organ risks across the brain, lungs, heart, liver, and pancreas.
@@ -173,7 +173,7 @@ Every objective was subjected to rigorous empirical testing:
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 | Layer | Technologies |
 |---|---|
@@ -185,5 +185,5 @@ Every objective was subjected to rigorous empirical testing:
 
 ---
 
-## 📜 License
+## License
 MIT License. Copyright (c) 2026 Q-RAKSHAK Development Team. See [LICENSE](LICENSE) for details.

@@ -4,7 +4,7 @@ This directory details all REST and WebSocket contracts implemented in Q-RAKSHAK
 
 ---
 
-## 📑 Contents
+## Contents
 
 1. [API Architecture & Standards](#api-architecture--standards)
 2. [Authentication & RBAC](#authentication--rbac)

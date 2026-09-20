@@ -7,17 +7,17 @@ Q-RAKSHAK utilizes a relational database architecture managed via **Prisma ORM**
 ## 1. Entity-Relationship Diagram
 
 ```
-┌────────────────┐          ┌───────────────────────┐
-│     Users      │ 1      * │      Assessments      │
-│ (Patient/Staff)├──────────┤   (ESI Triage & AI)   │
-└───────┬────────┘          └───────────┬───────────┘
-        │ 1                                 │ 1
-        │                                   │
-        │ *                                 │ *
-┌───────┴────────┐          ┌───────────┴───────────┐
-│ Consultations  │          │    VitalTelemetries   │
-│ &Prescriptions │          │  (Longitudinal Store) │
-└────────────────┘          └───────────────────────┘
+          
+     Users       1      *       Assessments      
+ (Patient/Staff)   (ESI Triage & AI)   
+          
+         1                                  1
+                                           
+         *                                  *
+          
+ Consultations                VitalTelemetries   
+ &Prescriptions             (Longitudinal Store) 
+          
 ```
 
 ---

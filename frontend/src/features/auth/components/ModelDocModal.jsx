@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { X, ExternalLink, Cpu, Zap, ArrowUpRight } from "lucide-react";
+import { X, ArrowUpRight } from "lucide-react";
 import { MODEL_DOCS_REGISTRY } from "./ModelDocModalRegistry.js";
 
 export default function ModelDocModal({ modelName, modelData, onClose }) {
@@ -49,15 +49,15 @@ export default function ModelDocModal({ modelName, modelData, onClose }) {
         zIndex: 9999,
         display: "flex",
         justifyContent: "flex-end",
-        backgroundColor: "rgba(0, 0, 0, 0.75)",
-        backdropFilter: "blur(4px)",
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        backdropFilter: "blur(5px)",
       }}
       onClick={onClose}
     >
       <div
         style={{
           width: "100%",
-          maxWidth: "640px",
+          maxWidth: "680px",
           height: "100%",
           backgroundColor: "#0A0A0A",
           borderLeft: "1px solid rgba(255, 255, 255, 0.15)",
@@ -65,7 +65,7 @@ export default function ModelDocModal({ modelName, modelData, onClose }) {
           flexDirection: "column",
           overflowY: "auto",
           color: "#EDEDED",
-          padding: "clamp(24px, 4vw, 40px)",
+          padding: "clamp(20px, 3.5vw, 36px)",
           position: "relative",
           borderRadius: "0px",
           boxSizing: "border-box",
@@ -80,8 +80,8 @@ export default function ModelDocModal({ modelName, modelData, onClose }) {
             justifyContent: "space-between",
             alignItems: "flex-start",
             borderBottom: "1px solid rgba(255, 255, 255, 0.12)",
-            paddingBottom: "24px",
-            marginBottom: "28px",
+            paddingBottom: "20px",
+            marginBottom: "24px",
           }}
         >
           <div>
@@ -90,7 +90,7 @@ export default function ModelDocModal({ modelName, modelData, onClose }) {
                 display: "flex",
                 alignItems: "center",
                 gap: "8px",
-                marginBottom: "8px",
+                marginBottom: "6px",
                 fontFamily: "var(--font-mono, monospace)",
                 fontSize: "0.68rem",
                 letterSpacing: "0.18em",
@@ -99,13 +99,13 @@ export default function ModelDocModal({ modelName, modelData, onClose }) {
               }}
             >
               <span>{model.category}</span>
-              <span>•</span>
+              <span>//</span>
               <span>{model.disease}</span>
             </div>
 
             <h2
               style={{
-                fontSize: "1.8rem",
+                fontSize: "clamp(1.5rem, 3.2vw, 2.0rem)",
                 fontWeight: 400,
                 margin: 0,
                 letterSpacing: "-0.02em",
@@ -118,8 +118,8 @@ export default function ModelDocModal({ modelName, modelData, onClose }) {
 
             <p
               style={{
-                fontSize: "0.82rem",
-                color: "#888888",
+                fontSize: "0.80rem",
+                color: "#999999",
                 margin: "4px 0 0 0",
                 fontFamily: "var(--font-mono, monospace)",
               }}
@@ -131,6 +131,7 @@ export default function ModelDocModal({ modelName, modelData, onClose }) {
           <button
             type="button"
             onClick={onClose}
+            aria-label="Close documentation drawer"
             style={{
               background: "transparent",
               border: "1px solid rgba(255, 255, 255, 0.2)",
@@ -162,8 +163,8 @@ export default function ModelDocModal({ modelName, modelData, onClose }) {
             border: "1px solid rgba(255, 255, 255, 0.15)",
             backgroundColor: "#111111",
             borderRadius: "0px",
-            padding: "16px 18px",
-            marginBottom: "28px",
+            padding: "14px 16px",
+            marginBottom: "24px",
           }}
         >
           <div
@@ -191,7 +192,7 @@ export default function ModelDocModal({ modelName, modelData, onClose }) {
         </div>
 
         {/* Key Metrics Grid */}
-        <div style={{ marginBottom: "28px" }}>
+        <div style={{ marginBottom: "26px" }}>
           <div
             style={{
               fontFamily: "var(--font-mono, monospace)",
@@ -199,7 +200,7 @@ export default function ModelDocModal({ modelName, modelData, onClose }) {
               letterSpacing: "0.18em",
               color: "#777777",
               textTransform: "uppercase",
-              marginBottom: "12px",
+              marginBottom: "10px",
             }}
           >
             01 // AUDITED BENCHMARK METRICS
@@ -208,7 +209,7 @@ export default function ModelDocModal({ modelName, modelData, onClose }) {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
+              gridTemplateColumns: "repeat(auto-fit, minmax(95px, 1fr))",
               gap: "1px",
               backgroundColor: "rgba(255, 255, 255, 0.12)",
               border: "1px solid rgba(255, 255, 255, 0.12)",
@@ -230,24 +231,25 @@ export default function ModelDocModal({ modelName, modelData, onClose }) {
                 key={metric.label}
                 style={{
                   backgroundColor: "#0F0F0F",
-                  padding: "14px 12px",
+                  padding: "12px 10px",
                   borderRadius: "0px",
                 }}
               >
                 <span
                   style={{
-                    fontSize: "0.62rem",
+                    fontSize: "0.60rem",
                     color: "#777777",
                     fontFamily: "var(--font-mono, monospace)",
                     display: "block",
-                    letterSpacing: "0.1em",
+                    letterSpacing: "0.08em",
+                    marginBottom: "4px",
                   }}
                 >
                   {metric.label}
                 </span>
                 <strong
                   style={{
-                    fontSize: "1.05rem",
+                    fontSize: "0.98rem",
                     color: "#FFFFFF",
                     fontFamily: "var(--font-mono, monospace)",
                     fontWeight: 600,
@@ -261,7 +263,7 @@ export default function ModelDocModal({ modelName, modelData, onClose }) {
         </div>
 
         {/* Technical Specification Rows */}
-        <div style={{ marginBottom: "36px" }}>
+        <div style={{ marginBottom: "26px" }}>
           <div
             style={{
               fontFamily: "var(--font-mono, monospace)",
@@ -269,7 +271,7 @@ export default function ModelDocModal({ modelName, modelData, onClose }) {
               letterSpacing: "0.18em",
               color: "#777777",
               textTransform: "uppercase",
-              marginBottom: "12px",
+              marginBottom: "10px",
             }}
           >
             02 // ARCHITECTURE & HARDWARE SPECIFICATION
@@ -297,25 +299,25 @@ export default function ModelDocModal({ modelName, modelData, onClose }) {
                 key={spec.key}
                 style={{
                   backgroundColor: "#0F0F0F",
-                  padding: "14px 16px",
+                  padding: "12px 14px",
                   borderRadius: "0px",
                 }}
               >
                 <span
                   style={{
-                    fontSize: "0.64rem",
+                    fontSize: "0.62rem",
                     color: "#888888",
                     fontFamily: "var(--font-mono, monospace)",
-                    letterSpacing: "0.12em",
+                    letterSpacing: "0.10em",
                     display: "block",
-                    marginBottom: "4px",
+                    marginBottom: "3px",
                   }}
                 >
                   {spec.key}
                 </span>
                 <span
                   style={{
-                    fontSize: "0.82rem",
+                    fontSize: "0.80rem",
                     color: "#E5E5E5",
                     fontFamily: "var(--font-mono, monospace)",
                     wordBreak: "break-word",
@@ -328,12 +330,214 @@ export default function ModelDocModal({ modelName, modelData, onClose }) {
           </div>
         </div>
 
+        {/* 03 // EMPIRICAL TRAINING & VALIDATION CONVERGENCE DYNAMICS */}
+        <div style={{ marginBottom: "32px" }}>
+          <div
+            style={{
+              fontFamily: "var(--font-mono, monospace)",
+              fontSize: "0.68rem",
+              letterSpacing: "0.18em",
+              color: "#777777",
+              textTransform: "uppercase",
+              marginBottom: "10px",
+            }}
+          >
+            03 // EMPIRICAL CONVERGENCE DYNAMICS: LOSS & ACCURACY PROFILES
+          </div>
+
+          <div
+            style={{
+              border: "1px solid rgba(255, 255, 255, 0.15)",
+              backgroundColor: "#0D0D0D",
+              padding: "16px",
+              borderRadius: "0px",
+              boxSizing: "border-box",
+            }}
+          >
+            {/* Proper Graph Heading */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+                flexWrap: "wrap",
+                gap: "8px",
+                marginBottom: "12px",
+                borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                paddingBottom: "10px",
+              }}
+            >
+              <div>
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono, monospace)",
+                    fontSize: "0.76rem",
+                    fontWeight: 700,
+                    letterSpacing: "0.06em",
+                    color: "#FFFFFF",
+                    textTransform: "uppercase",
+                    display: "block",
+                  }}
+                >
+                  {model.graphHeading || "EMPIRICAL CONVERGENCE DYNAMICS"}
+                </span>
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono, monospace)",
+                    fontSize: "0.68rem",
+                    color: "#888888",
+                    display: "block",
+                    marginTop: "2px",
+                  }}
+                >
+                  {model.graphSubtitle || "Training Loss vs Validation Loss & Accuracy Progression"}
+                </span>
+              </div>
+
+              <span
+                style={{
+                  fontFamily: "var(--font-mono, monospace)",
+                  fontSize: "0.62rem",
+                  color: "#A7F3D0",
+                  letterSpacing: "0.08em",
+                  border: "1px solid rgba(167, 243, 208, 0.3)",
+                  padding: "3px 8px",
+                  borderRadius: "0px",
+                  textTransform: "uppercase",
+                }}
+              >
+                {model.convergenceStatus || "AUDITED EMPIRICAL RUN"}
+              </span>
+            </div>
+
+            {/* Embedded Training & Validation Graph Screenshot */}
+            {model.screenshotUrl && (
+              <div
+                style={{
+                  width: "100%",
+                  backgroundColor: "#FFFFFF",
+                  padding: "4px",
+                  boxSizing: "border-box",
+                  borderRadius: "0px",
+                  overflow: "hidden",
+                  marginBottom: "14px",
+                }}
+              >
+                <img
+                  src={model.screenshotUrl}
+                  alt={model.graphHeading || "Empirical Convergence Curves"}
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    display: "block",
+                    borderRadius: "0px",
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Loss Trajectory Metrics Grid */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: "1px",
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                marginBottom: "14px",
+              }}
+            >
+              <div style={{ backgroundColor: "#141414", padding: "8px 10px" }}>
+                <span
+                  style={{
+                    fontSize: "0.58rem",
+                    color: "#888888",
+                    fontFamily: "var(--font-mono, monospace)",
+                    display: "block",
+                    letterSpacing: "0.06em",
+                  }}
+                >
+                  INITIAL LOSS
+                </span>
+                <strong
+                  style={{
+                    fontSize: "0.85rem",
+                    color: "#E2E8F0",
+                    fontFamily: "var(--font-mono, monospace)",
+                  }}
+                >
+                  {model.initialLoss || "N/A"}
+                </strong>
+              </div>
+
+              <div style={{ backgroundColor: "#141414", padding: "8px 10px" }}>
+                <span
+                  style={{
+                    fontSize: "0.58rem",
+                    color: "#888888",
+                    fontFamily: "var(--font-mono, monospace)",
+                    display: "block",
+                    letterSpacing: "0.06em",
+                  }}
+                >
+                  FINAL TRAIN LOSS
+                </span>
+                <strong
+                  style={{
+                    fontSize: "0.85rem",
+                    color: "#93C5FD",
+                    fontFamily: "var(--font-mono, monospace)",
+                  }}
+                >
+                  {model.finalLoss || "N/A"}
+                </strong>
+              </div>
+
+              <div style={{ backgroundColor: "#141414", padding: "8px 10px" }}>
+                <span
+                  style={{
+                    fontSize: "0.58rem",
+                    color: "#888888",
+                    fontFamily: "var(--font-mono, monospace)",
+                    display: "block",
+                    letterSpacing: "0.06em",
+                  }}
+                >
+                  FINAL VAL LOSS
+                </span>
+                <strong
+                  style={{
+                    fontSize: "0.85rem",
+                    color: "#FCA5A5",
+                    fontFamily: "var(--font-mono, monospace)",
+                  }}
+                >
+                  {model.valLoss || "N/A"}
+                </strong>
+              </div>
+            </div>
+
+            {/* Detailed Convergence Explanation Text */}
+            <p
+              style={{
+                fontSize: "0.78rem",
+                color: "#C4C4C4",
+                margin: 0,
+                lineHeight: 1.65,
+                fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+              }}
+            >
+              {model.graphAnalysis}
+            </p>
+          </div>
+        </div>
+
         {/* Footer Action */}
         <div
           style={{
             marginTop: "auto",
             borderTop: "1px solid rgba(255, 255, 255, 0.12)",
-            paddingTop: "24px",
+            paddingTop: "20px",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
@@ -349,7 +553,7 @@ export default function ModelDocModal({ modelName, modelData, onClose }) {
               letterSpacing: "0.1em",
             }}
           >
-            Q-RAKSHAK // SIH-26139
+            Q-RAKSHAK // SIH-26139 AUDITED
           </span>
 
           <a
@@ -378,7 +582,7 @@ export default function ModelDocModal({ modelName, modelData, onClose }) {
               e.currentTarget.style.backgroundColor = "#FFFFFF";
             }}
           >
-            <span>Read in GitHub</span>
+            <span>Read Specification in GitHub</span>
             <ArrowUpRight size={13} />
           </a>
         </div>

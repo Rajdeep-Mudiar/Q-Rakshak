@@ -15,12 +15,12 @@ The 3D model contains isolated sub-meshes with independent materials and shader 
 
 ```
 HumanBodyRoot
-├── cranial_mesh (Brain)
-├── thoracic_mesh (Heart & Aorta)
-├── pulmonary_mesh (Lungs & Bronchi)
-├── endocrine_mesh (Pancreas & Adrenals)
-├── hepatic_mesh (Liver)
-└── skeletal_mesh (Bones & Joint Articulations)
+ cranial_mesh (Brain)
+ thoracic_mesh (Heart & Aorta)
+ pulmonary_mesh (Lungs & Bronchi)
+ endocrine_mesh (Pancreas & Adrenals)
+ hepatic_mesh (Liver)
+ skeletal_mesh (Bones & Joint Articulations)
 ```
 
 ---

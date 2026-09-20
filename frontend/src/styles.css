@@ -4756,5 +4756,55 @@ textarea,
   backface-visibility: hidden;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   GLOBAL MOBILE RESPONSIVENESS & FLUID TYPOGRAPHY RULES
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  html, body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+  }
 
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
 
+  .table-responsive,
+  pre,
+  code {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  h1 {
+    font-size: clamp(1.8rem, 7vw, 2.6rem) !important;
+    line-height: 1.12 !important;
+  }
+
+  h2 {
+    font-size: clamp(1.35rem, 5vw, 1.85rem) !important;
+    line-height: 1.2 !important;
+  }
+
+  .card-panel,
+  .dashboard-card,
+  .editorial-spec-card {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 14px;
+  }
+
+  .editorial-header {
+    padding: 0 12px !important;
+  }
+
+  button,
+  input,
+  select {
+    min-height: 38px;
+  }
+}

@@ -8,34 +8,34 @@ The **Q-RAKSHAK Deterministic Triage Engine** implements the clinical Emergency 
 
 ```
                           [Patient Enters Triage]
-                                     │
-                                     ▼
+                                     
+                                     
                 [Decision Point A: Requires Immediate Life-Saving
                             Intervention / Resuscitation?]
-                                     │
-                    ┌────────────────┴────────────────┐
-                    │ YES                             │ NO
-                    ▼                                 ▼
-               [🚨 ESI 1]                  [Decision Point B: High-Risk
+                                     
+                    
+                     YES                              NO
+                                                     
+               [ ESI 1]                  [Decision Point B: High-Risk
              Resuscitation                  Situation / Confused / Lethargic
                                               Severe Pain or Distress?]
-                                                      │
-                                     ┌────────────────┴────────────────┐
-                                     │ YES                             │ NO
-                                     ▼                                 ▼
-                                [⚠️ ESI 2]                 [Decision Point C: How many
+                                                      
+                                     
+                                      YES                              NO
+                                                                      
+                                [ ESI 2]                 [Decision Point C: How many
                                  Emergent                   resources are anticipated?]
-                                                                       │
-                                              ┌────────────────────────┼────────────────────────┐
-                                              │ Many (>= 2)            │ One (1)                │ None (0)
-                                              ▼                        ▼                        ▼
-                                     [Vital Signs Check]           [📋 ESI 4]               [🟢 ESI 5]
+                                                                       
+                                              
+                                               Many (>= 2)             One (1)                 None (0)
+                                                                                              
+                                     [Vital Signs Check]           [ ESI 4]               [🟢 ESI 5]
                                      Are vitals in danger zone?   Semi-Urgent               Non-Urgent
-                                              │
-                                     ┌────────┴────────┐
-                                     │ Danger          │ Normal
-                                     ▼                 ▼
-                                [⚠️ ESI 2]        [🟡 ESI 3]
+                                              
+                                     
+                                      Danger           Normal
+                                                      
+                                [ ESI 2]        [🟡 ESI 3]
                                  Emergent           Urgent
 ```
 

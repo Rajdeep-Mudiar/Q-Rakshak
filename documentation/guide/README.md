@@ -4,7 +4,7 @@ This directory contains system onboarding guides, formal compliance audits for R
 
 ---
 
-## 📑 Guides
+## Guides
 
 - **[Developer Quickstart](quickstart.md)**: Environment setup, running backend & frontend, test suites.
 - **[Research Objectives Compliance Audit](research_objectives.md)**: Full verification matrix for OBJ-01 to OBJ-06.

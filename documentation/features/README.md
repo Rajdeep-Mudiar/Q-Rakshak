@@ -4,7 +4,7 @@ This section documents the clinical capabilities, workflows, and patient-facing 
 
 ---
 
-## 🌟 Feature Modules
+## Feature Modules
 
 1. **[Deterministic ESI Triage Engine](triage_engine.md)**  
    Multi-parameter clinical triage aligning with the Emergency Severity Index (ESI 1-5). Includes automated vital boundary checks and dynamic routing.

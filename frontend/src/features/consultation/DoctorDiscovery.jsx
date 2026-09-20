@@ -182,7 +182,7 @@ export default function DoctorDiscovery({ onOpenBooking, onJoinRoom, patientId }
           <p style={{ color: "var(--text-muted)" }}>No medical specialists match your search criteria.</p>
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))", gap: "16px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 300px), 1fr))", gap: "16px" }}>
           {filteredDoctors.map((doc) => {
             const isSelected = selectedDoctor?.id === doc.id;
             return (

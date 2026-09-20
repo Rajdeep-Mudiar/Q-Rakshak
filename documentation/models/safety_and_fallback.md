@@ -10,31 +10,31 @@ This document describes the autonomous fallback and safety gating architecture o
 
 ```
                  [Patient Clinical Features]
-                             │
-                             ▼
+                             
+                             
               [Class-Conditional OOD Detector]
           (Pooled Mahalanobis Distance Gating)
-                             │
-            ┌────────────────┴────────────────┐
-            │ In-Distribution                 │ Out-of-Distribution (OOD > threshold)
-            ▼                                 ▼
+                             
+            
+             In-Distribution                  Out-of-Distribution (OOD > threshold)
+                                             
     [Parallel Inference Engine]         [Clinical Abstention Alert]
-    ├── Quantum VQC / QSVM              - Trigger Doctor Mandatory Review
-    └── Classical Sentinel Suite        - Generate Warning Flag
-            │
-            ▼
+     Quantum VQC / QSVM              - Trigger Doctor Mandatory Review
+     Classical Sentinel Suite        - Generate Warning Flag
+            
+            
     [Reliability & Specificity Gate]
     - Is Quantum Specificity < Threshold (e.g. 0.80)?
     - Is ECE Calibration Error > 0.10?
-            │
-      ┌─────┴─────────────────────────┐
-      │ YES (Fails Safety Gating)     │ NO (Passes Safety Gating)
-      ▼                               ▼
+            
+      
+       YES (Fails Safety Gating)      NO (Passes Safety Gating)
+                                     
  [Deploy Classical Sentinel]    [Deploy Quantum Lead Model]
  (e.g. Sentinel-SVM 96.51%)      (with Temperature Scaling)
-      │                               │
-      └──────────────┬────────────────┘
-                     ▼
+                                     
+      
+                     
        [Unified Clinical Prediction]
 ```
 

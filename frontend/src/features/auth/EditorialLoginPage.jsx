@@ -459,7 +459,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 1fr",
+              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
               gap: "16px",
               borderTop: "1px solid #E2E8F0",
               paddingTop: "24px",
@@ -488,19 +488,19 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                   Secure Records
                 </span>
                 <span style={{ fontSize: "0.68rem", color: "#0284C7", background: "#F0F9FF", border: "1px solid #BAE6FD", padding: "2px 7px", borderRadius: "4px", fontWeight: 700 }}>
-                  Verified
+                  Audit Trail
                 </span>
               </div>
               <strong style={{ display: "block", fontSize: "0.92rem", color: "#0F172A", marginTop: "12px", fontWeight: 700 }}>
-                Protected Health Records
+                Tamper-Proof Audit
               </strong>
               <span style={{ display: "block", fontSize: "0.78rem", color: "#64748B", marginTop: "5px", lineHeight: 1.5 }}>
-                Tamper-evident medical history, digital prescriptions, and encrypted doctor consults.
+                End-to-end cryptographic logging with clinical protocol verification.
               </span>
             </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "24px", borderTop: "1px solid #E2E8F0", paddingTop: "16px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap", borderTop: "1px solid #E2E8F0", paddingTop: "16px" }}>
             <span style={{ fontSize: "0.72rem", color: "#475569", display: "inline-flex", alignItems: "center", gap: "6px", fontWeight: 600 }}>
               <CheckCircle2 size={14} color="#059669" /> Verified Security
             </span>
@@ -804,12 +804,13 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
       <div
         style={{
           overflowX: "auto",
+          WebkitOverflowScrolling: "touch",
           border: "1px solid rgba(255, 255, 255, 0.1)",
           borderRadius: "0px",
           background: "#0A0A0A",
         }}
       >
-        <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.80rem" }}>
+        <table style={{ width: "100%", minWidth: "780px", borderCollapse: "collapse", textAlign: "left", fontSize: "0.80rem" }}>
           <thead>
             <tr
               style={{
@@ -1047,12 +1048,13 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
       <div
         style={{
           overflowX: "auto",
+          WebkitOverflowScrolling: "touch",
           border: "1px solid rgba(255, 255, 255, 0.1)",
           borderRadius: "0px",
           background: "#0A0A0A",
         }}
       >
-        <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.80rem" }}>
+        <table style={{ width: "100%", minWidth: "780px", borderCollapse: "collapse", textAlign: "left", fontSize: "0.80rem" }}>
           <thead>
             <tr
               style={{

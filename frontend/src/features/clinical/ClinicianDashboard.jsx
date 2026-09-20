@@ -161,7 +161,7 @@ export default function ClinicianDashboard({ doctorId = "DOC-KAVITA", currentUse
       </div>
 
       {/* Two Column Layout: Schedule & Risk Triage */}
-      <div style={{ display: "grid", gridTemplateColumns: "1.15fr 1fr", gap: "16px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "16px" }}>
         {/* Left: Today's Consultation Schedule */}
         <div className="card-panel" style={{ display: "flex", flexDirection: "column", gap: "14px", padding: "18px", borderRadius: "var(--radius-md)", background: "var(--bg-surface)", border: "1px solid var(--border-default)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--border-default)", paddingBottom: "10px" }}>

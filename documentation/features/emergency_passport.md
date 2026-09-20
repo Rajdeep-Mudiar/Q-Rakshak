@@ -4,7 +4,7 @@ The Emergency Medical Passport provides zero-network first-responder access to c
 
 ---
 
-## 🚑 Critical Data Payload
+## Critical Data Payload
 - Blood group & Rh factor
 - Drug allergies (e.g., Penicillin, NSAIDs)
 - Current vital medications & dosages

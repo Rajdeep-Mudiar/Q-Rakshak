@@ -24,13 +24,13 @@ $$W(\theta) = \prod_{l=1}^L \left[ U_{\text{ent}} \cdot \left( \bigotimes_{i=1}^
 
 ### Circular CNOT Entanglement:
 ```
-q_0: ──●───────────────X──
-       │               │
-q_1: ──X──●────────────┼──
-          │            │
-q_2: ─────X──●─────────┼──
-             │         │
-q_3: ────────X─────────●──
+q_0: X
+                      
+q_1: X
+                      
+q_2: X
+                      
+q_3: X
 ```
 
 ---

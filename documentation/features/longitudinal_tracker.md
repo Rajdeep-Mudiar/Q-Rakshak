@@ -4,7 +4,7 @@ The Longitudinal Tracker enables clinicians to monitor chronic biomarkers across
 
 ---
 
-## 📈 Mathematical Trend Computation
+## Mathematical Trend Computation
 
 For time points $t_i$ and measurements $y_i$:
 
