@@ -106,7 +106,7 @@ class StandaloneVQC(nn.Module):
 
         dev = get_quantum_device(n_qubits)
 
-        @qml.qnode(dev, interface="torch", diff_method="parameter-shift")
+        @qml.qnode(dev, interface="torch", diff_method="best")
         def _circuit(inputs, weights):
             for i in range(n_qubits):
                 qml.RY(inputs[i], wires=i)
@@ -220,24 +220,33 @@ class QuantumSupportVectorMachine:
         else:
             self._kernel_circuit = None
 
-    def _compute_kernel_matrix(self, X1: np.ndarray, X2: np.ndarray) -> np.ndarray:
+    def _compute_kernel_matrix(self, X1: np.ndarray, X2: np.ndarray, is_symmetric: bool = False) -> np.ndarray:
         if self._kernel_circuit is None:
-            # Fallback linear/rbf kernel if pennylane not installed
             from sklearn.metrics.pairwise import rbf_kernel
             return rbf_kernel(X1, X2)
 
         N1, N2 = len(X1), len(X2)
         K = np.zeros((N1, N2), dtype=np.float32)
-        for i in range(N1):
-            for j in range(N2):
-                probs = self._kernel_circuit(X1[i], X2[j])
-                K[i, j] = probs[0]  # State fidelity |<psi(x1)|psi(x2)>|^2
+
+        if is_symmetric or (N1 == N2 and np.array_equal(X1, X2)):
+            for i in range(N1):
+                K[i, i] = 1.0
+                for j in range(i + 1, N2):
+                    probs = self._kernel_circuit(X1[i], X2[j])
+                    fidelity = float(probs[0])
+                    K[i, j] = fidelity
+                    K[j, i] = fidelity
+        else:
+            for i in range(N1):
+                for j in range(N2):
+                    probs = self._kernel_circuit(X1[i], X2[j])
+                    K[i, j] = float(probs[0])
         return K
 
     def fit(self, X: np.ndarray, y: np.ndarray):
         from sklearn.svm import SVC
         self.X_train = X.copy()
-        K_train = self._compute_kernel_matrix(X, X)
+        K_train = self._compute_kernel_matrix(X, X, is_symmetric=True)
         self.clf = SVC(kernel="precomputed", probability=True)
         self.clf.fit(K_train, y)
 
