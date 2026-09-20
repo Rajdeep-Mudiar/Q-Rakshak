@@ -89,6 +89,9 @@ def train_breast_cancer_pipeline(args):
 
     vqc_ckpt = output_dir / "OncoPulse-VQC.pt"
     vqc.save_checkpoint(str(vqc_ckpt))
+    with open(output_dir / "vqc_history.json", "w") as f:
+        import json
+        json.dump(getattr(vqc, "history", {"loss": []}), f, indent=2)
     print(f"✨ VQC Checkpoint saved to: {vqc_ckpt}")
 
     # 2. Fine-Tune OncoPulse-QSVM (Quantum Kernel Matrix)

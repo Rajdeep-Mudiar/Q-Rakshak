@@ -21,8 +21,26 @@ plt.rcParams["font.sans-serif"] = "DejaVu Sans"
 plt.rcParams["font.size"] = 10
 
 
+def find_history_file(base_dirs: list[str | Path], disease: str) -> Path | None:
+    """Auto-discovers training or VQC history files across common directories."""
+    candidate_names = ["training_history.json", "vqc_history.json"]
+    for b in base_dirs:
+        bp = Path(b)
+        if not bp.exists():
+            continue
+        for name in candidate_names:
+            target = bp / disease / name
+            if target.exists():
+                return target
+            # Search recursively within disease subfolders
+            matches = list(bp.glob(f"**/{disease}/{name}"))
+            if matches:
+                return matches[0]
+    return None
+
+
 def plot_training_curves(history_path: str | Path, disease_name: str, save_path: str | Path | None = None):
-    """Plots Training vs Validation Loss and Accuracy side-by-side."""
+    """Plots Training vs Validation Loss and Accuracy side-by-side or VQC Loss."""
     p = Path(history_path)
     if not p.exists():
         print(f"⚠️ No training history found at: {history_path}")
@@ -31,33 +49,46 @@ def plot_training_curves(history_path: str | Path, disease_name: str, save_path:
     with open(p, "r") as f:
         data = json.load(f)
 
-    train_loss = data.get("train_loss", [])
+    train_loss = data.get("train_loss", data.get("loss", []))
     val_loss = data.get("val_loss", [])
     train_acc = [x * 100 if x <= 1.0 else x for x in data.get("train_acc", [])]
     val_acc = [x * 100 if x <= 1.0 else x for x in data.get("val_acc", [])]
     epochs = range(1, len(train_loss) + 1)
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5), dpi=120)
+    if not train_loss:
+        print(f"⚠️ History file at {p} contains no loss history.")
+        return
 
-    # 1. Loss Curve
-    ax1.plot(epochs, train_loss, 'o-', color='#3B82F6', linewidth=2.5, markersize=5, label='Training Loss')
-    if val_loss:
-        ax1.plot(epochs, val_loss, 's--', color='#EF4444', linewidth=2.5, markersize=5, label='Validation Loss')
-    ax1.set_title(f"Cross-Entropy Loss vs Epochs ({disease_name.replace('_', ' ').title()})", fontsize=12, fontweight='bold')
-    ax1.set_xlabel("Epoch", fontsize=11)
-    ax1.set_ylabel("Loss", fontsize=11)
-    ax1.legend(frameon=True, facecolor='white', framealpha=0.9)
-    ax1.grid(True, linestyle=':', alpha=0.6)
+    if train_acc:
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5), dpi=120)
 
-    # 2. Accuracy Curve
-    ax2.plot(epochs, train_acc, 'o-', color='#10B981', linewidth=2.5, markersize=5, label='Training Accuracy (%)')
-    if val_acc:
-        ax2.plot(epochs, val_acc, 's--', color='#8B5CF6', linewidth=2.5, markersize=5, label='Validation Accuracy (%)')
-    ax2.set_title(f"Accuracy Progression ({disease_name.replace('_', ' ').title()})", fontsize=12, fontweight='bold')
-    ax2.set_xlabel("Epoch", fontsize=11)
-    ax2.set_ylabel("Accuracy (%)", fontsize=11)
-    ax2.legend(frameon=True, facecolor='white', framealpha=0.9)
-    ax2.grid(True, linestyle=':', alpha=0.6)
+        # 1. Loss Curve
+        ax1.plot(epochs, train_loss, 'o-', color='#3B82F6', linewidth=2.5, markersize=5, label='Training Loss')
+        if val_loss:
+            ax1.plot(epochs, val_loss, 's--', color='#EF4444', linewidth=2.5, markersize=5, label='Validation Loss')
+        ax1.set_title(f"Cross-Entropy Loss vs Epochs ({disease_name.replace('_', ' ').title()})", fontsize=12, fontweight='bold')
+        ax1.set_xlabel("Epoch", fontsize=11)
+        ax1.set_ylabel("Loss", fontsize=11)
+        ax1.legend(frameon=True, facecolor='white', framealpha=0.9)
+        ax1.grid(True, linestyle=':', alpha=0.6)
+
+        # 2. Accuracy Curve
+        ax2.plot(epochs, train_acc, 'o-', color='#10B981', linewidth=2.5, markersize=5, label='Training Accuracy (%)')
+        if val_acc:
+            ax2.plot(epochs, val_acc, 's--', color='#8B5CF6', linewidth=2.5, markersize=5, label='Validation Accuracy (%)')
+        ax2.set_title(f"Accuracy Progression ({disease_name.replace('_', ' ').title()})", fontsize=12, fontweight='bold')
+        ax2.set_xlabel("Epoch", fontsize=11)
+        ax2.set_ylabel("Accuracy (%)", fontsize=11)
+        ax2.legend(frameon=True, facecolor='white', framealpha=0.9)
+        ax2.grid(True, linestyle=':', alpha=0.6)
+    else:
+        fig, ax1 = plt.subplots(1, 1, figsize=(7, 4.5), dpi=120)
+        ax1.plot(epochs, train_loss, 'o-', color='#8B5CF6', linewidth=2.5, markersize=5, label='Quantum VQC Loss')
+        ax1.set_title(f"Quantum Parameter-Shift Optimization ({disease_name.replace('_', ' ').title()})", fontsize=12, fontweight='bold')
+        ax1.set_xlabel("Epoch / Iteration", fontsize=11)
+        ax1.set_ylabel("MSE Loss", fontsize=11)
+        ax1.legend(frameon=True, facecolor='white', framealpha=0.9)
+        ax1.grid(True, linestyle=':', alpha=0.6)
 
     plt.tight_layout()
     if save_path:
@@ -139,12 +170,20 @@ if __name__ == "__main__":
     parser.add_argument("--output-dir", type=str, default="./outputs")
     args = parser.parse_args()
 
-    base = Path(args.output_dir)
+    search_dirs = [
+        Path(args.output_dir),
+        Path("./outputs"),
+        Path("/kaggle/working/outputs"),
+        Path("/kaggle/working/QDoc/fine_tuned_models/outputs"),
+        Path("fine_tuned_models/outputs"),
+    ]
+
     diseases = ["pneumonia", "skin_cancer", "breast_cancer", "heart_disease", "parkinsons", "diabetes"] if args.disease == "all" else [args.disease]
 
     for d in diseases:
-        d_dir = base / d
-        hist_file = d_dir / "training_history.json"
-        if hist_file.exists():
-            print(f"📊 Plotting training curves for {d}...")
-            plot_training_curves(hist_file, d, d_dir / "training_curves.png")
+        hist_file = find_history_file(search_dirs, d)
+        if hist_file and hist_file.exists():
+            print(f"📊 Plotting training curves for {d} from {hist_file}...")
+            plot_training_curves(hist_file, d, hist_file.parent / "training_curves.png")
+        else:
+            print(f"⚠️ No history found for domain: {d}")

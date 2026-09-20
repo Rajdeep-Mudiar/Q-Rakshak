@@ -122,6 +122,7 @@ class StandaloneVQC:
         y_scaled = np.where(y == 0, -1.0, 1.0)
         n_samples = len(X)
         opt = qml.AdamOptimizer(stepsize=self.lr)
+        self.history = {"loss": []}
 
         def cost_fn(w, b, x_batch, y_batch):
             preds = np.array([self._circuit(x, w) + b for x in x_batch])
@@ -142,8 +143,11 @@ class StandaloneVQC:
                 epoch_loss += cost_fn(self.weights, self.bias, x_b, y_b)
                 steps += 1
 
+            avg_loss = float(epoch_loss / max(1, steps))
+            self.history["loss"].append(round(avg_loss, 4))
+
             if (epoch + 1) % 5 == 0 or epoch == epochs - 1:
-                print(f"Epoch [{epoch+1:02d}/{epochs:02d}] | MSE Loss: {epoch_loss / max(1, steps):.4f}")
+                print(f"Epoch [{epoch+1:02d}/{epochs:02d}] | MSE Loss: {avg_loss:.4f}")
 
     def predict_proba(self, X: np.ndarray) -> np.ndarray:
         raw_vals = np.array([self._circuit(x, self.weights) + self.bias for x in X])
