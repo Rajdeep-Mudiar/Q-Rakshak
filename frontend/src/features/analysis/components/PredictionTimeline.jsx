@@ -146,6 +146,24 @@ export default function PredictionTimeline({
     }
   };
 
+  const formatTime = (ts) => {
+    if (!ts) return "N/A";
+    try {
+      if (ts.includes("T") || ts.endsWith("Z")) {
+        const d = new Date(ts);
+        if (!isNaN(d.getTime())) {
+          return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+        }
+      }
+      if (ts.includes(" ")) {
+        return ts.split(" ")[1] || ts;
+      }
+      return ts;
+    } catch {
+      return ts;
+    }
+  };
+
   // Severity color helper
   const getRiskColor = (score) => {
     if (score >= 70) return "#dc2626"; // high / danger
@@ -1329,7 +1347,7 @@ export default function PredictionTimeline({
                         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.72rem" }}>
                           <thead>
                             <tr style={{ borderBottom: "1px solid #e2e8f0", color: "#64748b", textAlign: "left" }}>
-                              <th style={{ padding: "6px 8px" }}>Time (UTC)</th>
+                              <th style={{ padding: "6px 8px" }}>Time</th>
                               <th style={{ padding: "6px 8px" }}>Modality / Disease</th>
                               <th style={{ padding: "6px 8px" }}>Architecture</th>
                               <th style={{ padding: "6px 8px" }}>Classification</th>
@@ -1347,7 +1365,7 @@ export default function PredictionTimeline({
                                 }}
                               >
                                 <td style={{ padding: "6px 8px", fontFamily: "var(--font-mono, monospace)" }}>
-                                  {run.timestamp?.slice(11, 19) || "N/A"}
+                                  {formatTime(run.timestamp)}
                                 </td>
                                 <td style={{ padding: "6px 8px", fontWeight: 600 }}>
                                   {run.disease}

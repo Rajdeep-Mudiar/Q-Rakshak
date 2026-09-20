@@ -407,7 +407,7 @@ class DatabaseRepository:
         cb_conf = cb.get("confidence", 0.90) if isinstance(cb, dict) else float(record.get("classical_confidence") or 0.90)
 
         import datetime
-        created_at_val = record.get("created_at") or record.get("timestamp") or datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+        created_at_val = record.get("created_at") or record.get("timestamp") or datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         conn.execute("""
         INSERT INTO diagnostic_records (
@@ -510,7 +510,7 @@ class DatabaseRepository:
         import datetime
         from collections import defaultdict
 
-        now = datetime.datetime.now(datetime.timezone.utc)
+        now = datetime.datetime.now()
         now_date = now.date()
 
         # Step 1: Retrieve all records for this patient

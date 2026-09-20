@@ -1013,7 +1013,6 @@ export default function UnifiedAnalysisPage() {
             disclaimer: "SaMD Clinical Decision Support Output. Professional clinician review required.",
           };
           setResult(payload);
-          try { await clinicalApi.saveDiagnosticRecord(payload); } catch (e) { /* logged on server */ }
         } else {
           const isNormal = activeFile?.name?.toLowerCase().includes("normal");
           const payload = {
@@ -1041,7 +1040,6 @@ export default function UnifiedAnalysisPage() {
             disclaimer: "SaMD Clinical Decision Support Output. Professional clinician review required.",
           };
           setResult(payload);
-          try { await clinicalApi.saveDiagnosticRecord(payload); } catch (e) { /* logged on server */ }
         }
       } else if (study === "skin") {
         if (!activeFile) {
@@ -1079,7 +1077,6 @@ export default function UnifiedAnalysisPage() {
             disclaimer: "SaMD Clinical Decision Support Output. Professional clinician review required.",
           };
           setResult(payload);
-          try { await clinicalApi.saveDiagnosticRecord(payload); } catch (e) { /* logged on server */ }
         } else {
           const isMelanoma = activeFile?.name?.toLowerCase().includes("melanoma");
           const payload = {
@@ -1107,7 +1104,6 @@ export default function UnifiedAnalysisPage() {
             disclaimer: "SaMD Clinical Decision Support Output. Professional clinician review required.",
           };
           setResult(payload);
-          try { await clinicalApi.saveDiagnosticRecord(payload); } catch (e) { /* logged on server */ }
         }
       } else {
         if (activeFile && activeFile.type && activeFile.type.startsWith("image/")) {
@@ -1125,7 +1121,6 @@ export default function UnifiedAnalysisPage() {
           }
           const data = await clinicalApi.runDiagnosis(study, patientId || "USR-5EF52B", Object.keys(featureDict).length > 0 ? featureDict : null);
           setResult(data);
-          try { await clinicalApi.saveDiagnosticRecord(data); } catch (e) { /* logged on server */ }
         }
       }
     } catch (err) {
