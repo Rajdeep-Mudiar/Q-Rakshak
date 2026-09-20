@@ -92,19 +92,21 @@ class QuantumHybridHead(nn.Module):
 
 
 
-class StandaloneVQC:
-    """Numpy/Scikit-Learn compatible Standalone VQC for tabular datasets."""
+class StandaloneVQC(nn.Module):
+    """PyTorch-backed High-Performance Standalone VQC for tabular clinical datasets."""
 
     def __init__(self, n_qubits: int = 8, n_layers: int = 3, lr: float = 0.02):
+        super().__init__()
         self.n_qubits = n_qubits
         self.n_layers = n_layers
         self.lr = lr
-        self.weights = np.random.uniform(0, 2 * np.pi, (n_layers, n_qubits, 3))
-        self.bias = 0.0
+        self.q_weights = nn.Parameter(0.05 * torch.randn(n_layers, n_qubits, 3))
+        self.bias = nn.Parameter(torch.zeros(1))
+        self.history = {"loss": []}
 
         dev = get_quantum_device(n_qubits)
 
-        @qml.qnode(dev, interface="autograd", diff_method="parameter-shift")
+        @qml.qnode(dev, interface="torch", diff_method="parameter-shift")
         def _circuit(inputs, weights):
             for i in range(n_qubits):
                 qml.RY(inputs[i], wires=i)
@@ -118,39 +120,54 @@ class StandaloneVQC:
 
         self._circuit = _circuit
 
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        outs = []
+        for i in range(x.shape[0]):
+            outs.append(self._circuit(x[i], self.q_weights))
+        return torch.stack(outs) + self.bias
+
     def fit(self, X: np.ndarray, y: np.ndarray, epochs: int = 30, batch_size: int = 16):
-        y_scaled = np.where(y == 0, -1.0, 1.0)
-        n_samples = len(X)
-        opt = qml.AdamOptimizer(stepsize=self.lr)
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.to(device)
+        self.train()
+
+        X_t = torch.tensor(X, dtype=torch.float32)
+        y_scaled = torch.tensor(np.where(y == 0, -1.0, 1.0), dtype=torch.float32)
+
+        dataset = torch.utils.data.TensorDataset(X_t, y_scaled)
+        loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
+
+        optimizer = torch.optim.Adam(self.parameters(), lr=self.lr, weight_decay=1e-4)
+        criterion = nn.MSELoss()
         self.history = {"loss": []}
 
-        def cost_fn(w, b, x_batch, y_batch):
-            preds = np.array([self._circuit(x, w) + b for x in x_batch])
-            loss = np.mean((preds - y_batch) ** 2)
-            return loss
-
         for epoch in range(epochs):
-            perm = np.random.permutation(n_samples)
-            X_shuffled = X[perm]
-            y_shuffled = y_scaled[perm]
+            total_loss = 0.0
+            total_samples = 0
+            for x_b, y_b in loader:
+                x_b, y_b = x_b.to(device), y_b.to(device)
+                optimizer.zero_grad()
+                preds = self(x_b)
+                loss = criterion(preds, y_b)
+                loss.backward()
+                optimizer.step()
 
-            epoch_loss = 0.0
-            steps = 0
-            for start_idx in range(0, n_samples, batch_size):
-                x_b = X_shuffled[start_idx : start_idx + batch_size]
-                y_b = y_shuffled[start_idx : start_idx + batch_size]
-                self.weights, self.bias = opt.step(lambda w, b: cost_fn(w, b, x_b, y_b), self.weights, self.bias)
-                epoch_loss += cost_fn(self.weights, self.bias, x_b, y_b)
-                steps += 1
+                total_loss += loss.item() * len(x_b)
+                total_samples += len(x_b)
 
-            avg_loss = float(epoch_loss / max(1, steps))
+            avg_loss = total_loss / max(1, total_samples)
             self.history["loss"].append(round(avg_loss, 4))
 
             if (epoch + 1) % 5 == 0 or epoch == epochs - 1:
-                print(f"Epoch [{epoch+1:02d}/{epochs:02d}] | MSE Loss: {avg_loss:.4f}")
+                print(f"Epoch [{epoch+1:02d}/{epochs:02d}] | Quantum MSE Loss: {avg_loss:.4f}")
 
     def predict_proba(self, X: np.ndarray) -> np.ndarray:
-        raw_vals = np.array([self._circuit(x, self.weights) + self.bias for x in X])
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.to(device)
+        self.eval()
+        X_t = torch.tensor(X, dtype=torch.float32).to(device)
+        with torch.no_grad():
+            raw_vals = self(X_t).cpu().numpy()
         p1 = 1.0 / (1.0 + np.exp(-2.0 * raw_vals))
         p0 = 1.0 - p1
         return np.column_stack([p0, p1])
@@ -162,8 +179,8 @@ class StandaloneVQC:
     def save_checkpoint(self, path: str):
         torch.save(
             {
-                "weights": torch.tensor(self.weights, dtype=torch.float32),
-                "bias": float(self.bias),
+                "weights": self.q_weights.detach().cpu(),
+                "bias": self.bias.detach().cpu().item(),
                 "n_qubits": self.n_qubits,
                 "n_layers": self.n_layers,
             },
