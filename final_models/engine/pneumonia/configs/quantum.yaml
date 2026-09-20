@@ -1,0 +1,26 @@
+seed: 42
+dataset:
+  root: datasets/PNEUMONIA
+  image_size: 224
+training:
+  epochs: 30
+  batch_size: 32
+  num_workers: 0
+  lr: 5.0e-4
+  weight_decay: 1.0e-5
+  patience: 8
+  label_smoothing: 0.1
+  cosine_T0: 8
+  max_grad_norm: 1.0
+quantum:
+  qubits: 8
+  layers: 4
+  pca_components: 8
+  embedding: angle
+  ansatz: strongly
+  data_reupload: true
+  dropout: 0.2
+  focal_gamma: 2.0
+model:
+  name: QuantumPneu
+  backbone: PneuVision

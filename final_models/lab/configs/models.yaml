@@ -1,0 +1,103 @@
+﻿# Model Lab Configuration (models.yaml)
+# Q-Rakshak / Q-RAKSHAK Foundation Model Specifications
+
+models:
+  biomedclip:
+    name: "BiomedCLIP"
+    huggingface_id: "microsoft/BiomedCLIP-PubMedBERT_256-vit_base_patch16_224"
+    purpose: "Primary biomedical 2D image and text embedding model"
+    embedding_dimension: 512
+    modalities:
+      - "chest_xray"
+      - "dermatology"
+      - "histopathology"
+      - "ophthalmology"
+      - "2d_medical_image"
+      - "text"
+    initial_state: "frozen"
+    precision: "fp32"
+    device_preference: "auto"
+    license: "Microsoft Open Source / Research"
+    license_type: "Research Only"
+
+  medsiglip:
+    name: "MedSigLIP"
+    huggingface_id: "google/medsiglip-448"
+    purpose: "Medical vision-language representation benchmark"
+    embedding_dimension: 768
+    modalities:
+      - "chest_xray"
+      - "dermatology"
+      - "ophthalmology"
+      - "2d_medical_image"
+    initial_state: "frozen"
+    precision: "fp32"
+    device_preference: "auto"
+    license: "Health AI Developer Foundations Terms of Use"
+    license_type: "Restricted Health AI Developer Foundations"
+
+  medgemma:
+    name: "MedGemma"
+    huggingface_id: "google/medgemma-4b-it"
+    purpose: "Clinical multimodal reasoning and structured report generation"
+    embedding_dimension: 2048
+    modalities:
+      - "multimodal"
+      - "text"
+      - "2d_medical_image"
+    initial_state: "frozen"
+    precision: "fp16"
+    device_preference: "auto"
+    license: "Health AI Developer Foundations Terms of Use"
+    license_type: "Restricted Health AI Developer Foundations"
+
+  medicalnet:
+    name: "MedicalNet"
+    repository: "Warvito/MedicalNet-models"
+    purpose: "3D CT/MRI volumetric representation and transfer-learning baseline"
+    embedding_dimension: 512
+    modalities:
+      - "3d_ct"
+      - "3d_mri"
+    initial_state: "frozen"
+    precision: "fp32"
+    device_preference: "auto"
+    license: "Open Academic"
+    license_type: "Academic Research"
+
+  vista3d:
+    name: "VISTA3D"
+    repository: "Project-MONAI/VISTA"
+    purpose: "3D CT/MRI segmentation and anatomical ROI extraction"
+    embedding_dimension: 512
+    modalities:
+      - "3d_ct"
+      - "3d_mri"
+    initial_state: "frozen"
+    precision: "fp32"
+    device_preference: "auto"
+    license: "Apache 2.0"
+    license_type: "Permissive Open Source"
+
+classical_baselines:
+  - "logistic_regression"
+  - "svm_rbf"
+  - "random_forest"
+  - "xgboost"
+  - "catboost"
+  - "mlp"
+
+quantum_architectures:
+  vqc:
+    qubit_budget: [4, 6, 8]
+    layers: [1, 2, 3]
+    entanglement: "circular"
+    encoding: "angle_encoding"
+    measurement: "pauli_z"
+  qsvm:
+    qubit_budget: [4, 6, 8]
+    feature_map: "zz"
+    kernel: "state_fidelity"
+  hybrid_qnn:
+    qubits: 8
+    classical_head_layers: [64, 32]

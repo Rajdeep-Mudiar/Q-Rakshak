@@ -1,0 +1,6 @@
+alias: production
+preferred_models:
+  - DermisNova
+  - QuantumDerma
+review_confidence_threshold: 0.75
+max_upload_mb: 8

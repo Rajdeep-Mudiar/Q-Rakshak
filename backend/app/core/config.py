@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import sys
 from pathlib import Path
 from typing import List
 
@@ -8,6 +9,17 @@ from dotenv import load_dotenv
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 BACKEND_ROOT = Path(__file__).resolve().parents[2]
+
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+# Register final_models alias for seamless backwards-compatibility
+try:
+    import final_models.engine as _engine
+    import sys
+    sys.modules.setdefault("ml", _engine)
+except Exception:
+    pass
 
 # Priority: backend/.env -> root .env
 if (BACKEND_ROOT / ".env").exists():
@@ -31,7 +43,8 @@ class Settings:
     DEMO_DB_PATH: Path = Path(os.getenv("QMED_DEMO_DB_PATH", str(BACKEND_DIR / "q-rakshak_demo.db")))
     DB_PATH: Path = Path(os.getenv("QMED_DB_PATH", str(DEMO_DB_PATH if DB_MODE == "demo" else REAL_DB_PATH)))
     DATABASE_URL: str = os.getenv("DATABASE_URL", "").strip()
-    MODELS_DIR: Path = BASE_DIR / "models"
+    FINAL_MODELS_DIR: Path = BASE_DIR / "final_models"
+    MODELS_DIR: Path = (FINAL_MODELS_DIR / "checkpoints") if (FINAL_MODELS_DIR / "checkpoints").exists() else (BASE_DIR / "models")
     REPORTS_DIR: Path = BASE_DIR / "reports"
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:5173")
 

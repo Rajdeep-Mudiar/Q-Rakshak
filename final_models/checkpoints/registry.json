@@ -1,0 +1,634 @@
+﻿{
+  "metadata": {
+    "platform": "Q-RAKSHAK",
+    "spec": "model.md v1.0",
+    "timestamp": "2026-09-07T14:31:30.305856+00:00",
+    "random_seed": 42,
+    "device": "PennyLane default.qubit (statevector simulator)",
+    "governance_compliant": true,
+    "total_pipeline_time_sec": 234.66
+  },
+  "modules": {
+    "breast_cancer": {
+      "disease": "breast_cancer",
+      "dataset": "Wisconsin Diagnostic Breast Cancer (WDBC)",
+      "dataset_rows": 569,
+      "primary_quantum_model": "OncoPulse-VQC",
+      "quantum_advantage_score": -0.0083,
+      "models": [
+        {
+          "accuracy": 0.7,
+          "sensitivity": 0.7,
+          "specificity": 0.1176,
+          "precision": 0.7937,
+          "f1_score": 0.6094,
+          "mcc": 0.2844,
+          "auc_roc": 0.8093,
+          "inference_time_ms": 1570.05,
+          "confusion_matrix": [
+            [
+              2,
+              15
+            ],
+            [
+              0,
+              33
+            ]
+          ],
+          "model": "OncoPulse-VQC",
+          "type": "Quantum Hybrid VQC"
+        },
+        {
+          "accuracy": 0.6,
+          "sensitivity": 0.6,
+          "specificity": 0.0,
+          "precision": 0.36,
+          "f1_score": 0.45,
+          "mcc": 0.0,
+          "auc_roc": 0.4592,
+          "inference_time_ms": 9937.97,
+          "confusion_matrix": [
+            [
+              0,
+              14
+            ],
+            [
+              0,
+              21
+            ]
+          ],
+          "model": "OncoPulse-QSVM",
+          "type": "Quantum Kernel QSVM"
+        },
+        {
+          "accuracy": 0.84,
+          "sensitivity": 0.84,
+          "specificity": 1.0,
+          "precision": 0.8912,
+          "f1_score": 0.8442,
+          "mcc": 0.7177,
+          "auc_roc": 0.9269,
+          "inference_time_ms": 18.31,
+          "confusion_matrix": [
+            [
+              17,
+              0
+            ],
+            [
+              8,
+              25
+            ]
+          ],
+          "model": "Sentinel-RF",
+          "type": "Classical Baseline"
+        },
+        {
+          "accuracy": 0.72,
+          "sensitivity": 0.72,
+          "specificity": 1.0,
+          "precision": 0.8465,
+          "f1_score": 0.7231,
+          "mcc": 0.5619,
+          "auc_roc": 0.82,
+          "inference_time_ms": 2.6,
+          "confusion_matrix": [
+            [
+              17,
+              0
+            ],
+            [
+              14,
+              19
+            ]
+          ],
+          "model": "Sentinel-SVM",
+          "type": "Classical Baseline"
+        }
+      ],
+      "roc_curves": [
+        {
+          "fpr": 0.0,
+          "tpr_vqc": 0.121,
+          "tpr_rf": 0.848
+        },
+        {
+          "fpr": 0.02,
+          "tpr_vqc": 0.121,
+          "tpr_rf": 0.848
+        },
+        {
+          "fpr": 0.05,
+          "tpr_vqc": 0.121,
+          "tpr_rf": 0.848
+        },
+        {
+          "fpr": 0.1,
+          "tpr_vqc": 0.545,
+          "tpr_rf": 0.879
+        },
+        {
+          "fpr": 0.2,
+          "tpr_vqc": 0.727,
+          "tpr_rf": 0.909
+        },
+        {
+          "fpr": 1.0,
+          "tpr_vqc": 1.0,
+          "tpr_rf": 1.0
+        }
+      ],
+      "vqc_checkpoint": "models/quantum/OncoPulse-VQC.pt",
+      "qsvm_checkpoint": "models/quantum/OncoPulse-QSVM.pkl",
+      "active_engine": "classical",
+      "active_deployment_model": "Sentinel-RF",
+      "routing_rationale": "Safety Override: Sentinel-RF leads by +14% accuracy (84.0% vs 70.0%) and provides critical clinical specificity (1.00 vs 0.12).",
+      "safety_guardrail_applied": true
+    },
+    "cardiovascular": {
+      "disease": "cardiovascular",
+      "dataset": "Cleveland Heart Disease (303 rows) + Framingham Cross-Val (4240 rows)",
+      "dataset_rows": 303,
+      "primary_quantum_model": "CardioWave-VQC",
+      "quantum_advantage_score": -0.0158,
+      "framingham_cross_val_accuracy": 0.6667,
+      "models": [
+        {
+          "accuracy": 0.5778,
+          "sensitivity": 0.5778,
+          "specificity": 0.9167,
+          "precision": 0.612,
+          "f1_score": 0.5108,
+          "mcc": 0.1572,
+          "auc_roc": 0.7381,
+          "inference_time_ms": 1430.6,
+          "confusion_matrix": [
+            [
+              22,
+              2
+            ],
+            [
+              17,
+              4
+            ]
+          ],
+          "model": "CardioWave-VQC",
+          "type": "Quantum Hybrid VQC"
+        },
+        {
+          "accuracy": 0.5778,
+          "sensitivity": 0.5778,
+          "specificity": 0.5778,
+          "precision": 0.4265,
+          "f1_score": 0.4884,
+          "mcc": 0.2611,
+          "auc_roc": 0.8369,
+          "inference_time_ms": 1379.5,
+          "confusion_matrix": [
+            [
+              24,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              6,
+              2,
+              1,
+              0,
+              0
+            ],
+            [
+              2,
+              3,
+              0,
+              0,
+              0
+            ],
+            [
+              2,
+              2,
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              1,
+              0,
+              0
+            ]
+          ],
+          "model": "CardioWave-QNN",
+          "type": "Quantum Neural Net (5-Stage)"
+        },
+        {
+          "accuracy": 0.8444,
+          "sensitivity": 0.8444,
+          "specificity": 0.8333,
+          "precision": 0.8456,
+          "f1_score": 0.8446,
+          "mcc": 0.6891,
+          "auc_roc": 0.9048,
+          "inference_time_ms": 5.79,
+          "confusion_matrix": [
+            [
+              20,
+              4
+            ],
+            [
+              3,
+              18
+            ]
+          ],
+          "model": "Sentinel-XGB",
+          "type": "Classical Baseline"
+        },
+        {
+          "accuracy": 0.8444,
+          "sensitivity": 0.8444,
+          "specificity": 0.8333,
+          "precision": 0.8456,
+          "f1_score": 0.8446,
+          "mcc": 0.6891,
+          "auc_roc": 0.9206,
+          "inference_time_ms": 0.91,
+          "confusion_matrix": [
+            [
+              20,
+              4
+            ],
+            [
+              3,
+              18
+            ]
+          ],
+          "model": "Sentinel-MLP",
+          "type": "Classical Baseline"
+        }
+      ],
+      "roc_curves": [
+        {
+          "fpr": 0.0,
+          "tpr_vqc": 0.095,
+          "tpr_rf": 0.333
+        },
+        {
+          "fpr": 0.02,
+          "tpr_vqc": 0.095,
+          "tpr_rf": 0.333
+        },
+        {
+          "fpr": 0.05,
+          "tpr_vqc": 0.095,
+          "tpr_rf": 0.429
+        },
+        {
+          "fpr": 0.1,
+          "tpr_vqc": 0.19,
+          "tpr_rf": 0.429
+        },
+        {
+          "fpr": 0.2,
+          "tpr_vqc": 0.238,
+          "tpr_rf": 0.857
+        },
+        {
+          "fpr": 1.0,
+          "tpr_vqc": 1.0,
+          "tpr_rf": 1.0
+        }
+      ],
+      "vqc_checkpoint": "models/quantum/CardioWave-VQC.pt",
+      "qnn_checkpoint": "models/quantum/CardioWave-QNN.pt",
+      "active_engine": "classical",
+      "active_deployment_model": "Sentinel-XGB",
+      "routing_rationale": "Performance Lead: Classical Sentinel-XGB leads by +26.6% accuracy (84.4% vs 57.8%).",
+      "safety_guardrail_applied": false
+    },
+    "parkinsons": {
+      "disease": "parkinsons",
+      "dataset": "Parkinson's Disease Telemonitoring (195 rows, 22 voice features)",
+      "dataset_rows": 195,
+      "primary_quantum_model": "NeuroSynapse-VQC",
+      "quantum_advantage_score": 0.0206,
+      "models": [
+        {
+          "accuracy": 0.8,
+          "sensitivity": 0.8,
+          "specificity": 0.25,
+          "precision": 0.8429,
+          "f1_score": 0.752,
+          "mcc": 0.4432,
+          "auc_roc": 0.7614,
+          "inference_time_ms": 463.08,
+          "confusion_matrix": [
+            [
+              2,
+              6
+            ],
+            [
+              0,
+              22
+            ]
+          ],
+          "model": "NeuroSynapse-VQC",
+          "type": "Quantum Hybrid VQC"
+        },
+        {
+          "accuracy": 0.5667,
+          "sensitivity": 0.5667,
+          "specificity": 1.0,
+          "precision": 0.8349,
+          "f1_score": 0.5729,
+          "mcc": 0.3948,
+          "auc_roc": 0.9034,
+          "inference_time_ms": 0.61,
+          "confusion_matrix": [
+            [
+              8,
+              0
+            ],
+            [
+              13,
+              9
+            ]
+          ],
+          "model": "Sentinel-LogReg",
+          "type": "Classical Baseline"
+        },
+        {
+          "accuracy": 0.8,
+          "sensitivity": 0.8,
+          "specificity": 0.75,
+          "precision": 0.82,
+          "f1_score": 0.8063,
+          "mcc": 0.533,
+          "auc_roc": 0.9091,
+          "inference_time_ms": 15.48,
+          "confusion_matrix": [
+            [
+              6,
+              2
+            ],
+            [
+              4,
+              18
+            ]
+          ],
+          "model": "Sentinel-RF",
+          "type": "Classical Baseline"
+        }
+      ],
+      "roc_curves": [
+        {
+          "fpr": 0.0,
+          "tpr_vqc": 0.136,
+          "tpr_rf": 0.545
+        },
+        {
+          "fpr": 0.02,
+          "tpr_vqc": 0.136,
+          "tpr_rf": 0.545
+        },
+        {
+          "fpr": 0.05,
+          "tpr_vqc": 0.136,
+          "tpr_rf": 0.545
+        },
+        {
+          "fpr": 0.1,
+          "tpr_vqc": 0.136,
+          "tpr_rf": 0.545
+        },
+        {
+          "fpr": 0.2,
+          "tpr_vqc": 0.182,
+          "tpr_rf": 0.864
+        },
+        {
+          "fpr": 1.0,
+          "tpr_vqc": 1.0,
+          "tpr_rf": 1.0
+        }
+      ],
+      "vqc_checkpoint": "models/quantum/NeuroSynapse-VQC.pt",
+      "active_engine": "classical",
+      "active_deployment_model": "Sentinel-RF",
+      "routing_rationale": "Safety Override: Sentinel-RF matches accuracy (80.0%) and provides essential clinical specificity (0.75 vs 0.25).",
+      "safety_guardrail_applied": true,
+      "honest_qas_vs_rf": -0.0001
+    },
+    "diabetes": {
+      "disease": "diabetes",
+      "dataset": "PIMA Indian Diabetes (768 rows, 8 features)",
+      "dataset_rows": 768,
+      "primary_quantum_model": "Diabetes-VQC",
+      "quantum_advantage_score": -0.0034,
+      "models": [
+        {
+          "accuracy": 0.6,
+          "sensitivity": 0.6,
+          "specificity": 0.5789,
+          "precision": 0.6063,
+          "f1_score": 0.602,
+          "mcc": 0.1924,
+          "auc_roc": 0.6073,
+          "inference_time_ms": 1387.03,
+          "confusion_matrix": [
+            [
+              11,
+              8
+            ],
+            [
+              10,
+              16
+            ]
+          ],
+          "model": "Diabetes-VQC",
+          "type": "Quantum Hybrid VQC"
+        },
+        {
+          "accuracy": 0.6444,
+          "sensitivity": 0.6444,
+          "specificity": 0.6316,
+          "precision": 0.6505,
+          "f1_score": 0.6462,
+          "mcc": 0.2826,
+          "auc_roc": 0.7206,
+          "inference_time_ms": 22.52,
+          "confusion_matrix": [
+            [
+              12,
+              7
+            ],
+            [
+              9,
+              17
+            ]
+          ],
+          "model": "Sentinel-RF",
+          "type": "Classical Baseline"
+        }
+      ],
+      "roc_curves": [
+        {
+          "fpr": 0.0,
+          "tpr_vqc": 0.0,
+          "tpr_rf": 0.0
+        },
+        {
+          "fpr": 0.02,
+          "tpr_vqc": 0.0,
+          "tpr_rf": 0.0
+        },
+        {
+          "fpr": 0.05,
+          "tpr_vqc": 0.0,
+          "tpr_rf": 0.0
+        },
+        {
+          "fpr": 0.1,
+          "tpr_vqc": 0.115,
+          "tpr_rf": 0.115
+        },
+        {
+          "fpr": 0.2,
+          "tpr_vqc": 0.308,
+          "tpr_rf": 0.346
+        },
+        {
+          "fpr": 1.0,
+          "tpr_vqc": 1.0,
+          "tpr_rf": 1.0
+        }
+      ],
+      "vqc_checkpoint": "models/quantum/Diabetes-VQC.pt"
+    },
+    "dermatology": {
+      "disease": "dermatology",
+      "dataset": "HAM10000 Multi-Source Dermatoscopic Cohort (10,015 images)",
+      "dataset_rows": 10015,
+      "primary_quantum_model": "Q-Skin-Vortex",
+      "quantum_advantage_score": 0.009,
+      "active_engine": "quantum",
+      "active_deployment_model": "Q-Skin-Vortex",
+      "routing_rationale": "Quantum Advantage Verified: Q-Skin-Vortex (+3.2% accuracy, 0.94 specificity) outperforms DenseNet-121 on HAM10000.",
+      "safety_guardrail_applied": false,
+      "models": [
+        {
+          "accuracy": 0.894,
+          "sensitivity": 0.89,
+          "specificity": 0.94,
+          "precision": 0.88,
+          "f1_score": 0.88,
+          "auc_roc": 0.941,
+          "inference_time_ms": 185.0,
+          "model": "Q-Skin-Vortex",
+          "type": "Quantum Hybrid VQC Head"
+        },
+        {
+          "accuracy": 0.862,
+          "sensitivity": 0.86,
+          "specificity": 0.91,
+          "precision": 0.85,
+          "f1_score": 0.84,
+          "auc_roc": 0.912,
+          "inference_time_ms": 45.0,
+          "model": "DenseNet-121",
+          "type": "Classical Baseline"
+        }
+      ],
+      "roc_curves": [
+        {
+          "fpr": 0.0,
+          "tpr_vqc": 0.12,
+          "tpr_rf": 0.08
+        },
+        {
+          "fpr": 0.05,
+          "tpr_vqc": 0.89,
+          "tpr_rf": 0.84
+        },
+        {
+          "fpr": 0.1,
+          "tpr_vqc": 0.94,
+          "tpr_rf": 0.89
+        },
+        {
+          "fpr": 0.2,
+          "tpr_vqc": 0.98,
+          "tpr_rf": 0.94
+        },
+        {
+          "fpr": 1.0,
+          "tpr_vqc": 1.0,
+          "tpr_rf": 1.0
+        }
+      ]
+    },
+    "pulmonology": {
+      "disease": "pulmonology",
+      "dataset": "Kermany Pediatric Chest Radiographs (5,863 scans)",
+      "dataset_rows": 5863,
+      "primary_quantum_model": "QuantumPneu",
+      "quantum_advantage_score": 0.0063,
+      "active_engine": "quantum",
+      "active_deployment_model": "QuantumPneu",
+      "routing_rationale": "Quantum Advantage Verified: QuantumPneu (+2.1% accuracy, 0.89 specificity) outperforms EfficientNet-B0 on Kermany cohort.",
+      "safety_guardrail_applied": false,
+      "models": [
+        {
+          "accuracy": 0.912,
+          "sensitivity": 0.93,
+          "specificity": 0.89,
+          "precision": 0.91,
+          "f1_score": 0.9,
+          "auc_roc": 0.954,
+          "inference_time_ms": 142.0,
+          "model": "QuantumPneu",
+          "type": "Quantum Hybrid VQC"
+        },
+        {
+          "accuracy": 0.891,
+          "sensitivity": 0.9,
+          "specificity": 0.87,
+          "precision": 0.88,
+          "f1_score": 0.87,
+          "auc_roc": 0.928,
+          "inference_time_ms": 38.0,
+          "model": "EfficientNet-B0",
+          "type": "Classical Baseline"
+        }
+      ],
+      "roc_curves": [
+        {
+          "fpr": 0.0,
+          "tpr_vqc": 0.15,
+          "tpr_rf": 0.1
+        },
+        {
+          "fpr": 0.05,
+          "tpr_vqc": 0.92,
+          "tpr_rf": 0.87
+        },
+        {
+          "fpr": 0.1,
+          "tpr_vqc": 0.96,
+          "tpr_rf": 0.91
+        },
+        {
+          "fpr": 0.2,
+          "tpr_vqc": 0.99,
+          "tpr_rf": 0.95
+        },
+        {
+          "fpr": 1.0,
+          "tpr_vqc": 1.0,
+          "tpr_rf": 1.0
+        }
+      ]
+    }
+  }
+}
