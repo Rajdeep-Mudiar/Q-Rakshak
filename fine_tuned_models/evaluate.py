@@ -11,20 +11,23 @@ import argparse
 import json
 import sys
 from pathlib import Path
+import numpy as np
 
 # Add project roots for imports
 CURRENT_DIR = Path(__file__).resolve().parent
-if str(CURRENT_DIR) not in sys.path:
-    sys.path.insert(0, str(CURRENT_DIR))
+COMMON_DIR = CURRENT_DIR / "pipelines" / "common"
+for p in [str(CURRENT_DIR), str(COMMON_DIR)]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
 from pipelines.common.metrics_evaluator import evaluate_clinical_model
+from pipelines.common.quantum_circuits import StandaloneVQC, QuantumSupportVectorMachine
 
 
 def run_breast_cancer_evaluation(weights_dir: Path):
     import joblib
     from sklearn.datasets import load_breast_cancer
     from sklearn.model_selection import train_test_split
-    from quantum_circuits import StandaloneVQC, QuantumSupportVectorMachine
     
     data = load_breast_cancer()
     X = data.data.astype(np.float32)
@@ -74,7 +77,6 @@ def run_heart_disease_evaluation(weights_dir: Path):
     import joblib
     from pipelines.tabular.train_heart_disease import load_heart_data
     from sklearn.model_selection import train_test_split
-    from quantum_circuits import StandaloneVQC
     
     df, target = load_heart_data()
     X = df.values.astype(np.float32)
@@ -114,7 +116,6 @@ def run_parkinsons_evaluation(weights_dir: Path):
     import joblib
     from pipelines.tabular.train_parkinsons import load_parkinsons_data
     from sklearn.model_selection import train_test_split
-    from quantum_circuits import StandaloneVQC
     
     df, target = load_parkinsons_data()
     X = df.values.astype(np.float32)
@@ -154,7 +155,6 @@ def run_diabetes_evaluation(weights_dir: Path):
     import joblib
     from pipelines.tabular.train_diabetes import load_pima_data
     from sklearn.model_selection import train_test_split
-    from quantum_circuits import StandaloneVQC
     
     df, target = load_pima_data()
     X = df.values.astype(np.float32)
