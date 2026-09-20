@@ -2,7 +2,11 @@ from __future__ import annotations
 
 import torch
 import torch.nn as nn
-from torchvision import models
+
+try:
+    from torchvision import models
+except ImportError:
+    models = None
 
 
 class FeatureCNN(nn.Module):

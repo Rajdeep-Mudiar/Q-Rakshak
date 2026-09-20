@@ -13,14 +13,14 @@ export default function LiverDiseaseControls() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-      {/* Hepatic Parenchymal Involvement Slider */}
+      {/* Liver Severity Slider */}
       <div style={{ background: 'var(--dt-bg-surface)', border: '1px solid var(--dt-border-default)', padding: '10px', borderRadius: '6px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <label style={{ fontFamily: 'var(--dt-font-mono)', fontSize: '0.68rem', fontWeight: 700, color: 'var(--dt-text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <label style={{ fontFamily: 'var(--dt-font-sans)', fontSize: '0.72rem', fontWeight: 700, color: 'var(--dt-text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#D97706' }} />
-            Hepatic Parenchymal Tissue
+            Liver Risk Level
           </label>
-          <span style={{ fontFamily: 'var(--dt-font-mono)', fontSize: '0.60rem', fontWeight: 800, padding: '1px 6px', borderRadius: '4px', background: `${tier.hexColor}20`, color: tier.hexColor }}>
+          <span style={{ fontFamily: 'var(--dt-font-mono)', fontSize: '0.62rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', background: `${tier.hexColor}20`, color: tier.hexColor }}>
             {diseaseParams.percentage}% ({tier.label})
           </span>
         </div>
@@ -41,16 +41,16 @@ export default function LiverDiseaseControls() {
             value={diseaseParams.percentage}
             onChange={(e) => updateDiseaseParam('LIVER_DISEASE', 'percentage', Math.max(0, Math.min(100, Number(e.target.value))))}
             className="dt-input"
-            style={{ width: '54px', padding: '4px 6px', textAlign: 'center', fontSize: '0.68rem' }}
+            style={{ width: '54px', padding: '4px 6px', textAlign: 'center', fontSize: '0.70rem' }}
           />
         </div>
       </div>
 
-      {/* Hepatic Lobe Segmentation */}
+      {/* Liver Lobe Focus */}
       <div style={{ background: 'var(--dt-bg-surface)', border: '1px solid var(--dt-border-default)', padding: '10px', borderRadius: '6px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-        <label style={{ fontFamily: 'var(--dt-font-mono)', fontSize: '0.64rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--dt-text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <label style={{ fontFamily: 'var(--dt-font-sans)', fontSize: '0.68rem', fontWeight: 700, color: 'var(--dt-text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
           <Layers size={12} color="#F59E0B" />
-          Hepatic Lobe Segmentation
+          Focus Region
         </label>
         <div className="dt-grid-2">
           {disease.lobes.map((lobe) => (
@@ -59,7 +59,7 @@ export default function LiverDiseaseControls() {
               type="button"
               onClick={() => updateDiseaseParam('LIVER_DISEASE', 'selectedLobe', lobe.label)}
               className={`dt-affected-item ${diseaseParams.selectedLobe === lobe.label ? 'active' : ''}`}
-              style={{ padding: '6px 8px', fontSize: '0.66rem' }}
+              style={{ padding: '6px 8px', fontSize: '0.70rem' }}
             >
               <span>{lobe.label}</span>
             </button>

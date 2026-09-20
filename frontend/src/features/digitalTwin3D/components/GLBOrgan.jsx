@@ -113,13 +113,13 @@ export function GLBOrgan({
       material.emissive.set(vizState.emissiveColor);
       material.emissiveIntensity = vizState.emissiveIntensity * glow;
     } else if (isHovered) {
-      material.emissive.set('#B99D82');
-      material.emissiveIntensity = 0.35;
+      material.emissive.set('#38bdf8');
+      material.emissiveIntensity = 0.55;
     } else if (isSelected) {
-      material.emissive.set('#8A6042');
-      material.emissiveIntensity = 0.22;
+      material.emissive.set('#0284c7');
+      material.emissiveIntensity = 0.45;
     } else {
-      material.emissive.set('#33251E');
+      material.emissive.set('#000000');
       material.emissiveIntensity = 0;
     }
 
@@ -153,10 +153,11 @@ export function GLBOrgan({
     >
       <primitive object={clonedScene} />
 
+      {/* Selected Indicator Outline */}
       {isSelected && (
         <mesh scale={selectionOutlineScale}>
-          <sphereGeometry args={[0.55, 16, 16]} />
-          <meshBasicMaterial color="#8A6042" wireframe transparent opacity={0.45} />
+          <boxGeometry args={[0.35, 0.35, 0.35]} />
+          <meshBasicMaterial color="#38bdf8" wireframe transparent opacity={0.5} />
         </mesh>
       )}
     </group>

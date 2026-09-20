@@ -18,11 +18,11 @@ export default function BreastCancerControls() {
       {/* Left Breast Involvement */}
       <div style={{ background: 'var(--dt-bg-surface)', border: '1px solid var(--dt-border-default)', padding: '10px', borderRadius: '6px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <label style={{ fontFamily: 'var(--dt-font-mono)', fontSize: '0.68rem', fontWeight: 700, color: 'var(--dt-text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <label style={{ fontFamily: 'var(--dt-font-sans)', fontSize: '0.72rem', fontWeight: 700, color: 'var(--dt-text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#EC4899' }} />
-            Left Breast Tissue
+            Left Breast
           </label>
-          <span style={{ fontFamily: 'var(--dt-font-mono)', fontSize: '0.60rem', fontWeight: 800, padding: '1px 6px', borderRadius: '4px', background: `${leftTier.hexColor}20`, color: leftTier.hexColor }}>
+          <span style={{ fontFamily: 'var(--dt-font-mono)', fontSize: '0.62rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', background: `${leftTier.hexColor}20`, color: leftTier.hexColor }}>
             {diseaseParams.leftPercentage}% ({leftTier.label})
           </span>
         </div>
@@ -43,7 +43,7 @@ export default function BreastCancerControls() {
             value={diseaseParams.leftPercentage}
             onChange={(e) => updateDiseaseParam('BREAST_CANCER', 'leftPercentage', Math.max(0, Math.min(100, Number(e.target.value))))}
             className="dt-input"
-            style={{ width: '54px', padding: '4px 6px', textAlign: 'center', fontSize: '0.68rem' }}
+            style={{ width: '54px', padding: '4px 6px', textAlign: 'center', fontSize: '0.70rem' }}
           />
         </div>
       </div>
@@ -51,11 +51,11 @@ export default function BreastCancerControls() {
       {/* Right Breast Involvement */}
       <div style={{ background: 'var(--dt-bg-surface)', border: '1px solid var(--dt-border-default)', padding: '10px', borderRadius: '6px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <label style={{ fontFamily: 'var(--dt-font-mono)', fontSize: '0.68rem', fontWeight: 700, color: 'var(--dt-text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <label style={{ fontFamily: 'var(--dt-font-sans)', fontSize: '0.72rem', fontWeight: 700, color: 'var(--dt-text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#F472B6' }} />
-            Right Breast Tissue
+            Right Breast
           </label>
-          <span style={{ fontFamily: 'var(--dt-font-mono)', fontSize: '0.60rem', fontWeight: 800, padding: '1px 6px', borderRadius: '4px', background: `${rightTier.hexColor}20`, color: rightTier.hexColor }}>
+          <span style={{ fontFamily: 'var(--dt-font-mono)', fontSize: '0.62rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', background: `${rightTier.hexColor}20`, color: rightTier.hexColor }}>
             {diseaseParams.rightPercentage}% ({rightTier.label})
           </span>
         </div>
@@ -76,7 +76,7 @@ export default function BreastCancerControls() {
             value={diseaseParams.rightPercentage}
             onChange={(e) => updateDiseaseParam('BREAST_CANCER', 'rightPercentage', Math.max(0, Math.min(100, Number(e.target.value))))}
             className="dt-input"
-            style={{ width: '54px', padding: '4px 6px', textAlign: 'center', fontSize: '0.68rem' }}
+            style={{ width: '54px', padding: '4px 6px', textAlign: 'center', fontSize: '0.70rem' }}
           />
         </div>
       </div>

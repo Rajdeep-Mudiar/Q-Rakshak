@@ -30,25 +30,25 @@ function SkinMesh({ isFemale }) {
 
   const isSelected = selectedAnatomy === 'SKIN';
   const isHovered = hoveredAnatomy === 'SKIN';
-  const skinOpacity = xrayMode ? Math.max(0.06, 0.10 * (1 - xrayIntensity * 0.7)) : 0.18;
+  const skinOpacity = xrayMode ? Math.max(0.06, 0.12 * (1 - xrayIntensity * 0.7)) : 0.26;
 
   const { clonedScene } = useMemo(() => {
     const cloned = normalizeBodyScene(scene);
     const mat = new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color(isHovered ? '#60a5fa' : isSelected ? '#38bdf8' : '#a5b4cf'),
+      color: new THREE.Color(isHovered ? '#38bdf8' : isSelected ? '#0ea5e9' : '#64748b'),
       transparent: true,
       opacity: skinOpacity,
-      roughness: 0.14,
-      metalness: 0.05,
-      transmission: 0.7,
-      thickness: 0.35,
-      ior: 1.3,
+      roughness: 0.1,
+      metalness: 0.12,
+      transmission: 0.86,
+      thickness: 0.45,
+      ior: 1.2,
       depthWrite: false,
       side: THREE.FrontSide,
-      emissive: new THREE.Color(isHovered ? '#38bdf8' : isSelected ? '#0ea5e9' : '#000000'),
-      emissiveIntensity: isHovered ? 0.18 : isSelected ? 0.11 : 0,
-      clearcoat: 0.4,
-      clearcoatRoughness: 0.5
+      emissive: new THREE.Color(isHovered ? '#0284c7' : isSelected ? '#0369a1' : '#1e293b'),
+      emissiveIntensity: isHovered ? 0.45 : isSelected ? 0.35 : 0.12,
+      clearcoat: 0.85,
+      clearcoatRoughness: 0.2
     });
 
     cloned.traverse((child) => {

@@ -91,13 +91,13 @@ export function GLBLungs({ position = [0.0, 0.42, 0.0], scale = [0.21, 0.20, 0.2
       lungsMaterial.emissive.set(vizState.emissiveColor);
       lungsMaterial.emissiveIntensity = vizState.emissiveIntensity * glow;
     } else if (isHovered) {
-      lungsMaterial.emissive.set('#B99D82');
-      lungsMaterial.emissiveIntensity = 0.45;
+      lungsMaterial.emissive.set('#38bdf8');
+      lungsMaterial.emissiveIntensity = 0.5;
     } else if (isSelected) {
-      lungsMaterial.emissive.set('#8A6042');
-      lungsMaterial.emissiveIntensity = 0.35;
+      lungsMaterial.emissive.set('#0284c7');
+      lungsMaterial.emissiveIntensity = 0.4;
     } else {
-      lungsMaterial.emissive.set('#33251E');
+      lungsMaterial.emissive.set('#000000');
       lungsMaterial.emissiveIntensity = 0;
     }
   });
@@ -132,7 +132,7 @@ export function GLBLungs({ position = [0.0, 0.42, 0.0], scale = [0.21, 0.20, 0.2
       {isSelected && (
         <mesh scale={1.12}>
           <boxGeometry args={[0.9, 1.05, 0.3]} />
-          <meshBasicMaterial color="#8A6042" wireframe transparent opacity={0.55} />
+          <meshBasicMaterial color="#38bdf8" wireframe transparent opacity={0.55} />
         </mesh>
       )}
     </group>

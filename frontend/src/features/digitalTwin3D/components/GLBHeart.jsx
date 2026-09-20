@@ -92,13 +92,13 @@ export function GLBHeart({ position = [-0.030, 0.42, 0.03], scale = [0.11, 0.11,
         heartMaterial.emissive.set(vizState.emissiveColor);
         heartMaterial.emissiveIntensity = vizState.emissiveIntensity * glow;
       } else if (isHovered) {
-        heartMaterial.emissive.set('#B99D82');
-        heartMaterial.emissiveIntensity = 0.45;
+        heartMaterial.emissive.set('#38bdf8');
+        heartMaterial.emissiveIntensity = 0.5;
       } else if (isSelected) {
-        heartMaterial.emissive.set('#8A6042');
-        heartMaterial.emissiveIntensity = 0.35;
+        heartMaterial.emissive.set('#0284c7');
+        heartMaterial.emissiveIntensity = 0.4;
       } else {
-        heartMaterial.emissive.set('#33251E');
+        heartMaterial.emissive.set('#000000');
         heartMaterial.emissiveIntensity = 0;
       }
     }
@@ -132,7 +132,7 @@ export function GLBHeart({ position = [-0.030, 0.42, 0.03], scale = [0.11, 0.11,
       {isSelected && (
         <mesh scale={1.15}>
           <sphereGeometry args={[0.55, 16, 16]} />
-          <meshBasicMaterial color="#8A6042" wireframe transparent opacity={0.6} />
+          <meshBasicMaterial color="#38bdf8" wireframe transparent opacity={0.6} />
         </mesh>
       )}
     </group>

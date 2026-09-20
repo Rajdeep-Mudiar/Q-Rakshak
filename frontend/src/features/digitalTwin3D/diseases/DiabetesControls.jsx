@@ -8,18 +8,18 @@ export default function DiabetesControls() {
   const updateDiseaseParam = useTwinStore((state) => state.updateDiseaseParam);
 
   const targets = [
-    { key: 'pancreas', label: 'Pancreas (Endocrine/Islet)', val: diseaseParams.pancreas },
-    { key: 'kidneyLeft', label: 'Left Kidney (Renal/Nephron)', val: diseaseParams.kidneyLeft },
-    { key: 'kidneyRight', label: 'Right Kidney (Renal/Nephron)', val: diseaseParams.kidneyRight },
-    { key: 'heart', label: 'Heart (Cardiovascular Baseline)', val: diseaseParams.heart },
-    { key: 'vascular', label: 'Vascular Network (Micro/Macro)', val: diseaseParams.vascular },
+    { key: 'pancreas', label: 'Pancreas', val: diseaseParams.pancreas },
+    { key: 'kidneyLeft', label: 'Left Kidney', val: diseaseParams.kidneyLeft },
+    { key: 'kidneyRight', label: 'Right Kidney', val: diseaseParams.kidneyRight },
+    { key: 'heart', label: 'Heart', val: diseaseParams.heart },
+    { key: 'vascular', label: 'Blood Vessels', val: diseaseParams.vascular },
   ];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-      <div style={{ padding: '8px 10px', borderRadius: '6px', background: 'rgba(212, 175, 55, 0.1)', border: '1px solid var(--dt-gold-glow)', fontSize: '0.66rem', color: 'var(--dt-gold)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-        <Network size={14} color="var(--dt-gold)" />
-        <span><strong>Systemic Model:</strong> Adjust involvement across multiple target organs simultaneously.</span>
+      <div style={{ padding: '8px 10px', borderRadius: '6px', background: 'rgba(2, 132, 199, 0.08)', border: '1px solid rgba(2, 132, 199, 0.2)', fontSize: '0.70rem', color: 'var(--dt-text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <Network size={14} color="var(--dt-accent-blue)" />
+        <span>Adjust sliders to simulate disease impact on each organ.</span>
       </div>
 
       {targets.map((item) => {

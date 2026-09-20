@@ -74,7 +74,7 @@ function BreastStructure({ id, position, isFemale }) {
           transparent
           opacity={opacity}
           side={THREE.DoubleSide}
-          emissive={diseaseOverlayActive ? vizState.emissiveColor : isHovered ? '#B99D82' : '#33251E'}
+          emissive={diseaseOverlayActive ? vizState.emissiveColor : isHovered ? '#38bdf8' : '#000000'}
           emissiveIntensity={diseaseOverlayActive ? vizState.emissiveIntensity : isHovered ? 0.35 : 0}
         />
       </mesh>
@@ -87,7 +87,7 @@ function BreastStructure({ id, position, isFemale }) {
       {isSelected && (
         <mesh scale={1.12}>
           <sphereGeometry args={[0.24, 16, 16, 0, Math.PI * 2, 0, Math.PI * 0.52]} />
-          <meshBasicMaterial color="#8A6042" wireframe transparent opacity={0.5} />
+          <meshBasicMaterial color="#38bdf8" wireframe transparent opacity={0.5} />
         </mesh>
       )}
     </group>

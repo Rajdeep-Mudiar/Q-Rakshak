@@ -43,23 +43,23 @@ export default function RightSidebar() {
       <div className="dt-panel-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Info size={16} color="var(--dt-accent-blue)" />
-          <h3 style={{ fontSize: '0.80rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--dt-text-primary)', margin: 0 }}>
-            Anatomy Inspector
+          <h3 style={{ fontSize: '0.82rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--dt-text-primary)', margin: 0 }}>
+            Organ Details
           </h3>
         </div>
         <span
           style={{
-            fontFamily: 'var(--dt-font-mono)',
-            fontSize: '0.60rem',
-            padding: '2px 7px',
+            fontFamily: 'var(--dt-font-sans)',
+            fontSize: '0.64rem',
+            padding: '2px 8px',
             borderRadius: '4px',
-            background: 'var(--dt-bg-card-hover)',
+            background: 'var(--dt-accent-blue-soft)',
             color: 'var(--dt-accent-blue)',
-            border: '1px solid var(--dt-border-default)',
+            border: '1px solid rgba(2, 132, 199, 0.2)',
             fontWeight: 700,
           }}
         >
-          {selectedAnatomy || 'NONE SELECTED'}
+          {selectedAnatomy || 'SELECT AN ORGAN'}
         </span>
       </div>
 
@@ -67,16 +67,16 @@ export default function RightSidebar() {
         {/* 1. Active Affected Organs Summary */}
         <div className="dt-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.72rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--dt-text-primary)' }}>
-              Affected Organs ({affectedList.length})
+            <span style={{ fontSize: '0.74rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--dt-text-primary)' }}>
+              Organs at Risk ({affectedList.length})
             </span>
-            <ShieldAlert size={14} color="#D97706" />
+            <ShieldAlert size={14} color={affectedList.length > 0 ? '#DC2626' : '#10B981'} />
           </div>
 
           <div className="dt-affected-list">
             {affectedList.length === 0 ? (
-              <p style={{ fontSize: '0.70rem', color: 'var(--dt-text-muted)', margin: 0 }}>
-                No active disease hotspots mapped.
+              <p style={{ fontSize: '0.74rem', color: 'var(--dt-text-muted)', margin: 0, padding: '4px 0' }}>
+                All organs in normal range.
               </p>
             ) : (
               affectedList.map((item) => (
@@ -92,8 +92,8 @@ export default function RightSidebar() {
                   <span style={{ fontWeight: 600 }}>{item.label}</span>
                   <span
                     style={{
-                      fontSize: '0.62rem',
-                      padding: '2px 7px',
+                      fontSize: '0.64rem',
+                      padding: '2px 8px',
                       borderRadius: '4px',
                       background: `${item.tier.hexColor}15`,
                       color: item.tier.hexColor,
@@ -112,28 +112,28 @@ export default function RightSidebar() {
         {/* 2. Disease Simulation Baseline */}
         <div className="dt-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.72rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--dt-text-primary)' }}>
-              Health view status
+            <span style={{ fontSize: '0.74rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--dt-text-primary)' }}>
+              Simulation Overview
             </span>
             <Activity size={14} color="var(--dt-accent-blue)" />
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.74rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.76rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--dt-text-muted)' }}>Anatomical Sex:</span>
-              <strong style={{ color: 'var(--dt-text-primary)' }}>{patient.sex || 'Female'}</strong>
+              <span style={{ color: 'var(--dt-text-muted)' }}>Sex:</span>
+              <strong style={{ color: 'var(--dt-text-primary)', textTransform: 'capitalize' }}>{patient.sex || 'Female'}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--dt-text-muted)' }}>Age Cohort:</span>
+              <span style={{ color: 'var(--dt-text-muted)' }}>Age Group:</span>
               <strong style={{ color: 'var(--dt-text-primary)' }}>{patient.ageGroup || '40-60 yrs'}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--dt-text-muted)' }}>Condition:</span>
+              <span style={{ color: 'var(--dt-text-muted)' }}>Selected Disease:</span>
               <strong style={{ color: 'var(--dt-accent-blue)' }}>{disease?.name || 'Breast Cancer'}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--dt-text-muted)' }}>Update status:</span>
-              <strong style={{ color: 'var(--dt-accent-brown, #6D5743)' }}>Updated</strong>
+              <span style={{ color: 'var(--dt-text-muted)' }}>Status:</span>
+              <strong style={{ color: '#059669' }}>Live</strong>
             </div>
           </div>
         </div>

@@ -383,8 +383,9 @@ async def persist_clinical_diagnostic_record(
     return {"status": "success", "record_id": rid, "message": "Diagnostic record stored in database."}
 
 
+@router.get("/patient")
 @router.get("/patient/{patient_id}")
-async def get_patient_clinical_record(patient_id: str):
+async def get_patient_clinical_record(patient_id: str = "USR-5EF52B"):
     """Retrieves real patient clinical telemetry, conditions, and vitals from the SQLite database."""
     patient = DatabaseRepository.get_patient(patient_id)
     if not patient:
@@ -650,12 +651,22 @@ async def diagnose_medical_image(
     primary_conf = arbitration["primary_confidence"]
     active_engine = arbitration["active_engine"]
 
+    display_probs = q_probs if active_engine == "quantum" else c_probs
+    probs_dict = {
+        class_labels[i] if i < len(class_labels) else f"Class {i}": float(round(display_probs[i], 4))
+        for i in range(len(display_probs))
+    }
+    arbitration_margin = float(round(abs(arbitration["quantum_prediction"]["confidence"] - arbitration["classical_prediction"]["confidence"]), 4))
+
     try:
-        top_features = await anyio.to_thread.run_sync(
-            explainer.compute_quantum_perturbation_importance,
-            lambda x: vqc.predict_proba(x),
-            sample_q[0]
-        )
+        if "sample_q" in locals() and sample_q is not None and len(sample_q) > 0:
+            top_features = await anyio.to_thread.run_sync(
+                explainer.compute_quantum_perturbation_importance,
+                lambda x: vqc.predict_proba(x),
+                sample_q[0]
+            )
+        else:
+            top_features = []
     except Exception:
         top_features = [
             {"feature": "Optical Tissue Density", "importance": 0.34, "direction": "positive"},
@@ -686,7 +697,7 @@ async def diagnose_medical_image(
         "model_architecture": f"Q-Vision-VQC ({module.get('arch', 'VQC')})",
         "prediction": {"class": primary_label, "confidence": primary_conf},
         "classical_baseline": {"model": classical_model_name, "confidence": float(np.max(c_probs))},
-        "probabilities": arbitration["probabilities"],
+        "probabilities": probs_dict,
         "explainability": {
             "top_features": top_features,
             "bounding_boxes": attention_data.get("bounding_boxes", []),
@@ -701,15 +712,17 @@ async def diagnose_medical_image(
         "record_id": rid,
         "disease": disease_name,
         "patient_id": patient_id,
+        "active_engine": active_engine,
+        "hybrid_arbitration": arbitration,
         "prediction": {
             "class": primary_label,
             "confidence": primary_conf,
             "engine": active_engine,
             "quantum_latency_ms": round(q_latency_ms, 2),
             "classical_latency_ms": round(c_latency_ms, 2),
-            "arbitration_margin": arbitration["arbitration_margin"],
+            "arbitration_margin": arbitration_margin,
         },
-        "probabilities": arbitration["probabilities"],
+        "probabilities": probs_dict,
         "explainability": {
             "method": "Quantum State Perturbation Gradient + Saliency Map",
             "top_features": top_features,
@@ -720,9 +733,9 @@ async def diagnose_medical_image(
         },
         "classical_baseline": {
             "model": classical_model_name,
-            "prediction": arbitration["classical_label"],
+            "prediction": arbitration["classical_prediction"]["label"],
             "confidence": float(round(np.max(c_probs), 4)),
-            "probabilities": {class_labels[i]: float(round(p, 4)) for i, p in enumerate(c_probs)},
+            "probabilities": {class_labels[i] if i < len(class_labels) else f"Class {i}": float(round(p, 4)) for i, p in enumerate(c_probs)},
         },
         "image_telemetry": {
             "resolution": f"{w} × {h}",

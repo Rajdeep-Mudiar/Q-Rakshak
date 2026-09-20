@@ -17,7 +17,7 @@ export default function BottomBar() {
       {/* Visual Severity Legend */}
       <div className="dt-legend-group">
         <span style={{ color: 'var(--dt-text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-          Severity:
+          Risk Level:
         </span>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {SEVERITY_TIERS.map((tier) => (
@@ -42,21 +42,21 @@ export default function BottomBar() {
         <div className="dt-legend-item" style={{ background: 'var(--dt-accent-blue-soft)', borderColor: 'rgba(37, 99, 235, 0.2)' }}>
           <Activity size={12} color="var(--dt-accent-blue)" />
           <span style={{ color: 'var(--dt-accent-blue)', fontWeight: 700 }}>
-            Peak Risk: {maxInvolvement}%
+            Max Risk: {maxInvolvement}%
           </span>
         </div>
 
         <div className="dt-legend-item">
           <ShieldAlert size={12} color="var(--dt-accent-blue)" />
           <span style={{ color: 'var(--dt-text-primary)', fontWeight: 600 }}>
-            {organCount} Hotspot{organCount !== 1 ? 's' : ''}
+            {organCount} Affected Organ{organCount !== 1 ? 's' : ''}
           </span>
         </div>
 
         <div className="dt-legend-item" style={{ background: 'var(--dt-bg-card-hover)', borderColor: 'var(--dt-border-default)' }}>
           <Cpu size={12} color="var(--dt-accent-blue)" />
           <span style={{ color: 'var(--dt-accent-blue)', fontWeight: 700 }}>
-            {patientMode === 'active' ? `Health view updated: ${patient.patientId || patient.id || ''}` : 'Ready to explore'}
+            {patientMode === 'active' ? `Live: ${patient.patientId || patient.id || ''}` : 'Ready'}
           </span>
         </div>
       </div>

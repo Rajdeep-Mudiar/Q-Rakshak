@@ -32,55 +32,63 @@ export default function AnatomyLabel({ anatomyId, position }) {
       position={[targetPos[0], targetPos[1] + 0.08, targetPos[2]]}
       distanceFactor={4.5}
       center
-      style={{ pointerEvents: 'auto', transition: 'opacity 0.1s ease' }}
+      style={{ pointerEvents: 'auto', transition: 'all 0.15s ease' }}
     >
       <div
         onClick={(e) => {
           e.stopPropagation();
           setSelectedAnatomy(isSelected ? null : anatomyId);
         }}
-        className="dt-anatomy-label-badge"
         style={{
+          cursor: 'pointer',
+          padding: '4px 10px',
+          borderRadius: '20px',
           background: isSelected
-            ? 'rgba(15, 118, 110, 0.95)'
+            ? 'rgba(2, 132, 199, 0.92)'
             : percentage > 40
-            ? 'rgba(159, 18, 57, 0.95)'
-            : 'rgba(14, 16, 23, 0.92)',
-          borderColor: isSelected
-            ? 'var(--dt-teal-glow)'
+            ? 'rgba(225, 29, 72, 0.92)'
+            : 'rgba(15, 23, 42, 0.88)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          border: isSelected
+            ? '1px solid #38bdf8'
             : percentage > 40
-            ? '#F43F5E'
-            : 'var(--dt-border-default)',
+            ? '1px solid #f43f5e'
+            : '1px solid rgba(255, 255, 255, 0.15)',
           boxShadow: isSelected
-            ? '0 0 16px rgba(45, 212, 191, 0.35)'
+            ? '0 0 16px rgba(56, 189, 248, 0.45)'
             : percentage > 40
-            ? '0 0 16px rgba(244, 63, 94, 0.35)'
+            ? '0 0 16px rgba(244, 63, 94, 0.45)'
             : '0 4px 14px rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          whiteSpace: 'nowrap',
+          userSelect: 'none',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
-          <span style={{ fontFamily: 'var(--dt-font-mono)', fontSize: '0.68rem', fontWeight: 800, color: '#FFFFFF' }}>
-            {anatomy.label}
-          </span>
-          {percentage > 0 && (
-            <span
-              style={{
-                fontFamily: 'var(--dt-font-mono)',
-                fontSize: '0.60rem',
-                fontWeight: 800,
-                padding: '1px 5px',
-                borderRadius: '3px',
-                background: percentage > 40 ? 'rgba(239, 68, 68, 0.4)' : 'rgba(16, 185, 129, 0.4)',
-                color: '#FFFFFF'
-              }}
-            >
-              {percentage}%
-            </span>
-          )}
-        </div>
-        <div style={{ fontFamily: 'var(--dt-font-mono)', fontSize: '0.56rem', color: percentage > 40 ? '#FCA5A5' : 'var(--dt-text-muted)', marginTop: '1px' }}>
-          {percentage > 40 ? 'Elevated health reading' : 'Within expected range'}
-        </div>
+        <span
+          style={{
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            background: percentage > 40 ? '#f43f5e' : percentage > 0 ? '#fbbf24' : '#10b981',
+            boxShadow: `0 0 8px ${percentage > 40 ? '#f43f5e' : percentage > 0 ? '#fbbf24' : '#10b981'}`
+          }}
+        />
+        <span style={{ fontSize: '0.70rem', fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.01em' }}>
+          {anatomy.label}
+        </span>
+        <span
+          style={{
+            fontSize: '0.62rem',
+            fontWeight: 600,
+            color: percentage > 40 ? '#fecdd3' : percentage > 0 ? '#fde68a' : '#a7f3d0',
+            opacity: 0.95
+          }}
+        >
+          {percentage > 0 ? `${percentage}% Risk` : 'Normal'}
+        </span>
       </div>
     </Html>
   );

@@ -33,18 +33,19 @@ export default function DigitalTwinViewer({ canvasRef, compact = false }) {
 
   const cameraPresets = compact ? ['Front', 'Top'] : ['Front', 'Back', 'Left', 'Right', 'Top'];
 
-  const quickOrgans = [
-    { id: 'BRAIN', label: 'Brain' },
-    { id: 'HEART', label: 'Heart' },
-    { id: 'LUNG_LEFT', label: 'Lungs' },
-    { id: 'LIVER', label: 'Liver' },
-    { id: 'KIDNEY_LEFT', label: 'Kidneys' },
-  ];
-
   return (
     <ErrorBoundary>
-      <div ref={containerRef} style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', userSelect: 'none', background: '#000000' }}>
-
+      <div
+        ref={containerRef}
+        style={{
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+          overflow: 'hidden',
+          userSelect: 'none',
+          background: 'radial-gradient(circle at 50% 35%, #151f38 0%, #0a0f1d 55%, #050811 100%)'
+        }}
+      >
         {/* 3D WebGL Canvas */}
         <Canvas
           ref={canvasRef}
@@ -58,20 +59,28 @@ export default function DigitalTwinViewer({ canvasRef, compact = false }) {
           shadows
           style={{ width: '100%', height: '100%', cursor: 'grab' }}
         >
-          <color attach="background" args={['#000000']} />
+          {/* Subtle atmospheric fog */}
+          <fog attach="fog" args={['#0a0f1d', 6, 25]} />
 
-          {/* Cinematic Anatomical Studio Lighting */}
-          <ambientLight intensity={1.1} />
-          <directionalLight position={[5, 8, 5]} intensity={1.6} castShadow shadow-mapSize={[2048, 2048]} />
-          <directionalLight position={[-5, 6, -4]} intensity={0.9} color="#A67C5B" />
-          <directionalLight position={[0, -2, 4]} intensity={0.5} color="#8A6042" />
-          <pointLight position={[0, 0.4, 2.2]} intensity={1.2} color="#FFF8EF" distance={8} />
-          <hemisphereLight skyColor="#F3EADF" groundColor="#D8C3AD" intensity={0.7} />
+          {/* Futuristic Medical Studio Lighting */}
+          <ambientLight intensity={1.3} color="#e0f2fe" />
+          
+          {/* Key Light (Front-Right Pure White) */}
+          <directionalLight position={[4, 6, 4]} intensity={2.2} color="#ffffff" castShadow shadow-mapSize={[1024, 1024]} />
+          
+          {/* Cyan Rim Light (Back-Left Holographic Glow) */}
+          <directionalLight position={[-4, 5, -4]} intensity={1.8} color="#38bdf8" />
+          
+          {/* Indigo/Violet Fill Light (Bottom Up) */}
+          <directionalLight position={[0, -3, 3]} intensity={0.9} color="#818cf8" />
+          
+          {/* Core Spotlight */}
+          <pointLight position={[0, 0.4, 2.0]} intensity={1.5} color="#ffffff" distance={7} />
 
-          {/* Holographic Floor Grid */}
+          {/* Holographic Glowing Floor Ring & Grid */}
           <gridHelper
-            args={[6, 24, '#1E293B', '#0F172A']}
-            position={[0, -0.90, 0]}
+            args={[5, 20, '#0284c7', '#1e293b']}
+            position={[0, -0.92, 0]}
           />
 
           <Suspense fallback={null}>

@@ -25,10 +25,10 @@ function SectionHeader({ icon: Icon, title, color = 'var(--dt-accent-blue)' }) {
 
 // ── Tab Definitions ────────────────────────────────────────────────────────────
 const TABS = [
-  { id: 'overview',   label: 'Health data',    icon: Activity },
-  { id: 'disease',    label: 'Simulation',   icon: Stethoscope },
-  { id: 'history',    label: 'History',      icon: Clock },
-  { id: 'meds',       label: 'Prescriptions', icon: Pill },
+  { id: 'overview',   label: 'Vitals',        icon: Activity },
+  { id: 'disease',    label: 'Simulation',    icon: Stethoscope },
+  { id: 'history',    label: 'History',       icon: Clock },
+  { id: 'meds',       label: 'Medications',   icon: Pill },
 ];
 
 // ── Health data and overview tab ─────────────────────────────────────────────
@@ -64,52 +64,51 @@ function TelemetryTab() {
       <div className="dt-card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
-            <div style={{ fontFamily: 'var(--dt-font-mono)', fontSize: '0.62rem', color: 'var(--dt-accent-blue)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Patient health record
+            <div style={{ fontFamily: 'var(--dt-font-sans)', fontSize: '0.64rem', color: 'var(--dt-accent-blue)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Patient Profile
             </div>
-            <div style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--dt-text-primary)', marginTop: '2px' }}>
+            <div style={{ fontSize: '0.94rem', fontWeight: 800, color: 'var(--dt-text-primary)', marginTop: '2px' }}>
               {patient.firstName ? `${patient.firstName} ${patient.lastName || ''}`.trim() : (patient.patientId ? `Patient #${patient.patientId}` : 'Patient')}
             </div>
-            <div style={{ fontSize: '0.66rem', color: 'var(--dt-text-muted)', fontFamily: 'var(--dt-font-mono)', marginTop: '2px' }}>
-              ABHA: {patient.abhaId || '—'}
+            <div style={{ fontSize: '0.68rem', color: 'var(--dt-text-muted)', marginTop: '2px' }}>
+              ID: {patient.patientId || patient.id || '—'}
             </div>
           </div>
           <span
             style={{
               padding: '3px 8px',
               borderRadius: '4px',
-              background: 'var(--dt-bg-card-hover)',
-              border: '1px solid var(--dt-border-default)',
+              background: 'var(--dt-accent-blue-soft)',
+              border: '1px solid rgba(2, 132, 199, 0.2)',
               color: 'var(--dt-accent-blue)',
-              fontSize: '0.62rem',
+              fontSize: '0.64rem',
               fontWeight: 700,
-              fontFamily: 'var(--dt-font-mono)',
               display: 'flex',
               alignItems: 'center',
               gap: '4px'
             }}
           >
-            Record updated
+            <ShieldCheck size={11} /> Connected
           </span>
         </div>
 
         {/* Demographic Stats Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', marginTop: '6px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', marginTop: '8px' }}>
           <div style={{ background: 'var(--dt-bg-surface)', padding: '6px 8px', borderRadius: '6px', border: '1px solid var(--dt-border-default)' }}>
             <div style={{ fontSize: '0.58rem', color: 'var(--dt-text-muted)', fontWeight: 700 }}>BLOOD</div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--dt-accent-blue)', fontFamily: 'var(--dt-font-mono)' }}>{patient.bloodType || '—'}</div>
+            <div style={{ fontSize: '0.80rem', fontWeight: 800, color: 'var(--dt-accent-blue)' }}>{patient.bloodType || '—'}</div>
           </div>
           <div style={{ background: 'var(--dt-bg-surface)', padding: '6px 8px', borderRadius: '6px', border: '1px solid var(--dt-border-default)' }}>
             <div style={{ fontSize: '0.58rem', color: 'var(--dt-text-muted)', fontWeight: 700 }}>SEX</div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--dt-text-primary)', textTransform: 'capitalize' }}>{patient.sex || '—'}</div>
+            <div style={{ fontSize: '0.80rem', fontWeight: 700, color: 'var(--dt-text-primary)', textTransform: 'capitalize' }}>{patient.sex || '—'}</div>
           </div>
           <div style={{ background: 'var(--dt-bg-surface)', padding: '6px 8px', borderRadius: '6px', border: '1px solid var(--dt-border-default)' }}>
             <div style={{ fontSize: '0.58rem', color: 'var(--dt-text-muted)', fontWeight: 700 }}>AGE</div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--dt-text-primary)' }}>{patient.ageGroup || (patient.dateOfBirth ? `${new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear()} yrs` : '—')}</div>
+            <div style={{ fontSize: '0.80rem', fontWeight: 700, color: 'var(--dt-text-primary)' }}>{patient.ageGroup || (patient.dateOfBirth ? `${new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear()} yrs` : '—')}</div>
           </div>
           <div style={{ background: 'var(--dt-bg-surface)', padding: '6px 8px', borderRadius: '6px', border: '1px solid var(--dt-border-default)' }}>
             <div style={{ fontSize: '0.58rem', color: 'var(--dt-text-muted)', fontWeight: 700 }}>BMI</div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--dt-text-primary)', fontFamily: 'var(--dt-font-mono)' }}>{hasBMI ? bmi : '—'}</div>
+            <div style={{ fontSize: '0.80rem', fontWeight: 800, color: 'var(--dt-text-primary)' }}>{hasBMI ? bmi : '—'}</div>
           </div>
         </div>
       </div>
@@ -118,9 +117,9 @@ function TelemetryTab() {
       {hasVitals ? (
         <div className="dt-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <SectionHeader icon={Activity} title="Heart and breathing" color="var(--dt-accent-blue)" />
+            <SectionHeader icon={Activity} title="Heart & Vitals" color="var(--dt-accent-blue)" />
             <span style={{ fontSize: '0.62rem', color: 'var(--dt-accent-blue)', fontWeight: 600 }}>
-              Updated health data
+              Live Readings
             </span>
           </div>
 
@@ -130,7 +129,7 @@ function TelemetryTab() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '0.62rem', color: 'var(--dt-text-muted)', fontWeight: 700 }}>BLOOD PRESSURE</span>
                 {sys !== null && dia !== null && (
-                  <span style={{ fontSize: '0.56rem', fontWeight: 700, padding: '1px 5px', borderRadius: '3px', background: 'var(--dt-bg-card-hover)', color: 'var(--dt-accent-blue)', border: '1px solid var(--dt-border-default)' }}>
+                  <span style={{ fontSize: '0.56rem', fontWeight: 700, padding: '1px 5px', borderRadius: '3px', background: bpElevated ? '#fee2e2' : '#e0f2fe', color: bpElevated ? '#dc2626' : 'var(--dt-accent-blue)' }}>
                     {bpElevated ? 'ELEVATED' : 'NORMAL'}
                   </span>
                 )}
@@ -154,11 +153,11 @@ function TelemetryTab() {
             {/* SpO2 Saturation */}
             <div style={{ background: 'var(--dt-bg-surface)', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--dt-border-default)', display: 'flex', flexDirection: 'column', gap: '3px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.62rem', color: 'var(--dt-text-muted)', fontWeight: 700 }}>OXYGEN SpO₂</span>
+                <span style={{ fontSize: '0.62rem', color: 'var(--dt-text-muted)', fontWeight: 700 }}>OXYGEN LEVEL</span>
                 <Wind size={12} color="var(--dt-accent-blue)" />
               </div>
               <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--dt-text-primary)', fontFamily: 'var(--dt-font-sans)' }}>
-                {spo2 !== null ? <>{spo2}% <span style={{ fontSize: '0.64rem', color: 'var(--dt-text-muted)', fontWeight: 500 }}>SaO2</span></> : '—'}
+                {spo2 !== null ? <>{spo2}% <span style={{ fontSize: '0.64rem', color: 'var(--dt-text-muted)', fontWeight: 500 }}>SpO2</span></> : '—'}
               </div>
             </div>
 
@@ -177,14 +176,14 @@ function TelemetryTab() {
       ) : (
         <div className="dt-card" style={{ textAlign: 'center', padding: '16px 12px' }}>
           <Activity size={20} color="var(--dt-text-muted)" style={{ margin: '0 auto 6px' }} />
-          <div style={{ fontSize: '0.72rem', color: 'var(--dt-text-muted)', fontWeight: 600 }}>No clinical telemetry recorded</div>
-          <div style={{ fontSize: '0.64rem', color: 'var(--dt-text-muted)', marginTop: '3px' }}>Cardiopulmonary vitals populate when clinical ICU telemetry or diagnostic sensor streams are connected.</div>
+          <div style={{ fontSize: '0.74rem', color: 'var(--dt-text-secondary)', fontWeight: 700 }}>No vitals recorded</div>
+          <div style={{ fontSize: '0.68rem', color: 'var(--dt-text-muted)', marginTop: '3px' }}>Vitals populate automatically when connected to patient telemetry.</div>
         </div>
       )}
 
       {/* Active Diagnosed Conditions & Symptoms */}
       <div className="dt-card">
-        <SectionHeader icon={AlertTriangle} title="Diagnosed Conditions & Symptoms" color="#D97706" />
+        <SectionHeader icon={AlertTriangle} title="Symptoms & Conditions" color="#D97706" />
         {patient.symptoms?.length > 0 ? (
           <div className="dt-symptoms-matrix">
             {patient.symptoms.map((symptom) => {
@@ -195,7 +194,7 @@ function TelemetryTab() {
                   type="button"
                   onClick={() => toggleSymptom(symptom)}
                   className={`dt-symptom-tag ${active ? 'active' : ''}`}
-                  title="Toggle symptom status"
+                  title="Toggle symptom"
                 >
                   {active && <Check size={11} strokeWidth={3} />}
                   <span>{symptom}</span>
@@ -204,15 +203,15 @@ function TelemetryTab() {
             })}
           </div>
         ) : (
-          <div style={{ fontSize: '0.70rem', color: 'var(--dt-text-muted)', fontStyle: 'italic', padding: '8px 0' }}>
-            No conditions recorded
+          <div style={{ fontSize: '0.72rem', color: 'var(--dt-text-muted)', fontStyle: 'italic', padding: '6px 0' }}>
+            No symptoms recorded
           </div>
         )}
       </div>
 
       {/* Clinical Observations & Record Notes */}
       <div className="dt-card">
-        <label className="dt-label">Physician Clinical Narrative</label>
+        <label className="dt-label">Doctor Notes</label>
         <div
           style={{
             background: 'var(--dt-bg-surface)',
@@ -225,7 +224,7 @@ function TelemetryTab() {
             fontStyle: patient.notes ? 'normal' : 'italic',
           }}
         >
-          {patient.notes || 'No physician notes recorded.'}
+          {patient.notes || 'No doctor notes recorded.'}
         </div>
       </div>
     </div>
@@ -241,7 +240,7 @@ function DiseaseTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
       <div className="dt-card">
-        <SectionHeader icon={Stethoscope} title="Target Disease Models" color="var(--dt-accent-blue)" />
+        <SectionHeader icon={Stethoscope} title="Select Condition to Simulate" color="var(--dt-accent-blue)" />
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           {diseases.map((d) => (
             <button
@@ -254,13 +253,13 @@ function DiseaseTab() {
                 <div style={{ fontWeight: 700, color: selectedDisease === d.id ? 'var(--dt-accent-blue)' : 'var(--dt-text-primary)' }}>
                   {d.name}
                 </div>
-                <div style={{ fontSize: '0.64rem', color: 'var(--dt-text-muted)', marginTop: '2px' }}>
+                <div style={{ fontSize: '0.66rem', color: 'var(--dt-text-muted)', marginTop: '2px' }}>
                   {d.category}
                 </div>
               </div>
               <span
                 style={{
-                  fontSize: '0.60rem',
+                  fontSize: '0.62rem',
                   padding: '2px 7px',
                   borderRadius: '4px',
                   background: selectedDisease === d.id ? 'var(--dt-accent-blue-soft)' : 'var(--dt-bg-card-hover)',
@@ -278,8 +277,8 @@ function DiseaseTab() {
       {/* Disease Controls */}
       <div className="dt-card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <label className="dt-label">Health readings</label>
-          <span style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--dt-accent-blue)' }}>
+          <label className="dt-label">Organ Adjustments</label>
+          <span style={{ fontSize: '0.70rem', fontWeight: 700, color: 'var(--dt-accent-blue)' }}>
             {DISEASE_REGISTRY[selectedDisease]?.name}
           </span>
         </div>
@@ -324,7 +323,7 @@ function HistoryTab() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
       {/* Allergies Card */}
       <div className="dt-card">
-        <SectionHeader icon={AlertTriangle} title="Known allergies and cautions" color="var(--dt-accent-blue)" />
+        <SectionHeader icon={AlertTriangle} title="Allergies" color="var(--dt-accent-blue)" />
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
           {patient.allergies?.length > 0 ? (
             patient.allergies.map((allergy, idx) => {
@@ -358,7 +357,7 @@ function HistoryTab() {
               );
             })
           ) : (
-            <span style={{ fontSize: '0.72rem', color: 'var(--dt-text-muted)' }}>No known allergies recorded.</span>
+            <span style={{ fontSize: '0.72rem', color: 'var(--dt-text-muted)' }}>No known allergies.</span>
           )}
         </div>
 
@@ -379,7 +378,7 @@ function HistoryTab() {
 
       {/* Chronic Conditions Card */}
       <div className="dt-card">
-        <SectionHeader icon={Clock} title="Chronic Diagnoses" color="var(--dt-accent-blue)" />
+        <SectionHeader icon={Clock} title="Chronic Conditions" color="var(--dt-accent-blue)" />
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
           {((patient.chronicConditions && patient.chronicConditions.length > 0) ? patient.chronicConditions : (patient.medicalHistory || [])).length > 0 ? (
             ((patient.chronicConditions && patient.chronicConditions.length > 0) ? patient.chronicConditions : (patient.medicalHistory || [])).map((c, idx) => {
@@ -420,7 +419,7 @@ function HistoryTab() {
         <form onSubmit={handleAddCondition} style={{ display: 'flex', gap: '6px', marginTop: '4px' }}>
           <input
             type="text"
-            placeholder="Add chronic diagnosis..."
+            placeholder="Add condition..."
             value={newCondition}
             onChange={(e) => setNewCondition(e.target.value)}
             className="dt-input"
@@ -458,7 +457,7 @@ function MedsTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
       <div className="dt-card">
-        <SectionHeader icon={Pill} title="Active Medications" color="var(--dt-accent-blue)" />
+        <SectionHeader icon={Pill} title="Current Medications" color="var(--dt-accent-blue)" />
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           {patient.medications?.length > 0 ? (
             patient.medications.map((m, idx) => (
@@ -478,7 +477,7 @@ function MedsTab() {
                   <div style={{ fontSize: '0.76rem', fontWeight: 700, color: 'var(--dt-text-primary)' }}>
                     {m.name}
                   </div>
-                  <div style={{ fontSize: '0.64rem', color: 'var(--dt-text-muted)' }}>
+                  <div style={{ fontSize: '0.66rem', color: 'var(--dt-text-muted)' }}>
                     {m.dosage} • {m.frequency}
                   </div>
                 </div>
@@ -492,7 +491,7 @@ function MedsTab() {
               </div>
             ))
           ) : (
-            <span style={{ fontSize: '0.72rem', color: 'var(--dt-text-muted)' }}>No active medications listed.</span>
+            <span style={{ fontSize: '0.72rem', color: 'var(--dt-text-muted)' }}>No medications listed.</span>
           )}
         </div>
 
@@ -524,7 +523,7 @@ function MedsTab() {
             />
           </div>
           <button type="submit" className="dt-action-btn" style={{ justifyContent: 'center', marginTop: '2px' }}>
-            <Plus size={13} /> Add Prescription
+            <Plus size={13} /> Add Medication
           </button>
         </form>
       </div>
@@ -562,11 +561,11 @@ export default function LeftSidebar() {
       <div className="dt-panel-header">
         <div style={{ width: '100%' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-            <span style={{ fontSize: '0.64rem', fontFamily: 'var(--dt-font-mono)', fontWeight: 700, color: 'var(--dt-text-muted)', textTransform: 'uppercase' }}>
+            <span style={{ fontSize: '0.66rem', fontWeight: 700, color: 'var(--dt-text-muted)', textTransform: 'uppercase' }}>
               Patient Record
             </span>
-            <span style={{ fontSize: '0.62rem', color: 'var(--dt-accent-blue)', fontWeight: 600 }}>
-              Live Sync Active
+            <span style={{ fontSize: '0.64rem', color: 'var(--dt-accent-blue)', fontWeight: 600 }}>
+              Live Sync
             </span>
           </div>
 
@@ -585,7 +584,7 @@ export default function LeftSidebar() {
               className="dt-action-btn-primary"
               style={{ padding: '6px 12px', fontSize: '0.72rem' }}
             >
-              {isFetchingPatient ? <Loader2 size={12} className="spin" /> : 'Fetch'}
+              {isFetchingPatient ? <Loader2 size={12} className="spin" /> : 'Load'}
             </button>
           </form>
         </div>

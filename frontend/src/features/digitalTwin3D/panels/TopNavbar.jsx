@@ -22,15 +22,15 @@ export default function TopNavbar({ onExportReport }) {
   const [layersMenuOpen, setLayersMenuOpen] = useState(false);
 
   const layerItems = [
-    { key: 'skin',          label: 'Skin & Outer Surface' },
-    { key: 'skeleton',      label: 'Skeletal & Bone Structure' },
-    { key: 'organs',        label: 'Primary Internal Organs' },
-    { key: 'vessels',       label: 'Blood Vessels & Circulatory' },
-    { key: 'airway',        label: 'Respiratory Airway' },
-    { key: 'digestive',     label: 'Digestive Tract' },
-    { key: 'urinary',       label: 'Urinary System' },
-    { key: 'diseaseOverlay',label: 'Disease Heatmap Overlays' },
-    { key: 'labels',        label: '3D Anatomical Labels' },
+    { key: 'skin',          label: 'Skin Silhouette' },
+    { key: 'skeleton',      label: 'Skeleton & Bones' },
+    { key: 'organs',        label: 'Internal Organs' },
+    { key: 'vessels',       label: 'Blood Vessels' },
+    { key: 'airway',        label: 'Lungs & Airways' },
+    { key: 'digestive',     label: 'Digestive System' },
+    { key: 'urinary',       label: 'Kidneys & Bladder' },
+    { key: 'diseaseOverlay',label: 'Risk Highlights' },
+    { key: 'labels',        label: 'Organ Labels' },
   ];
 
   return (
@@ -43,16 +43,16 @@ export default function TopNavbar({ onExportReport }) {
         <div>
           <div className="dt-topbar-title-wrap">
             <h1 className="dt-topbar-title">
-              3D Digital Health Twin
+              3D Digital Twin
             </h1>
             <span className="dt-topbar-pill">
-              25 3D ORGANS
+              3D BODY VIEW
             </span>
           </div>
           <p className="dt-topbar-sub">
             {patientMode === 'active'
-              ? `Synchronized with Patient ${patient.patientId || patient.id || ''}`
-              : 'Interactive 3D health view'}
+              ? `Patient: ${patient.patientId || patient.id || 'Active Record'}`
+              : 'Interactive 3D Body Simulation'}
           </p>
         </div>
       </div>
@@ -67,7 +67,7 @@ export default function TopNavbar({ onExportReport }) {
             className="dt-action-btn"
           >
             <Layers size={14} color="var(--dt-accent-blue)" />
-            <span>Anatomy Layers</span>
+            <span>Body Layers</span>
             <ChevronDown size={13} color="var(--dt-text-muted)" />
           </button>
 
@@ -77,28 +77,27 @@ export default function TopNavbar({ onExportReport }) {
                 position: 'absolute',
                 right: 0,
                 marginTop: '6px',
-                width: '260px',
+                width: '240px',
                 borderRadius: '8px',
                 background: 'var(--dt-bg-surface)',
                 border: '1px solid var(--dt-border-default)',
                 padding: '8px',
-                boxShadow: '0 12px 28px rgba(15, 23, 42, 0.12)',
+                boxShadow: '0 12px 28px rgba(15, 23, 42, 0.15)',
                 zIndex: 60,
               }}
             >
               <div
                 style={{
-                  fontFamily: 'var(--dt-font-mono)',
-                  fontSize: '0.62rem',
+                  fontSize: '0.66rem',
                   fontWeight: 700,
                   color: 'var(--dt-text-muted)',
                   textTransform: 'uppercase',
-                  letterSpacing: '0.06em',
+                  letterSpacing: '0.04em',
                   padding: '4px 8px 6px',
                   borderBottom: '1px solid var(--dt-border-default)',
                 }}
               >
-                Anatomical Layers ({layerItems.length})
+                Toggle Visible Layers
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '6px' }}>
                 {layerItems.map((item) => (
@@ -173,7 +172,7 @@ export default function TopNavbar({ onExportReport }) {
           className="dt-action-btn-primary"
         >
           <Download size={14} strokeWidth={2.5} />
-          <span>Export Clinical Report</span>
+          <span>Export Report</span>
         </button>
       </div>
     </header>
