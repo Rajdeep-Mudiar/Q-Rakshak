@@ -2,22 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
-  Activity,
   Cpu,
-  CheckCircle2,
-  AlertTriangle,
   Zap,
-  BookOpen,
+  ArrowUpRight,
   ExternalLink,
-  ShieldCheck,
-  TrendingUp,
-  BarChart3,
-  Heart,
-  Eye,
-  Brain,
-  Layers,
-  Sparkles,
-  ArrowUpRight
+  ChevronRight,
 } from "lucide-react";
 import ModelDocModal from "./ModelDocModal.jsx";
 
@@ -28,89 +17,92 @@ if (typeof window !== "undefined") {
 const EVALUATION_SECTIONS = [
   {
     id: "breast-cancer",
+    index: "01",
     headingLine: "---> [Evaluating Breast Cancer Models] <---",
-    title: "Wisconsin Diagnostic Breast Cancer (WDBC)",
-    badge: "ONCOLOGICAL DIAGNOSTICS",
-    badgeColor: "#D946EF",
-    badgeBg: "rgba(217, 70, 239, 0.12)",
-    badgeBorder: "rgba(217, 70, 239, 0.3)",
-    description: "Multi-parameter comparative audit evaluating quantum variational circuits against classical kernel and tree baselines on 569 fine-needle aspirates.",
-    theme: {
-      bg: "#090514",
-      orbColor: "#D946EF",
-      cardBg: "rgba(20, 10, 38, 0.65)",
-      accent: "#E879F9",
-      glow: "rgba(217, 70, 239, 0.22)",
-      border: "rgba(217, 70, 239, 0.28)",
-      gradient: "linear-gradient(135deg, rgba(217, 70, 239, 0.15) 0%, transparent 60%)",
-    },
+    headingTitle: "Evaluating Breast Cancer Models",
+    category: "ONCOLOGY // WDBC COHORT",
+    title: "Wisconsin Diagnostic Breast Cancer",
+    sampleSize: "N = 569 FNA Biopsies • 30 Morphological Dimensions",
+    description: "Standardized 5-seed patient-level stratified 3-way partition evaluating 8-qubit variational circuits against regularized classical kernel and tree ensembles.",
+    bgColor: "#09080A",
+    cardBg: "#0E0D10",
+    borderColor: "#222026",
+    accentColor: "#D4B3E2", // Soft muted chalk lilac
     docLink: "https://github.com/ARYANCY/QDoc/blob/main/documentation/models/breast_cancer.md",
     models: [
       {
         name: "OncoPulse-VQC",
+        architecture: "8-Qubit Circular VQC",
         type: "Quantum VQC",
         accuracy: "76.74%",
-        accuracyNum: 76.74,
         aucRoc: "0.8443",
         sensitivity: "0.9444",
         specificity: "0.4688",
+        sensSpec: "0.9444 / 0.4688",
         precision: "0.7500",
         f1Score: "0.8361",
+        precF1: "0.7500 / 0.8361",
         mccScore: "0.4909",
         eceError: "0.1440",
         avgLatency: "0.00 ms",
-        status: "Quantum Shadow",
+        status: "QUANTUM SHADOW",
         isQuantum: true,
         isChampion: false,
       },
       {
         name: "OncoPulse-QSVM",
+        architecture: "ZZ Feature Map Kernel",
         type: "Quantum QSVM",
         accuracy: "74.42%",
-        accuracyNum: 74.42,
         aucRoc: "0.8872",
         sensitivity: "0.9815",
         specificity: "0.3438",
+        sensSpec: "0.9815 / 0.3438",
         precision: "0.7162",
         f1Score: "0.8281",
+        precF1: "0.7162 / 0.8281",
         mccScore: "0.4537",
         eceError: "0.0584",
         avgLatency: "0.00 ms",
-        status: "Kernel Shadow",
+        status: "KERNEL SHADOW",
         isQuantum: true,
         isChampion: false,
       },
       {
         name: "Sentinel-RF",
+        architecture: "100-Tree Decision Forest",
         type: "Classical RF",
         accuracy: "88.37%",
-        accuracyNum: 88.37,
         aucRoc: "0.9792",
         sensitivity: "0.9259",
         specificity: "0.8125",
+        sensSpec: "0.9259 / 0.8125",
         precision: "0.8929",
         f1Score: "0.9091",
+        precF1: "0.8929 / 0.9091",
         mccScore: "0.7489",
         eceError: "0.0786",
         avgLatency: "0.00 ms",
-        status: "Classical Baseline",
+        status: "CLASSICAL CONTROL",
         isQuantum: false,
         isChampion: false,
       },
       {
         name: "Sentinel-SVM",
+        architecture: "RBF Kernel (C=1.0, γ='scale')",
         type: "Classical SVM",
         accuracy: "96.51%",
-        accuracyNum: 96.51,
         aucRoc: "0.9948",
         sensitivity: "1.0000",
         specificity: "0.9062",
+        sensSpec: "1.0000 / 0.9062",
         precision: "0.9474",
         f1Score: "0.9730",
+        precF1: "0.9474 / 0.9730",
         mccScore: "0.9266",
         eceError: "0.0505",
         avgLatency: "0.00 ms",
-        status: "🏆 Clinical Champion",
+        status: "CLINICAL CHAMPION",
         isQuantum: false,
         isChampion: true,
       },
@@ -118,72 +110,73 @@ const EVALUATION_SECTIONS = [
   },
   {
     id: "heart-disease",
+    index: "02",
     headingLine: "---> [Evaluating Heart Disease Models] <---",
-    title: "CardioWave Cardiovascular Cohort (Cleveland & Statlog)",
-    badge: "CARDIOLOGY VITALITY",
-    badgeColor: "#F43F5E",
-    badgeBg: "rgba(244, 63, 94, 0.12)",
-    badgeBorder: "rgba(244, 63, 94, 0.3)",
-    description: "Acute cardiac risk evaluation comparing circular entangled VQC with deep multi-layer perceptrons and gradient boosted decision forests.",
-    theme: {
-      bg: "#120509",
-      orbColor: "#F43F5E",
-      cardBg: "rgba(32, 10, 20, 0.65)",
-      accent: "#FB7185",
-      glow: "rgba(244, 63, 94, 0.22)",
-      border: "rgba(244, 63, 94, 0.28)",
-      gradient: "linear-gradient(135deg, rgba(244, 63, 94, 0.15) 0%, transparent 60%)",
-    },
+    headingTitle: "Evaluating Heart Disease Models",
+    category: "CARDIOLOGY // CARDIO-WAVE",
+    title: "Cleveland & Statlog Cardiac Cohort",
+    sampleSize: "N = 303 Clinical Profiles • 13 Diagnostic Attributes",
+    description: "Acute coronary risk classification comparing circular nearest-neighbor parameterized circuits with deep dense multi-layer networks and boosted gradient ensembles.",
+    bgColor: "#0A0808",
+    cardBg: "#100D0D",
+    borderColor: "#262020",
+    accentColor: "#E2B3B8", // Soft muted chalk rose
     docLink: "https://github.com/ARYANCY/QDoc/blob/main/documentation/models/heart_disease.md",
     models: [
       {
         name: "CardioWave-VQC",
+        architecture: "6-Qubit Hardware-Efficient",
         type: "Quantum VQC",
         accuracy: "95.65%",
-        accuracyNum: 95.65,
         aucRoc: "0.8977",
         sensitivity: "1.0000",
         specificity: "0.0000",
+        sensSpec: "1.0000 / 0.0000",
         precision: "0.9565",
         f1Score: "0.9778",
+        precF1: "0.9565 / 0.9778",
         mccScore: "0.0000",
         eceError: "0.0949",
         avgLatency: "0.00 ms",
-        status: "Quantum High-Recall",
+        status: "HIGH RECALL",
         isQuantum: true,
         isChampion: false,
       },
       {
         name: "Sentinel-XGB",
+        architecture: "120 Boosted Trees (η=0.05)",
         type: "Classical XGB",
         accuracy: "95.65%",
-        accuracyNum: 95.65,
         aucRoc: "0.9318",
         sensitivity: "0.9773",
         specificity: "0.5000",
+        sensSpec: "0.9773 / 0.5000",
         precision: "0.9773",
         f1Score: "0.9773",
+        precF1: "0.9773 / 0.9773",
         mccScore: "0.4773",
         eceError: "0.0305",
         avgLatency: "0.00 ms",
-        status: "Classical Balanced",
+        status: "BALANCED CONTROL",
         isQuantum: false,
         isChampion: false,
       },
       {
         name: "Sentinel-MLP",
+        architecture: "Dense 64-32 Layer Stack",
         type: "Classical MLP",
         accuracy: "97.83%",
-        accuracyNum: 97.83,
         aucRoc: "1.0000",
         sensitivity: "1.0000",
         specificity: "0.5000",
+        sensSpec: "1.0000 / 0.5000",
         precision: "0.9778",
         f1Score: "0.9888",
+        precF1: "0.9778 / 0.9888",
         mccScore: "0.6992",
         eceError: "0.0288",
         avgLatency: "0.00 ms",
-        status: "🏆 Clinical Champion",
+        status: "CLINICAL CHAMPION",
         isQuantum: false,
         isChampion: true,
       },
@@ -191,72 +184,73 @@ const EVALUATION_SECTIONS = [
   },
   {
     id: "parkinsons",
+    index: "03",
     headingLine: "---> [Evaluating Parkinson's Models] <---",
-    title: "NeuroSynapse Speech Phonation Cohort (Oxford Telemonitoring)",
-    badge: "NEUROLOGICAL DYSKINESIA",
-    badgeColor: "#06B6D4",
-    badgeBg: "rgba(6, 182, 212, 0.12)",
-    badgeBorder: "rgba(6, 182, 212, 0.3)",
-    description: "Continuous acoustic voice dyskinesia analysis evaluating parameterized quantum circuits and regularized linear controls.",
-    theme: {
-      bg: "#040A18",
-      orbColor: "#06B6D4",
-      cardBg: "rgba(10, 20, 48, 0.65)",
-      accent: "#38BDF8",
-      glow: "rgba(6, 182, 212, 0.22)",
-      border: "rgba(6, 182, 212, 0.28)",
-      gradient: "linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, transparent 60%)",
-    },
+    headingTitle: "Evaluating Parkinson's Models",
+    category: "NEUROLOGY // NEURO-SYNAPSE",
+    title: "Oxford Phonation Telemonitoring",
+    sampleSize: "N = 195 Voice Recordings • 16 Acoustic Jitter/Shimmer Formants",
+    description: "Continuous dysphonia assessment evaluating multi-qubit Pauli-Z expectation classifiers against regularized linear controls under class-imbalanced held-out test splits.",
+    bgColor: "#08090C",
+    cardBg: "#0C0E12",
+    borderColor: "#1E222A",
+    accentColor: "#B3C8E2", // Soft muted chalk slate
     docLink: "https://github.com/ARYANCY/QDoc/blob/main/documentation/models/parkinsons.md",
     models: [
       {
         name: "NeuroSynapse-VQC",
+        architecture: "8-Qubit Angle Embedding",
         type: "Quantum VQC",
         accuracy: "73.33%",
-        accuracyNum: 73.33,
         aucRoc: "0.4659",
         sensitivity: "1.0000",
         specificity: "0.0000",
+        sensSpec: "1.0000 / 0.0000",
         precision: "0.7333",
         f1Score: "0.8462",
+        precF1: "0.7333 / 0.8462",
         mccScore: "0.0000",
         eceError: "0.0388",
         avgLatency: "0.00 ms",
-        status: "Quantum Baseline",
+        status: "MIN-ECE BASELINE",
         isQuantum: true,
         isChampion: false,
       },
       {
         name: "Sentinel-RF",
+        architecture: "100-Tree Stratified Forest",
         type: "Classical RF",
         accuracy: "73.33%",
-        accuracyNum: 73.33,
         aucRoc: "0.4318",
         sensitivity: "1.0000",
         specificity: "0.0000",
+        sensSpec: "1.0000 / 0.0000",
         precision: "0.7333",
         f1Score: "0.8462",
+        precF1: "0.7333 / 0.8462",
         mccScore: "0.0000",
         eceError: "0.0918",
         avgLatency: "0.00 ms",
-        status: "Classical RF",
+        status: "CLASSICAL CONTROL",
         isQuantum: false,
         isChampion: false,
       },
       {
         name: "Sentinel-LogReg",
+        architecture: "L2 Regularized (C=1.0)",
         type: "Classical LogReg",
         accuracy: "73.33%",
-        accuracyNum: 73.33,
         aucRoc: "0.5114",
         sensitivity: "1.0000",
         specificity: "0.0000",
+        sensSpec: "1.0000 / 0.0000",
         precision: "0.7333",
         f1Score: "0.8462",
+        precF1: "0.7333 / 0.8462",
         mccScore: "0.0000",
         eceError: "0.0959",
         avgLatency: "0.00 ms",
-        status: "🏆 Linear Control Lead",
+        status: "AUC LEAD",
         isQuantum: false,
         isChampion: true,
       },
@@ -264,72 +258,73 @@ const EVALUATION_SECTIONS = [
   },
   {
     id: "diabetes",
+    index: "04",
     headingLine: "---> [Evaluating Diabetes Models] <---",
-    title: "Endocrine Metabolic Diagnostic Cohort (Pima Indians)",
-    badge: "METABOLIC HOMEOSTASIS",
-    badgeColor: "#10B981",
-    badgeBg: "rgba(16, 185, 129, 0.12)",
-    badgeBorder: "rgba(16, 185, 129, 0.3)",
-    description: "Metabolic risk triage evaluating 8-qubit variational Hamiltonian expectation models against calibrated random forest ensembles.",
-    theme: {
-      bg: "#03140C",
-      orbColor: "#10B981",
-      cardBg: "rgba(6, 32, 22, 0.65)",
-      accent: "#34D399",
-      glow: "rgba(16, 185, 129, 0.22)",
-      border: "rgba(16, 185, 129, 0.28)",
-      gradient: "linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, transparent 60%)",
-    },
+    headingTitle: "Evaluating Diabetes Models",
+    category: "METABOLIC // ENDOCRINE SUITE",
+    title: "Pima Indians Diabetes Diagnostic",
+    sampleSize: "N = 768 Patient Histories • 8 Physiological Indices",
+    description: "Endocrine disorder prediction comparing train-normalized rotational variational circuits with calibrated ensemble decision trees on held-out test data.",
+    bgColor: "#070908",
+    cardBg: "#0B0E0C",
+    borderColor: "#1D2420",
+    accentColor: "#B3E2C6", // Soft muted chalk mint
     docLink: "https://github.com/ARYANCY/QDoc/blob/main/documentation/models/diabetes.md",
     models: [
       {
         name: "Diabetes-VQC",
+        architecture: "8-Qubit Circular Ring",
         type: "Quantum VQC",
         accuracy: "71.55%",
-        accuracyNum: 71.55,
         aucRoc: "0.8631",
         sensitivity: "1.0000",
         specificity: "0.0000",
+        sensSpec: "1.0000 / 0.0000",
         precision: "0.7155",
         f1Score: "0.8342",
+        precF1: "0.7155 / 0.8342",
         mccScore: "0.0000",
         eceError: "0.1238",
         avgLatency: "0.00 ms",
-        status: "Quantum Shadow",
+        status: "HIGH RECALL",
         isQuantum: true,
         isChampion: false,
       },
       {
         name: "Sentinel-RF",
+        architecture: "150 Decision Estimators",
         type: "Classical RF",
         accuracy: "91.38%",
-        accuracyNum: 91.38,
         aucRoc: "0.9693",
         sensitivity: "0.9277",
         specificity: "0.8788",
+        sensSpec: "0.9277 / 0.8788",
         precision: "0.9506",
         f1Score: "0.9390",
+        precF1: "0.9506 / 0.9390",
         mccScore: "0.7927",
         eceError: "0.0741",
         avgLatency: "0.00 ms",
-        status: "🏆 Clinical Champion",
+        status: "CLINICAL CHAMPION",
         isQuantum: false,
         isChampion: true,
       },
       {
         name: "Sentinel-XGB",
+        architecture: "100 Gradient Boosting Trees",
         type: "Classical XGB",
         accuracy: "90.52%",
-        accuracyNum: 90.52,
         aucRoc: "0.9701",
         sensitivity: "0.9036",
         specificity: "0.9091",
+        sensSpec: "0.9036 / 0.9091",
         precision: "0.9615",
         f1Score: "0.9317",
+        precF1: "0.9615 / 0.9317",
         mccScore: "0.7813",
         eceError: "0.0544",
         avgLatency: "0.00 ms",
-        status: "High Specificity Lead",
+        status: "SPECIFICITY LEAD",
         isQuantum: false,
         isChampion: false,
       },
@@ -339,93 +334,160 @@ const EVALUATION_SECTIONS = [
 
 export default function ModelEvaluationShowcase() {
   const containerRef = useRef(null);
-  const orbRef = useRef(null);
   const [selectedModelDoc, setSelectedModelDoc] = useState(null);
 
   useEffect(() => {
     if (typeof window === "undefined" || !containerRef.current) return;
 
     const ctx = gsap.context(() => {
-      // 1. Entrance animation for the master heading
-      gsap.from(".showcase-header", {
+      // Masthead subtle scroll entrance
+      gsap.from(".zara-masthead-title", {
         opacity: 0,
         y: 40,
-        duration: 1.0,
+        duration: 1.2,
         ease: "power3.out",
         scrollTrigger: {
-          trigger: ".showcase-header",
-          start: "top 80%",
+          trigger: ".zara-masthead-title",
+          start: "top 90%",
+          toggleActions: "play none none reverse",
         },
       });
 
-      // 2. Animate each disease section card with stagger and background color shift
-      EVALUATION_SECTIONS.forEach((section, idx) => {
+      EVALUATION_SECTIONS.forEach((section) => {
         const sectionElem = document.getElementById(`section-${section.id}`);
         if (!sectionElem) return;
 
-        // Animate card entrance
-        gsap.from(sectionElem, {
-          opacity: 0,
-          y: 50,
-          scale: 0.98,
-          duration: 0.9,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: sectionElem,
-            start: "top 78%",
-          },
-        });
-
-        // Stagger table rows inside section
-        const rows = sectionElem.querySelectorAll(".model-row");
-        if (rows.length) {
-          gsap.from(rows, {
-            opacity: 0,
-            x: -25,
-            stagger: 0.08,
-            duration: 0.6,
+        // Elegant card reveal animation on scroll
+        gsap.fromTo(
+          sectionElem,
+          { opacity: 0, y: 45 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 1.0,
             ease: "power2.out",
             scrollTrigger: {
               trigger: sectionElem,
-              start: "top 70%",
+              start: "top 85%",
+              toggleActions: "play none none reverse",
             },
-          });
+          }
+        );
+
+        // Sexy heading banner & arrow animation
+        const headingBanner = sectionElem.querySelector(".sexy-heading-banner");
+        const arrowLeft = sectionElem.querySelector(".sexy-arrow-left");
+        const arrowRight = sectionElem.querySelector(".sexy-arrow-right");
+        const headingTitle = sectionElem.querySelector(".sexy-heading-title");
+
+        if (headingBanner) {
+          gsap.fromTo(
+            headingBanner,
+            { opacity: 0, y: 20 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.8,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: sectionElem,
+                start: "top 82%",
+                toggleActions: "play none none reverse",
+              },
+            }
+          );
         }
 
-        // Background Color Shift & Dynamic Ambient Orb
+        if (arrowLeft && arrowRight) {
+          gsap.fromTo(
+            arrowLeft,
+            { x: -18, opacity: 0 },
+            {
+              x: 0,
+              opacity: 1,
+              duration: 0.7,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: sectionElem,
+                start: "top 80%",
+                toggleActions: "play none none reverse",
+              },
+            }
+          );
+          gsap.fromTo(
+            arrowRight,
+            { x: 18, opacity: 0 },
+            {
+              x: 0,
+              opacity: 1,
+              duration: 0.7,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: sectionElem,
+                start: "top 80%",
+                toggleActions: "play none none reverse",
+              },
+            }
+          );
+        }
+
+        if (headingTitle) {
+          gsap.fromTo(
+            headingTitle,
+            { letterSpacing: "0.02em", opacity: 0.6 },
+            {
+              letterSpacing: "0.08em",
+              opacity: 1,
+              duration: 0.9,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: sectionElem,
+                start: "top 80%",
+                toggleActions: "play none none reverse",
+              },
+            }
+          );
+        }
+
+        // Table rows subtle staggered reveal
+        const rows = sectionElem.querySelectorAll(".zara-table-row");
+        if (rows.length > 0) {
+          gsap.fromTo(
+            rows,
+            { opacity: 0, x: -12 },
+            {
+              opacity: 1,
+              x: 0,
+              duration: 0.6,
+              stagger: 0.08,
+              ease: "power1.out",
+              scrollTrigger: {
+                trigger: sectionElem,
+                start: "top 75%",
+                toggleActions: "play none none reverse",
+              },
+            }
+          );
+        }
+
+        // Ambient background color morph
         ScrollTrigger.create({
           trigger: sectionElem,
-          start: "top 55%",
-          end: "bottom 45%",
+          start: "top 60%",
+          end: "bottom 40%",
           onEnter: () => {
             gsap.to(containerRef.current, {
-              backgroundColor: section.theme.bg,
+              backgroundColor: section.bgColor,
               duration: 1.2,
-              ease: "power2.out",
+              ease: "power2.inOut",
             });
-            if (orbRef.current) {
-              gsap.to(orbRef.current, {
-                background: `radial-gradient(circle, ${section.theme.glow} 0%, transparent 70%)`,
-                top: `${sectionElem.offsetTop + 100}px`,
-                duration: 1.4,
-                ease: "power2.out",
-              });
-            }
           },
           onEnterBack: () => {
             gsap.to(containerRef.current, {
-              backgroundColor: section.theme.bg,
+              backgroundColor: section.bgColor,
               duration: 1.2,
-              ease: "power2.out",
+              ease: "power2.inOut",
             });
-            if (orbRef.current) {
-              gsap.to(orbRef.current, {
-                background: `radial-gradient(circle, ${section.theme.glow} 0%, transparent 70%)`,
-                top: `${sectionElem.offsetTop + 100}px`,
-                duration: 1.4,
-                ease: "power2.out",
-              });
-            }
           },
         });
       });
@@ -440,49 +502,17 @@ export default function ModelEvaluationShowcase() {
       id="quantum-model-benchmarks"
       style={{
         width: "100%",
-        backgroundColor: "#090514",
-        color: "#F8FAFC",
-        padding: "clamp(60px, 8vw, 110px) clamp(20px, 4vw, 48px)",
-        transition: "background-color 0.9s ease",
+        backgroundColor: "#080808",
+        color: "#F4F4F4",
+        padding: "clamp(60px, 8vw, 120px) clamp(20px, 4.5vw, 64px)",
+        transition: "background-color 0.8s ease",
         position: "relative",
-        overflow: "hidden",
         boxSizing: "border-box",
+        borderRadius: "0px", // Strict Zara style
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif",
       }}
     >
-      {/* Dynamic Floating Ambient Light Orb */}
-      <div
-        ref={orbRef}
-        style={{
-          position: "absolute",
-          width: "700px",
-          height: "700px",
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(217, 70, 239, 0.22) 0%, transparent 70%)",
-          filter: "blur(120px)",
-          pointerEvents: "none",
-          zIndex: 0,
-          left: "50%",
-          transform: "translateX(-50%)",
-          transition: "background 1.2s ease, top 1.2s ease",
-        }}
-      />
-
-      {/* Cyber Grid Texture Overlay */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundImage: `
-            linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px)
-          `,
-          backgroundSize: "48px 48px",
-          pointerEvents: "none",
-          zIndex: 0,
-        }}
-      />
-
-      {/* Top Border Accent Line */}
+      {/* Subtle Top Architectural Hairline */}
       <div
         style={{
           position: "absolute",
@@ -490,147 +520,255 @@ export default function ModelEvaluationShowcase() {
           left: 0,
           right: 0,
           height: "1px",
-          background: "linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.3), rgba(217, 70, 239, 0.3), transparent)",
+          backgroundColor: "rgba(255, 255, 255, 0.12)",
         }}
       />
 
-      {/* Master Section Header */}
-      <div className="showcase-header" style={{ maxWidth: "1280px", margin: "0 auto 72px auto", textAlign: "center", position: "relative", zIndex: 1 }}>
+      {/* Zara Magazine Masthead Header */}
+      <div
+        style={{
+          maxWidth: "1320px",
+          margin: "0 auto 80px auto",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.15)",
+          paddingBottom: "40px",
+          borderRadius: "0px",
+        }}
+      >
         <div
           style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "8px",
-            padding: "6px 16px",
-            background: "rgba(255, 255, 255, 0.06)",
-            border: "1px solid rgba(255, 255, 255, 0.14)",
-            borderRadius: "30px",
-            fontSize: "0.72rem",
-            fontWeight: 800,
-            letterSpacing: "0.09em",
-            textTransform: "uppercase",
-            color: "#38BDF8",
-            marginBottom: "18px",
-            boxShadow: "0 4px 16px rgba(56, 189, 248, 0.15)",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "baseline",
+            flexWrap: "wrap",
+            gap: "16px",
+            marginBottom: "24px",
           }}
         >
-          <Sparkles size={13} color="#38BDF8" />
-          Audited Clinical Intelligence Suite
+          <span
+            style={{
+              fontFamily: "var(--font-mono, monospace)",
+              fontSize: "0.72rem",
+              letterSpacing: "0.22em",
+              textTransform: "uppercase",
+              color: "#888888",
+            }}
+          >
+            VOL. 2026 // SCIENTIFIC AUDIT
+          </span>
+
+          <span
+            style={{
+              fontFamily: "var(--font-mono, monospace)",
+              fontSize: "0.72rem",
+              letterSpacing: "0.15em",
+              textTransform: "uppercase",
+              color: "#888888",
+            }}
+          >
+            5-SEED STRATIFIED VERIFICATION
+          </span>
         </div>
 
         <h2
+          className="zara-masthead-title"
           style={{
-            fontSize: "clamp(2.2rem, 4.2vw, 3.8rem)",
-            fontWeight: 900,
-            letterSpacing: "-0.035em",
-            lineHeight: 1.08,
-            margin: "0 0 18px 0",
+            fontSize: "clamp(2.4rem, 5.2vw, 4.8rem)",
+            fontWeight: 400,
+            letterSpacing: "-0.04em",
+            lineHeight: 0.98,
+            margin: "0 0 24px 0",
             color: "#FFFFFF",
+            textTransform: "uppercase",
           }}
         >
-          Quantum vs. Classical <br />
-          <span
-            style={{
-              background: "linear-gradient(135deg, #38BDF8 0%, #C084FC 45%, #F43F5E 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            Empirical Model Evaluations
+          Quantum vs Classical. <br />
+          <span style={{ color: "#777777", fontWeight: 300 }}>
+            Model Evaluation Matrix.
           </span>
         </h2>
 
-        <p
+        <div
           style={{
-            fontSize: "clamp(0.96rem, 1.3vw, 1.15rem)",
-            color: "#94A3B8",
-            maxWidth: "780px",
-            margin: "0 auto",
-            lineHeight: 1.65,
+            display: "grid",
+            gridTemplateColumns: "2fr 1fr",
+            gap: "32px",
+            alignItems: "start",
           }}
+          className="zara-header-subgrid"
         >
-          Rigorous 5-seed patient-level stratified benchmarking evaluating PennyLane Variational Quantum Classifiers (VQC) and Quantum Support Vector Machines (QSVM) alongside classical sentinel baselines under identical feature representations.
-        </p>
+          <p
+            style={{
+              fontSize: "0.96rem",
+              color: "#A0A0A0",
+              margin: 0,
+              lineHeight: 1.65,
+              maxWidth: "720px",
+              fontWeight: 400,
+            }}
+          >
+            Rigorous, mathematically validated comparison between PennyLane Variational Quantum Classifiers (VQC), Quantum Kernel QSVMs, and standard Classical Sentinel baselines. Fully reproducible with zero data leakage.
+          </p>
+
+          <div
+            style={{
+              borderLeft: "1px solid rgba(255, 255, 255, 0.15)",
+              paddingLeft: "24px",
+              fontFamily: "var(--font-mono, monospace)",
+              fontSize: "0.70rem",
+              color: "#777777",
+              lineHeight: 1.8,
+            }}
+          >
+            <div>PLATFORM: Q-RAKSHAK</div>
+            <div>SPECIFICATION: v1.0 AUDITED</div>
+            <div>FALLBACK PROTOCOL: ACTIVE</div>
+          </div>
+        </div>
       </div>
 
-      {/* 4 Disease Sections */}
-      <div style={{ maxWidth: "1280px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "88px", position: "relative", zIndex: 1 }}>
-        {EVALUATION_SECTIONS.map((section, idx) => (
+      {/* 4 Disease Sections - Zara Clean Monograph */}
+      <div
+        style={{
+          maxWidth: "1320px",
+          margin: "0 auto",
+          display: "flex",
+          flexDirection: "column",
+          gap: "72px",
+        }}
+      >
+        {EVALUATION_SECTIONS.map((section) => (
           <section
             key={section.id}
             id={`section-${section.id}`}
             style={{
+              backgroundColor: section.cardBg,
+              border: `1px solid ${section.borderColor}`,
+              borderRadius: "0px", // Zara sharp
+              padding: "clamp(24px, 3.5vw, 40px)",
               position: "relative",
-              padding: "clamp(28px, 4vw, 48px)",
-              background: section.theme.cardBg,
-              backdropFilter: "blur(24px)",
-              WebkitBackdropFilter: "blur(24px)",
-              border: `1px solid ${section.theme.border}`,
-              borderRadius: "20px",
-              boxShadow: `0 24px 64px -16px ${section.theme.glow}`,
-              backgroundImage: section.theme.gradient,
-              transition: "border-color 0.4s ease, box-shadow 0.4s ease, background 0.4s ease",
+              boxSizing: "border-box",
             }}
           >
-            {/* Header Line with Sexy ASCII Style */}
+            {/* Section Heading Bar */}
             <div
               style={{
                 display: "flex",
                 justifyContent: "space-between",
-                alignItems: "center",
+                alignItems: "flex-start",
                 flexWrap: "wrap",
                 gap: "16px",
-                marginBottom: "20px",
-                borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
-                paddingBottom: "18px",
+                borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+                paddingBottom: "20px",
+                marginBottom: "24px",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-                {/* Glowing ASCII Terminal Header */}
+              <div>
                 <div
                   style={{
-                    display: "inline-flex",
+                    display: "flex",
                     alignItems: "center",
-                    gap: "8px",
-                    background: "rgba(0, 0, 0, 0.45)",
-                    border: `1px solid ${section.theme.border}`,
-                    borderRadius: "8px",
-                    padding: "6px 14px",
-                    boxShadow: `0 0 20px ${section.theme.glow}`,
+                    gap: "12px",
+                    marginBottom: "8px",
                   }}
                 >
                   <span
                     style={{
                       fontFamily: "var(--font-mono, monospace)",
-                      fontSize: "clamp(0.85rem, 1.4vw, 1.05rem)",
-                      fontWeight: 800,
-                      letterSpacing: "0.04em",
-                      color: section.theme.accent,
-                      textShadow: `0 0 12px ${section.theme.glow}`,
+                      fontSize: "0.70rem",
+                      fontWeight: 700,
+                      letterSpacing: "0.15em",
+                      color: section.accentColor,
+                      textTransform: "uppercase",
                     }}
                   >
-                    {section.headingLine}
+                    [{section.index}] {section.category}
                   </span>
                 </div>
 
-                <span
+                {/* The Sexy Heading Line */}
+                <div
+                  className="sexy-heading-banner"
                   style={{
-                    fontSize: "0.68rem",
-                    fontWeight: 800,
-                    padding: "3px 8px",
-                    borderRadius: "4px",
-                    background: section.badgeBg,
-                    color: section.badgeColor,
-                    border: `1px solid ${section.badgeBorder}`,
-                    letterSpacing: "0.06em",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    background: "rgba(255, 255, 255, 0.03)",
+                    border: `1px solid ${section.borderColor || "rgba(255, 255, 255, 0.15)"}`,
+                    borderLeft: `3px solid ${section.accentColor}`,
+                    padding: "10px 18px",
+                    borderRadius: "0px",
+                    margin: "0 0 10px 0",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <span
+                    className="sexy-arrow-left"
+                    style={{
+                      fontFamily: "var(--font-mono, monospace)",
+                      fontSize: "1.05rem",
+                      fontWeight: 800,
+                      color: section.accentColor,
+                      letterSpacing: "0.02em",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      userSelect: "none",
+                    }}
+                  >
+                    ───►
+                  </span>
+
+                  <h3
+                    className="sexy-heading-line"
+                    style={{
+                      margin: 0,
+                      fontFamily: "var(--font-mono, monospace)",
+                      fontSize: "clamp(1.02rem, 1.7vw, 1.3rem)",
+                      fontWeight: 700,
+                      letterSpacing: "0.08em",
+                      color: "#FFFFFF",
+                      textTransform: "uppercase",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                  >
+                    <span style={{ color: section.accentColor, opacity: 0.9 }}>[</span>
+                    <span className="sexy-heading-title" style={{ color: "#FFFFFF" }}>
+                      {section.headingTitle || section.headingLine.replace(/--->\s*\[(.*)\]\s*<---/, "$1")}
+                    </span>
+                    <span style={{ color: section.accentColor, opacity: 0.9 }}>]</span>
+                  </h3>
+
+                  <span
+                    className="sexy-arrow-right"
+                    style={{
+                      fontFamily: "var(--font-mono, monospace)",
+                      fontSize: "1.05rem",
+                      fontWeight: 800,
+                      color: section.accentColor,
+                      letterSpacing: "0.02em",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      userSelect: "none",
+                    }}
+                  >
+                    ◄───
+                  </span>
+                </div>
+
+                <p
+                  style={{
+                    fontSize: "0.82rem",
+                    color: "#888888",
+                    margin: 0,
                     fontFamily: "var(--font-mono, monospace)",
                   }}
                 >
-                  {section.badge}
-                </span>
+                  {section.sampleSize}
+                </p>
               </div>
 
-              {/* Documentation Link Button */}
+              {/* Technical Documentation Anchor */}
               <a
                 href={section.docLink}
                 target="_blank"
@@ -638,232 +776,273 @@ export default function ModelEvaluationShowcase() {
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: "7px",
-                  padding: "8px 16px",
-                  background: "rgba(255, 255, 255, 0.06)",
-                  border: "1px solid rgba(255, 255, 255, 0.14)",
-                  borderRadius: "8px",
-                  fontSize: "0.75rem",
-                  fontWeight: 700,
-                  color: "#FFFFFF",
+                  gap: "6px",
+                  padding: "6px 14px",
+                  background: "transparent",
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                  borderRadius: "0px",
+                  color: "#EEEEEE",
+                  fontSize: "0.72rem",
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
                   textDecoration: "none",
-                  transition: "background 0.2s, border-color 0.2s, transform 0.15s",
+                  transition: "border-color 0.2s, color 0.2s, background 0.2s",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.14)";
-                  e.currentTarget.style.borderColor = section.theme.accent;
-                  e.currentTarget.style.transform = "translateY(-1px)";
+                  e.currentTarget.style.borderColor = "#FFFFFF";
+                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.06)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.06)";
-                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.14)";
-                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.2)";
+                  e.currentTarget.style.background = "transparent";
                 }}
               >
-                <BookOpen size={14} color={section.theme.accent} />
-                <span>Technical Model Docs</span>
+                <span>Full Specification</span>
                 <ArrowUpRight size={13} />
               </a>
             </div>
 
-            <p style={{ fontSize: "0.90rem", color: "#CBD5E1", margin: "0 0 24px 0", lineHeight: 1.6, maxWidth: "880px" }}>
-              {section.description}
-            </p>
-
-            {/* Benchmark Table */}
+            {/* Shortened, Simplified Zara Table */}
             <div
               style={{
+                width: "100%",
                 overflowX: "auto",
-                borderRadius: "12px",
-                border: "1px solid rgba(255, 255, 255, 0.08)",
-                background: "rgba(5, 8, 18, 0.55)",
-                boxShadow: "inset 0 2px 10px rgba(0, 0, 0, 0.3)",
+                borderRadius: "0px",
               }}
             >
-              <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.82rem" }}>
+              <table
+                style={{
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  textAlign: "left",
+                  fontSize: "0.82rem",
+                }}
+              >
                 <thead>
-                  <tr style={{ background: "rgba(255, 255, 255, 0.03)", borderBottom: "1px solid rgba(255, 255, 255, 0.08)", color: "#94A3B8" }}>
-                    <th style={{ padding: "16px 18px", fontWeight: 700 }}>Model Name & Architecture</th>
-                    <th style={{ padding: "16px 12px", fontWeight: 700, textAlign: "right" }}>Accuracy</th>
-                    <th style={{ padding: "16px 12px", fontWeight: 700, textAlign: "right" }}>AUC-ROC</th>
-                    <th style={{ padding: "16px 12px", fontWeight: 700, textAlign: "right" }}>Sensitivity</th>
-                    <th style={{ padding: "16px 12px", fontWeight: 700, textAlign: "right" }}>Specificity</th>
-                    <th style={{ padding: "16px 12px", fontWeight: 700, textAlign: "right" }}>Precision</th>
-                    <th style={{ padding: "16px 12px", fontWeight: 700, textAlign: "right" }}>F1 Score</th>
-                    <th style={{ padding: "16px 12px", fontWeight: 700, textAlign: "right" }}>MCC</th>
-                    <th style={{ padding: "16px 12px", fontWeight: 700, textAlign: "right" }}>ECE Error</th>
-                    <th style={{ padding: "16px 12px", fontWeight: 700, textAlign: "right" }}>Avg Latency</th>
-                    <th style={{ padding: "16px 18px", fontWeight: 700, textAlign: "center" }}>Specification</th>
+                  <tr
+                    style={{
+                      borderBottom: "1px solid rgba(255, 255, 255, 0.12)",
+                      color: "#777777",
+                      fontFamily: "var(--font-mono, monospace)",
+                      fontSize: "0.68rem",
+                      letterSpacing: "0.12em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    <th style={{ padding: "12px 14px 12px 0", fontWeight: 600 }}>Model / Architecture</th>
+                    <th style={{ padding: "12px 12px", fontWeight: 600, textAlign: "right" }}>Accuracy</th>
+                    <th style={{ padding: "12px 12px", fontWeight: 600, textAlign: "right" }}>AUC-ROC</th>
+                    <th style={{ padding: "12px 12px", fontWeight: 600, textAlign: "right" }}>Sens / Spec</th>
+                    <th style={{ padding: "12px 12px", fontWeight: 600, textAlign: "right" }}>Prec / F1</th>
+                    <th style={{ padding: "12px 12px", fontWeight: 600, textAlign: "right" }}>MCC</th>
+                    <th style={{ padding: "12px 12px", fontWeight: 600, textAlign: "right" }}>ECE Error</th>
+                    <th style={{ padding: "12px 12px", fontWeight: 600, textAlign: "center" }}>Status</th>
+                    <th style={{ padding: "12px 0 12px 12px", fontWeight: 600, textAlign: "right" }}>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {section.models.map((model, mIdx) => (
                     <tr
                       key={model.name}
-                      className="model-row"
+                      className="zara-table-row"
                       style={{
-                        borderBottom: mIdx !== section.models.length - 1 ? "1px solid rgba(255, 255, 255, 0.04)" : "none",
-                        background: model.isChampion ? "rgba(16, 185, 129, 0.06)" : "transparent",
-                        transition: "background 0.2s ease",
+                        borderBottom: mIdx !== section.models.length - 1 ? "1px solid rgba(255, 255, 255, 0.06)" : "none",
+                        transition: "background-color 0.15s ease",
                       }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = model.isChampion ? "rgba(16, 185, 129, 0.12)" : "rgba(255, 255, 255, 0.035)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = model.isChampion ? "rgba(16, 185, 129, 0.06)" : "transparent";
-                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.02)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
                     >
-                      {/* Model Name */}
-                      <td style={{ padding: "16px 18px" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                      {/* Model & Architecture */}
+                      <td style={{ padding: "14px 12px 14px 0" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                           <span
                             style={{
-                              width: "32px",
-                              height: "32px",
-                              borderRadius: "8px",
-                              background: model.isQuantum ? "rgba(168, 85, 247, 0.15)" : "rgba(16, 185, 129, 0.15)",
-                              border: `1px solid ${model.isQuantum ? "rgba(168, 85, 247, 0.35)" : "rgba(16, 185, 129, 0.35)"}`,
+                              width: "22px",
+                              height: "22px",
                               display: "inline-flex",
                               alignItems: "center",
                               justifyContent: "center",
-                              color: model.isQuantum ? "#C084FC" : "#34D399",
-                              flexShrink: 0,
+                              border: "1px solid rgba(255, 255, 255, 0.15)",
+                              color: model.isQuantum ? "#C4B5FD" : "#A7F3D0",
+                              fontSize: "0.65rem",
+                              borderRadius: "0px",
                             }}
                           >
-                            {model.isQuantum ? <Zap size={16} /> : <Cpu size={16} />}
+                            {model.isQuantum ? <Zap size={11} /> : <Cpu size={11} />}
                           </span>
                           <div>
-                            <strong style={{ fontSize: "0.90rem", color: "#FFFFFF", display: "block" }}>
-                              {model.name}
-                            </strong>
-                            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "3px" }}>
-                              <span style={{ fontSize: "0.68rem", color: "#94A3B8" }}>
-                                {model.type}
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                              <strong
+                                style={{
+                                  color: "#FFFFFF",
+                                  fontSize: "0.88rem",
+                                  fontWeight: 600,
+                                  letterSpacing: "-0.01em",
+                                }}
+                              >
+                                {model.name}
+                              </strong>
+                              <span
+                                style={{
+                                  fontSize: "0.62rem",
+                                  color: "#666666",
+                                  fontFamily: "var(--font-mono, monospace)",
+                                }}
+                              >
+                                {model.avgLatency}
                               </span>
-                              {model.isChampion && (
-                                <span
-                                  style={{
-                                    fontSize: "0.62rem",
-                                    color: "#34D399",
-                                    background: "rgba(16, 185, 129, 0.18)",
-                                    border: "1px solid rgba(16, 185, 129, 0.4)",
-                                    padding: "1px 6px",
-                                    borderRadius: "3px",
-                                    fontWeight: 800,
-                                  }}
-                                >
-                                  CHAMPION
-                                </span>
-                              )}
                             </div>
+                            <span
+                              style={{
+                                color: "#777777",
+                                fontSize: "0.72rem",
+                                fontFamily: "var(--font-mono, monospace)",
+                                display: "block",
+                              }}
+                            >
+                              {model.architecture}
+                            </span>
                           </div>
                         </div>
                       </td>
 
                       {/* Accuracy */}
-                      <td style={{ padding: "16px 12px", textAlign: "right", fontFamily: "var(--font-mono, monospace)" }}>
-                        <strong style={{ color: model.isChampion ? "#34D399" : "#FFFFFF", fontSize: "0.94rem" }}>
-                          {model.accuracy}
-                        </strong>
-                        <div
-                          style={{
-                            width: "70px",
-                            height: "3px",
-                            background: "rgba(255, 255, 255, 0.1)",
-                            borderRadius: "2px",
-                            margin: "4px 0 0 auto",
-                            overflow: "hidden",
-                          }}
-                        >
-                          <div
-                            style={{
-                              width: `${model.accuracyNum}%`,
-                              height: "100%",
-                              background: model.isChampion
-                                ? "linear-gradient(90deg, #10B981, #34D399)"
-                                : model.isQuantum
-                                ? "linear-gradient(90deg, #A855F7, #D946EF)"
-                                : "linear-gradient(90deg, #3B82F6, #38BDF8)",
-                            }}
-                          />
-                        </div>
+                      <td
+                        style={{
+                          padding: "14px 12px",
+                          textAlign: "right",
+                          fontFamily: "var(--font-mono, monospace)",
+                          fontWeight: 600,
+                          fontSize: "0.92rem",
+                          color: model.isChampion ? "#FFFFFF" : "#D4D4D4",
+                        }}
+                      >
+                        {model.accuracy}
                       </td>
 
                       {/* AUC-ROC */}
-                      <td style={{ padding: "16px 12px", textAlign: "right", fontFamily: "var(--font-mono, monospace)", color: "#38BDF8", fontWeight: 700 }}>
+                      <td
+                        style={{
+                          padding: "14px 12px",
+                          textAlign: "right",
+                          fontFamily: "var(--font-mono, monospace)",
+                          color: "#D4D4D4",
+                        }}
+                      >
                         {model.aucRoc}
                       </td>
 
-                      {/* Sensitivity */}
-                      <td style={{ padding: "16px 12px", textAlign: "right", fontFamily: "var(--font-mono, monospace)", color: parseFloat(model.sensitivity) >= 0.95 ? "#34D399" : "#F8FAFC", fontWeight: 600 }}>
-                        {model.sensitivity}
+                      {/* Sensitivity / Specificity */}
+                      <td
+                        style={{
+                          padding: "14px 12px",
+                          textAlign: "right",
+                          fontFamily: "var(--font-mono, monospace)",
+                          color: "#AAAAAA",
+                          fontSize: "0.78rem",
+                        }}
+                      >
+                        {model.sensSpec}
                       </td>
 
-                      {/* Specificity */}
-                      <td style={{ padding: "16px 12px", textAlign: "right", fontFamily: "var(--font-mono, monospace)", color: parseFloat(model.specificity) === 0 ? "#F43F5E" : "#F8FAFC", fontWeight: 600 }}>
-                        {model.specificity}
+                      {/* Precision / F1 */}
+                      <td
+                        style={{
+                          padding: "14px 12px",
+                          textAlign: "right",
+                          fontFamily: "var(--font-mono, monospace)",
+                          color: "#AAAAAA",
+                          fontSize: "0.78rem",
+                        }}
+                      >
+                        {model.precF1}
                       </td>
 
-                      {/* Precision */}
-                      <td style={{ padding: "16px 12px", textAlign: "right", fontFamily: "var(--font-mono, monospace)", color: "#E2E8F0" }}>
-                        {model.precision}
-                      </td>
-
-                      {/* F1 Score */}
-                      <td style={{ padding: "16px 12px", textAlign: "right", fontFamily: "var(--font-mono, monospace)", color: "#E2E8F0" }}>
-                        {model.f1Score}
-                      </td>
-
-                      {/* MCC */}
-                      <td style={{ padding: "16px 12px", textAlign: "right", fontFamily: "var(--font-mono, monospace)", color: "#E2E8F0" }}>
+                      {/* MCC Score */}
+                      <td
+                        style={{
+                          padding: "14px 12px",
+                          textAlign: "right",
+                          fontFamily: "var(--font-mono, monospace)",
+                          color: "#999999",
+                          fontSize: "0.78rem",
+                        }}
+                      >
                         {model.mccScore}
                       </td>
 
                       {/* ECE Error */}
-                      <td style={{ padding: "16px 12px", textAlign: "right", fontFamily: "var(--font-mono, monospace)", color: "#FBBF24" }}>
+                      <td
+                        style={{
+                          padding: "14px 12px",
+                          textAlign: "right",
+                          fontFamily: "var(--font-mono, monospace)",
+                          color: "#AAAAAA",
+                          fontSize: "0.78rem",
+                        }}
+                      >
                         {model.eceError}
                       </td>
 
-                      {/* Avg Latency */}
-                      <td style={{ padding: "16px 12px", textAlign: "right", fontFamily: "var(--font-mono, monospace)", color: "#C084FC" }}>
-                        {model.avgLatency}
-                      </td>
-
-                      {/* Doc Specs Button */}
-                      <td style={{ padding: "16px 18px", textAlign: "center" }}>
-                        <button
-                          type="button"
-                          onClick={() => setSelectedModelDoc(model.name)}
+                      {/* Status Tag */}
+                      <td style={{ padding: "14px 12px", textAlign: "center" }}>
+                        <span
                           style={{
-                            background: "rgba(255, 255, 255, 0.08)",
-                            border: "1px solid rgba(255, 255, 255, 0.16)",
-                            borderRadius: "6px",
-                            padding: "6px 12px",
-                            color: "#FFFFFF",
-                            fontSize: "0.72rem",
-                            fontWeight: 700,
-                            cursor: "pointer",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: "6px",
-                            boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
-                            transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = "rgba(255, 255, 255, 0.18)";
-                            e.currentTarget.style.borderColor = section.theme.accent;
-                            e.currentTarget.style.transform = "translateY(-1px)";
-                            e.currentTarget.style.boxShadow = `0 4px 12px ${section.theme.glow}`;
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = "rgba(255, 255, 255, 0.08)";
-                            e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.16)";
-                            e.currentTarget.style.transform = "translateY(0)";
-                            e.currentTarget.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.2)";
+                            fontFamily: "var(--font-mono, monospace)",
+                            fontSize: "0.64rem",
+                            letterSpacing: "0.08em",
+                            padding: "3px 8px",
+                            border: `1px solid ${
+                              model.isChampion
+                                ? "rgba(255, 255, 255, 0.4)"
+                                : "rgba(255, 255, 255, 0.12)"
+                            }`,
+                            backgroundColor: model.isChampion ? "rgba(255, 255, 255, 0.08)" : "transparent",
+                            color: model.isChampion ? "#FFFFFF" : "#888888",
+                            borderRadius: "0px",
+                            textTransform: "uppercase",
+                            display: "inline-block",
                           }}
                         >
-                          <Eye size={12} color={section.theme.accent} />
-                          <span>View Doc</span>
+                          {model.status}
+                        </span>
+                      </td>
+
+                      {/* Action */}
+                      <td style={{ padding: "14px 0 14px 12px", textAlign: "right" }}>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setSelectedModelDoc({
+                              ...model,
+                              diseaseTrack: section.title,
+                              category: section.category,
+                            })
+                          }
+                          style={{
+                            background: "transparent",
+                            border: "1px solid rgba(255, 255, 255, 0.2)",
+                            borderRadius: "0px",
+                            padding: "4px 10px",
+                            color: "#FFFFFF",
+                            fontFamily: "var(--font-mono, monospace)",
+                            fontSize: "0.68rem",
+                            letterSpacing: "0.06em",
+                            cursor: "pointer",
+                            transition: "all 0.15s ease",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = "#FFFFFF";
+                            e.currentTarget.style.color = "#000000";
+                            e.currentTarget.style.borderColor = "#FFFFFF";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = "transparent";
+                            e.currentTarget.style.color = "#FFFFFF";
+                            e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.2)";
+                          }}
+                        >
+                          DOCS ↗
                         </button>
                       </td>
                     </tr>
@@ -875,10 +1054,11 @@ export default function ModelEvaluationShowcase() {
         ))}
       </div>
 
-      {/* Model Documentation Slide-over Drawer / Modal */}
+      {/* Model Documentation Drawer - Sharp Zero-Radius */}
       {selectedModelDoc && (
         <ModelDocModal
-          modelName={selectedModelDoc}
+          modelData={selectedModelDoc}
+          modelName={selectedModelDoc.name || selectedModelDoc}
           onClose={() => setSelectedModelDoc(null)}
         />
       )}

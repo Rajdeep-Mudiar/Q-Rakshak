@@ -20,7 +20,6 @@ import {
   ExternalLink
 } from "lucide-react";
 import { animateErrorShake } from "../../utils/motion.js";
-import HybridBenchmarkSection from "./components/HybridBenchmarkSection.jsx";
 import ModelEvaluationShowcase from "./components/ModelEvaluationShowcase.jsx";
 import { authApi } from "../../api/auth.js";
 
@@ -44,19 +43,31 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
     const ctx = gsap.context(() => {
       // Smooth light-to-dark transition as user scrolls down from hero
       gsap.to(pageContainerRef.current, {
-        backgroundColor: "#090514",
+        backgroundColor: "#080808",
         scrollTrigger: {
           trigger: heroSectionRef.current,
           start: "bottom 95%",
           end: "bottom 15%",
-          scrub: 1.2,
+          scrub: 1.4,
         },
       });
 
-      // Floating gentle animation on the scroll cue pill
-      gsap.to(".editorial-scroll-cue-pill", {
-        y: 6,
-        duration: 1.8,
+      // Subtle parallax fade on hero cockpit as user scrolls into the benchmark showcase
+      gsap.to(heroSectionRef.current, {
+        opacity: 0.12,
+        y: -35,
+        scrollTrigger: {
+          trigger: heroSectionRef.current,
+          start: "top top",
+          end: "bottom 20%",
+          scrub: 1.4,
+        },
+      });
+
+      // Floating gentle animation on the Zara scroll cue bar
+      gsap.to(".zara-scroll-cue-pill", {
+        y: 4,
+        duration: 2.0,
         repeat: -1,
         yoyo: true,
         ease: "sine.inOut",
@@ -205,39 +216,39 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(5px); }
         }
-        .editorial-scroll-cue-pill {
+        .zara-scroll-cue-pill {
           cursor: pointer;
           display: inline-flex;
           align-items: center;
-          gap: 12px;
-          padding: 12px 28px;
-          background: rgba(255, 255, 255, 0.96);
-          border: 1px solid #CBD5E1;
-          border-radius: 40px;
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(5, 150, 105, 0.08);
-          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          gap: 14px;
+          padding: 12px 24px;
+          background: #000000;
+          color: #FFFFFF;
+          border: 1px solid rgba(0, 0, 0, 0.9);
+          border-radius: 0px;
+          font-family: var(--font-mono, monospace);
+          font-size: 0.72rem;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .editorial-scroll-cue-pill:hover {
-          border-color: #059669 !important;
+        .zara-scroll-cue-pill:hover {
           background: #FFFFFF !important;
-          box-shadow: 0 12px 36px rgba(5, 150, 105, 0.25), 0 0 0 3px rgba(5, 150, 105, 0.15) !important;
-          transform: translateY(-3px) scale(1.02);
+          color: #000000 !important;
+          border-color: #000000 !important;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
         }
-        .scroll-pulse-dot {
-          width: 9px;
-          height: 9px;
-          border-radius: 50%;
-          background: #059669;
-          position: relative;
-          box-shadow: 0 0 10px #059669;
+        .zara-pulse-square {
+          width: 7px;
+          height: 7px;
+          background: #FFFFFF;
+          display: inline-block;
+          transition: background 0.2s ease;
         }
-        .scroll-pulse-dot::after {
-          content: "";
-          position: absolute;
-          inset: -4px;
-          border-radius: 50%;
-          border: 2px solid #059669;
-          animation: pingRing 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+        .zara-scroll-cue-pill:hover .zara-pulse-square {
+          background: #000000;
         }
         .scroll-arrow-anim {
           animation: bounceArrow 1.5s infinite ease-in-out;
@@ -604,20 +615,11 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
             const el = document.getElementById("quantum-model-benchmarks");
             if (el) el.scrollIntoView({ behavior: "smooth" });
           }}
-          className="editorial-scroll-cue-pill"
+          className="zara-scroll-cue-pill"
         >
-          <div className="scroll-pulse-dot" />
-          <span
-            style={{
-              fontSize: "0.80rem",
-              fontWeight: 700,
-              color: "#0F172A",
-              letterSpacing: "0.02em",
-            }}
-          >
-            Scroll down to explore Quantum vs Classical Models & Clinical Benchmarks
-          </span>
-          <ArrowDown size={15} color="#059669" className="scroll-arrow-anim" />
+          <span className="zara-pulse-square" />
+          <span>EXPLORE AUDITED QUANTUM-CLASSICAL BENCHMARKS</span>
+          <ArrowDown size={14} className="scroll-arrow-anim" />
         </div>
       </div>
     </div>
@@ -625,502 +627,639 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
     {/* ── Section: Quantum Model Benchmark Showcase (Directly below hero with per-disease theme transitions) ── */}
     <ModelEvaluationShowcase />
 
-    {/* ── Section: Hybrid AI Benchmark ── */}
-    <HybridBenchmarkSection />
-
-      {/* ── Section: Research Objectives Compliance Matrix (OBJ-01 – OBJ-06) ── */}
-      <section
+    {/* ── Section: Research Objectives Compliance Matrix (OBJ-01 – OBJ-06) ── */}
+    <section
+      style={{
+        marginTop: "64px",
+        background: "#0A0A0A",
+        border: "1px solid rgba(255, 255, 255, 0.12)",
+        borderLeft: "2px solid #FFFFFF",
+        borderRadius: "0px",
+        padding: "clamp(24px, 3.5vw, 40px)",
+        position: "relative",
+        zIndex: 10,
+        boxSizing: "border-box",
+      }}
+    >
+      <div
         style={{
-          marginTop: "48px",
-          background: "#FFFFFF",
-          border: "1px solid #E2E8F0",
-          borderLeft: "4px solid #2563EB",
-          borderRadius: "12px",
-          padding: "clamp(20px, 3vw, 32px)",
-          position: "relative",
-          zIndex: 10,
-          boxShadow: "0 4px 16px rgba(0, 0, 0, 0.04)",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          flexWrap: "wrap",
+          gap: "16px",
+          marginBottom: "24px",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+          paddingBottom: "20px",
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "16px", marginBottom: "20px", borderBottom: "1px solid #E2E8F0", paddingBottom: "16px" }}>
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-              <span style={{ fontSize: "0.68rem", fontWeight: 800, padding: "2px 7px", background: "#EFF6FF", color: "#1E40AF", border: "1px solid #BFDBFE", borderRadius: "4px", letterSpacing: "0.08em" }}>
-                RESEARCH COMPLIANCE
-              </span>
-              <span style={{ fontSize: "0.70rem", color: "#64748B", fontFamily: "var(--font-mono, monospace)" }}>
-                HYBRID QUANTUM-CLASSICAL MACHINE LEARNING AUDIT
-              </span>
-            </div>
-            <h2 style={{ fontFamily: "var(--font-sans, inherit)", fontSize: "clamp(1.2rem, 2vw, 1.55rem)", fontWeight: 800, color: "#0F172A", margin: "0 0 6px 0", letterSpacing: "-0.02em" }}>
-              Research Objectives Compliance Matrix (OBJ-01 – OBJ-06)
-            </h2>
-            <p style={{ fontSize: "0.82rem", color: "#475569", margin: 0, lineHeight: 1.5, maxWidth: "780px" }}>
-              Evidence-based verification matrix auditing all defined research objectives against verified codebase implementations, mathematically audited pipelines, and zero-leakage protocols.
-            </p>
-          </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-            <a
-              href="https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md"
-              target="_blank"
-              rel="noopener noreferrer"
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+            <span
               style={{
-                fontSize: "0.74rem",
-                color: "#1E40AF",
-                background: "#EFF6FF",
-                border: "1px solid #BFDBFE",
-                padding: "5px 12px",
-                borderRadius: "6px",
+                fontSize: "0.68rem",
                 fontWeight: 700,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                textDecoration: "none",
+                padding: "3px 8px",
+                background: "transparent",
+                color: "#FFFFFF",
+                border: "1px solid rgba(255, 255, 255, 0.25)",
+                borderRadius: "0px",
+                letterSpacing: "0.12em",
+                fontFamily: "var(--font-mono, monospace)",
+                textTransform: "uppercase",
               }}
             >
-              <ExternalLink size={13} />
-              <span>GitHub Documentation Portal</span>
-            </a>
-            <span style={{ fontSize: "0.74rem", color: "#059669", background: "#ECFDF5", border: "1px solid #A7F3D0", padding: "5px 12px", borderRadius: "6px", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: "6px" }}>
-              <CheckCircle2 size={14} color="#059669" /> 6 / 6 Objectives Satisfied
+              RESEARCH COMPLIANCE
+            </span>
+            <span
+              style={{
+                fontSize: "0.70rem",
+                color: "#777777",
+                fontFamily: "var(--font-mono, monospace)",
+                letterSpacing: "0.08em",
+              }}
+            >
+              HYBRID QUANTUM-CLASSICAL MACHINE LEARNING AUDIT
             </span>
           </div>
+          <h2
+            style={{
+              fontFamily: "var(--font-sans, inherit)",
+              fontSize: "clamp(1.25rem, 2.2vw, 1.8rem)",
+              fontWeight: 400,
+              color: "#FFFFFF",
+              margin: "0 0 8px 0",
+              letterSpacing: "-0.02em",
+              textTransform: "uppercase",
+            }}
+          >
+            Research Objectives Compliance Matrix (OBJ-01 – OBJ-06)
+          </h2>
+          <p
+            style={{
+              fontSize: "0.85rem",
+              color: "#888888",
+              margin: 0,
+              lineHeight: 1.6,
+              maxWidth: "780px",
+            }}
+          >
+            Evidence-based verification matrix auditing all defined research objectives against verified codebase implementations, mathematically audited pipelines, and zero-leakage protocols.
+          </p>
         </div>
 
-        {/* Objectives Data Table */}
-        <div style={{ overflowX: "auto", border: "1px solid #E2E8F0", borderRadius: "8px", background: "#FFFFFF" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.80rem" }}>
-            <thead>
-              <tr style={{ background: "#F8FAFC", borderBottom: "1px solid #E2E8F0", color: "#475569" }}>
-                <th style={{ padding: "12px 14px", width: "80px", fontFamily: "var(--font-mono, monospace)", fontSize: "0.70rem", letterSpacing: "0.05em" }}>ID</th>
-                <th style={{ padding: "12px 14px", fontWeight: 700, color: "#0F172A", width: "230px" }}>Research Objective</th>
-                <th style={{ padding: "12px 14px", fontWeight: 700, color: "#0F172A" }}>Implementation & Code Evidence</th>
-                <th style={{ padding: "12px 14px", fontWeight: 700, color: "#0F172A", width: "210px" }}>Repository Reference</th>
-                <th style={{ padding: "12px 14px", fontWeight: 700, color: "#0F172A", textAlign: "right", width: "140px" }}>Compliance Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                {
-                  id: "OBJ-01",
-                  title: "Hybrid Quantum-Classical Architecture for Early Disease Detection",
-                  evidence: "Classical preprocessing pipeline (ml/preprocessing/validation.py), train-only PCA dimensionality reduction, PennyLane VQC/VQR circuits, and UnifiedMedicalPredictor with conformal calibration.",
-                  readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md#obj-01",
-                  readmeLabel: "documentation #obj-01",
-                  status: "100% SATISFIED",
-                  statusColor: "#059669",
-                  bg: "#ECFDF5",
-                  border: "#A7F3D0",
-                },
-                {
-                  id: "OBJ-02",
-                  title: "High-Dimensional Quantum Classification & Continuous Regression",
-                  evidence: "BiomedCLIP (512-dim) / MedSigLIP (768-dim) foundation encoders, train-only compression into <=8 qubits, and VariationalQuantumRegressor with Pauli-Z expectations for continuous targets (Parkinson's UPDRS).",
-                  readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md#obj-02",
-                  readmeLabel: "documentation #obj-02",
-                  status: "100% SATISFIED",
-                  statusColor: "#059669",
-                  bg: "#ECFDF5",
-                  border: "#A7F3D0",
-                },
-                {
-                  id: "OBJ-03",
-                  title: "Accuracy, Sensitivity, and Specificity vs Classical Baselines",
-                  evidence: "Standardized ClassicalBaselineSuite and ClassicalRegressionSuite under identical 5-seed patient-level stratified split (Seeds: 7, 21, 42, 73, 101); full metrics and confusion matrices with zero fabricated claims.",
-                  readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md#obj-03",
-                  readmeLabel: "documentation #obj-03",
-                  status: "100% SATISFIED",
-                  statusColor: "#059669",
-                  bg: "#ECFDF5",
-                  border: "#A7F3D0",
-                },
-                {
-                  id: "OBJ-04",
-                  title: "Scalability, Interpretability & Quantum Hardware Compatibility",
-                  evidence: "HardwareProviderRegistry modeling IBM Quantum Eagle (127Q), AWS Rigetti (80Q), and IonQ Forte (36Q) with T1/T2 noise; Grad-CAM Turbo saliency, KernelSHAP feature contributions, and qubit sensitivity.",
-                  readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md#obj-04",
-                  readmeLabel: "documentation #obj-04",
-                  status: "100% SATISFIED",
-                  statusColor: "#059669",
-                  bg: "#ECFDF5",
-                  border: "#A7F3D0",
-                },
-                {
-                  id: "OBJ-05",
-                  title: "Preprocessing, Feature Selection & Zero Data Leakage",
-                  evidence: "ClinicalTabularPreprocessor (median imputation, IQR outlier clipping, MinMax scaling) + PatientGroupedSplitter (GroupShuffleSplit across patient_id) with automated mathematical leakage audits.",
-                  readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md#obj-05",
-                  readmeLabel: "documentation #obj-05",
-                  status: "100% SATISFIED",
-                  statusColor: "#059669",
-                  bg: "#ECFDF5",
-                  border: "#A7F3D0",
-                },
-                {
-                  id: "OBJ-06",
-                  title: "Scientific Benchmarking (Accuracy, Efficiency & Generalization)",
-                  evidence: "AblationMatrixRunner executing standard Experiments A-F; tracemalloc peak memory profiling, 1000-resample bootstrap 95% CIs, quantum gate/depth telemetry, and continuous regression benchmarking.",
-                  readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md#obj-06",
-                  readmeLabel: "documentation #obj-06",
-                  status: "100% SATISFIED",
-                  statusColor: "#059669",
-                  bg: "#ECFDF5",
-                  border: "#A7F3D0",
-                },
-              ].map((item, index) => (
-                <tr
-                  key={item.id}
-                  style={{
-                    borderBottom: "1px solid #F1F5F9",
-                    background: index % 2 === 0 ? "#FFFFFF" : "#FAFAFA",
-                    transition: "background 0.15s ease",
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "#EFF6FF")}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = index % 2 === 0 ? "#FFFFFF" : "#FAFAFA")}
-                >
-                  <td style={{ padding: "12px 14px", fontFamily: "var(--font-mono, monospace)", color: "#1E40AF", fontSize: "0.74rem", fontWeight: 800 }}>
-                    {item.id}
-                  </td>
-                  <td style={{ padding: "12px 14px", color: "#0F172A", fontWeight: 700, lineHeight: 1.4 }}>
-                    {item.title}
-                  </td>
-                  <td style={{ padding: "12px 14px", color: "#475569", lineHeight: 1.45, fontSize: "0.78rem" }}>
-                    {item.evidence}
-                  </td>
-                  <td style={{ padding: "12px 14px" }}>
-                    <a
-                      href={item.readmeAnchor}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "5px",
-                        fontSize: "0.72rem",
-                        color: "#2563EB",
-                        background: "#EFF6FF",
-                        border: "1px solid #BFDBFE",
-                        padding: "3px 8px",
-                        borderRadius: "4px",
-                        textDecoration: "none",
-                        fontFamily: "var(--font-mono, monospace)",
-                        fontWeight: 600,
-                      }}
-                    >
-                      <span>{item.readmeLabel}</span>
-                      <ExternalLink size={10} />
-                    </a>
-                  </td>
-                  <td style={{ padding: "12px 14px", textAlign: "right" }}>
-                    <span
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "5px",
-                        fontSize: "0.68rem",
-                        fontWeight: 700,
-                        padding: "3px 8px",
-                        borderRadius: "4px",
-                        background: item.bg,
-                        color: item.statusColor,
-                        border: `1px solid ${item.border}`,
-                      }}
-                    >
-                      <CheckCircle2 size={11} color={item.statusColor} />
-                      {item.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      {/* ── Section: Delivery Table (Expected Deliverables) ── */}
-      <section
-        style={{
-          marginTop: "48px",
-          background: "#FFFFFF",
-          border: "1px solid #E2E8F0",
-          borderLeft: "4px solid #059669",
-          borderRadius: "12px",
-          padding: "clamp(20px, 3vw, 32px)",
-          position: "relative",
-          zIndex: 10,
-          boxShadow: "0 4px 16px rgba(0, 0, 0, 0.04)",
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "16px", marginBottom: "20px", borderBottom: "1px solid #E2E8F0", paddingBottom: "16px" }}>
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-              <span style={{ fontSize: "0.68rem", fontWeight: 800, padding: "2px 7px", background: "#ECFDF5", color: "#059669", border: "1px solid #A7F3D0", borderRadius: "4px", letterSpacing: "0.08em" }}>
-                SIH PROBLEM STATEMENT 26139
-              </span>
-              <span style={{ fontSize: "0.70rem", color: "#64748B", fontFamily: "var(--font-mono, monospace)" }}>
-                SECTION 13 SPECIFICATION
-              </span>
-            </div>
-            <h2 style={{ fontFamily: "var(--font-sans, inherit)", fontSize: "clamp(1.2rem, 2vw, 1.55rem)", fontWeight: 800, color: "#0F172A", margin: "0 0 6px 0", letterSpacing: "-0.02em" }}>
-              Delivery Table (Expected Deliverables)
-            </h2>
-            <p style={{ fontSize: "0.82rem", color: "#475569", margin: 0, lineHeight: 1.5, maxWidth: "720px" }}>
-              Comprehensive verification matrix of fully functional software, quantum circuits, data pipelines, clinical explainability, and regulatory governance deliverables.
-            </p>
-          </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <span style={{ fontSize: "0.74rem", color: "#059669", background: "#ECFDF5", border: "1px solid #A7F3D0", padding: "5px 12px", borderRadius: "6px", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: "6px" }}>
-              <CheckCircle2 size={14} color="#059669" /> 15 / 15 Deliverables Verified
-            </span>
-          </div>
-        </div>
-
-        {/* Deliverables Data Table */}
-        <div style={{ overflowX: "auto", border: "1px solid #E2E8F0", borderRadius: "8px", background: "#FFFFFF" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.80rem" }}>
-            <thead>
-              <tr style={{ background: "#F8FAFC", borderBottom: "1px solid #E2E8F0", color: "#475569" }}>
-                <th style={{ padding: "12px 14px", width: "45px", fontFamily: "var(--font-mono, monospace)", fontSize: "0.70rem", letterSpacing: "0.05em" }}>#</th>
-                <th style={{ padding: "12px 14px", fontWeight: 700, color: "#0F172A" }}>Expected Deliverable</th>
-                <th style={{ padding: "12px 14px", fontWeight: 700, color: "#0F172A" }}>Scope & Implementation Components</th>
-                <th style={{ padding: "12px 14px", fontWeight: 700, color: "#0F172A" }}>Delivery Format</th>
-                <th style={{ padding: "12px 14px", fontWeight: 700, color: "#0F172A", textAlign: "right" }}>Compliance Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                {
-                  id: 1,
-                  title: "Hybrid Quantum-Classical ML Platform",
-                  scope: "Fully functional web software platform with 6 clinical workspaces, live HUD telemetry, and sub-15ms inference latency.",
-                  format: "Deployed Web App + Source Repo",
-                  status: "100% Complete",
-                  statusColor: "#059669",
-                  bg: "#ECFDF5",
-                  border: "#A7F3D0",
-                },
-                {
-                  id: 2,
-                  title: "Data Ingestion & Preprocessing Pipeline",
-                  scope: "Zero-leakage GroupShuffleSplit across patient_id, train-only PCA/MI feature compression, and MinMax angle scaling (0 to π).",
-                  format: "ml.preprocessing + FHIR/DICOM",
-                  status: "Verified (Zero Leakage)",
-                  statusColor: "#059669",
-                  bg: "#ECFDF5",
-                  border: "#A7F3D0",
-                },
-                {
-                  id: 3,
-                  title: "Hybrid Quantum Models (VQC, QSVM, QNN)",
-                  scope: "8-Qubit circular CNOT entanglement VQC, ZZ fidelity kernel QSVM, and PyTorch TorchLayer Hybrid QNN with barren plateau telemetry.",
-                  format: "PennyLane + Qiskit (.pt / .pkl)",
-                  status: "Trained & Calibrated",
-                  statusColor: "#059669",
-                  bg: "#ECFDF5",
-                  border: "#A7F3D0",
-                },
-                {
-                  id: 4,
-                  title: "Classical Baseline Benchmarking Models",
-                  scope: "Paired control baselines: Logistic Regression, Random Forest (100 trees), XGBoost, CatBoost, SVM (RBF), and MLP (64-32).",
-                  format: "ml.models.classical",
-                  status: "Benchmarked",
-                  statusColor: "#0284C7",
-                  bg: "#F0F9FF",
-                  border: "#BAE6FD",
-                },
-                {
-                  id: 5,
-                  title: "Cross-Cohort Benchmark Ablation Report",
-                  scope: "Evaluation metrics: AUROC (0.9615), Sensitivity (95.2%), Specificity (97.1%), ECE (0.0185 < 0.04), and Quantum Advantage Score.",
-                  format: "FINAL_MIGRATION_REPORT.md",
-                  status: "Published & Audited",
-                  statusColor: "#059669",
-                  bg: "#ECFDF5",
-                  border: "#A7F3D0",
-                },
-                {
-                  id: 6,
-                  title: "Clinical Explainability Module",
-                  scope: "Visual Grad-CAM with Turbo colormap & automated ROI bounding box extraction, KernelSHAP feature attribution, and quantum sensitivity.",
-                  format: "ml.explainability + UI Overlays",
-                  status: "Integrated",
-                  statusColor: "#059669",
-                  bg: "#ECFDF5",
-                  border: "#A7F3D0",
-                },
-                {
-                  id: 7,
-                  title: "2D / 3D Anatomical Digital Twin",
-                  scope: "Interactive Three.js 3D physiological avatar rendering multi-organ risk scores onto interactive organ meshes in real time.",
-                  format: "WebGL Three.js Canvas",
-                  status: "Interactive",
-                  statusColor: "#7C3AED",
-                  bg: "#F5F3FF",
-                  border: "#DDD6FE",
-                },
-                {
-                  id: 8,
-                  title: "Clinical UI/UX Design System & Cockpit",
-                  scope: "Bento-grid HUD cockpit, high-contrast dark/light clinical themes, and WCAG 2.1 AA accessibility modes.",
-                  format: "React 18 + CSS Tokens",
-                  status: "Production Ready",
-                  statusColor: "#059669",
-                  bg: "#ECFDF5",
-                  border: "#A7F3D0",
-                },
-                {
-                  id: 9,
-                  title: "Software Requirements Specification (SRS)",
-                  scope: "Formal specification document authored in compliance with IEEE 830-1998 and ISO/IEC/IEEE 29148-2018 standards.",
-                  format: "docs/SRS.md (v1.0)",
-                  status: "Complete",
-                  statusColor: "#0284C7",
-                  bg: "#F0F9FF",
-                  border: "#BAE6FD",
-                },
-                {
-                  id: 10,
-                  title: "Security & Regulatory Compliance Documentation",
-                  scope: "WORM immutable SHA-256 tamper-evident audit logging, HIPAA Safe Harbor 18-identifier stripping, and DPDP Act 2023 consent flows.",
-                  format: "docs/COMPLIANCE_DPDP_HIPAA.md",
-                  status: "Enforced",
-                  statusColor: "#059669",
-                  bg: "#ECFDF5",
-                  border: "#A7F3D0",
-                },
-                {
-                  id: 11,
-                  title: "OpenAPI / Swagger API Documentation",
-                  scope: "Type-checked Pydantic v2 endpoints for diagnostic inference, quantum circuit telemetry, emergency triage, and user RBAC.",
-                  format: "FastAPI /docs + API_SPEC.md",
-                  status: "Live (/docs)",
-                  statusColor: "#0284C7",
-                  bg: "#F0F9FF",
-                  border: "#BAE6FD",
-                },
-                {
-                  id: 12,
-                  title: "Automated Test Suite & Verification Reports",
-                  scope: "Pytest verification covering API routes, zero data leakage audits, quantum circuit unitarity, and calibration guarantees.",
-                  format: "tests/ Suite + CI Manifest",
-                  status: "87/87 Passed",
-                  statusColor: "#059669",
-                  bg: "#ECFDF5",
-                  border: "#A7F3D0",
-                },
-                {
-                  id: 13,
-                  title: "Containerization & Deployment Guide",
-                  scope: "Docker orchestration, Conda Python 3.10 environment specification, and local weight caching for offline clinical execution.",
-                  format: "Dockerfile + docs/run.md",
-                  status: "Containerized",
-                  statusColor: "#0284C7",
-                  bg: "#F0F9FF",
-                  border: "#BAE6FD",
-                },
-                {
-                  id: 14,
-                  title: "Emergency Medical Passport & Print Triage",
-                  scope: "ISO/IEC 7810 ID-1 standard wallet card, single-page A4 print stylesheet, and dynamic tamper-proof emergency QR code.",
-                  format: "Printable SVG / A4 CSS",
-                  status: "Production Ready",
-                  statusColor: "#059669",
-                  bg: "#ECFDF5",
-                  border: "#A7F3D0",
-                },
-                {
-                  id: 15,
-                  title: "Open Source Repository & Model Governance",
-                  scope: "Complete Git repository with developer guide, Model Specification Handbook (model.md), Phase 17 Output Contract, and MIT license.",
-                  format: "Git Repository + README.md",
-                  status: "MIT Open Source",
-                  statusColor: "#059669",
-                  bg: "#ECFDF5",
-                  border: "#A7F3D0",
-                },
-              ].map((item, index) => (
-                <tr
-                  key={item.id}
-                  style={{
-                    borderBottom: "1px solid #F1F5F9",
-                    background: index % 2 === 0 ? "#FFFFFF" : "#FAFAFA",
-                    transition: "background 0.15s ease",
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "#F0FDF4")}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = index % 2 === 0 ? "#FFFFFF" : "#FAFAFA")}
-                >
-                  <td style={{ padding: "12px 14px", fontFamily: "var(--font-mono, monospace)", color: "#64748B", fontSize: "0.72rem" }}>
-                    {String(item.id).padStart(2, "0")}
-                  </td>
-                  <td style={{ padding: "12px 14px", color: "#0F172A", fontWeight: 700 }}>
-                    {item.title}
-                  </td>
-                  <td style={{ padding: "12px 14px", color: "#475569", lineHeight: 1.45 }}>
-                    {item.scope}
-                  </td>
-                  <td style={{ padding: "12px 14px" }}>
-                    <code style={{ fontSize: "0.70rem", color: "#334155", background: "#F1F5F9", border: "1px solid #E2E8F0", padding: "3px 6px", borderRadius: "4px" }}>
-                      {item.format}
-                    </code>
-                  </td>
-                  <td style={{ padding: "12px 14px", textAlign: "right" }}>
-                    <span
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "5px",
-                        fontSize: "0.68rem",
-                        fontWeight: 700,
-                        padding: "3px 8px",
-                        borderRadius: "4px",
-                        background: item.bg,
-                        color: item.statusColor,
-                        border: `1px solid ${item.border}`,
-                      }}
-                    >
-                      <CheckCircle2 size={11} color={item.statusColor} />
-                      {item.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <footer style={{ marginTop: "40px", borderTop: "1px solid #E2E8F0", paddingTop: "20px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px", position: "relative", zIndex: 10 }}>
-        <div style={{ fontSize: "0.75rem", color: "#64748B" }}>
-          &copy; 2026 Q-RAKSHAK Clinical Technology Platform. All rights reserved.
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
           <a
-            href="https://github.com/Rajdeep-Mudiar/Q-Rakshak"
+            href="https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md"
             target="_blank"
             rel="noopener noreferrer"
             style={{
-              fontSize: "0.75rem",
-              color: "#2563EB",
-              fontWeight: 600,
-              textDecoration: "none",
+              fontSize: "0.72rem",
+              color: "#FFFFFF",
+              background: "transparent",
+              border: "1px solid rgba(255, 255, 255, 0.25)",
+              padding: "6px 14px",
+              borderRadius: "0px",
+              fontFamily: "var(--font-mono, monospace)",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
               display: "inline-flex",
               alignItems: "center",
-              gap: "5px",
+              gap: "6px",
+              textDecoration: "none",
+              transition: "all 0.15s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#FFFFFF";
+              e.currentTarget.style.color = "#000000";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "transparent";
+              e.currentTarget.style.color = "#FFFFFF";
             }}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-            </svg>
-            <span>github.com/Rajdeep-Mudiar/Q-Rakshak</span>
             <ExternalLink size={12} />
+            <span>Documentation Portal</span>
           </a>
-          <span style={{ fontSize: "0.75rem", color: "#64748B", cursor: "pointer", transition: "color 0.2s" }} onMouseEnter={e => e.currentTarget.style.color = "#0F172A"} onMouseLeave={e => e.currentTarget.style.color = "#64748B"}>Privacy Policy</span>
-          <span style={{ fontSize: "0.75rem", color: "#64748B", cursor: "pointer", transition: "color 0.2s" }} onMouseEnter={e => e.currentTarget.style.color = "#0F172A"} onMouseLeave={e => e.currentTarget.style.color = "#64748B"}>Terms of Service</span>
+          <span
+            style={{
+              fontSize: "0.72rem",
+              color: "#FFFFFF",
+              background: "rgba(255, 255, 255, 0.06)",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
+              padding: "6px 14px",
+              borderRadius: "0px",
+              fontFamily: "var(--font-mono, monospace)",
+              letterSpacing: "0.08em",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+          >
+            <CheckCircle2 size={13} color="#FFFFFF" /> 6 / 6 SATISFIED
+          </span>
         </div>
-      </footer>
-    </div>
-  );
+      </div>
+
+      {/* Objectives Data Table - Zara Minimalist */}
+      <div
+        style={{
+          overflowX: "auto",
+          border: "1px solid rgba(255, 255, 255, 0.1)",
+          borderRadius: "0px",
+          background: "#0A0A0A",
+        }}
+      >
+        <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.80rem" }}>
+          <thead>
+            <tr
+              style={{
+                background: "#111111",
+                borderBottom: "1px solid rgba(255, 255, 255, 0.12)",
+                color: "#777777",
+                fontFamily: "var(--font-mono, monospace)",
+                fontSize: "0.68rem",
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+              }}
+            >
+              <th style={{ padding: "12px 14px", width: "80px" }}>ID</th>
+              <th style={{ padding: "12px 14px", fontWeight: 600, color: "#FFFFFF", width: "230px" }}>Research Objective</th>
+              <th style={{ padding: "12px 14px", fontWeight: 600, color: "#FFFFFF" }}>Implementation & Code Evidence</th>
+              <th style={{ padding: "12px 14px", fontWeight: 600, color: "#FFFFFF", width: "190px" }}>Repository Reference</th>
+              <th style={{ padding: "12px 14px", fontWeight: 600, color: "#FFFFFF", textAlign: "right", width: "140px" }}>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              {
+                id: "OBJ-01",
+                title: "Hybrid Quantum-Classical Architecture for Early Disease Detection",
+                evidence: "Classical preprocessing pipeline (ml/preprocessing/validation.py), train-only PCA dimensionality reduction, PennyLane VQC/VQR circuits, and UnifiedMedicalPredictor with conformal calibration.",
+                readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md#obj-01",
+                readmeLabel: "guide #obj-01",
+                status: "SATISFIED",
+              },
+              {
+                id: "OBJ-02",
+                title: "High-Dimensional Quantum Classification & Continuous Regression",
+                evidence: "BiomedCLIP (512-dim) / MedSigLIP (768-dim) foundation encoders, train-only compression into <=8 qubits, and VariationalQuantumRegressor with Pauli-Z expectations for continuous targets (Parkinson's UPDRS).",
+                readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md#obj-02",
+                readmeLabel: "guide #obj-02",
+                status: "SATISFIED",
+              },
+              {
+                id: "OBJ-03",
+                title: "Accuracy, Sensitivity, and Specificity vs Classical Baselines",
+                evidence: "Standardized ClassicalBaselineSuite and ClassicalRegressionSuite under identical 5-seed patient-level stratified split (Seeds: 7, 21, 42, 73, 101); full metrics and confusion matrices with zero fabricated claims.",
+                readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md#obj-03",
+                readmeLabel: "guide #obj-03",
+                status: "SATISFIED",
+              },
+              {
+                id: "OBJ-04",
+                title: "Scalability, Interpretability & Quantum Hardware Compatibility",
+                evidence: "HardwareProviderRegistry modeling IBM Quantum Eagle (127Q), AWS Rigetti (80Q), and IonQ Forte (36Q) with T1/T2 noise; Grad-CAM Turbo saliency, KernelSHAP feature contributions, and qubit sensitivity.",
+                readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md#obj-04",
+                readmeLabel: "guide #obj-04",
+                status: "SATISFIED",
+              },
+              {
+                id: "OBJ-05",
+                title: "Preprocessing, Feature Selection & Zero Data Leakage",
+                evidence: "ClinicalTabularPreprocessor (median imputation, IQR outlier clipping, MinMax scaling) + PatientGroupedSplitter (GroupShuffleSplit across patient_id) with automated mathematical leakage audits.",
+                readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md#obj-05",
+                readmeLabel: "guide #obj-05",
+                status: "SATISFIED",
+              },
+              {
+                id: "OBJ-06",
+                title: "Scientific Benchmarking (Accuracy, Efficiency & Generalization)",
+                evidence: "AblationMatrixRunner executing standard Experiments A-F; tracemalloc peak memory profiling, 1000-resample bootstrap 95% CIs, quantum gate/depth telemetry, and continuous regression benchmarking.",
+                readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md#obj-06",
+                readmeLabel: "guide #obj-06",
+                status: "SATISFIED",
+              },
+            ].map((item, index) => (
+              <tr
+                key={item.id}
+                style={{
+                  borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
+                  background: index % 2 === 0 ? "#0A0A0A" : "#0E0E0E",
+                  transition: "background 0.15s ease",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255, 255, 255, 0.03)")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = index % 2 === 0 ? "#0A0A0A" : "#0E0E0E")}
+              >
+                <td style={{ padding: "14px", fontFamily: "var(--font-mono, monospace)", color: "#FFFFFF", fontSize: "0.74rem", fontWeight: 700 }}>
+                  {item.id}
+                </td>
+                <td style={{ padding: "14px", color: "#EDEDED", fontWeight: 600, lineHeight: 1.4 }}>
+                  {item.title}
+                </td>
+                <td style={{ padding: "14px", color: "#888888", lineHeight: 1.5, fontSize: "0.78rem" }}>
+                  {item.evidence}
+                </td>
+                <td style={{ padding: "14px" }}>
+                  <a
+                    href={item.readmeAnchor}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      fontSize: "0.70rem",
+                      color: "#CCCCCC",
+                      background: "transparent",
+                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                      padding: "4px 8px",
+                      borderRadius: "0px",
+                      textDecoration: "none",
+                      fontFamily: "var(--font-mono, monospace)",
+                    }}
+                  >
+                    <span>{item.readmeLabel}</span>
+                    <ExternalLink size={10} />
+                  </a>
+                </td>
+                <td style={{ padding: "14px", textAlign: "right" }}>
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      fontSize: "0.65rem",
+                      fontWeight: 700,
+                      padding: "3px 8px",
+                      borderRadius: "0px",
+                      background: "rgba(255, 255, 255, 0.06)",
+                      color: "#FFFFFF",
+                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                      fontFamily: "var(--font-mono, monospace)",
+                    }}
+                  >
+                    <CheckCircle2 size={11} color="#FFFFFF" />
+                    {item.status}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    {/* ── Section: Delivery Table (Expected Deliverables) ── */}
+    <section
+      style={{
+        marginTop: "48px",
+        background: "#0A0A0A",
+        border: "1px solid rgba(255, 255, 255, 0.12)",
+        borderLeft: "2px solid #FFFFFF",
+        borderRadius: "0px",
+        padding: "clamp(24px, 3.5vw, 40px)",
+        position: "relative",
+        zIndex: 10,
+        boxSizing: "border-box",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          flexWrap: "wrap",
+          gap: "16px",
+          marginBottom: "24px",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+          paddingBottom: "20px",
+        }}
+      >
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+            <span
+              style={{
+                fontSize: "0.68rem",
+                fontWeight: 700,
+                padding: "3px 8px",
+                background: "transparent",
+                color: "#FFFFFF",
+                border: "1px solid rgba(255, 255, 255, 0.25)",
+                borderRadius: "0px",
+                letterSpacing: "0.12em",
+                fontFamily: "var(--font-mono, monospace)",
+                textTransform: "uppercase",
+              }}
+            >
+              SIH PROBLEM STATEMENT 26139
+            </span>
+            <span
+              style={{
+                fontSize: "0.70rem",
+                color: "#777777",
+                fontFamily: "var(--font-mono, monospace)",
+                letterSpacing: "0.08em",
+              }}
+            >
+              SECTION 13 SPECIFICATION
+            </span>
+          </div>
+          <h2
+            style={{
+              fontFamily: "var(--font-sans, inherit)",
+              fontSize: "clamp(1.25rem, 2.2vw, 1.8rem)",
+              fontWeight: 400,
+              color: "#FFFFFF",
+              margin: "0 0 8px 0",
+              letterSpacing: "-0.02em",
+              textTransform: "uppercase",
+            }}
+          >
+            Delivery Table (Expected Deliverables)
+          </h2>
+          <p style={{ fontSize: "0.85rem", color: "#888888", margin: 0, lineHeight: 1.6, maxWidth: "720px" }}>
+            Comprehensive verification matrix of fully functional software, quantum circuits, data pipelines, clinical explainability, and regulatory governance deliverables.
+          </p>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <span
+            style={{
+              fontSize: "0.72rem",
+              color: "#FFFFFF",
+              background: "rgba(255, 255, 255, 0.06)",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
+              padding: "6px 14px",
+              borderRadius: "0px",
+              fontFamily: "var(--font-mono, monospace)",
+              letterSpacing: "0.08em",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+          >
+            <CheckCircle2 size={13} color="#FFFFFF" /> 15 / 15 DELIVERABLES VERIFIED
+          </span>
+        </div>
+      </div>
+
+      {/* Deliverables Data Table */}
+      <div
+        style={{
+          overflowX: "auto",
+          border: "1px solid rgba(255, 255, 255, 0.1)",
+          borderRadius: "0px",
+          background: "#0A0A0A",
+        }}
+      >
+        <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.80rem" }}>
+          <thead>
+            <tr
+              style={{
+                background: "#111111",
+                borderBottom: "1px solid rgba(255, 255, 255, 0.12)",
+                color: "#777777",
+                fontFamily: "var(--font-mono, monospace)",
+                fontSize: "0.68rem",
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+              }}
+            >
+              <th style={{ padding: "12px 14px", width: "45px" }}>#</th>
+              <th style={{ padding: "12px 14px", fontWeight: 600, color: "#FFFFFF", width: "230px" }}>Expected Deliverable</th>
+              <th style={{ padding: "12px 14px", fontWeight: 600, color: "#FFFFFF" }}>Scope & Implementation Components</th>
+              <th style={{ padding: "12px 14px", fontWeight: 600, color: "#FFFFFF", width: "200px" }}>Delivery Format</th>
+              <th style={{ padding: "12px 14px", fontWeight: 600, color: "#FFFFFF", textAlign: "right", width: "140px" }}>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              {
+                id: 1,
+                title: "Hybrid Quantum-Classical ML Platform",
+                scope: "Fully functional web software platform with 6 clinical workspaces, live HUD telemetry, and sub-15ms inference latency.",
+                format: "Deployed Web App + Source Repo",
+                status: "100% Complete",
+              },
+              {
+                id: 2,
+                title: "Data Ingestion & Preprocessing Pipeline",
+                scope: "Zero-leakage GroupShuffleSplit across patient_id, train-only PCA/MI feature compression, and MinMax angle scaling (0 to π).",
+                format: "ml.preprocessing + FHIR/DICOM",
+                status: "Verified",
+              },
+              {
+                id: 3,
+                title: "Hybrid Quantum Models (VQC, QSVM, QNN)",
+                scope: "8-Qubit circular CNOT entanglement VQC, ZZ fidelity kernel QSVM, and PyTorch TorchLayer Hybrid QNN with barren plateau telemetry.",
+                format: "PennyLane + Qiskit (.pt / .pkl)",
+                status: "Calibrated",
+              },
+              {
+                id: 4,
+                title: "Classical Baseline Benchmarking Models",
+                scope: "Paired control baselines: Logistic Regression, Random Forest (100 trees), XGBoost, CatBoost, SVM (RBF), and MLP (64-32).",
+                format: "ml.models.classical",
+                status: "Benchmarked",
+              },
+              {
+                id: 5,
+                title: "Cross-Cohort Benchmark Ablation Report",
+                scope: "Evaluation metrics: AUROC, Sensitivity, Specificity, ECE, and Quantum Advantage Score across all tracks.",
+                format: "documentation/models/",
+                status: "Audited",
+              },
+              {
+                id: 6,
+                title: "Clinical Explainability Module",
+                scope: "Visual Grad-CAM with Turbo colormap & automated ROI bounding box extraction, KernelSHAP feature attribution, and quantum sensitivity.",
+                format: "ml.explainability + UI Overlays",
+                status: "Integrated",
+              },
+              {
+                id: 7,
+                title: "2D / 3D Anatomical Digital Twin",
+                scope: "Interactive Three.js 3D physiological avatar rendering multi-organ risk scores onto interactive organ meshes in real time.",
+                format: "WebGL Three.js Canvas",
+                status: "Interactive",
+              },
+              {
+                id: 8,
+                title: "Clinical UI/UX Design System & Cockpit",
+                scope: "Bento-grid HUD cockpit, high-contrast dark/light clinical themes, and WCAG 2.1 AA accessibility modes.",
+                format: "React 18 + CSS Tokens",
+                status: "Production Ready",
+              },
+              {
+                id: 9,
+                title: "Software Requirements Specification (SRS)",
+                scope: "Formal specification document authored in compliance with IEEE 830-1998 and ISO/IEC/IEEE 29148-2018 standards.",
+                format: "documentation/guide/",
+                status: "Complete",
+              },
+              {
+                id: 10,
+                title: "Security & Regulatory Compliance Documentation",
+                scope: "WORM immutable SHA-256 tamper-evident audit logging, HIPAA Safe Harbor 18-identifier stripping, and DPDP Act 2023 consent flows.",
+                format: "documentation/guide/compliance",
+                status: "Enforced",
+              },
+              {
+                id: 11,
+                title: "OpenAPI / Swagger API Documentation",
+                scope: "Type-checked Pydantic v2 endpoints for diagnostic inference, quantum circuit telemetry, emergency triage, and user RBAC.",
+                format: "FastAPI /docs + apis/",
+                status: "Live (/docs)",
+              },
+              {
+                id: 12,
+                title: "Automated Test Suite & Verification Reports",
+                scope: "Pytest verification covering API routes, zero data leakage audits, quantum circuit unitarity, and calibration guarantees.",
+                format: "tests/ Suite + CI Manifest",
+                status: "87/87 Passed",
+              },
+              {
+                id: 13,
+                title: "Containerization & Deployment Guide",
+                scope: "Docker orchestration, Conda Python 3.10 environment specification, and local weight caching for offline clinical execution.",
+                format: "Dockerfile + documentation/",
+                status: "Containerized",
+              },
+              {
+                id: 14,
+                title: "Emergency Medical Passport & Print Triage",
+                scope: "ISO/IEC 7810 ID-1 standard wallet card, single-page A4 print stylesheet, and dynamic tamper-proof emergency QR code.",
+                format: "Printable SVG / A4 CSS",
+                status: "Production Ready",
+              },
+              {
+                id: 15,
+                title: "Open Source Repository & Model Governance",
+                scope: "Complete Git repository with developer guide, Model Specification Handbook, and MIT license.",
+                format: "Git Repository + README.md",
+                status: "MIT License",
+              },
+            ].map((item, index) => (
+              <tr
+                key={item.id}
+                style={{
+                  borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
+                  background: index % 2 === 0 ? "#0A0A0A" : "#0E0E0E",
+                  transition: "background 0.15s ease",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255, 255, 255, 0.03)")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = index % 2 === 0 ? "#0A0A0A" : "#0E0E0E")}
+              >
+                <td style={{ padding: "14px", fontFamily: "var(--font-mono, monospace)", color: "#777777", fontSize: "0.72rem" }}>
+                  {String(item.id).padStart(2, "0")}
+                </td>
+                <td style={{ padding: "14px", color: "#EDEDED", fontWeight: 600 }}>
+                  {item.title}
+                </td>
+                <td style={{ padding: "14px", color: "#888888", lineHeight: 1.5, fontSize: "0.78rem" }}>
+                  {item.scope}
+                </td>
+                <td style={{ padding: "14px" }}>
+                  <code
+                    style={{
+                      fontSize: "0.70rem",
+                      color: "#CCCCCC",
+                      background: "#141414",
+                      border: "1px solid rgba(255, 255, 255, 0.12)",
+                      padding: "4px 8px",
+                      borderRadius: "0px",
+                      fontFamily: "var(--font-mono, monospace)",
+                    }}
+                  >
+                    {item.format}
+                  </code>
+                </td>
+                <td style={{ padding: "14px", textAlign: "right" }}>
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      fontSize: "0.65rem",
+                      fontWeight: 700,
+                      padding: "3px 8px",
+                      borderRadius: "0px",
+                      background: "rgba(255, 255, 255, 0.06)",
+                      color: "#FFFFFF",
+                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                      fontFamily: "var(--font-mono, monospace)",
+                    }}
+                  >
+                    <CheckCircle2 size={11} color="#FFFFFF" />
+                    {item.status}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    {/* Zara High-Fashion Minimalist Footer */}
+    <footer
+      style={{
+        marginTop: "80px",
+        borderTop: "1px solid rgba(255, 255, 255, 0.12)",
+        paddingTop: "32px",
+        paddingBottom: "40px",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        flexWrap: "wrap",
+        gap: "16px",
+        position: "relative",
+        zIndex: 10,
+        fontFamily: "var(--font-mono, monospace)",
+        fontSize: "0.72rem",
+        color: "#666666",
+        letterSpacing: "0.08em",
+      }}
+    >
+      <div>
+        &copy; 2026 Q-RAKSHAK // CLINICAL AUDIT & QUANTUM BENCHMARKS.
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: "24px", flexWrap: "wrap" }}>
+        <a
+          href="https://github.com/Rajdeep-Mudiar/Q-Rakshak"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            color: "#EEEEEE",
+            textDecoration: "none",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "6px",
+            transition: "color 0.15s ease",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "#FFFFFF")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "#EEEEEE")}
+        >
+          <span>GITHUB REPOSITORY</span>
+          <ExternalLink size={11} />
+        </a>
+        <span
+          style={{ cursor: "pointer", transition: "color 0.15s ease" }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "#FFFFFF")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "#666666")}
+        >
+          PRIVACY PROTOCOL
+        </span>
+        <span
+          style={{ cursor: "pointer", transition: "color 0.15s ease" }}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "#FFFFFF")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "#666666")}
+        >
+          GOVERNANCE & TERMS
+        </span>
+      </div>
+    </footer>
+  </div>
+);
 }
