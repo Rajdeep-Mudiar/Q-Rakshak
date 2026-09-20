@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   ShieldCheck,
   Lock,
@@ -12,6 +13,7 @@ import {
   Stethoscope,
   Sparkles,
   ArrowRight,
+  ArrowDown,
   AlertCircle,
   Activity,
   Layers,
@@ -19,7 +21,12 @@ import {
 } from "lucide-react";
 import { animateErrorShake } from "../../utils/motion.js";
 import HybridBenchmarkSection from "./components/HybridBenchmarkSection.jsx";
+import ModelEvaluationShowcase from "./components/ModelEvaluationShowcase.jsx";
 import { authApi } from "../../api/auth.js";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySuccess, loading, error }) {
   const [showGuideModal, setShowGuideModal] = useState(false);
@@ -28,6 +35,36 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
   const modalContainerRef = useRef(null);
   const narrativeRef = useRef(null);
   const formContainerRef = useRef(null);
+  const pageContainerRef = useRef(null);
+  const heroSectionRef = useRef(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !pageContainerRef.current || !heroSectionRef.current) return;
+
+    const ctx = gsap.context(() => {
+      // Smooth light-to-dark transition as user scrolls down from hero
+      gsap.to(pageContainerRef.current, {
+        backgroundColor: "#090514",
+        scrollTrigger: {
+          trigger: heroSectionRef.current,
+          start: "bottom 95%",
+          end: "bottom 15%",
+          scrub: 1.2,
+        },
+      });
+
+      // Floating gentle animation on the scroll cue pill
+      gsap.to(".editorial-scroll-cue-pill", {
+        y: 6,
+        duration: 1.8,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+      });
+    }, pageContainerRef);
+
+    return () => ctx.revert();
+  }, []);
 
   useEffect(() => {
     const scriptId = "google-jssdk-gsi";
@@ -132,6 +169,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
 
   return (
     <div
+      ref={pageContainerRef}
       style={{
         minHeight: "100vh",
         width: "100vw",
@@ -150,9 +188,60 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
         position: "relative",
         boxSizing: "border-box",
         fontFamily: "var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif)",
+        transition: "background-color 0.4s ease",
       }}
     >
       <style>{`
+        @keyframes pulseDot {
+          0% { transform: scale(0.95); opacity: 0.8; box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.7); }
+          70% { transform: scale(1.1); opacity: 1; box-shadow: 0 0 0 8px rgba(5, 150, 105, 0); }
+          100% { transform: scale(0.95); opacity: 0.8; box-shadow: 0 0 0 0 rgba(5, 150, 105, 0); }
+        }
+        @keyframes pingRing {
+          0% { transform: scale(0.8); opacity: 0.9; }
+          75%, 100% { transform: scale(2.4); opacity: 0; }
+        }
+        @keyframes bounceArrow {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(5px); }
+        }
+        .editorial-scroll-cue-pill {
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 12px;
+          padding: 12px 28px;
+          background: rgba(255, 255, 255, 0.96);
+          border: 1px solid #CBD5E1;
+          border-radius: 40px;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(5, 150, 105, 0.08);
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .editorial-scroll-cue-pill:hover {
+          border-color: #059669 !important;
+          background: #FFFFFF !important;
+          box-shadow: 0 12px 36px rgba(5, 150, 105, 0.25), 0 0 0 3px rgba(5, 150, 105, 0.15) !important;
+          transform: translateY(-3px) scale(1.02);
+        }
+        .scroll-pulse-dot {
+          width: 9px;
+          height: 9px;
+          border-radius: 50%;
+          background: #059669;
+          position: relative;
+          box-shadow: 0 0 10px #059669;
+        }
+        .scroll-pulse-dot::after {
+          content: "";
+          position: absolute;
+          inset: -4px;
+          border-radius: 50%;
+          border: 2px solid #059669;
+          animation: pingRing 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+        .scroll-arrow-anim {
+          animation: bounceArrow 1.5s infinite ease-in-out;
+        }
         .editorial-google-btn {
           width: 100%;
           min-height: 52px;
@@ -191,12 +280,12 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
         }
         .editorial-main-grid {
           display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 60px;
+          grid-template-columns: 1.15fr 0.85fr;
+          gap: clamp(32px, 5vw, 64px);
           align-items: center;
-          margin-top: 40px;
+          margin: 40px 0;
         }
-        @media (max-width: 900px) {
+        @media (max-width: 960px) {
           .editorial-main-grid {
             grid-template-columns: 1fr;
             gap: 40px;
@@ -204,104 +293,115 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
         }
       `}</style>
 
-      {/* Top Architectural Header */}
-      <header
+      {/* ── Desktop Full-Height Hero Section (100vh) ── */}
+      <div
+        ref={heroSectionRef}
         style={{
+          minHeight: "100vh",
           display: "flex",
+          flexDirection: "column",
           justifyContent: "space-between",
-          alignItems: "center",
-          borderBottom: "1px solid #E2E8F0",
-          paddingBottom: "20px",
-          gap: "20px",
-          flexWrap: "wrap",
           position: "relative",
-          zIndex: 10,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <span
-            style={{
-              fontFamily: "var(--font-sans, inherit)",
-              fontSize: "1.15rem",
-              fontWeight: 800,
-              letterSpacing: "0.03em",
-              color: "#0F172A",
-              textTransform: "uppercase",
-            }}
-          >
-            QRakshak
-          </span>
-          <span style={{ color: "#CBD5E1", fontSize: "0.95rem" }}>/</span>
-          <span
-            style={{
-              fontSize: "0.74rem",
-              color: "#64748B",
-              fontFamily: "var(--font-mono, monospace)",
-              letterSpacing: "0.07em",
-              textTransform: "uppercase",
-              fontWeight: 600,
-            }}
-          >
-            Clinical Intelligence Platform
-          </span>
-        </div>
-
-        <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "7px",
-              padding: "7px 14px",
-              background: "#F8FAFC",
-              border: "1px solid #E2E8F0",
-              borderRadius: "6px",
-            }}
-          >
-            <ShieldCheck size={14} color="#059669" />
+        {/* Top Architectural Header */}
+        <header
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            borderBottom: "1px solid #E2E8F0",
+            paddingBottom: "20px",
+            gap: "20px",
+            flexWrap: "wrap",
+            position: "relative",
+            zIndex: 10,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <span
               style={{
-                fontSize: "0.70rem",
-                color: "#334155",
-                fontWeight: 700,
-                fontFamily: "var(--font-mono, monospace)",
-                letterSpacing: "0.05em",
+                fontFamily: "var(--font-sans, inherit)",
+                fontSize: "1.15rem",
+                fontWeight: 800,
+                letterSpacing: "0.03em",
+                color: "#0F172A",
+                textTransform: "uppercase",
               }}
             >
-              HIPAA • DPDP-2023 Certified
+              QRakshak
+            </span>
+            <span style={{ color: "#CBD5E1", fontSize: "0.95rem" }}>/</span>
+            <span
+              style={{
+                fontSize: "0.74rem",
+                color: "#64748B",
+                fontFamily: "var(--font-mono, monospace)",
+                letterSpacing: "0.07em",
+                textTransform: "uppercase",
+                fontWeight: 600,
+              }}
+            >
+              Clinical Intelligence Platform
             </span>
           </div>
 
-          <a
-            href="https://github.com/Rajdeep-Mudiar/Q-Rakshak"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "7px",
-              padding: "7px 14px",
-              background: "#0F172A",
-              color: "#FFFFFF",
-              border: "1px solid #0F172A",
-              borderRadius: "6px",
-              fontSize: "0.72rem",
-              fontWeight: 700,
-              textDecoration: "none",
-              letterSpacing: "0.02em",
-              transition: "background 0.2s, transform 0.15s",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "#1E293B")}
-            onMouseLeave={(e) => (e.currentTarget.style.background = "#0F172A")}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-            </svg>
-            <span>GitHub Repository</span>
-            <ExternalLink size={12} />
-          </a>
-        </div>
-      </header>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "7px",
+                padding: "7px 14px",
+                background: "#F8FAFC",
+                border: "1px solid #E2E8F0",
+                borderRadius: "6px",
+              }}
+            >
+              <ShieldCheck size={14} color="#059669" />
+              <span
+                style={{
+                  fontSize: "0.70rem",
+                  color: "#334155",
+                  fontWeight: 700,
+                  fontFamily: "var(--font-mono, monospace)",
+                  letterSpacing: "0.05em",
+                }}
+              >
+                HIPAA • DPDP-2023 Certified
+              </span>
+            </div>
+
+            <a
+              href="https://github.com/ARYANCY/QDoc"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "7px",
+                padding: "7px 14px",
+                background: "#0F172A",
+                color: "#FFFFFF",
+                border: "1px solid #0F172A",
+                borderRadius: "6px",
+                fontSize: "0.72rem",
+                fontWeight: 700,
+                textDecoration: "none",
+                letterSpacing: "0.02em",
+                transition: "background 0.2s, transform 0.15s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#1E293B")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "#0F172A")}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+              </svg>
+              <span>GitHub: ARYANCY/QDoc</span>
+              <ExternalLink size={12} />
+            </a>
+          </div>
+        </header>
 
       {/* Main Split Grid */}
       <main className="editorial-main-grid" style={{ flex: 1 }}>
@@ -485,8 +585,48 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
         </div>
       </main>
 
-      {/* ── Section: Hybrid AI Benchmark (Directly below existing login section) ── */}
-      <HybridBenchmarkSection />
+      {/* ── Sign to Scroll Down to Quantum Models ── */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          marginTop: "auto",
+          paddingTop: "24px",
+          paddingBottom: "16px",
+          position: "relative",
+          zIndex: 10,
+        }}
+      >
+        <div
+          onClick={() => {
+            const el = document.getElementById("quantum-model-benchmarks");
+            if (el) el.scrollIntoView({ behavior: "smooth" });
+          }}
+          className="editorial-scroll-cue-pill"
+        >
+          <div className="scroll-pulse-dot" />
+          <span
+            style={{
+              fontSize: "0.80rem",
+              fontWeight: 700,
+              color: "#0F172A",
+              letterSpacing: "0.02em",
+            }}
+          >
+            Scroll down to explore Quantum vs Classical Models & Clinical Benchmarks
+          </span>
+          <ArrowDown size={15} color="#059669" className="scroll-arrow-anim" />
+        </div>
+      </div>
+    </div>
+
+    {/* ── Section: Quantum Model Benchmark Showcase (Directly below hero with per-disease theme transitions) ── */}
+    <ModelEvaluationShowcase />
+
+    {/* ── Section: Hybrid AI Benchmark ── */}
+    <HybridBenchmarkSection />
 
       {/* ── Section: Research Objectives Compliance Matrix (OBJ-01 – OBJ-06) ── */}
       <section
@@ -522,7 +662,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
 
           <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
             <a
-              href="https://github.com/Rajdeep-Mudiar/Q-Rakshak#research-objectives-compliance-matrix"
+              href="https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md"
               target="_blank"
               rel="noopener noreferrer"
               style={{
@@ -540,7 +680,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
               }}
             >
               <ExternalLink size={13} />
-              <span>GitHub README Specification</span>
+              <span>GitHub Documentation Portal</span>
             </a>
             <span style={{ fontSize: "0.74rem", color: "#059669", background: "#ECFDF5", border: "1px solid #A7F3D0", padding: "5px 12px", borderRadius: "6px", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: "6px" }}>
               <CheckCircle2 size={14} color="#059669" /> 6 / 6 Objectives Satisfied
@@ -566,8 +706,8 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                   id: "OBJ-01",
                   title: "Hybrid Quantum-Classical Architecture for Early Disease Detection",
                   evidence: "Classical preprocessing pipeline (ml/preprocessing/validation.py), train-only PCA dimensionality reduction, PennyLane VQC/VQR circuits, and UnifiedMedicalPredictor with conformal calibration.",
-                  readmeAnchor: "https://github.com/Rajdeep-Mudiar/Q-Rakshak#obj-01-hybrid-quantum-classical-architecture-for-early-disease-detection",
-                  readmeLabel: "README.md #obj-01",
+                  readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md#obj-01",
+                  readmeLabel: "documentation #obj-01",
                   status: "100% SATISFIED",
                   statusColor: "#059669",
                   bg: "#ECFDF5",
@@ -577,8 +717,8 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                   id: "OBJ-02",
                   title: "High-Dimensional Quantum Classification & Continuous Regression",
                   evidence: "BiomedCLIP (512-dim) / MedSigLIP (768-dim) foundation encoders, train-only compression into <=8 qubits, and VariationalQuantumRegressor with Pauli-Z expectations for continuous targets (Parkinson's UPDRS).",
-                  readmeAnchor: "https://github.com/Rajdeep-Mudiar/Q-Rakshak#obj-02-high-dimensional-quantum-classification--regression-models",
-                  readmeLabel: "README.md #obj-02",
+                  readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md#obj-02",
+                  readmeLabel: "documentation #obj-02",
                   status: "100% SATISFIED",
                   statusColor: "#059669",
                   bg: "#ECFDF5",
@@ -588,8 +728,8 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                   id: "OBJ-03",
                   title: "Accuracy, Sensitivity, and Specificity vs Classical Baselines",
                   evidence: "Standardized ClassicalBaselineSuite and ClassicalRegressionSuite under identical 5-seed patient-level stratified split (Seeds: 7, 21, 42, 73, 101); full metrics and confusion matrices with zero fabricated claims.",
-                  readmeAnchor: "https://github.com/Rajdeep-Mudiar/Q-Rakshak#obj-03-accuracy-sensitivity-and-specificity-vs-classical-baselines",
-                  readmeLabel: "README.md #obj-03",
+                  readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md#obj-03",
+                  readmeLabel: "documentation #obj-03",
                   status: "100% SATISFIED",
                   statusColor: "#059669",
                   bg: "#ECFDF5",
@@ -599,8 +739,8 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                   id: "OBJ-04",
                   title: "Scalability, Interpretability & Quantum Hardware Compatibility",
                   evidence: "HardwareProviderRegistry modeling IBM Quantum Eagle (127Q), AWS Rigetti (80Q), and IonQ Forte (36Q) with T1/T2 noise; Grad-CAM Turbo saliency, KernelSHAP feature contributions, and qubit sensitivity.",
-                  readmeAnchor: "https://github.com/Rajdeep-Mudiar/Q-Rakshak#obj-04-scalability-interpretability--quantum-hardware-compatibility",
-                  readmeLabel: "README.md #obj-04",
+                  readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md#obj-04",
+                  readmeLabel: "documentation #obj-04",
                   status: "100% SATISFIED",
                   statusColor: "#059669",
                   bg: "#ECFDF5",
@@ -610,8 +750,8 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                   id: "OBJ-05",
                   title: "Preprocessing, Feature Selection & Zero Data Leakage",
                   evidence: "ClinicalTabularPreprocessor (median imputation, IQR outlier clipping, MinMax scaling) + PatientGroupedSplitter (GroupShuffleSplit across patient_id) with automated mathematical leakage audits.",
-                  readmeAnchor: "https://github.com/Rajdeep-Mudiar/Q-Rakshak#obj-05-preprocessing-feature-selection--explainability-modules",
-                  readmeLabel: "README.md #obj-05",
+                  readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md#obj-05",
+                  readmeLabel: "documentation #obj-05",
                   status: "100% SATISFIED",
                   statusColor: "#059669",
                   bg: "#ECFDF5",
@@ -621,8 +761,8 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                   id: "OBJ-06",
                   title: "Scientific Benchmarking (Accuracy, Efficiency & Generalization)",
                   evidence: "AblationMatrixRunner executing standard Experiments A-F; tracemalloc peak memory profiling, 1000-resample bootstrap 95% CIs, quantum gate/depth telemetry, and continuous regression benchmarking.",
-                  readmeAnchor: "https://github.com/Rajdeep-Mudiar/Q-Rakshak#obj-06-scientific-benchmarking-accuracy-efficiency--generalization",
-                  readmeLabel: "README.md #obj-06",
+                  readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md#obj-06",
+                  readmeLabel: "documentation #obj-06",
                   status: "100% SATISFIED",
                   statusColor: "#059669",
                   bg: "#ECFDF5",
