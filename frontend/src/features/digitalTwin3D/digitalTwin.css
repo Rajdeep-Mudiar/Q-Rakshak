@@ -1,4 +1,4 @@
-﻿/* ── Q-RAKSHAK 3D DIGITAL HEALTH TWIN MODERN LIGHT CLINICAL STUDIO ─────────
+/* ── Q-RAKSHAK 3D DIGITAL HEALTH TWIN MODERN LIGHT CLINICAL STUDIO ─────────
    Light Clinical Studio Palette • High Contrast Dark Text • Modern Ergonomic Cards
 ───────────────────────────────────────────────────────────────────────────── */
 
@@ -627,4 +627,34 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
+}
+
+/* ── Mobile Responsiveness for 3D Digital Twin ── */
+@media (max-width: 1024px) {
+  .dt-main-grid {
+    flex-direction: column !important;
+    overflow-y: auto !important;
+  }
+
+  .dt-left-sidebar,
+  .dt-right-sidebar {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  .dt-center-viewer {
+    min-height: 380px !important;
+    height: 380px !important;
+    width: 100% !important;
+  }
+
+  .dt-bottombar {
+    height: auto !important;
+    max-height: none !important;
+    padding: 8px 12px !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
 }

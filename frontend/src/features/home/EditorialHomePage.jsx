@@ -403,7 +403,7 @@ export default function EditorialHomePage({ onNavigate, currentUser, allowedTabs
           </div>
 
           {/* Active Operator Status Box */}
-          <div style={{ background: "var(--bg-surface-alt)", border: "1px solid var(--border-default)", padding: "14px 20px", borderRadius: "10px", textAlign: "right", minWidth: "220px", boxShadow: "var(--shadow-sm)" }}>
+          <div className="active-operator-box" style={{ background: "var(--bg-surface-alt)", border: "1px solid var(--border-default)", padding: "14px 20px", borderRadius: "10px", textAlign: "right", minWidth: "220px", boxShadow: "var(--shadow-sm)" }}>
             <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.62rem", color: "var(--text-muted)", letterSpacing: "0.08em", textTransform: "uppercase", display: "block", fontWeight: 700 }}>
               Active Clinical Operator
             </span>
@@ -423,7 +423,7 @@ export default function EditorialHomePage({ onNavigate, currentUser, allowedTabs
       </section>
 
       {/* ── Key Clinical & Computational Metrics (Animated Stagger) ── */}
-      <section ref={kpiGridRef} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "14px" }}>
+      <section ref={kpiGridRef} className="kpi-metric-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "14px" }}>
         {kpis.map((kpi, idx) => (
           <div
             key={idx}
@@ -514,7 +514,7 @@ export default function EditorialHomePage({ onNavigate, currentUser, allowedTabs
                 </p>
               </div>
 
-              <div style={{ display: "flex", gap: "6px" }}>
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                 <button
                   type="button"
                   onClick={() => setBenchmarkView("ablations")}
@@ -552,8 +552,8 @@ export default function EditorialHomePage({ onNavigate, currentUser, allowedTabs
 
             {/* Benchmark View 1: Scientific Ablation Suite */}
             {benchmarkView === "ablations" ? (
-              <div style={{ background: "#FFFFFF", borderRadius: "14px", border: "1px solid var(--border-default)", overflowX: "auto", boxShadow: "var(--shadow-card)" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.80rem" }}>
+              <div className="table-scroll-container table-responsive editorial-table-scroll" style={{ background: "#FFFFFF", borderRadius: "14px", border: "1px solid var(--border-default)", overflowX: "auto", WebkitOverflowScrolling: "touch", boxShadow: "var(--shadow-card)" }}>
+                <table style={{ width: "100%", minWidth: "750px", borderCollapse: "collapse", textAlign: "left", fontSize: "0.80rem" }}>
                   <thead>
                     <tr style={{ background: "var(--bg-surface-alt)", borderBottom: "1px solid var(--border-default)", color: "var(--text-secondary)" }}>
                       <th style={{ padding: "12px 14px", width: "40px" }}>ID</th>
@@ -624,8 +624,8 @@ export default function EditorialHomePage({ onNavigate, currentUser, allowedTabs
               </div>
             ) : (
               /* Benchmark View 2: Cross-Disease Cohorts */
-              <div style={{ background: "#FFFFFF", borderRadius: "14px", border: "1px solid var(--border-default)", overflowX: "auto", boxShadow: "var(--shadow-card)" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.80rem" }}>
+              <div className="table-scroll-container table-responsive editorial-table-scroll" style={{ background: "#FFFFFF", borderRadius: "14px", border: "1px solid var(--border-default)", overflowX: "auto", WebkitOverflowScrolling: "touch", boxShadow: "var(--shadow-card)" }}>
+                <table style={{ width: "100%", minWidth: "750px", borderCollapse: "collapse", textAlign: "left", fontSize: "0.80rem" }}>
                   <thead>
                     <tr style={{ background: "var(--bg-surface-alt)", borderBottom: "1px solid var(--border-default)", color: "var(--text-secondary)" }}>
                       <th style={{ padding: "12px 14px", fontWeight: 700 }}>Disease Modality</th>
@@ -783,7 +783,7 @@ export default function EditorialHomePage({ onNavigate, currentUser, allowedTabs
         {/* ── TAB 3: CLINICAL EXPLAINABILITY & 3D DIGITAL TWIN ── */}
         {activeSubTab === "explainability" && (
           <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "16px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: "16px" }}>
               {/* Visual Explainability Card */}
               <div style={{ background: "#FFFFFF", border: "1px solid var(--border-default)", borderRadius: "14px", padding: "22px", boxShadow: "var(--shadow-card)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
@@ -880,7 +880,7 @@ export default function EditorialHomePage({ onNavigate, currentUser, allowedTabs
               </span>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: "16px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))", gap: "16px" }}>
               {portals.map((p) => {
                 const canOpen = allowedTabs.includes(p.id);
                 const IconComp = p.icon;

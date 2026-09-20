@@ -114,8 +114,8 @@ export default function ComplianceConsole({ patientId = "USR-5EF52B" }) {
           </span>
         </div>
 
-        <div className="data-table-wrap" style={{ maxHeight: "200px", overflowY: "auto", borderRadius: "var(--radius-sm)" }}>
-          <table className="clinical-data-table">
+        <div className="data-table-wrap table-responsive editorial-table-scroll" style={{ maxHeight: "240px", overflowY: "auto", overflowX: "auto", WebkitOverflowScrolling: "touch", borderRadius: "var(--radius-sm)" }}>
+          <table className="clinical-data-table" style={{ minWidth: "680px" }}>
             <thead>
               <tr>
                 <th>Event ID</th>
@@ -167,7 +167,7 @@ export default function ComplianceConsole({ patientId = "USR-5EF52B" }) {
           </span>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px", marginTop: "10px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))", gap: "10px", marginTop: "10px" }}>
           {registry.map((mod) => (
             <div
               key={mod.version}

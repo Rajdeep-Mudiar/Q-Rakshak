@@ -495,7 +495,7 @@ export default function EmergencyCardView({ patientId = 'USR-5EF52B' }) {
       >
         {/* 1. Executive Hero Patient Banner */}
         <div className="triage-hero-banner">
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '20px', flex: 1, minWidth: '300px' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '20px', flex: 1, minWidth: 0 }}>
             {/* Blood Group Pillar Badge */}
             <div
               style={{
@@ -1090,7 +1090,7 @@ export default function EmergencyCardView({ patientId = 'USR-5EF52B' }) {
                 </span>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+              <div className="emergency-speed-dial-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                 {INDIA_HELPLINES.map((item) => {
                   const Icon = item.icon;
                   return (

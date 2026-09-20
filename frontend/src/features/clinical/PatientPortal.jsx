@@ -253,7 +253,7 @@ export default function PatientPortal({ patientId = "USR-5EF52B", currentUser = 
                 </div>
 
                 {/* Conditions, Allergies & Active Medications (Text Format) */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                <div className="responsive-grid-two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                   <div style={{ background: "var(--bg-surface-alt)", padding: "10px", border: "1px solid var(--border-subtle)" }}>
                     <div style={{ fontSize: "0.64rem", fontWeight: 800, fontFamily: "var(--font-mono)", color: "var(--text-muted)", textTransform: "uppercase", marginBottom: "4px" }}>
                       Active Clinical Conditions

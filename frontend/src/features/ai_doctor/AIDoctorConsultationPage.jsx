@@ -659,6 +659,7 @@ export default function AIDoctorConsultationPage({ patientId = "USR-5EF52B", cur
 
       {/* ── Master Zoom-Style Video Stage Grid ─────────────────────────────── */}
       <div
+        className="ai-doctor-grid"
         style={{
           flex: 1,
           display: "grid",

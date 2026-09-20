@@ -3,7 +3,7 @@ import React from "react";
 export default function EditorialFooter() {
   return (
     <footer
-      className="editorial-footer"
+      className="editorial-footer editorial-footer-container"
       style={{
         borderTop: "1px solid var(--border-default)",
         backgroundColor: "var(--bg-surface)",

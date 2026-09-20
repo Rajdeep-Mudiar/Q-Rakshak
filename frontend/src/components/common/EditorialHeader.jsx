@@ -55,7 +55,7 @@ export default function EditorialHeader({
           className="mobile-hamburger-btn"
           onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
           aria-label="Toggle Navigation Drawer"
-          style={{ background: "none", border: "1px solid var(--border-default)", borderRadius: "var(--radius-xs)", padding: "6px", cursor: "pointer", color: "var(--ink-primary)", display: "none", alignItems: "center", justifyContent: "center" }}
+          style={{ background: "none", border: "1px solid var(--border-default)", borderRadius: "var(--radius-xs)", padding: "8px 12px", minWidth: "44px", minHeight: "44px", cursor: "pointer", color: "var(--ink-primary)", display: "none", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-mono)", fontSize: "0.76rem", fontWeight: 700 }}
         >
           {mobileSidebarOpen ? "Close" : "Menu"}
         </button>

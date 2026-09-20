@@ -541,7 +541,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
 
       {/* ── TAB 1: IDENTITY & DEMOGRAPHICS ── */}
       {activeTab === "identity" && (
-        <div style={{ display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: "20px", marginBottom: "20px" }}>
+        <div className="responsive-grid-two-col" style={{ display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: "20px", marginBottom: "20px" }}>
           {/* Left: Demographics Box */}
           <div className="panel" style={{ padding: "20px", background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px", borderBottom: "1px solid var(--border-default)", paddingBottom: "10px" }}>
@@ -551,7 +551,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
               </h3>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "14px" }}>
+            <div className="responsive-grid-two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "14px" }}>
               <div className="form-group">
                 <label className="form-label">Full Legal Name</label>
                 <input
@@ -608,7 +608,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
               </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "14px" }}>
+            <div className="responsive-grid-two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "14px" }}>
               <div className="form-group">
                 <label className="form-label">Primary Email</label>
                 <input
@@ -635,7 +635,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
               </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+            <div className="responsive-grid-two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
               <div className="form-group">
                 <label className="form-label">Blood Group</label>
                 <select

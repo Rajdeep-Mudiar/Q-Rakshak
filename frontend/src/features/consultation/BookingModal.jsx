@@ -106,7 +106,7 @@ export default function BookingModal({ doctor, initialSlot, onClose, onSuccess, 
     >
       <div
         ref={modalRef}
-        className="card-panel"
+        className="card-panel modal-responsive-sheet"
         style={{
           width: "100%",
           maxWidth: "640px",
@@ -140,12 +140,18 @@ export default function BookingModal({ doctor, initialSlot, onClose, onSuccess, 
           <button
             type="button"
             onClick={onClose}
+            aria-label="Close booking modal"
             style={{
               background: "transparent",
               border: "none",
               color: "var(--text-muted)",
               cursor: "pointer",
-              padding: "4px",
+              padding: "8px",
+              minWidth: "44px",
+              minHeight: "44px",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
             <X size={18} />
@@ -164,7 +170,7 @@ export default function BookingModal({ doctor, initialSlot, onClose, onSuccess, 
           {/* Step 1: Intake & Details */}
           {step === 1 && (
             <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <div className="responsive-grid-two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
                 <div>
                   <label className="metric-label" style={{ display: "block", marginBottom: "4px" }}>Select Slot</label>
                   <select

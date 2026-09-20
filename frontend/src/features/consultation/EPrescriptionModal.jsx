@@ -129,7 +129,7 @@ export default function EPrescriptionModal({ booking, onClose, onSuccess }) {
     >
       <div
         ref={modalRef}
-        className="card-panel"
+        className="card-panel modal-responsive-sheet"
         style={{
           width: "100%",
           maxWidth: "760px",
@@ -165,7 +165,19 @@ export default function EPrescriptionModal({ booking, onClose, onSuccess }) {
           <button
             type="button"
             onClick={onClose}
-            style={{ background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer" }}
+            aria-label="Close prescription modal"
+            style={{
+              background: "transparent",
+              border: "none",
+              color: "var(--text-muted)",
+              cursor: "pointer",
+              padding: "8px",
+              minWidth: "44px",
+              minHeight: "44px",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
             <X size={18} />
           </button>

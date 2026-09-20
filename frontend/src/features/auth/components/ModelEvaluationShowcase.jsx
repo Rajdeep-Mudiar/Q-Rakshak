@@ -704,7 +704,7 @@ export default function ModelEvaluationShowcase() {
             gap: "32px",
             alignItems: "start",
           }}
-          className="zara-header-subgrid"
+          className="zara-header-subgrid masthead-subgrid"
         >
           <p
             style={{
@@ -749,6 +749,7 @@ export default function ModelEvaluationShowcase() {
           <section
             key={section.id}
             id={`section-${section.id}`}
+            className="disease-section-viewport"
             style={{
               minHeight: "calc(100vh - 40px)",
               width: "100%",
@@ -756,7 +757,7 @@ export default function ModelEvaluationShowcase() {
               border: `1px solid ${section.borderColor}`,
               borderLeft: `4px solid ${section.accentColor}`,
               borderRadius: "0px", // Zara sharp
-              padding: "clamp(36px, 4.5vh, 56px) clamp(24px, 3.5vw, 56px)",
+              padding: "clamp(24px, 3.5vh, 56px) clamp(16px, 3.5vw, 56px)",
               position: "relative",
               boxSizing: "border-box",
               display: "flex",
@@ -802,7 +803,7 @@ export default function ModelEvaluationShowcase() {
 
                 {/* The Sexy Heading Line */}
                 <div
-                  className="sexy-heading-banner"
+                  className="sexy-heading-banner showcase-banner-heading"
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
@@ -919,6 +920,7 @@ export default function ModelEvaluationShowcase() {
 
             {/* Shortened, Simplified Zara Table - Full Desktop Size */}
             <div
+              className="table-scroll-container editorial-table-scroll table-responsive"
               style={{
                 width: "100%",
                 overflowX: "auto",
@@ -928,9 +930,10 @@ export default function ModelEvaluationShowcase() {
               }}
             >
               <table
+                className="zara-table-responsive"
                 style={{
                   width: "100%",
-                  minWidth: "780px",
+                  minWidth: "720px",
                   borderCollapse: "collapse",
                   textAlign: "left",
                   fontSize: "0.85rem",

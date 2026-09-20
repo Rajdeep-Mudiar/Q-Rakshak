@@ -132,7 +132,7 @@ export default function DoctorDiscovery({ onOpenBooking, onJoinRoom, patientId }
             />
           </div>
 
-          <div style={{ display: "flex", gap: "6px", overflowX: "auto" }}>
+          <div style={{ display: "flex", gap: "8px", overflowX: "auto", WebkitOverflowScrolling: "touch", scrollbarWidth: "none", maxWidth: "100%", paddingBottom: "4px" }}>
             {[
               { id: "all", label: "All Specialties" },
               { id: "cardiology", label: "Cardiology" },
@@ -147,6 +147,7 @@ export default function DoctorDiscovery({ onOpenBooking, onJoinRoom, patientId }
                 style={{
                   fontSize: "0.80rem",
                   padding: "8px 14px",
+                  minHeight: "44px",
                   borderRadius: "8px",
                   border: selectedSpecialty === spec.id ? "1px solid var(--primary)" : "1px solid var(--border-default)",
                   background: selectedSpecialty === spec.id ? "var(--primary-soft)" : "var(--bg-surface)",
@@ -155,6 +156,8 @@ export default function DoctorDiscovery({ onOpenBooking, onJoinRoom, patientId }
                   cursor: "pointer",
                   whiteSpace: "nowrap",
                   transition: "all 0.15s ease",
+                  display: "inline-flex",
+                  alignItems: "center",
                 }}
               >
                 {spec.label}

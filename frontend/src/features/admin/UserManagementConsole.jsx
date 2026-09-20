@@ -218,7 +218,7 @@ export default function UserManagementConsole() {
       )}
 
       {/* Bento Stat Metric Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 140px), 1fr))", gap: "10px" }}>
         <div className="bento-stat" style={{ borderRadius: "var(--radius-md)" }}>
           <div className="corner-tag-arrow">↗</div>
           <div className="bento-stat-num">{users.length}</div>
@@ -249,8 +249,8 @@ export default function UserManagementConsole() {
 
       {/* Users Table */}
       <div className="card-panel" style={{ borderRadius: "var(--radius-md)", border: "1px solid var(--border-default)", padding: 0 }}>
-        <div className="data-table-wrap" style={{ borderRadius: "var(--radius-md)", border: "none" }}>
-          <table className="clinical-data-table">
+        <div className="data-table-wrap table-responsive editorial-table-scroll" style={{ borderRadius: "var(--radius-md)", border: "none", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+          <table className="clinical-data-table" style={{ minWidth: "720px" }}>
             <thead>
               <tr>
                 <th>User ID</th>

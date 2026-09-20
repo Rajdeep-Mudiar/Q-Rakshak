@@ -1029,6 +1029,7 @@ export default function UnifiedAnalysisPage() {
             <div key={sIdx} style={{ display: "flex", flexDirection: "column", gap: "2px", marginBottom: "6px" }}>
               {!sidebarCollapsed && <p className="nav-section-label">{sec.title}</p>}
               {sec.items.map((item) => {
+                const ItemIcon = item.icon;
                 return (
                   <button
                     key={item.id}
@@ -1038,7 +1039,9 @@ export default function UnifiedAnalysisPage() {
                       setMobileSidebarOpen(false);
                     }}
                     title={item.label}
+                    style={{ display: "flex", alignItems: "center", gap: "10px", minHeight: "38px" }}
                   >
+                    {ItemIcon && <ItemIcon size={16} style={{ flexShrink: 0 }} />}
                     {!sidebarCollapsed && <span>{item.label}</span>}
                   </button>
                 );

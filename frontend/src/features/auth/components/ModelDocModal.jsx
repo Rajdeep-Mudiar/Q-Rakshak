@@ -55,6 +55,7 @@ export default function ModelDocModal({ modelName, modelData, onClose }) {
       onClick={onClose}
     >
       <div
+        className="model-doc-drawer"
         style={{
           width: "100%",
           maxWidth: "680px",
@@ -65,7 +66,7 @@ export default function ModelDocModal({ modelName, modelData, onClose }) {
           flexDirection: "column",
           overflowY: "auto",
           color: "#EDEDED",
-          padding: "clamp(20px, 3.5vw, 36px)",
+          padding: "clamp(18px, 3.5vw, 36px)",
           position: "relative",
           borderRadius: "0px",
           boxSizing: "border-box",
@@ -137,6 +138,8 @@ export default function ModelDocModal({ modelName, modelData, onClose }) {
               border: "1px solid rgba(255, 255, 255, 0.2)",
               borderRadius: "0px",
               padding: "8px",
+              minWidth: "44px",
+              minHeight: "44px",
               color: "#FFFFFF",
               cursor: "pointer",
               display: "inline-flex",

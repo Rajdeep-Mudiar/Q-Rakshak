@@ -39,7 +39,7 @@ export default function ExplainabilityView({ explainability, diseaseName = "Heal
           <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "12px" }}>
             {topFeatures.map((feat, idx) => (
               <div key={idx} style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "4px" }}>
-                <span style={{ fontSize: "0.80rem", fontWeight: 600, color: "var(--text-primary)" }}>
+                <span style={{ fontSize: "0.80rem", fontWeight: 600, color: "var(--text-primary)", wordBreak: "break-word" }}>
                   {feat.feature}
                 </span>
                 <span style={{ fontSize: "0.80rem", fontWeight: 700, fontFamily: "var(--font-mono)", color: "var(--primary)" }}>

@@ -318,7 +318,17 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
         @media (max-width: 960px) {
           .editorial-main-grid {
             grid-template-columns: 1fr;
-            gap: 40px;
+            gap: 24px;
+            margin: 20px 0;
+          }
+        }
+        @media (max-width: 480px) {
+          .scroll-cue-pill {
+            padding: 8px 14px !important;
+            gap: 8px !important;
+          }
+          .scroll-cue-pill span {
+            font-size: 0.72rem !important;
           }
         }
       `}</style>
@@ -326,13 +336,14 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
       {/* ── Desktop Full-Height Hero Section (100vh) ── */}
       <div
         ref={heroSectionRef}
+        className="editorial-login-hero"
         style={{
           minHeight: "100vh",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
           position: "relative",
-          padding: "clamp(18px, 2.5vh, 28px) clamp(24px, 3.5vw, 48px) clamp(24px, 3.5vh, 36px)",
+          padding: "clamp(16px, 2.5vh, 28px) clamp(16px, 3.5vw, 48px) clamp(20px, 3.5vh, 36px)",
           boxSizing: "border-box",
         }}
       >
@@ -427,9 +438,9 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
             <h1
               style={{
                 fontFamily: "var(--font-sans, inherit)",
-                fontSize: "clamp(2.5rem, 4.4vw, 4.2rem)",
+                fontSize: "clamp(1.85rem, 5.5vw, 3.8rem)",
                 fontWeight: 900,
-                lineHeight: 1.05,
+                lineHeight: 1.1,
                 letterSpacing: "-0.04em",
                 color: "#0F172A",
                 margin: 0,
@@ -457,6 +468,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
 
           {/* Spec Cards */}
           <div
+            className="editorial-spec-grid"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
@@ -516,18 +528,23 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
         {/* Right Authentication Cockpit */}
         <div
           ref={formContainerRef}
+          className="editorial-auth-card"
           style={{
             background: "#FFFFFF",
             border: "1px solid #E2E8F0",
             borderRadius: "12px",
-            padding: "clamp(40px, 5vw, 54px) clamp(28px, 4vw, 42px)",
+            padding: "clamp(28px, 4vw, 54px) clamp(20px, 4vw, 42px)",
             position: "relative",
             boxShadow: "0 12px 36px rgba(0, 0, 0, 0.06)",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            textAlign: "center"
+            textAlign: "center",
+            width: "100%",
+            maxWidth: "520px",
+            margin: "0 auto",
+            boxSizing: "border-box",
           }}
         >
           <div style={{ marginBottom: "32px" }}>
@@ -669,12 +686,12 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
     {/* ── Section: Research Objectives Compliance Matrix (OBJ-01 – OBJ-06) ── */}
     <section
       style={{
-        margin: "64px clamp(24px, 3.5vw, 48px) 0 clamp(24px, 3.5vw, 48px)",
+        margin: "clamp(32px, 5vw, 64px) clamp(16px, 3.5vw, 48px) 0 clamp(16px, 3.5vw, 48px)",
         background: "#0A0A0A",
         border: "1px solid rgba(255, 255, 255, 0.12)",
         borderLeft: "2px solid #FFFFFF",
         borderRadius: "0px",
-        padding: "clamp(24px, 3.5vw, 40px)",
+        padding: "clamp(18px, 3vw, 40px)",
         position: "relative",
         zIndex: 10,
         boxSizing: "border-box",
