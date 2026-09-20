@@ -35,14 +35,14 @@ fine_tuned_models/
 
 In your Kaggle Notebook / Session, click **`+ Add Input`** and attach:
 
-| Domain / Disease | Dataset Search on Kaggle | Exact Kaggle Dataset Slug | Mounted Input Path |
+| Domain / Disease | Dataset Search on Kaggle | Exact Active Kaggle Link | Mounted Input Path |
 | :--- | :--- | :--- | :--- |
-| **1. Pneumonia** | `chest-xray-pneumonia` | `paultimothymooney/chest-xray-pneumonia` | `/kaggle/input/datasets/paultimothymooney/chest-xray-pneumonia` or `/kaggle/input/chest-xray-pneumonia` |
-| **2. Skin Cancer** | `skin-cancer-mnist-ham10000` | `kmader/skin-cancer-mnist-ham10000` | `/kaggle/input/datasets/kmader/skin-cancer-mnist-ham10000` or `/kaggle/input/skin-cancer-mnist-ham10000` |
-| **3. Breast Cancer** | *(No input required)* | Built-in WDBC | Built-in |
-| **4. Heart Disease** | *(Optional)* `heart-disease-uci` | `ronitf/heart-disease-uci` | `/kaggle/input/heart-disease-uci/heart.csv` |
-| **5. Parkinson's** | *(Optional)* `parkinsons-data-set` | `vikasukani/parkinsons-disease-data-set` | `/kaggle/input/parkinsons-disease-data-set/parkinsons.data` |
-| **6. Diabetes** | *(Optional)* `pima-indians-diabetes` | `uciml/pima-indians-diabetes-database` | `/kaggle/input/pima-indians-diabetes-database/diabetes.csv` |
+| **1. Pneumonia** | `chest-xray-pneumonia` | [paultimothymooney/chest-xray-pneumonia](https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia) | `/kaggle/input/chest-xray-pneumonia/chest_xray` |
+| **2. Skin Cancer** | `skin-cancer-mnist-ham10000` | [kmader/skin-cancer-mnist-ham10000](https://www.kaggle.com/datasets/kmader/skin-cancer-mnist-ham10000) | `/kaggle/input/skin-cancer-mnist-ham10000` |
+| **3. Breast Cancer** | *(No input required)* | Built-in WDBC (`sklearn`) | Built-in |
+| **4. Heart Disease** | `heart-failure-prediction` | [fedesoriano/heart-failure-prediction](https://www.kaggle.com/datasets/fedesoriano/heart-failure-prediction) | `/kaggle/input/heart-failure-prediction/heart.csv` |
+| **5. Parkinson's** | `parkinsons-disease-data-set` | [vikasukani/parkinsons-disease-data-set](https://www.kaggle.com/datasets/vikasukani/parkinsons-disease-data-set) | `/kaggle/input/parkinsons-disease-data-set/parkinsons.data` |
+| **6. Diabetes** | `diabetes-dataset` | [akshaydattatraykhare/diabetes-dataset](https://www.kaggle.com/datasets/akshaydattatraykhare/diabetes-dataset) | `/kaggle/input/diabetes-dataset/diabetes.csv` |
 
 ---
 

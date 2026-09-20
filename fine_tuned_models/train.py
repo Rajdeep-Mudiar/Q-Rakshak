@@ -47,6 +47,8 @@ def detect_data_path(disease: str, custom_path: str | None = None) -> str:
             "./datasets/skin_cancer",
         ],
         "heart_disease": [
+            "/kaggle/input/heart-disease-dataset/heart.csv",
+            "/kaggle/input/heart-failure-prediction/heart.csv",
             "/kaggle/input/heart-disease-uci/heart.csv",
             "./datasets/heart.csv",
         ],
@@ -55,6 +57,7 @@ def detect_data_path(disease: str, custom_path: str | None = None) -> str:
             "./datasets/parkinsons.data",
         ],
         "diabetes": [
+            "/kaggle/input/diabetes-dataset/diabetes.csv",
             "/kaggle/input/pima-indians-diabetes-database/diabetes.csv",
             "./datasets/diabetes.csv",
         ],
