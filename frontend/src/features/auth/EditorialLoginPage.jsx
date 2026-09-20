@@ -80,12 +80,13 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
   useEffect(() => {
     const scriptId = "google-jssdk-gsi";
     let isMounted = true;
+    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "985994695248-4615o9ba17tahv2q94ba01t322r3aunr.apps.googleusercontent.com";
 
     function initGoogleClient() {
-      if (typeof window !== "undefined" && window.google?.accounts?.id) {
+      if (typeof window !== "undefined" && window.google?.accounts?.id && googleClientId) {
         try {
           window.google.accounts.id.initialize({
-            client_id: "985994695248-4615o9ba17tahv2q94ba01t322r3aunr.apps.googleusercontent.com",
+            client_id: googleClientId,
             callback: async (response) => {
               if (response?.credential && isMounted) {
                 try {
@@ -108,9 +109,10 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
             },
             auto_select: false,
             cancel_on_tap_outside: true,
+            use_fedcm_for_prompt: true,
           });
-        } catch (e) {
-          console.warn("Google Identity Services notice:", e);
+        } catch {
+          // Graceful fallback if GSI initialization fails
         }
       }
     }
@@ -140,13 +142,14 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
     if (typeof window !== "undefined" && window.google?.accounts?.id) {
       try {
         window.google.accounts.id.prompt((notification) => {
-          if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+          if (notification.isNotDisplayed() || notification.isSkippedMoment() || notification.isDismissedMoment()) {
             if (onGoogleLogin) onGoogleLogin();
           }
         });
         return;
       } catch {
-        // Fallback to onGoogleLogin
+        if (onGoogleLogin) onGoogleLogin();
+        return;
       }
     }
     if (onGoogleLogin) {
