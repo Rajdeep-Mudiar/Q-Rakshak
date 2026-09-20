@@ -1,0 +1,309 @@
+{
+  "breast_cancer": {
+    "OncoPulse-VQC": {
+      "model": "OncoPulse-VQC",
+      "type": "Quantum VQC",
+      "accuracy": 0.7674,
+      "sensitivity": 0.9444,
+      "specificity": 0.4688,
+      "precision": 0.75,
+      "f1_score": 0.8361,
+      "mcc": 0.4909,
+      "auc_roc": 0.8443,
+      "ece": 0.144,
+      "inference_time_ms": 0.0,
+      "confusion_matrix": [
+        [
+          15,
+          17
+        ],
+        [
+          3,
+          51
+        ]
+      ]
+    },
+    "OncoPulse-QSVM": {
+      "model": "OncoPulse-QSVM",
+      "type": "Quantum QSVM",
+      "accuracy": 0.7442,
+      "sensitivity": 0.9815,
+      "specificity": 0.3438,
+      "precision": 0.7162,
+      "f1_score": 0.8281,
+      "mcc": 0.4537,
+      "auc_roc": 0.8872,
+      "ece": 0.0584,
+      "inference_time_ms": 0.0,
+      "confusion_matrix": [
+        [
+          11,
+          21
+        ],
+        [
+          1,
+          53
+        ]
+      ]
+    },
+    "Sentinel-RF": {
+      "model": "Sentinel-RF",
+      "type": "Classical RF",
+      "accuracy": 0.8837,
+      "sensitivity": 0.9259,
+      "specificity": 0.8125,
+      "precision": 0.8929,
+      "f1_score": 0.9091,
+      "mcc": 0.7489,
+      "auc_roc": 0.9792,
+      "ece": 0.0786,
+      "inference_time_ms": 0.0,
+      "confusion_matrix": [
+        [
+          26,
+          6
+        ],
+        [
+          4,
+          50
+        ]
+      ]
+    },
+    "Sentinel-SVM": {
+      "model": "Sentinel-SVM",
+      "type": "Classical SVM",
+      "accuracy": 0.9651,
+      "sensitivity": 1.0,
+      "specificity": 0.9062,
+      "precision": 0.9474,
+      "f1_score": 0.973,
+      "mcc": 0.9266,
+      "auc_roc": 0.9948,
+      "ece": 0.0505,
+      "inference_time_ms": 0.0,
+      "confusion_matrix": [
+        [
+          29,
+          3
+        ],
+        [
+          0,
+          54
+        ]
+      ]
+    }
+  },
+  "heart_disease": {
+    "CardioWave-VQC": {
+      "model": "CardioWave-VQC",
+      "type": "Quantum VQC",
+      "accuracy": 0.9565,
+      "sensitivity": 1.0,
+      "specificity": 0.0,
+      "precision": 0.9565,
+      "f1_score": 0.9778,
+      "mcc": 0.0,
+      "auc_roc": 0.8977,
+      "ece": 0.0949,
+      "inference_time_ms": 0.0,
+      "confusion_matrix": [
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          44
+        ]
+      ]
+    },
+    "Sentinel-XGB": {
+      "model": "Sentinel-XGB",
+      "type": "Classical XGB",
+      "accuracy": 0.9565,
+      "sensitivity": 0.9773,
+      "specificity": 0.5,
+      "precision": 0.9773,
+      "f1_score": 0.9773,
+      "mcc": 0.4773,
+      "auc_roc": 0.9318,
+      "ece": 0.0305,
+      "inference_time_ms": 0.0,
+      "confusion_matrix": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          43
+        ]
+      ]
+    },
+    "Sentinel-MLP": {
+      "model": "Sentinel-MLP",
+      "type": "Classical MLP",
+      "accuracy": 0.9783,
+      "sensitivity": 1.0,
+      "specificity": 0.5,
+      "precision": 0.9778,
+      "f1_score": 0.9888,
+      "mcc": 0.6992,
+      "auc_roc": 1.0,
+      "ece": 0.0288,
+      "inference_time_ms": 0.0,
+      "confusion_matrix": [
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          44
+        ]
+      ]
+    }
+  },
+  "parkinsons": {
+    "NeuroSynapse-VQC": {
+      "model": "NeuroSynapse-VQC",
+      "type": "Quantum VQC",
+      "accuracy": 0.7333,
+      "sensitivity": 1.0,
+      "specificity": 0.0,
+      "precision": 0.7333,
+      "f1_score": 0.8462,
+      "mcc": 0.0,
+      "auc_roc": 0.4659,
+      "ece": 0.0388,
+      "inference_time_ms": 0.0,
+      "confusion_matrix": [
+        [
+          0,
+          8
+        ],
+        [
+          0,
+          22
+        ]
+      ]
+    },
+    "Sentinel-RF": {
+      "model": "Sentinel-RF",
+      "type": "Classical RF",
+      "accuracy": 0.7333,
+      "sensitivity": 1.0,
+      "specificity": 0.0,
+      "precision": 0.7333,
+      "f1_score": 0.8462,
+      "mcc": 0.0,
+      "auc_roc": 0.4318,
+      "ece": 0.0918,
+      "inference_time_ms": 0.0,
+      "confusion_matrix": [
+        [
+          0,
+          8
+        ],
+        [
+          0,
+          22
+        ]
+      ]
+    },
+    "Sentinel-LogReg": {
+      "model": "Sentinel-LogReg",
+      "type": "Classical LogReg",
+      "accuracy": 0.7333,
+      "sensitivity": 1.0,
+      "specificity": 0.0,
+      "precision": 0.7333,
+      "f1_score": 0.8462,
+      "mcc": 0.0,
+      "auc_roc": 0.5114,
+      "ece": 0.0959,
+      "inference_time_ms": 0.0,
+      "confusion_matrix": [
+        [
+          0,
+          8
+        ],
+        [
+          0,
+          22
+        ]
+      ]
+    }
+  },
+  "diabetes": {
+    "Diabetes-VQC": {
+      "model": "Diabetes-VQC",
+      "type": "Quantum VQC",
+      "accuracy": 0.7155,
+      "sensitivity": 1.0,
+      "specificity": 0.0,
+      "precision": 0.7155,
+      "f1_score": 0.8342,
+      "mcc": 0.0,
+      "auc_roc": 0.8631,
+      "ece": 0.1238,
+      "inference_time_ms": 0.0,
+      "confusion_matrix": [
+        [
+          0,
+          33
+        ],
+        [
+          0,
+          83
+        ]
+      ]
+    },
+    "Sentinel-RF": {
+      "model": "Sentinel-RF",
+      "type": "Classical RF",
+      "accuracy": 0.9138,
+      "sensitivity": 0.9277,
+      "specificity": 0.8788,
+      "precision": 0.9506,
+      "f1_score": 0.939,
+      "mcc": 0.7927,
+      "auc_roc": 0.9693,
+      "ece": 0.0741,
+      "inference_time_ms": 0.0,
+      "confusion_matrix": [
+        [
+          29,
+          4
+        ],
+        [
+          6,
+          77
+        ]
+      ]
+    },
+    "Sentinel-XGB": {
+      "model": "Sentinel-XGB",
+      "type": "Classical XGB",
+      "accuracy": 0.9052,
+      "sensitivity": 0.9036,
+      "specificity": 0.9091,
+      "precision": 0.9615,
+      "f1_score": 0.9317,
+      "mcc": 0.7813,
+      "auc_roc": 0.9701,
+      "ece": 0.0544,
+      "inference_time_ms": 0.0,
+      "confusion_matrix": [
+        [
+          30,
+          3
+        ],
+        [
+          8,
+          75
+        ]
+      ]
+    }
+  }
+}
