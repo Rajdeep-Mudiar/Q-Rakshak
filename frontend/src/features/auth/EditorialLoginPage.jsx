@@ -749,7 +749,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
           <a
-            href="https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md"
+            href="https://github.com/ARYANCY/QDoc/blob/main/documentation/objectives/README.md"
             target="_blank"
             rel="noopener noreferrer"
             style={{
@@ -836,48 +836,48 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                 id: "OBJ-01",
                 title: "Hybrid Quantum-Classical Architecture for Early Disease Detection",
                 evidence: "Classical preprocessing pipeline (ml/preprocessing/validation.py), train-only PCA dimensionality reduction, PennyLane VQC/VQR circuits, and UnifiedMedicalPredictor with conformal calibration.",
-                readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md#obj-01",
-                readmeLabel: "guide #obj-01",
+                readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/objectives/OBJ-01_hybrid_quantum_classical_pipeline.md",
+                readmeLabel: "objectives / obj-01",
                 status: "SATISFIED",
               },
               {
                 id: "OBJ-02",
                 title: "High-Dimensional Quantum Classification & Continuous Regression",
                 evidence: "BiomedCLIP (512-dim) / MedSigLIP (768-dim) foundation encoders, train-only compression into <=8 qubits, and VariationalQuantumRegressor with Pauli-Z expectations for continuous targets (Parkinson's UPDRS).",
-                readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md#obj-02",
-                readmeLabel: "guide #obj-02",
+                readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/objectives/OBJ-02_high_dimensional_encoders_continuous_regression.md",
+                readmeLabel: "objectives / obj-02",
                 status: "SATISFIED",
               },
               {
                 id: "OBJ-03",
                 title: "Accuracy, Sensitivity, and Specificity vs Classical Baselines",
                 evidence: "Standardized ClassicalBaselineSuite and ClassicalRegressionSuite under identical 5-seed patient-level stratified split (Seeds: 7, 21, 42, 73, 101); full metrics and confusion matrices with zero fabricated claims.",
-                readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md#obj-03",
-                readmeLabel: "guide #obj-03",
+                readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/objectives/OBJ-03_benchmarks_vs_classical_baselines.md",
+                readmeLabel: "objectives / obj-03",
                 status: "SATISFIED",
               },
               {
                 id: "OBJ-04",
                 title: "Scalability, Interpretability & Quantum Hardware Compatibility",
                 evidence: "HardwareProviderRegistry modeling IBM Quantum Eagle (127Q), AWS Rigetti (80Q), and IonQ Forte (36Q) with T1/T2 noise; Grad-CAM Turbo saliency, KernelSHAP feature contributions, and qubit sensitivity.",
-                readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md#obj-04",
-                readmeLabel: "guide #obj-04",
+                readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/objectives/OBJ-04_scalability_interpretability_qpu_compatibility.md",
+                readmeLabel: "objectives / obj-04",
                 status: "SATISFIED",
               },
               {
                 id: "OBJ-05",
                 title: "Preprocessing, Feature Selection & Zero Data Leakage",
                 evidence: "ClinicalTabularPreprocessor (median imputation, IQR outlier clipping, MinMax scaling) + PatientGroupedSplitter (GroupShuffleSplit across patient_id) with automated mathematical leakage audits.",
-                readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md#obj-05",
-                readmeLabel: "guide #obj-05",
+                readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/objectives/OBJ-05_preprocessing_feature_selection_zero_leakage.md",
+                readmeLabel: "objectives / obj-05",
                 status: "SATISFIED",
               },
               {
                 id: "OBJ-06",
                 title: "Scientific Benchmarking (Accuracy, Efficiency & Generalization)",
                 evidence: "AblationMatrixRunner executing standard Experiments A-F; tracemalloc peak memory profiling, 1000-resample bootstrap 95% CIs, quantum gate/depth telemetry, and continuous regression benchmarking.",
-                readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/guide/research_objectives.md#obj-06",
-                readmeLabel: "guide #obj-06",
+                readmeAnchor: "https://github.com/ARYANCY/QDoc/blob/main/documentation/objectives/OBJ-06_scientific_benchmarking_telemetry_bootstrapping.md",
+                readmeLabel: "objectives / obj-06",
                 status: "SATISFIED",
               },
             ].map((item, index) => (
