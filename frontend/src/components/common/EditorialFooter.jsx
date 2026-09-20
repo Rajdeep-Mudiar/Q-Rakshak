@@ -26,7 +26,7 @@ export default function EditorialFooter() {
         </span>
         <span style={{ color: "var(--border-default)" }}>|</span>
         <span style={{ fontSize: "0.70rem", color: "var(--text-secondary)", fontFamily: "var(--font-mono)" }}>
-          HIPAA Safe Harbor 18 • DPDP Act 2023 • WORM Certified
+          HIPAA Safe Harbor 18 • DPDP Act 2023 • WORM Audit Trail
         </span>
       </div>
 

@@ -389,7 +389,7 @@ export default function EditorialHomePage({ onNavigate, currentUser, allowedTabs
                 IEEE 830-1998 SPECIFICATION
               </span>
               <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.68rem", padding: "3px 8px", background: "rgba(5, 150, 105, 0.1)", color: "#059669", border: "1px solid rgba(5, 150, 105, 0.2)", borderRadius: "4px", fontWeight: 700 }}>
-                HIPAA & DPDP-2023 CERTIFIED
+                HIPAA & DPDP-2023 PROTOCOL
               </span>
             </div>
 

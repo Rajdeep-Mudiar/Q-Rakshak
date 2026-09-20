@@ -64,10 +64,10 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
         },
       });
 
-      // Floating gentle animation on the Zara scroll cue bar
-      gsap.to(".zara-scroll-cue-pill", {
-        y: 4,
-        duration: 2.0,
+      // Floating gentle animation on the scroll cue pill
+      gsap.to(".scroll-cue-pill, .zara-scroll-cue-pill", {
+        y: -4,
+        duration: 1.8,
         repeat: -1,
         yoyo: true,
         ease: "sine.inOut",
@@ -194,7 +194,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        padding: "clamp(20px, 3.2vw, 42px)",
+        padding: 0,
         overflowX: "hidden",
         position: "relative",
         boxSizing: "border-box",
@@ -214,7 +214,26 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
         }
         @keyframes bounceArrow {
           0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(5px); }
+          50% { transform: translateY(4px); }
+        }
+        .scroll-cue-pill {
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 12px;
+          padding: 10px 22px;
+          background: #FFFFFF;
+          color: #0F172A;
+          border: 1px solid #E2E8F0;
+          border-radius: 9999px;
+          box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+          transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .scroll-cue-pill:hover {
+          background: #F8FAFC !important;
+          border-color: #CBD5E1 !important;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+          transform: translateY(-2px);
         }
         .zara-scroll-cue-pill {
           cursor: pointer;
@@ -313,6 +332,8 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
           flexDirection: "column",
           justifyContent: "space-between",
           position: "relative",
+          padding: "clamp(18px, 2.5vh, 28px) clamp(24px, 3.5vw, 48px) clamp(24px, 3.5vh, 36px)",
+          boxSizing: "border-box",
         }}
       >
         {/* Top Architectural Header */}
@@ -358,31 +379,6 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "7px",
-                padding: "7px 14px",
-                background: "#F8FAFC",
-                border: "1px solid #E2E8F0",
-                borderRadius: "6px",
-              }}
-            >
-              <ShieldCheck size={14} color="#059669" />
-              <span
-                style={{
-                  fontSize: "0.70rem",
-                  color: "#334155",
-                  fontWeight: 700,
-                  fontFamily: "var(--font-mono, monospace)",
-                  letterSpacing: "0.05em",
-                }}
-              >
-                HIPAA • DPDP-2023 Certified
-              </span>
-            </div>
-
             <a
               href="https://github.com/ARYANCY/QDoc"
               target="_blank"
@@ -395,7 +391,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                 background: "#0F172A",
                 color: "#FFFFFF",
                 border: "1px solid #0F172A",
-                borderRadius: "6px",
+                borderRadius: "0px",
                 fontSize: "0.72rem",
                 fontWeight: 700,
                 textDecoration: "none",
@@ -604,8 +600,8 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
           alignItems: "center",
           justifyContent: "center",
           marginTop: "auto",
-          paddingTop: "24px",
-          paddingBottom: "16px",
+          paddingTop: "12px",
+          paddingBottom: "clamp(8px, 1.5vh, 16px)",
           position: "relative",
           zIndex: 10,
         }}
@@ -615,11 +611,54 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
             const el = document.getElementById("quantum-model-benchmarks");
             if (el) el.scrollIntoView({ behavior: "smooth" });
           }}
-          className="zara-scroll-cue-pill"
+          className="scroll-cue-pill"
         >
-          <span className="zara-pulse-square" />
-          <span>EXPLORE AUDITED QUANTUM-CLASSICAL BENCHMARKS</span>
-          <ArrowDown size={14} className="scroll-arrow-anim" />
+          {/* Pulsing Radar Dot Matching User Screenshot */}
+          <span
+            style={{
+              position: "relative",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "16px",
+              height: "16px",
+            }}
+          >
+            <span
+              style={{
+                position: "absolute",
+                width: "100%",
+                height: "100%",
+                borderRadius: "50%",
+                backgroundColor: "#10B981",
+                opacity: 0.35,
+                animation: "pingRing 2s cubic-bezier(0, 0, 0.2, 1) infinite",
+              }}
+            />
+            <span
+              style={{
+                width: "8px",
+                height: "8px",
+                borderRadius: "50%",
+                backgroundColor: "#059669",
+                display: "inline-block",
+              }}
+            />
+          </span>
+
+          <span
+            style={{
+              fontSize: "0.82rem",
+              fontWeight: 700,
+              color: "#0F172A",
+              fontFamily: "var(--font-sans, inherit)",
+              letterSpacing: "-0.01em",
+            }}
+          >
+            Scroll down to explore Quantum vs Classical Models & Clinical Benchmarks
+          </span>
+
+          <ArrowDown size={14} color="#059669" className="scroll-arrow-anim" />
         </div>
       </div>
     </div>
@@ -630,7 +669,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
     {/* ── Section: Research Objectives Compliance Matrix (OBJ-01 – OBJ-06) ── */}
     <section
       style={{
-        marginTop: "64px",
+        margin: "64px clamp(24px, 3.5vw, 48px) 0 clamp(24px, 3.5vw, 48px)",
         background: "#0A0A0A",
         border: "1px solid rgba(255, 255, 255, 0.12)",
         borderLeft: "2px solid #FFFFFF",
@@ -913,7 +952,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
     {/* ── Section: Delivery Table (Expected Deliverables) ── */}
     <section
       style={{
-        marginTop: "48px",
+        margin: "48px clamp(24px, 3.5vw, 48px) 0 clamp(24px, 3.5vw, 48px)",
         background: "#0A0A0A",
         border: "1px solid rgba(255, 255, 255, 0.12)",
         borderLeft: "2px solid #FFFFFF",
@@ -1205,7 +1244,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
     {/* Zara High-Fashion Minimalist Footer */}
     <footer
       style={{
-        marginTop: "80px",
+        margin: "80px clamp(24px, 3.5vw, 48px) 0 clamp(24px, 3.5vw, 48px)",
         borderTop: "1px solid rgba(255, 255, 255, 0.12)",
         paddingTop: "32px",
         paddingBottom: "40px",
