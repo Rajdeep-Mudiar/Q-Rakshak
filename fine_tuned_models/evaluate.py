@@ -54,7 +54,8 @@ def run_breast_cancer_evaluation(weights_dir: Path):
         # 2. OncoPulse-QSVM
         qsvm_path = weights_dir / "breast_cancer" / "OncoPulse-QSVM.joblib"
         if qsvm_path.exists():
-            qsvm = joblib.load(qsvm_path)
+            qsvm = QuantumSupportVectorMachine(n_qubits=8)
+            qsvm.load_checkpoint(str(qsvm_path))
             qsvm_probs = qsvm.predict_proba(X_test_q)
             results["OncoPulse-QSVM"] = evaluate_clinical_model("OncoPulse-QSVM", "Quantum QSVM", y_test, qsvm.predict(X_test_q), qsvm_probs)
 

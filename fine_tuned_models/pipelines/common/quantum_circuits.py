@@ -167,7 +167,7 @@ class StandaloneVQC(nn.Module):
         self.eval()
         X_t = torch.tensor(X, dtype=torch.float32).to(device)
         with torch.no_grad():
-            raw_vals = self(X_t).cpu().numpy()
+            raw_vals = self(X_t).cpu().numpy().flatten()
         p1 = 1.0 / (1.0 + np.exp(-2.0 * raw_vals))
         p0 = 1.0 - p1
         return np.column_stack([p0, p1])
@@ -189,10 +189,20 @@ class StandaloneVQC(nn.Module):
 
     def load_checkpoint(self, path: str):
         ckpt = torch.load(path, map_location="cpu")
-        self.weights = ckpt["weights"].numpy()
-        self.bias = ckpt["bias"]
-        self.n_qubits = ckpt["n_qubits"]
-        self.n_layers = ckpt["n_layers"]
+        if isinstance(ckpt, dict) and "weights" in ckpt:
+            weights_val = ckpt["weights"]
+            if not isinstance(weights_val, torch.Tensor):
+                weights_val = torch.tensor(weights_val, dtype=torch.float32)
+            bias_val = ckpt.get("bias", 0.0)
+            if not isinstance(bias_val, torch.Tensor):
+                bias_val = torch.tensor([bias_val], dtype=torch.float32)
+
+            self.q_weights = nn.Parameter(weights_val.clone().detach().float())
+            self.bias = nn.Parameter(bias_val.clone().detach().float())
+            self.n_qubits = ckpt.get("n_qubits", self.n_qubits)
+            self.n_layers = ckpt.get("n_layers", self.n_layers)
+        elif isinstance(ckpt, dict) and "model_state_dict" in ckpt:
+            self.load_state_dict(ckpt["model_state_dict"])
 
 
 class QuantumSupportVectorMachine:
@@ -202,6 +212,7 @@ class QuantumSupportVectorMachine:
         self.n_qubits = n_qubits
         self.dev = get_quantum_device(n_qubits)
         self.clf = None
+        self.X_train = None
 
         if qml is not None:
             @qml.qnode(self.dev, interface="autograd")
@@ -261,4 +272,14 @@ class QuantumSupportVectorMachine:
     def save_checkpoint(self, path: str):
         import joblib
         joblib.dump({"clf": self.clf, "X_train": self.X_train, "n_qubits": self.n_qubits}, path)
+
+    def load_checkpoint(self, path: str):
+        import joblib
+        data = joblib.load(path)
+        if isinstance(data, dict):
+            self.clf = data.get("clf")
+            self.X_train = data.get("X_train")
+            self.n_qubits = data.get("n_qubits", self.n_qubits)
+        else:
+            self.clf = data
 
