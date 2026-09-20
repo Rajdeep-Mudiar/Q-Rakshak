@@ -69,7 +69,7 @@ def train_breast_cancer_pipeline(args):
     # 1. Fine-Tune OncoPulse-VQC
     print("\n⚛️ Training OncoPulse-VQC...")
     vqc = StandaloneVQC(n_qubits=args.n_qubits, n_layers=args.n_layers, lr=args.lr)
-    vqc.fit(X_train_q, y_train, epochs=args.epochs, batch_size=args.batch_size)
+    vqc.fit(X_train_q, y_train, X_val=X_val_q, y_val=y_val, epochs=args.epochs, batch_size=args.batch_size)
 
     # Evaluate VQC
     t0 = time.perf_counter()
@@ -89,9 +89,11 @@ def train_breast_cancer_pipeline(args):
 
     vqc_ckpt = output_dir / "OncoPulse-VQC.pt"
     vqc.save_checkpoint(str(vqc_ckpt))
-    with open(output_dir / "vqc_history.json", "w") as f:
+    with open(output_dir / "training_history.json", "w") as f:
         import json
-        json.dump(getattr(vqc, "history", {"loss": []}), f, indent=2)
+        json.dump(getattr(vqc, "history", {}), f, indent=2)
+    with open(output_dir / "vqc_history.json", "w") as f:
+        json.dump(getattr(vqc, "history", {}), f, indent=2)
     print(f"✨ VQC Checkpoint saved to: {vqc_ckpt}")
 
     # 2. Fine-Tune OncoPulse-QSVM (Quantum Kernel Matrix)

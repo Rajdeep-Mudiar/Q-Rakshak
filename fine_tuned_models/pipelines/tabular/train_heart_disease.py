@@ -103,7 +103,7 @@ def train_heart_disease_pipeline(args):
     # 1. Train CardioWave-VQC
     print("\n⚛️ Training CardioWave-VQC...")
     vqc = StandaloneVQC(n_qubits=args.n_qubits, n_layers=args.n_layers, lr=args.lr)
-    vqc.fit(X_train_q, y_train, epochs=args.epochs, batch_size=args.batch_size)
+    vqc.fit(X_train_q, y_train, X_val=X_val_q, y_val=y_val, epochs=args.epochs, batch_size=args.batch_size)
 
     t0 = time.perf_counter()
     vqc_probs = vqc.predict_proba(X_test_q)
@@ -122,9 +122,11 @@ def train_heart_disease_pipeline(args):
 
     vqc_ckpt = output_dir / "CardioWave-VQC.pt"
     vqc.save_checkpoint(str(vqc_ckpt))
-    with open(output_dir / "vqc_history.json", "w") as f:
+    with open(output_dir / "training_history.json", "w") as f:
         import json
-        json.dump(getattr(vqc, "history", {"loss": []}), f, indent=2)
+        json.dump(getattr(vqc, "history", {}), f, indent=2)
+    with open(output_dir / "vqc_history.json", "w") as f:
+        json.dump(getattr(vqc, "history", {}), f, indent=2)
     print(f"✨ VQC Checkpoint saved to: {vqc_ckpt}")
 
     # 2. Train Sentinel-XGB Baseline

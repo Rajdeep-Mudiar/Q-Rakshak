@@ -26,12 +26,30 @@ plt.rcParams["axes.edgecolor"] = "#cccccc"
 plt.rcParams["axes.linewidth"] = 0.8
 
 DOMAIN_TITLES = {
-    "pneumonia": ("Loss vs Epochs — QuantumPneu (Pneumonia Hybrid VQC)", "Accuracy Progression (%) — QuantumPneu (Pneumonia Hybrid VQC)"),
-    "skin_cancer": ("Loss vs Epochs — Q-Skin-Vortex (Skin Cancer Hybrid VQC)", "Accuracy Progression (%) — Q-Skin-Vortex (Skin Cancer Hybrid VQC)"),
-    "breast_cancer": "Quantum Circuit Optimization — OncoPulse-VQC (Breast Cancer WDBC)",
-    "heart_disease": "Quantum Circuit Optimization — CardioWave-VQC (Heart Disease Cleveland)",
-    "parkinsons": "Quantum Circuit Optimization — NeuroSynapse-VQC (Parkinson's Acoustics)",
-    "diabetes": "Quantum Circuit Optimization — Diabetes-VQC (PIMA Diabetes)",
+    "pneumonia": (
+        "Loss vs Epochs — QuantumPneu (Pneumonia Hybrid VQC)",
+        "Accuracy Progression (%) — QuantumPneu (Pneumonia Hybrid VQC)",
+    ),
+    "skin_cancer": (
+        "Loss vs Epochs — Q-Skin-Vortex (Skin Cancer Hybrid VQC)",
+        "Accuracy Progression (%) — Q-Skin-Vortex (Skin Cancer Hybrid VQC)",
+    ),
+    "breast_cancer": (
+        "Loss vs Epochs — OncoPulse-VQC (Breast Cancer WDBC)",
+        "Accuracy Progression (%) — OncoPulse-VQC (Breast Cancer WDBC)",
+    ),
+    "heart_disease": (
+        "Loss vs Epochs — CardioWave-VQC (Heart Disease Cleveland)",
+        "Accuracy Progression (%) — CardioWave-VQC (Heart Disease Cleveland)",
+    ),
+    "parkinsons": (
+        "Loss vs Epochs — NeuroSynapse-VQC (Parkinson's Acoustics)",
+        "Accuracy Progression (%) — NeuroSynapse-VQC (Parkinson's Acoustics)",
+    ),
+    "diabetes": (
+        "Loss vs Epochs — Diabetes-VQC (PIMA Diabetes)",
+        "Accuracy Progression (%) — Diabetes-VQC (PIMA Diabetes)",
+    ),
 }
 
 

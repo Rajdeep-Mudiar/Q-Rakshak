@@ -126,10 +126,17 @@ class StandaloneVQC(nn.Module):
             outs.append(self._circuit(x[i], self.q_weights))
         return torch.stack(outs) + self.bias
 
-    def fit(self, X: np.ndarray, y: np.ndarray, epochs: int = 30, batch_size: int = 16):
+    def fit(
+        self,
+        X: np.ndarray,
+        y: np.ndarray,
+        X_val: np.ndarray = None,
+        y_val: np.ndarray = None,
+        epochs: int = 30,
+        batch_size: int = 16,
+    ):
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.to(device)
-        self.train()
 
         X_t = torch.tensor(X, dtype=torch.float32)
         y_scaled = torch.tensor(np.where(y == 0, -1.0, 1.0), dtype=torch.float32)
@@ -139,9 +146,21 @@ class StandaloneVQC(nn.Module):
 
         optimizer = torch.optim.Adam(self.parameters(), lr=self.lr, weight_decay=1e-4)
         criterion = nn.MSELoss()
-        self.history = {"loss": []}
+        self.history = {
+            "train_loss": [],
+            "val_loss": [],
+            "train_acc": [],
+            "val_acc": [],
+            "loss": [],
+        }
+
+        has_val = X_val is not None and y_val is not None
+        if has_val:
+            X_val_t = torch.tensor(X_val, dtype=torch.float32).to(device)
+            y_val_scaled = torch.tensor(np.where(y_val == 0, -1.0, 1.0), dtype=torch.float32).to(device)
 
         for epoch in range(epochs):
+            self.train()
             total_loss = 0.0
             total_samples = 0
             for x_b, y_b in loader:
@@ -156,10 +175,29 @@ class StandaloneVQC(nn.Module):
                 total_samples += len(x_b)
 
             avg_loss = total_loss / max(1, total_samples)
+            self.history["train_loss"].append(round(avg_loss, 4))
             self.history["loss"].append(round(avg_loss, 4))
 
-            if (epoch + 1) % 5 == 0 or epoch == epochs - 1:
-                print(f"Epoch [{epoch+1:02d}/{epochs:02d}] | Quantum MSE Loss: {avg_loss:.4f}")
+            # Evaluate training accuracy
+            self.eval()
+            with torch.no_grad():
+                train_raw = self(X_t.to(device)).cpu().numpy().flatten()
+                train_preds = (train_raw >= 0).astype(int)
+                train_acc = float((train_preds == y).mean() * 100)
+                self.history["train_acc"].append(round(train_acc, 2))
+
+                if has_val:
+                    val_raw = self(X_val_t).cpu().numpy().flatten()
+                    val_loss = float(criterion(self(X_val_t), y_val_scaled).item())
+                    val_preds = (val_raw >= 0).astype(int)
+                    val_acc = float((val_preds == y_val).mean() * 100)
+                    self.history["val_loss"].append(round(val_loss, 4))
+                    self.history["val_acc"].append(round(val_acc, 2))
+
+            if has_val:
+                print(f"Epoch [{epoch+1:02d}/{epochs:02d}] Train Acc: {train_acc:.2f}% | Val Acc: {val_acc:.2f}% (Loss: {avg_loss:.4f}, Val Loss: {val_loss:.4f})")
+            else:
+                print(f"Epoch [{epoch+1:02d}/{epochs:02d}] Train Acc: {train_acc:.2f}% | MSE Loss: {avg_loss:.4f}")
 
     def predict_proba(self, X: np.ndarray) -> np.ndarray:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
