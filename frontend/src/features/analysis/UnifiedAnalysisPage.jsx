@@ -324,46 +324,22 @@ const ROLE_PERMISSIONS = {
 
 
 const STUDIES = {
-  breast_cancer: {
-    id: "breast_cancer",
-    label: "Breast Oncology (WDBC)",
-    badge: "Oncology • Histopathology Scan",
-    desc: "Histopathology tissue slide scan or FNA nuclear margin classification.",
-    model: "VQC (8-Qubit SOTA)",
+  skin: {
+    id: "skin",
+    label: "Dermatoscopy (Skin Cancer)",
+    badge: "Dermatology • Medical Image Scan",
+    desc: "Pigmented dermatoscopic lesion triage and melanoma classification.",
+    model: "QuantumDerma (10-Qubit VQC)",
     modality: "image",
     samples: [
-      { name: "Malignant Histopathology Slide", label: "Malignant (High Risk)", type: "image/png", desc: "Atypical pleomorphic nuclei with irregular margins" },
-      { name: "Benign Histopathology Slide", label: "Benign (Optimal)", type: "image/png", desc: "Cohesive uniform ductal epithelial cells" },
-    ],
-  },
-  heart: {
-    id: "heart",
-    label: "Cardiology (Cleveland)",
-    badge: "Cardiovascular • ECG Rhythm Strip",
-    desc: "12-lead ECG rhythm strip scan or coronary artery risk factors.",
-    model: "QSVM (Fidelity Kernel)",
-    modality: "image",
-    samples: [
-      { name: "Abnormal ECG Rhythm Strip", label: "Coronary Risk (Elevated)", type: "image/png", desc: "ST depression > 2mm with irregular QRS complex" },
-      { name: "Normal Sinus Rhythm ECG", label: "Normal (Optimal)", type: "image/png", desc: "Uniform P wave, narrow QRS, upright T wave" },
-    ],
-  },
-  diabetes: {
-    id: "diabetes",
-    label: "Metabolic / Diabetes (PIMA)",
-    badge: "Metabolic • Retinal Scan",
-    desc: "Fundus retinal photograph scan or glycemic metabolic panel.",
-    model: "QNN (Multi-Class)",
-    modality: "image",
-    samples: [
-      { name: "Diabetic Retinopathy Fundus Scan", label: "Diabetic (Elevated)", type: "image/png", desc: "Microaneurysms and hard exudates in macular zone" },
-      { name: "Normal Retinal Fundus Scan", label: "Non-diabetic (Optimal)", type: "image/png", desc: "Clear optic disc, uniform macula, intact vasculature" },
+      { name: "Melanocytic Nevus (Dermoscopy)", label: "nv (Benign)", type: "image/png", desc: "Symmetric globular reticular pigmentation" },
+      { name: "Melanoma Lesion (Dermoscopy)", label: "mel (Malignant)", type: "image/png", desc: "Asymmetric atypical pigment network with regression" },
     ],
   },
   pneumonia: {
     id: "pneumonia",
-    label: "Chest Radiography (Pneu)",
-    badge: "Pulmonology • X-Ray Scan",
+    label: "Chest Radiography (Pneumonia)",
+    badge: "Pulmonology • Medical X-Ray Scan",
     desc: "Radiographic inspection for pulmonary consolidation and opacity.",
     model: "QuantumPneu (8-Qubit VQC)",
     modality: "image",
@@ -372,16 +348,182 @@ const STUDIES = {
       { name: "Bacterial Consolidation Scan", label: "Bacterial Pneumonia", type: "image/png", desc: "Dense right lower lobe airspace consolidation" },
     ],
   },
-  skin: {
-    id: "skin",
-    label: "Dermatoscopy (Skin Cancer)",
-    badge: "Dermatology • Dermoscopy Scan",
-    desc: "Pigmented dermatoscopic lesion triage and melanoma classification.",
-    model: "QuantumDerma (10-Qubit VQC)",
-    modality: "image",
+  breast_cancer: {
+    id: "breast_cancer",
+    label: "Breast Oncology (WDBC)",
+    badge: "Oncology • Laboratory Biomarkers",
+    desc: "FNA biopsy nuclear margin and cellular morphometry parameters.",
+    model: "OncoPulse-VQC (8-Qubit SOTA)",
+    modality: "tabular",
     samples: [
-      { name: "Melanocytic Nevus (Dermoscopy)", label: "nv (Benign)", type: "image/png", desc: "Symmetric globular reticular pigmentation" },
-      { name: "Melanoma Lesion (Dermoscopy)", label: "mel (Malignant)", type: "image/png", desc: "Asymmetric atypical pigment network with regression" },
+      {
+        name: "Malignant Biopsy Profile",
+        label: "Malignant (High Risk)",
+        desc: "Radius 17.99mm, Texture 20.38, Concavity 0.160",
+        values: {
+          radius_mean: 17.99,
+          texture_mean: 20.38,
+          perimeter_mean: 122.8,
+          area_mean: 1001.0,
+          smoothness_mean: 0.118,
+          compactness_mean: 0.277,
+          concavity_mean: 0.300,
+          "concave points_mean": 0.147,
+          symmetry_mean: 0.241,
+          fractal_dimension_mean: 0.078,
+        },
+      },
+      {
+        name: "Benign Screening Profile",
+        label: "Benign (Optimal)",
+        desc: "Radius 13.54mm, Texture 14.36, Concavity 0.066",
+        values: {
+          radius_mean: 13.54,
+          texture_mean: 14.36,
+          perimeter_mean: 87.46,
+          area_mean: 566.3,
+          smoothness_mean: 0.097,
+          compactness_mean: 0.081,
+          concavity_mean: 0.066,
+          "concave points_mean": 0.047,
+          symmetry_mean: 0.188,
+          fractal_dimension_mean: 0.058,
+        },
+      },
+    ],
+  },
+  heart: {
+    id: "heart",
+    label: "Cardiology (Cleveland)",
+    badge: "Cardiovascular • Clinical Panel",
+    desc: "Cardiovascular biomarkers, blood pressure, ST depression, and ECG metrics.",
+    model: "CardioWave-VQC (8-Qubit QSVM)",
+    modality: "tabular",
+    samples: [
+      {
+        name: "Elevated Cardiovascular Risk",
+        label: "Elevated Risk",
+        desc: "Age 63, BP 145, Chol 233, ST Depr 2.3mm",
+        values: {
+          age: 63.0,
+          sex: 1.0,
+          cp: 3.0,
+          trestbps: 145.0,
+          chol: 233.0,
+          fbs: 1.0,
+          restecg: 2.0,
+          thalach: 150.0,
+          exang: 1.0,
+          oldpeak: 2.3,
+          slope: 2.0,
+          ca: 1.0,
+        },
+      },
+      {
+        name: "Normal Cardiac Baseline",
+        label: "Normal (Optimal)",
+        desc: "Age 45, BP 115, Chol 190, ST Depr 0.0mm",
+        values: {
+          age: 45.0,
+          sex: 0.0,
+          cp: 0.0,
+          trestbps: 115.0,
+          chol: 190.0,
+          fbs: 0.0,
+          restecg: 0.0,
+          thalach: 165.0,
+          exang: 0.0,
+          oldpeak: 0.0,
+          slope: 1.0,
+          ca: 0.0,
+        },
+      },
+    ],
+  },
+  diabetes: {
+    id: "diabetes",
+    label: "Metabolic / Diabetes (PIMA)",
+    badge: "Metabolic • Glycemic Biomarkers",
+    desc: "Glycemic metabolic panel, glucose tolerance, insulin, and BMI metrics.",
+    model: "Diabetes-VQC (8-Qubit QNN)",
+    modality: "tabular",
+    samples: [
+      {
+        name: "Elevated Glycemic Risk",
+        label: "Diabetic (Elevated)",
+        desc: "Glucose 168 mg/dL, Insulin 240, BMI 38.2",
+        values: {
+          Pregnancies: 4.0,
+          Glucose: 168.0,
+          BloodPressure: 84.0,
+          SkinThickness: 32.0,
+          Insulin: 240.0,
+          BMI: 38.2,
+          DiabetesPedigreeFunction: 0.78,
+          Age: 46.0,
+        },
+      },
+      {
+        name: "Optimal Metabolic Health",
+        label: "Non-diabetic (Optimal)",
+        desc: "Glucose 92 mg/dL, Insulin 65, BMI 22.8",
+        values: {
+          Pregnancies: 1.0,
+          Glucose: 92.0,
+          BloodPressure: 68.0,
+          SkinThickness: 18.0,
+          Insulin: 65.0,
+          BMI: 22.8,
+          DiabetesPedigreeFunction: 0.28,
+          Age: 29.0,
+        },
+      },
+    ],
+  },
+  parkinsons: {
+    id: "parkinsons",
+    label: "Voice Telemetry (Parkinson's)",
+    badge: "Neurological • Acoustic Biomarkers",
+    desc: "Biomedical voice acoustics, vocal jitter, shimmer, and pitch entropy.",
+    model: "NeuroSynapse-VQC (6-Qubit VQC)",
+    modality: "tabular",
+    samples: [
+      {
+        name: "Elevated Motor Signs Profile",
+        label: "Parkinson's (Elevated)",
+        desc: "Jitter 0.012%, Shimmer 0.065, Spread1 -4.2",
+        values: {
+          "MDVP:Fo(Hz)": 119.9,
+          "MDVP:Fhi(Hz)": 157.3,
+          "MDVP:Flo(Hz)": 74.9,
+          "MDVP:Jitter(%)": 0.012,
+          "MDVP:Shimmer": 0.065,
+          HNR: 19.0,
+          RPDE: 0.62,
+          DFA: 0.78,
+          spread1: -4.2,
+          spread2: 0.32,
+          PPE: 0.35,
+        },
+      },
+      {
+        name: "Healthy Control Baseline",
+        label: "Control (Optimal)",
+        desc: "Jitter 0.003%, Shimmer 0.018, Spread1 -6.8",
+        values: {
+          "MDVP:Fo(Hz)": 197.0,
+          "MDVP:Fhi(Hz)": 206.8,
+          "MDVP:Flo(Hz)": 192.0,
+          "MDVP:Jitter(%)": 0.003,
+          "MDVP:Shimmer": 0.018,
+          HNR: 26.5,
+          RPDE: 0.38,
+          DFA: 0.65,
+          spread1: -6.8,
+          spread2: 0.14,
+          PPE: 0.12,
+        },
+      },
     ],
   },
 };
@@ -564,26 +706,69 @@ export default function UnifiedAnalysisPage() {
   useEffect(() => {
     if (!patientId) {
       setPatientData(null);
-      setRawFeatures([]);
-      return;
-    }
-
-    clinicalApi.getPatientRecord(patientId)
-      .then((res) => {
-        if (res.patient) setPatientData(res.patient);
-      })
-      .catch(() => {});
-
-    if (STUDIES[study]?.modality === "biomarker") {
-      clinicalApi.getDiseaseFeatures(study, patientId)
+    } else {
+      clinicalApi.getPatientRecord(patientId)
         .then((res) => {
-          if (res.features && res.features.length > 0) setRawFeatures(res.features);
+          if (res.patient) setPatientData(res.patient);
         })
         .catch(() => {});
+    }
+
+    if (STUDIES[study]?.modality === "tabular") {
+      clinicalApi.getDiseaseFeatures(study, patientId || "USR-5EF52B")
+        .then((res) => {
+          if (res.features && res.features.length > 0) {
+            setRawFeatures(res.features);
+          } else {
+            const fallbackSample = STUDIES[study]?.samples?.[0];
+            if (fallbackSample?.values) {
+              setRawFeatures(Object.entries(fallbackSample.values).map(([k, v]) => ({
+                name: k,
+                label: k.replace(/_/g, " ").toUpperCase(),
+                value: v,
+                unit: "a.u.",
+              })));
+            }
+          }
+        })
+        .catch(() => {
+          const fallbackSample = STUDIES[study]?.samples?.[0];
+          if (fallbackSample?.values) {
+            setRawFeatures(Object.entries(fallbackSample.values).map(([k, v]) => ({
+              name: k,
+              label: k.replace(/_/g, " ").toUpperCase(),
+              value: v,
+              unit: "a.u.",
+            })));
+          }
+        });
     } else {
       setRawFeatures([]);
     }
   }, [patientId, study]);
+
+  function applyPreset(preset) {
+    if (!preset) return;
+    if (preset.values) {
+      setRawFeatures((prev) => {
+        if (prev && prev.length > 0) {
+          return prev.map((f) => ({
+            ...f,
+            value: preset.values[f.name] !== undefined ? preset.values[f.name] : f.value,
+          }));
+        } else {
+          return Object.entries(preset.values).map(([k, v]) => ({
+            name: k,
+            label: k.replace(/_/g, " ").toUpperCase(),
+            value: v,
+            unit: "a.u.",
+          }));
+        }
+      });
+      setFile(new File([JSON.stringify(preset.values)], `${preset.name}.json`, { type: "application/json" }));
+      setError(null);
+    }
+  }
 
   const inputRef = useRef(null);
   const currentStudy = STUDIES[study] || STUDIES.breast_cancer;
@@ -1174,7 +1359,7 @@ export default function UnifiedAnalysisPage() {
                     </div>
                   </div>
                   <div className="cockpit-col-body">
-                    <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                       {Object.entries(STUDIES).map(([k, cfg]) => (
                         <button
                           key={k}
@@ -1187,8 +1372,24 @@ export default function UnifiedAnalysisPage() {
                           }}
                         >
                           <div style={{ flex: 1 }}>
-                            <h4>{cfg.label}</h4>
-                            <p>{cfg.desc}</p>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "2px" }}>
+                              <h4 style={{ margin: 0 }}>{cfg.label}</h4>
+                              <span
+                                style={{
+                                  fontSize: "0.58rem",
+                                  fontWeight: 800,
+                                  padding: "2px 6px",
+                                  borderRadius: "3px",
+                                  textTransform: "uppercase",
+                                  background: cfg.modality === "image" ? "rgba(0, 242, 254, 0.12)" : "rgba(168, 85, 247, 0.12)",
+                                  color: cfg.modality === "image" ? "var(--primary)" : "#C084FC",
+                                  border: cfg.modality === "image" ? "1px solid rgba(0, 242, 254, 0.3)" : "1px solid rgba(168, 85, 247, 0.3)",
+                                }}
+                              >
+                                {cfg.modality === "image" ? "📸 Image Scan" : "📊 Manual Values"}
+                              </span>
+                            </div>
+                            <p style={{ margin: "2px 0 4px" }}>{cfg.desc}</p>
                             <span style={{ fontSize: "0.64rem", color: "var(--primary)", fontWeight: 700 }}>
                               {cfg.model}
                             </span>
@@ -1430,69 +1631,110 @@ export default function UnifiedAnalysisPage() {
                         </div>
                       </div>
                     ) : (
-                      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                        {/* Clinical Biomarkers & FHIR EHR Upload */}
-                        <div style={{ border: "1px dashed var(--border-default)", padding: "10px", textAlign: "center", background: "var(--bg-canvas)", borderRadius: "4px" }}>
-                          <Upload size={18} color="var(--primary)" style={{ margin: "0 auto 4px" }} />
-                          <p style={{ fontSize: "0.72rem", fontWeight: 800, color: "var(--text-primary)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
-                            Upload Clinical EHR / FHIR Record (JSON / CSV / VCF)
-                          </p>
-                          <p style={{ fontSize: "0.64rem", color: "var(--text-muted)", marginBottom: "6px" }}>
-                            {file ? file.name : "Select patient laboratory biomarkers or pick sample profile"}
-                          </p>
-                          <input
-                            ref={inputRef}
-                            type="file"
-                            accept=".csv,.json,.vcf"
-                            style={{ display: "none" }}
-                            onChange={(e) => handleFile(e.target.files?.[0])}
-                          />
-                          <button
-                            type="button"
-                            className="btn-secondary"
-                            style={{ width: "100%", fontSize: "0.68rem", padding: "5px", fontWeight: 800, textTransform: "uppercase" }}
-                            onClick={() => inputRef.current?.click()}
-                          >
-                            Browse EHR Record
-                          </button>
-                        </div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                        {/* Interactive Clinical Biomarkers & Parameter Manual Entry */}
+                        <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "6px", padding: "12px", display: "flex", flexDirection: "column", gap: "10px" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--border-subtle)", paddingBottom: "6px" }}>
+                            <div>
+                              <span style={{ fontSize: "0.74rem", fontWeight: 800, color: "var(--text-primary)", textTransform: "uppercase", letterSpacing: "0.04em", display: "block" }}>
+                                Clinical Biomarker Parameters (Manual Values)
+                              </span>
+                              <span style={{ fontSize: "0.62rem", color: "var(--text-muted)" }}>
+                                Type or adjust values manually below, or click a 1-click sample profile
+                              </span>
+                            </div>
+                            <span style={{ fontSize: "0.62rem", fontFamily: "var(--font-mono)", color: "var(--primary)", fontWeight: 700, background: "rgba(0, 242, 254, 0.08)", border: "1px solid rgba(0, 242, 254, 0.2)", padding: "2px 6px", borderRadius: "3px" }}>
+                              {rawFeatures.length} Biomarkers Active
+                            </span>
+                          </div>
 
-                        {/* Sample Health Profiles */}
-                        <div>
-                          <p style={{ fontSize: "0.64rem", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "4px" }}>
-                            Sample Laboratory Profiles
-                          </p>
-                          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                            {currentStudy.samples.map((s, idx) => (
-                              <button
-                                key={idx}
-                                type="button"
-                                className="btn-secondary"
-                                style={{
-                                  fontSize: "0.66rem",
-                                  padding: "6px 8px",
-                                  display: "flex",
-                                  justifyContent: "space-between",
-                                  alignItems: "center",
-                                  textAlign: "left",
-                                  background: file?.name?.includes(s.name) ? "var(--bg-surface-alt)" : "var(--bg-surface)",
-                                  border: file?.name?.includes(s.name) ? "1px solid var(--primary)" : "1px solid var(--border-default)",
-                                }}
-                                onClick={() => {
-                                  setFile(new File(["clinical_data"], `${s.name}.json`, { type: "application/json" }));
-                                  setImagePreviewUrl(null);
-                                  setResult(null);
-                                }}
-                              >
-                                <div>
-                                  <strong style={{ display: "block", color: "var(--text-primary)" }}>{s.name}</strong>
-                                  <span style={{ fontSize: "0.58rem", color: "var(--text-muted)" }}>{s.desc}</span>
+                          {/* Responsive 2/3-Column Parameter Input Grid */}
+                          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: "8px", maxHeight: "300px", overflowY: "auto", paddingRight: "4px" }}>
+                            {rawFeatures.map((f, idx) => (
+                              <div key={f.name || idx} style={{ background: "var(--bg-canvas)", border: "1px solid var(--border-subtle)", borderRadius: "4px", padding: "6px 8px" }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "3px" }}>
+                                  <label style={{ fontSize: "0.64rem", fontWeight: 700, color: "var(--text-secondary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "115px" }} title={f.label || f.name}>
+                                    {f.label || f.name.replace(/_/g, " ")}
+                                  </label>
+                                  <span style={{ fontSize: "0.56rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
+                                    {f.unit || "a.u."}
+                                  </span>
                                 </div>
-                                <span style={{ fontSize: "0.60rem", padding: "2px 6px", background: s.label.includes("Normal") || s.label.includes("Benign") ? "var(--risk-low-bg)" : "var(--risk-high-bg)", color: s.label.includes("Normal") || s.label.includes("Benign") ? "var(--risk-low)" : "var(--risk-high)", fontWeight: 800, borderRadius: "2px" }}>
-                                  {s.label}
-                                </span>
-                              </button>
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                  <input
+                                    type="number"
+                                    step={f.step || "any"}
+                                    value={f.value !== undefined ? f.value : ""}
+                                    onChange={(e) => handleFeatureChange(idx, e.target.value)}
+                                    style={{
+                                      width: "100%",
+                                      background: "var(--bg-surface)",
+                                      border: "1px solid var(--border-default)",
+                                      borderRadius: "3px",
+                                      padding: "4px 6px",
+                                      fontSize: "0.72rem",
+                                      fontFamily: "var(--font-mono)",
+                                      fontWeight: 700,
+                                      color: "var(--text-primary)",
+                                    }}
+                                  />
+                                </div>
+                                {f.mean !== undefined && (
+                                  <div style={{ fontSize: "0.54rem", color: "var(--text-muted)", marginTop: "2px" }}>
+                                    Population Mean: <span style={{ fontFamily: "var(--font-mono)", color: "var(--text-secondary)" }}>{f.mean}</span>
+                                  </div>
+                                )}
+                              </div>
                             ))}
+                          </div>
+
+                          {/* Sample Health Profiles (1-Click Presets) */}
+                          <div style={{ borderTop: "1px solid var(--border-subtle)", paddingTop: "8px" }}>
+                            <p style={{ fontSize: "0.62rem", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>
+                              Sample Clinical Profiles (1-Click Auto-Fill)
+                            </p>
+                            <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                              {currentStudy.samples.map((s, idx) => (
+                                <button
+                                  key={idx}
+                                  type="button"
+                                  className="btn-secondary"
+                                  style={{
+                                    fontSize: "0.65rem",
+                                    padding: "5px 9px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "6px",
+                                    borderRadius: "3px",
+                                  }}
+                                  onClick={() => applyPreset(s)}
+                                >
+                                  <strong>{s.name}</strong>
+                                  <span style={{ fontSize: "0.58rem", padding: "1px 5px", background: s.label.includes("Normal") || s.label.includes("Benign") || s.label.includes("Optimal") || s.label.includes("Control") ? "var(--risk-low-bg)" : "var(--risk-high-bg)", color: s.label.includes("Normal") || s.label.includes("Benign") || s.label.includes("Optimal") || s.label.includes("Control") ? "var(--risk-low)" : "var(--risk-high)", fontWeight: 800, borderRadius: "2px" }}>
+                                    {s.label}
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Optional EHR CSV / JSON Import */}
+                          <div style={{ border: "1px dashed var(--border-subtle)", borderRadius: "4px", padding: "6px", textAlign: "center", background: "rgba(0,0,0,0.15)" }}>
+                            <input
+                              ref={inputRef}
+                              type="file"
+                              accept=".csv,.json"
+                              style={{ display: "none" }}
+                              onChange={(e) => handleFile(e.target.files?.[0])}
+                            />
+                            <button
+                              type="button"
+                              style={{ background: "transparent", border: 0, color: "var(--primary)", fontSize: "0.62rem", fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                              onClick={() => inputRef.current?.click()}
+                            >
+                              <Upload size={11} />
+                              <span>Import Patient Dataset (CSV / JSON)</span>
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -1510,12 +1752,12 @@ export default function UnifiedAnalysisPage() {
                         {loading ? (
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px" }}>
                             <SquareLoader size="sm" color="#FFFFFF" style={{ padding: 0 }} />
-                            <span>Analyzing Scan with Quantum AI...</span>
+                            <span>{currentStudy.modality === "image" ? "Analyzing Medical Scan with Quantum AI..." : "Running Quantum AI Biomarker Checkup..."}</span>
                           </div>
                         ) : (
                           <>
                             <Play size={14} />
-                            <span>Run Quantum AI Scan Prediction</span>
+                            <span>{currentStudy.modality === "image" ? "Run Quantum AI Image Scan Prediction" : "Run Instant Quantum AI Checkup"}</span>
                           </>
                         )}
                       </button>

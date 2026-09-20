@@ -451,23 +451,97 @@ async def get_emergency_qr_svg(patient_id: str):
     return Response(content=svg_str, media_type="image/svg+xml")
 
 
+CLINICAL_FEATURE_DEFAULTS = {
+    "breast_cancer": [
+        {"name": "radius_mean", "label": "Mean Radius", "value": 14.12, "mean": 14.13, "unit": "mm", "min": 6.0, "max": 30.0, "step": 0.1},
+        {"name": "texture_mean", "label": "Mean Texture", "value": 19.28, "mean": 19.29, "unit": "a.u.", "min": 9.0, "max": 40.0, "step": 0.1},
+        {"name": "perimeter_mean", "label": "Mean Perimeter", "value": 91.96, "mean": 91.97, "unit": "mm", "min": 40.0, "max": 190.0, "step": 0.5},
+        {"name": "area_mean", "label": "Mean Area", "value": 654.88, "mean": 654.9, "unit": "mm²", "min": 140.0, "max": 2500.0, "step": 5.0},
+        {"name": "smoothness_mean", "label": "Smoothness (Local Variance)", "value": 0.096, "mean": 0.096, "unit": "a.u.", "min": 0.05, "max": 0.20, "step": 0.005},
+        {"name": "compactness_mean", "label": "Compactness", "value": 0.104, "mean": 0.104, "unit": "a.u.", "min": 0.01, "max": 0.35, "step": 0.005},
+        {"name": "concavity_mean", "label": "Concavity Severity", "value": 0.088, "mean": 0.089, "unit": "a.u.", "min": 0.0, "max": 0.45, "step": 0.005},
+        {"name": "concave points_mean", "label": "Concave Contour Points", "value": 0.048, "mean": 0.049, "unit": "a.u.", "min": 0.0, "max": 0.20, "step": 0.005},
+        {"name": "symmetry_mean", "label": "Nuclei Symmetry", "value": 0.181, "mean": 0.181, "unit": "a.u.", "min": 0.1, "max": 0.35, "step": 0.005},
+        {"name": "fractal_dimension_mean", "label": "Fractal Dimension", "value": 0.062, "mean": 0.063, "unit": "a.u.", "min": 0.04, "max": 0.10, "step": 0.001},
+    ],
+    "heart": [
+        {"name": "age", "label": "Patient Age", "value": 54.0, "mean": 54.4, "unit": "years", "min": 18.0, "max": 100.0, "step": 1.0},
+        {"name": "sex", "label": "Sex (1=Male, 0=Female)", "value": 1.0, "mean": 0.68, "unit": "binary", "min": 0.0, "max": 1.0, "step": 1.0},
+        {"name": "cp", "label": "Chest Pain Type (0-3)", "value": 0.0, "mean": 0.97, "unit": "category", "min": 0.0, "max": 3.0, "step": 1.0},
+        {"name": "trestbps", "label": "Resting Blood Pressure", "value": 131.0, "mean": 131.6, "unit": "mm Hg", "min": 80.0, "max": 220.0, "step": 1.0},
+        {"name": "chol", "label": "Serum Cholesterol", "value": 246.0, "mean": 246.3, "unit": "mg/dl", "min": 100.0, "max": 600.0, "step": 1.0},
+        {"name": "fbs", "label": "Fasting Blood Sugar > 120 (1/0)", "value": 0.0, "mean": 0.15, "unit": "binary", "min": 0.0, "max": 1.0, "step": 1.0},
+        {"name": "restecg", "label": "Resting ECG (0-2)", "value": 0.0, "mean": 0.53, "unit": "category", "min": 0.0, "max": 2.0, "step": 1.0},
+        {"name": "thalach", "label": "Maximum Heart Rate Achieved", "value": 149.0, "mean": 149.6, "unit": "bpm", "min": 60.0, "max": 220.0, "step": 1.0},
+        {"name": "exang", "label": "Exercise Induced Angina (1/0)", "value": 0.0, "mean": 0.33, "unit": "binary", "min": 0.0, "max": 1.0, "step": 1.0},
+        {"name": "oldpeak", "label": "ST Depression by Exercise", "value": 1.04, "mean": 1.04, "unit": "mm", "min": 0.0, "max": 6.5, "step": 0.1},
+        {"name": "slope", "label": "Peak Exercise ST Slope (0-2)", "value": 1.0, "mean": 1.4, "unit": "category", "min": 0.0, "max": 2.0, "step": 1.0},
+        {"name": "ca", "label": "Major Vessels Colored (0-3)", "value": 0.0, "mean": 0.73, "unit": "count", "min": 0.0, "max": 3.0, "step": 1.0},
+    ],
+    "diabetes": [
+        {"name": "Pregnancies", "label": "Number of Pregnancies", "value": 3.0, "mean": 3.8, "unit": "count", "min": 0.0, "max": 20.0, "step": 1.0},
+        {"name": "Glucose", "label": "Plasma Glucose Concentration", "value": 120.0, "mean": 120.9, "unit": "mg/dL", "min": 40.0, "max": 250.0, "step": 1.0},
+        {"name": "BloodPressure", "label": "Diastolic Blood Pressure", "value": 69.0, "mean": 69.1, "unit": "mm Hg", "min": 30.0, "max": 140.0, "step": 1.0},
+        {"name": "SkinThickness", "label": "Triceps Skin Fold Thickness", "value": 20.5, "mean": 20.5, "unit": "mm", "min": 0.0, "max": 100.0, "step": 0.5},
+        {"name": "Insulin", "label": "2-Hour Serum Insulin", "value": 79.8, "mean": 79.8, "unit": "mu U/ml", "min": 0.0, "max": 850.0, "step": 1.0},
+        {"name": "BMI", "label": "Body Mass Index (BMI)", "value": 31.9, "mean": 31.9, "unit": "kg/m²", "min": 10.0, "max": 70.0, "step": 0.1},
+        {"name": "DiabetesPedigreeFunction", "label": "Diabetes Pedigree Score", "value": 0.47, "mean": 0.47, "unit": "score", "min": 0.05, "max": 2.5, "step": 0.01},
+        {"name": "Age", "label": "Patient Age", "value": 33.0, "mean": 33.2, "unit": "years", "min": 18.0, "max": 100.0, "step": 1.0},
+    ],
+    "parkinsons": [
+        {"name": "MDVP:Fo(Hz)", "label": "Avg Vocal Frequency", "value": 154.2, "mean": 154.2, "unit": "Hz", "min": 80.0, "max": 260.0, "step": 0.5},
+        {"name": "MDVP:Fhi(Hz)", "label": "Max Vocal Frequency", "value": 197.1, "mean": 197.1, "unit": "Hz", "min": 100.0, "max": 600.0, "step": 0.5},
+        {"name": "MDVP:Flo(Hz)", "label": "Min Vocal Frequency", "value": 116.3, "mean": 116.3, "unit": "Hz", "min": 60.0, "max": 240.0, "step": 0.5},
+        {"name": "MDVP:Jitter(%)", "label": "Frequency Jitter (%)", "value": 0.006, "mean": 0.006, "unit": "%", "min": 0.001, "max": 0.035, "step": 0.0005},
+        {"name": "MDVP:Shimmer", "label": "Amplitude Shimmer", "value": 0.029, "mean": 0.029, "unit": "a.u.", "min": 0.005, "max": 0.12, "step": 0.001},
+        {"name": "HNR", "label": "Harmonics-to-Noise Ratio", "value": 21.88, "mean": 21.88, "unit": "dB", "min": 8.0, "max": 35.0, "step": 0.1},
+        {"name": "RPDE", "label": "Recurrence Period Entropy", "value": 0.498, "mean": 0.498, "unit": "score", "min": 0.2, "max": 0.7, "step": 0.005},
+        {"name": "DFA", "label": "Detrended Fluctuation", "value": 0.718, "mean": 0.718, "unit": "score", "min": 0.5, "max": 0.9, "step": 0.005},
+        {"name": "spread1", "label": "Fundamental Variation 1", "value": -5.68, "mean": -5.68, "unit": "score", "min": -8.0, "max": -2.0, "step": 0.05},
+        {"name": "spread2", "label": "Fundamental Variation 2", "value": 0.226, "mean": 0.226, "unit": "score", "min": 0.05, "max": 0.45, "step": 0.005},
+        {"name": "PPE", "label": "Pitch Period Entropy", "value": 0.206, "mean": 0.206, "unit": "score", "min": 0.04, "max": 0.55, "step": 0.005},
+    ],
+}
+
+
 @router.get("/patient/{patient_id}/features/{disease}")
 async def get_patient_disease_features(patient_id: str, disease: str):
     """Extracts standardized clinical feature vectors and mean values for the selected protocol."""
+    disease_key = disease.lower().replace("-", "_").strip()
+    if disease_key in {"breast", "breast_cancer", "wdbc"}:
+        norm_key = "breast_cancer"
+    elif disease_key in {"heart", "cleveland", "cardio"}:
+        norm_key = "heart"
+    elif disease_key in {"diabetes", "pima"}:
+        norm_key = "diabetes"
+    elif disease_key in {"parkinsons", "parkinson", "neuro"}:
+        norm_key = "parkinsons"
+    else:
+        norm_key = "breast_cancer"
+
     try:
-        module = get_trained_module(disease.lower())
-    except Exception as exc:
-        raise HTTPException(status_code=400, detail=f"Unsupported disease protocol: {exc}")
-
-    df = module["df"]
-    feat_names = module["feat_names"]
-
-    # Sample a representative real patient feature profile from dataset
-    sample_row = df.iloc[0].to_dict()
-    feature_items = [
-        {"name": k, "value": round(float(v), 3), "mean": round(float(df[k].mean()), 3), "unit": "a.u."}
-        for k, v in list(sample_row.items())[:12]
-    ]
+        module = get_trained_module(norm_key)
+        df = module["df"]
+        feat_names = module["feat_names"]
+        sample_row = df.iloc[0].to_dict()
+        defaults_map = {item["name"]: item for item in CLINICAL_FEATURE_DEFAULTS.get(norm_key, [])}
+        
+        feature_items = []
+        for k, v in list(sample_row.items())[:12]:
+            meta = defaults_map.get(k, {})
+            feature_items.append({
+                "name": k,
+                "label": meta.get("label", k.replace("_", " ").title()),
+                "value": round(float(v), 3),
+                "mean": round(float(df[k].mean()), 3),
+                "unit": meta.get("unit", "a.u."),
+                "min": meta.get("min", 0.0),
+                "max": meta.get("max", round(float(df[k].max() * 1.2), 2)),
+                "step": meta.get("step", 0.1),
+            })
+    except Exception:
+        feature_items = CLINICAL_FEATURE_DEFAULTS.get(norm_key, CLINICAL_FEATURE_DEFAULTS["breast_cancer"])
+        feat_names = [f["name"] for f in feature_items]
 
     return {
         "status": "success",
