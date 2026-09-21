@@ -2,8 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import { User, Mail, Phone, Shield, CheckCircle2, Save, X, Bell, Cpu, Building, Heart, Stethoscope } from "lucide-react";
 import { profileApi } from "../../api/profile";
 import { animateModalOpen } from "../../utils/motion";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function ProfileSettingsModal({ isOpen, onClose, userId = "USR-5EF52B", userRole = "patient", onProfileUpdated }) {
+  const { t } = useLanguage();
   const overlayRef = useRef(null);
   const modalRef = useRef(null);
   const [profile, setProfile] = useState({

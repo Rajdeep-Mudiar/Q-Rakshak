@@ -3,6 +3,7 @@ import { Compass, ShieldAlert, CheckCircle2, ChevronRight, Activity } from "luci
 import { earlyDetectionApi } from "../../api/earlyDetection";
 import { animateEntrance, animateCardStagger } from "../../utils/motion";
 import SquareLoader from "../common/SquareLoader.jsx";
+import DiseaseEarlyDetectionTimeline from "../../features/analysis/components/DiseaseEarlyDetectionTimeline.jsx";
 
 export default function EarlyDetectionMap({ patientId = "USR-5EF52B" }) {
   const containerRef = useRef(null);
@@ -24,22 +25,17 @@ export default function EarlyDetectionMap({ patientId = "USR-5EF52B" }) {
 
   const stages = pathway?.stages || [];
 
-  if (loading && !pathway) {
-    return (
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "260px" }}>
-        <SquareLoader label="Loading longitudinal progression pathway..." />
-      </div>
-    );
-  }
-
   return (
     <div ref={containerRef} style={{ display: "flex", flexDirection: "column", gap: "16px", height: "100%", overflowY: "auto", padding: "6px" }}>
-      {/* Disease Pathway Selector */}
-      <div style={{ display: "flex", gap: "8px" }}>
+      {/* Disease Pathway Selector across all 6 protocols */}
+      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
         {[
-          { key: "breast_cancer", label: "Breast Oncology Progression" },
-          { key: "cardiovascular", label: "Cardiovascular Ischemia" },
-          { key: "diabetes", label: "Metabolic Syndrome & Diabetes" },
+          { key: "breast_cancer", label: "Breast Oncology" },
+          { key: "cardiovascular", label: "Heart & Cardio Plaque" },
+          { key: "diabetes", label: "Diabetes & Metabolism" },
+          { key: "pneumonia", label: "Pulmonary Infection (Pneu)" },
+          { key: "skin", label: "Skin Spot & Melanoma" },
+          { key: "parkinsons", label: "Parkinson's Voice & Motor" },
         ].map((d) => (
           <button
             key={d.key}
@@ -53,6 +49,8 @@ export default function EarlyDetectionMap({ patientId = "USR-5EF52B" }) {
               borderColor: selectedDisease === d.key ? "var(--primary)" : "var(--border-default)",
               fontWeight: selectedDisease === d.key ? 700 : 500,
               fontSize: "0.78rem",
+              cursor: "pointer",
+              transition: "all 0.15s ease",
             }}
             onClick={() => setSelectedDisease(d.key)}
           >
@@ -60,6 +58,12 @@ export default function EarlyDetectionMap({ patientId = "USR-5EF52B" }) {
           </button>
         ))}
       </div>
+
+      {/* ── Interactive Early Detection Timeline Graph for Selected Disease ── */}
+      <DiseaseEarlyDetectionTimeline
+        diseaseId={selectedDisease}
+        showDiseaseSelector={false}
+      />
 
       {/* Pathway Header KPI */}
       <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "10px" }}>

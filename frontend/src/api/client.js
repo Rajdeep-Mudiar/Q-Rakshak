@@ -1,5 +1,17 @@
 import { API_KEY, API_TIMEOUT_MS } from "./config";
 
+let authExpiredDebounceTimer = null;
+function notifyAuthExpired(endpoint) {
+  localStorage.removeItem("qmed_token");
+  localStorage.removeItem("qmed_user");
+  if (!authExpiredDebounceTimer) {
+    window.dispatchEvent(new CustomEvent("qmed:auth_expired", { detail: { endpoint } }));
+    authExpiredDebounceTimer = setTimeout(() => {
+      authExpiredDebounceTimer = null;
+    }, 2000);
+  }
+}
+
 async function executeFetchWithRetry(endpoint, fetchOptions, timeoutId, maxRetries = 3) {
   let attempt = 0;
   while (attempt <= maxRetries) {
@@ -9,9 +21,7 @@ async function executeFetchWithRetry(endpoint, fetchOptions, timeoutId, maxRetri
 
       const isAuthEndpoint = endpoint.includes("/auth/login") || endpoint.includes("/auth/register");
       if (response.status === 401 && !isAuthEndpoint) {
-        localStorage.removeItem("qmed_token");
-        localStorage.removeItem("qmed_user");
-        window.dispatchEvent(new CustomEvent("qmed:auth_expired", { detail: { endpoint } }));
+        notifyAuthExpired(endpoint);
       }
 
       // Check for cloud free-tier cold-start gateway errors (502, 503, 504)

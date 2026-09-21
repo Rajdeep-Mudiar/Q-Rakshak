@@ -286,13 +286,26 @@ export default function VirtualConsultationRoom({ booking, isDoctor = false, onL
         screenStreamRef.current = screenStream;
         setIsScreenSharing(true);
 
-        // Switch remote or local display
-        if (remoteVideoRef.current) {
-          remoteVideoRef.current.srcObject = screenStream;
-          remoteVideoRef.current.play().catch(() => {});
+        const screenTrack = screenStream.getVideoTracks()[0];
+
+        // Transmit screen track over WebRTC peer connection
+        if (peerConnectionRef.current) {
+          const senders = peerConnectionRef.current.getSenders?.() || [];
+          const videoSender = senders.find((s) => s.track && s.track.kind === "video");
+          if (videoSender && screenTrack) {
+            await videoSender.replaceTrack(screenTrack).catch((err) => {
+              console.warn("Could not replace video track with screen track:", err);
+            });
+          }
         }
 
-        screenStream.getVideoTracks()[0].onended = () => {
+        // Preview screen share locally in picture-in-picture box
+        if (localVideoRef.current) {
+          localVideoRef.current.srcObject = screenStream;
+          localVideoRef.current.play().catch(() => {});
+        }
+
+        screenTrack.onended = () => {
           stopScreenShare();
         };
       } catch (err) {
@@ -303,12 +316,32 @@ export default function VirtualConsultationRoom({ booking, isDoctor = false, onL
     }
   }
 
-  function stopScreenShare() {
+  async function stopScreenShare() {
     if (screenStreamRef.current) {
       screenStreamRef.current.getTracks().forEach((track) => track.stop());
       screenStreamRef.current = null;
     }
     setIsScreenSharing(false);
+
+    // Restore local camera track over WebRTC
+    const localVideoTrack = localStreamRef.current?.getVideoTracks?.()[0];
+    if (peerConnectionRef.current && localVideoTrack) {
+      const senders = peerConnectionRef.current.getSenders?.() || [];
+      const videoSender = senders.find((s) => s.track && s.track.kind === "video");
+      if (videoSender) {
+        await videoSender.replaceTrack(localVideoTrack).catch((err) => {
+          console.warn("Could not restore camera track:", err);
+        });
+      }
+    }
+
+    // Restore local camera preview in picture-in-picture box
+    if (localVideoRef.current && localStreamRef.current) {
+      localVideoRef.current.srcObject = localStreamRef.current;
+      localVideoRef.current.play().catch(() => {});
+    }
+
+    // Ensure remote video maintains the remote stream
     if (remoteVideoRef.current && remoteStreamRef.current) {
       remoteVideoRef.current.srcObject = remoteStreamRef.current;
       remoteVideoRef.current.play().catch(() => {});

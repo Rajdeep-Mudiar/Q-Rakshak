@@ -29,9 +29,11 @@ import PatientClinicalDossier from "./components/PatientClinicalDossier.jsx";
 import VapiConfigModal from "./components/VapiConfigModal.jsx";
 import { aiDoctorApi } from "../../api/aiDoctor.js";
 import SquareLoader from "../../components/common/SquareLoader.jsx";
+import { useLanguage } from "../../context/LanguageContext.jsx";
 import "../../styles.css";
 
 export default function AIDoctorConsultationPage({ patientId = "USR-5EF52B", currentUser }) {
+  const { t } = useLanguage();
   const [dossier, setDossier] = useState(null);
   const [systemPrompt, setSystemPrompt] = useState("");
   const [loadingContext, setLoadingContext] = useState(true);

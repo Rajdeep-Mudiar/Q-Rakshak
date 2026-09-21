@@ -18,8 +18,10 @@ import {
 import { usersApi } from "../../api/users";
 import { animateEntrance, animateCardStagger } from "../../utils/motion";
 import SquareLoader from "../../components/common/SquareLoader.jsx";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function UserManagementConsole() {
+  const { t } = useLanguage();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");

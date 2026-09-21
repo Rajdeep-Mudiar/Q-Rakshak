@@ -39,9 +39,16 @@ class Settings:
     BACKEND_DIR: Path = BACKEND_ROOT
     DATA_DIR: Path = BACKEND_DIR
     DB_MODE: str = os.getenv("QMED_DB_MODE", "production").strip().lower()
-    REAL_DB_PATH: Path = Path(os.getenv("QMED_REAL_DB_PATH", str(BACKEND_DIR / "q-rakshak.db")))
-    DEMO_DB_PATH: Path = Path(os.getenv("QMED_DEMO_DB_PATH", str(BACKEND_DIR / "q-rakshak_demo.db")))
-    DB_PATH: Path = Path(os.getenv("QMED_DB_PATH", str(DEMO_DB_PATH if DB_MODE == "demo" else REAL_DB_PATH)))
+
+    # Always ensure database paths are resolved absolutely to prevent root vs backend cwd drift
+    _raw_real_db = os.getenv("QMED_REAL_DB_PATH", "q-rakshak.db")
+    REAL_DB_PATH: Path = (BACKEND_DIR / _raw_real_db) if not Path(_raw_real_db).is_absolute() else Path(_raw_real_db)
+    
+    _raw_demo_db = os.getenv("QMED_DEMO_DB_PATH", "q-rakshak_demo.db")
+    DEMO_DB_PATH: Path = (BACKEND_DIR / _raw_demo_db) if not Path(_raw_demo_db).is_absolute() else Path(_raw_demo_db)
+
+    _raw_db = os.getenv("QMED_DB_PATH", "")
+    DB_PATH: Path = ((BACKEND_DIR / _raw_db) if not Path(_raw_db).is_absolute() else Path(_raw_db)) if _raw_db else (DEMO_DB_PATH if DB_MODE == "demo" else REAL_DB_PATH)
     DATABASE_URL: str = os.getenv("DATABASE_URL", "").strip()
     FINAL_MODELS_DIR: Path = BASE_DIR / "final_models"
     MODELS_DIR: Path = (FINAL_MODELS_DIR / "checkpoints") if (FINAL_MODELS_DIR / "checkpoints").exists() else (BASE_DIR / "models")

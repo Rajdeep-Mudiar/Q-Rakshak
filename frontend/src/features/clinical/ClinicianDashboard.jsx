@@ -16,8 +16,10 @@ import {
 import { consultationsApi } from "../../api/consultations";
 import VirtualConsultationRoom from "../consultation/VirtualConsultationRoom";
 import { animateEntrance, animateCardStagger } from "../../utils/motion";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function ClinicianDashboard({ doctorId = "DOC-KAVITA", currentUser = null }) {
+  const { t } = useLanguage();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeBookingForRoom, setActiveBookingForRoom] = useState(null);

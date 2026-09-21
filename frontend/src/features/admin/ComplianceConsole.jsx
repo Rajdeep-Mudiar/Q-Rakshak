@@ -2,8 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import { ShieldCheck, Lock, Database, CheckCircle2 } from "lucide-react";
 import { complianceApi } from "../../api/compliance";
 import { animateEntrance, animateCardStagger } from "../../utils/motion";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function ComplianceConsole({ patientId = "USR-5EF52B" }) {
+  const { t } = useLanguage();
   const [auditLogs, setAuditLogs] = useState([]);
   const [registry, setRegistry] = useState([]);
   const [consent, setConsent] = useState({ storage: true, research: true, sharing: false });

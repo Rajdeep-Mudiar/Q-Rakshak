@@ -32,6 +32,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import { clinicalApi } from "../../../api/clinical";
+import { useLanguage } from "../../../context/LanguageContext.jsx";
 
 export default function PredictionTimeline({
   patientId = "USR-5EF52B",
@@ -39,6 +40,7 @@ export default function PredictionTimeline({
   lastPredictionResult = null,
   activeStudy = null,
 }) {
+  const { t } = useLanguage();
   const [timelineData, setTimelineData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -117,12 +119,29 @@ export default function PredictionTimeline({
   const weekly = timelineData?.weekly_analysis;
   const monthly = timelineData?.monthly_analysis;
 
+  // Synchronize disease filter when parent cockpit activeStudy changes
+  useEffect(() => {
+    if (!activeStudy) return;
+    const studyMap = {
+      breast_cancer: "Breast Oncology (WDBC)",
+      heart: "Cardiology (Cleveland)",
+      diabetes: "Metabolic / Diabetes (PIMA)",
+      pneumonia: "Chest Radiography (Pneu)",
+      skin: "Dermatoscopy (Skin Cancer)",
+      parkinsons: "Neurodegeneration (Parkinson's Voice)",
+    };
+    if (studyMap[activeStudy]) {
+      setSelectedDisease(studyMap[activeStudy]);
+    }
+  }, [activeStudy]);
+
   const canonicalDiseases = [
     "Breast Oncology (WDBC)",
     "Cardiology (Cleveland)",
     "Metabolic / Diabetes (PIMA)",
     "Chest Radiography (Pneu)",
     "Dermatoscopy (Skin Cancer)",
+    "Neurodegeneration (Parkinson's Voice)",
   ];
   const availableDiseases = Array.from(
     new Set([

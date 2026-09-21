@@ -14,8 +14,10 @@ import {
   Atom,
 } from "lucide-react";
 import { animateModalOpen } from "../../utils/motion";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function UserGuideModal({ isOpen, onClose }) {
+  const { t } = useLanguage();
   const overlayRef = useRef(null);
   const modalRef = useRef(null);
   const [currentSlide, setCurrentSlide] = useState(0);

@@ -12,8 +12,10 @@ import QRCodeSVG from '../../components/common/QRCodeSVG';
 import TriagePhysicalCard from '../../components/clinical/TriagePhysicalCard';
 import PrintableMedicalCardSheet from '../../components/clinical/PrintableMedicalCardSheet';
 import { animateCard3DFlip } from '../../utils/motion.js';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function EmergencyCardView({ patientId = 'USR-5EF52B' }) {
+  const { t } = useLanguage();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

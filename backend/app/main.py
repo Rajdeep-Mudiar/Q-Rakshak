@@ -10,6 +10,7 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 import logging
+import time
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from starlette.middleware.gzip import GZipMiddleware
@@ -91,8 +92,6 @@ app.include_router(skin_cancer_router)
 app.include_router(pneumonia_router)
 app.include_router(graphs_router)
 app.include_router(consultations_router)
-import time
-
 app.include_router(notifications_router)
 app.include_router(emergency_router)
 app.include_router(ai_doctor_router)

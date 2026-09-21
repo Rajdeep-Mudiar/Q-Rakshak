@@ -3,6 +3,8 @@ import { createRoot } from "react-dom/client";
 import UnifiedAnalysisPage from "./features/analysis/UnifiedAnalysisPage.jsx";
 import EmergencyCardView from "./features/clinical/EmergencyCardView.jsx";
 import NotFoundPage from "./components/common/NotFoundPage.jsx";
+import ErrorBoundary from "./components/common/ErrorBoundary.jsx";
+import { LanguageProvider } from "./context/LanguageContext.jsx";
 import "./styles.css";
 
 function AppRouter() {
@@ -46,6 +48,10 @@ function AppRouter() {
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <AppRouter />
+    <ErrorBoundary>
+      <LanguageProvider>
+        <AppRouter />
+      </LanguageProvider>
+    </ErrorBoundary>
   </React.StrictMode>
 );

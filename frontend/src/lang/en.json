@@ -1,0 +1,422 @@
+{
+  "app": {
+    "name": "Q-RAKSHAK",
+    "subtitle": "Quantum Clinical AI Diagnostic & Tele-Consultation Platform",
+    "emergency_tag": "Govt of India AIIMS Certified • 256-Bit Encrypted",
+    "verified_badge": "Clinical Decision Support System (SaMD)",
+    "helpline": "Emergency Medical Helpline: 108 / 112"
+  },
+  "nav_sections": {
+    "primary": "Diagnostic Workflows",
+    "clinical_care": "Clinical Care & Tele-Medicine",
+    "advanced_tools": "Advanced Physiological Studio",
+    "account_profile": "Account & Security",
+    "system_admin": "System Governance & Audit"
+  },
+  "nav": {
+    "overview": "Overview & Home",
+    "health_checkups": "Health Checkups",
+    "digital_twin": "3D Digital Health Twin",
+    "early_detection": "Early Detection Map",
+    "ai_doctor": "AI Doctor 1-on-1 (Voice)",
+    "find_doctors": "Find Doctors & Consult",
+    "my_consultations": "My Appointments & Rx",
+    "health_records": "My Health Records",
+    "my_profile": "My Profile & Security",
+    "clinician_queue": "Consultation Queue & Triage",
+    "compliance": "Compliance & Audit",
+    "user_management": "User Management",
+    "patient_registry": "Patient Registry",
+    "benchmarks": "AI Health Benchmarks",
+    "telemetry": "System Activity"
+  },
+  "header": {
+    "search_placeholder": "Search checkups, doctors, organs, medical terms...",
+    "consult_doctor": "Consult Doctor",
+    "explore_diseases": "Explore Diseases",
+    "platform_tour": "Platform Tour",
+    "language": "Language",
+    "role": "Role",
+    "authenticated_as": "Authenticated As",
+    "profile_settings": "Profile & Security",
+    "logout": "Log Out",
+    "login": "Log In",
+    "guest": "Guest Mode",
+    "contrast_toggle": "High Contrast",
+    "font_toggle": "Readable Font"
+  },
+  "actions": {
+    "start_checkup": "Start Health Checkup",
+    "run_checkup": "Run Instant Quantum AI Checkup",
+    "upload_scan": "Upload Medical Scan",
+    "browse_file": "Browse File",
+    "drag_drop_hint": "Drag and drop your file here, or click to browse",
+    "load_sample": "Load Test Sample",
+    "try_again": "Try Again",
+    "return_home": "Return to Dashboard",
+    "reload_page": "Reload Page",
+    "view_report": "View Full Report",
+    "download_report": "Download Verified Health Report (PDF)",
+    "book_appointment": "Book Consultation",
+    "join_call": "Join Video Consultation Room",
+    "end_call": "Leave Consultation",
+    "save_changes": "Save Changes",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "close": "Close",
+    "share": "Share",
+    "filter": "Filter",
+    "clear": "Clear",
+    "submit": "Submit",
+    "view_details": "View Details",
+    "override": "Clinical Override",
+    "print": "Print Document",
+    "copy_link": "Copy Secure Link"
+  },
+  "diseases": {
+    "breast_cancer": {
+      "name": "Breast Cancer Check",
+      "short_name": "Breast Cancer",
+      "badge": "Biopsy Results • Cell Shape",
+      "tagline": "Checks cell shape and margin data from lab biopsy tests to detect early signs of abnormal cell growth.",
+      "input_type": "Tabular Lab Biomarkers (Radius, Texture, Concavity)",
+      "lead_time": "24 Months Pre-Clinical Window",
+      "survival_rate": "99.1% 5-Year Survival when detected at Stage 0",
+      "desc": "FNA biopsy nuclear margin and cellular morphometry parameters.",
+      "why_it_matters": "Early cellular detection allows minimally invasive interventions before micro-calcifications progress.",
+      "warning_signs": [
+        "Painless, firm solitary breast lump with irregular borders",
+        "Skin tethering, dimpling, or orange peel texture",
+        "Recent nipple inversion, retraction, or spontaneous discharge",
+        "Persistent axillary lymphadenopathy or unilateral swelling"
+      ],
+      "checklist": [
+        "Gather recent FNA biopsy or ultrasound records",
+        "Review cellular radius and perimeter measurements",
+        "Verify absence of acute localized infections",
+        "Ensure patient demographic profiles are up to date"
+      ]
+    },
+    "heart_disease": {
+      "name": "Heart Health Check",
+      "short_name": "Heart Disease",
+      "badge": "Cardiac Vitals & ECG Rhythm",
+      "tagline": "Analyzes blood pressure, cholesterol, resting ECG, and exercise tolerance to detect cardiovascular risks.",
+      "input_type": "Clinical Cardiovascular Telemetry (BP, ECG, Chol)",
+      "lead_time": "36 Months Pre-Clinical Window",
+      "survival_rate": "48% Reduction in Major Adverse Cardiac Events",
+      "desc": "Cardiovascular biomarkers, blood pressure, ST depression, and ECG metrics.",
+      "why_it_matters": "Identifying sub-clinical arterial plaque buildup years in advance prevents irreversible myocardial infarction.",
+      "warning_signs": [
+        "Retrosternal chest pressure radiating to left arm or jaw",
+        "Unexplained shortness of breath on mild exertion",
+        "Palpitations, irregular pulse, or sudden dizziness",
+        "Persistent bilateral ankle edema or fatigue"
+      ],
+      "checklist": [
+        "Record resting blood pressure after 5 minutes sitting",
+        "Have recent lipid profile results (Total Chol, HDL, LDL) ready",
+        "Include resting ECG telemetry strip if available",
+        "Note exercise tolerance and past family cardiac history"
+      ]
+    },
+    "diabetes": {
+      "name": "Diabetes & Blood Sugar Check",
+      "short_name": "Diabetes",
+      "badge": "Glucose & Metabolic Indicators",
+      "tagline": "Evaluates plasma glucose, fasting insulin, BMI, and metabolic markers to catch insulin resistance early.",
+      "input_type": "Metabolic Panel Biomarkers (Glucose, Insulin, BMI)",
+      "lead_time": "48 Months (4 Years) Reversible Window",
+      "survival_rate": "100% Reversible with early lifestyle guidance",
+      "desc": "Glycemic metabolic panel, glucose tolerance, insulin, and BMI metrics.",
+      "why_it_matters": "Beta-cell dysfunction can be reversed during pre-diabetes before permanent microvascular complications occur.",
+      "warning_signs": [
+        "Increased thirst and frequent nocturnal urination",
+        "Unexplained weight loss despite increased appetite",
+        "Chronic lethargy and postprandial fatigue",
+        "Slow healing cuts, peripheral tingling, or blurred vision"
+      ],
+      "checklist": [
+        "Record 8-hour fasting plasma glucose in mg/dL",
+        "Measure current body mass index (BMI)",
+        "Check fasting serum insulin levels if tested",
+        "Note family history of Type 2 diabetes"
+      ]
+    },
+    "pneumonia": {
+      "name": "Pneumonia & Lungs",
+      "short_name": "Pneumonia",
+      "badge": "Lungs & Breathing • Chest X-Ray",
+      "tagline": "Checks chest radiographs for pulmonary infiltrates, fluid buildup, and early bacterial or viral infections.",
+      "input_type": "High-Resolution Chest Radiograph (PNG, JPG, DICOM)",
+      "lead_time": "48 to 72 Hours Early Intervention Window",
+      "survival_rate": "94% Avoidance of ICU and Ventilator Admissions",
+      "desc": "Radiographic inspection for pulmonary consolidation and parenchymal opacity.",
+      "why_it_matters": "Distinguishing bacterial vs. viral pneumonia within 48 hours directs life-saving targeted therapy.",
+      "warning_signs": [
+        "Productive cough with purulent or rust-colored sputum",
+        "High fever accompanied by shaking chills and diaphoresis",
+        "Pleuritic chest pain worsening on deep inspiration",
+        "SpO2 dropping below 94% on room air with tachypnea"
+      ],
+      "checklist": [
+        "Ensure posterior-anterior (PA) chest X-ray is clearly illuminated",
+        "Verify DICOM metadata or PNG/JPEG image resolution",
+        "Check patient SpO2 level and respiratory rate",
+        "Note onset time of fever and productive cough"
+      ]
+    },
+    "skin_cancer": {
+      "name": "Skin Cancer & Moles",
+      "short_name": "Skin Cancer",
+      "badge": "Skin Spots • Photo Scan",
+      "tagline": "Analyzes dermoscopy lesion photos for border irregularities, color variegation, and early melanoma signs.",
+      "input_type": "Dermoscopy Lesion Photo (PNG, JPG, WEBP)",
+      "lead_time": "12 to 18 Months Pre-Invasive Window",
+      "survival_rate": "99.5% 5-Year Survival when treated in situ",
+      "desc": "Pigmented dermatoscopic lesion triage and melanoma classification.",
+      "why_it_matters": "In-situ melanoma excision carries near 100% cure rate compared to vertical invasive melanoma.",
+      "warning_signs": [
+        "Asymmetrical border or irregular notched edges",
+        "Multiple colors (black, brown, red, white, or blue) within one lesion",
+        "Diameter greater than 6 mm (pencil eraser size)",
+        "Evolving size, shape, surface elevation, or bleeding"
+      ],
+      "checklist": [
+        "Capture well-lit, in-focus close-up photograph of skin lesion",
+        "Ensure no hair or glare obscures lesion borders",
+        "Document lesion anatomical location",
+        "Note if the mole has grown or bled in the past 6 months"
+      ]
+    },
+    "parkinsons": {
+      "name": "Parkinson's Voice Check",
+      "short_name": "Parkinson's",
+      "badge": "Voice Recording & Brain Health",
+      "tagline": "Measures micro-tremors, frequency jitter, and vocal amplitude variations from sustained phonation audio.",
+      "input_type": "Acoustic Vocal Telemetry (Hz, Jitter, Shimmer)",
+      "lead_time": "24 to 36 Months Pre-Motor Window",
+      "survival_rate": "76% Delay in progression of motor disability",
+      "desc": "Biomedical voice acoustics, vocal jitter, shimmer, and pitch entropy.",
+      "why_it_matters": "Vocal fold phonatory instability appears up to 3 years prior to cardinal resting tremors.",
+      "warning_signs": [
+        "Micrographia (progressively smaller, cramped handwriting)",
+        "Resting hand or finger tremor (pill-rolling tremor)",
+        "Hypophonia (quiet, monotone, or breathy voice)",
+        "Rigidity and reduced arm swing while walking"
+      ],
+      "checklist": [
+        "Record sustained vowel /a/ sound in quiet environment",
+        "Ensure microphone is 10 cm from mouth at 45 degree angle",
+        "Maintain vocal phonation for at least 3 seconds",
+        "Review baseline acoustic jitter and shimmer metrics"
+      ]
+    }
+  },
+  "features": {
+    "doctor_consultation": {
+      "title": "Doctor Tele-Consultations & Clinical Triage",
+      "tagline": "Board-Certified Specialists • HIPAA & ABDM Verified Telemedicine",
+      "category": "Clinical Care",
+      "badge": "Tele-Medicine • Specialist Network",
+      "primaryCta": "Find Specialists & Book Now",
+      "secondaryCta": "View My Appointments & Rx",
+      "summary": "Connect directly with board-certified oncologists, cardiologists, pulmonologists, dermatologists, and neurologists through secure tele-consultation rooms.",
+      "clinicalStandards": "All consultations comply with HIPAA, ABDM, and DISHA medical communication protocols."
+    },
+    "ai_doctor": {
+      "title": "AI Doctor 1-on-1 Studio",
+      "tagline": "Interactive Voice & Clinical AI Dialogue",
+      "category": "Interactive Intelligence",
+      "badge": "Voice AI • Real-Time Triage",
+      "primaryCta": "Start Voice Conversation",
+      "secondaryCta": "Review Past Transcripts",
+      "summary": "Speak naturally with our Clinical Voice AI assistant to triage symptoms, explain lab reports, and prepare for your doctor visit."
+    },
+    "digital_twin": {
+      "title": "3D Digital Health Twin",
+      "tagline": "Personalized Anatomical Organ Simulation",
+      "category": "Advanced Visualization",
+      "badge": "3D Bio-Twin • Spatial Health",
+      "primaryCta": "Explore 3D Body Twin",
+      "secondaryCta": "Inspect Vitality Layers",
+      "summary": "Visualize your multi-organ physiological status in an interactive 3D body model powered by real-time biomarker feeds."
+    },
+    "profile_security": {
+      "title": "My Profile & Medical Security",
+      "tagline": "Cryptographic Identity & Patient Records",
+      "category": "Security & Identity",
+      "badge": "ABHA Linked • Zero-Knowledge",
+      "primaryCta": "Manage Medical Profile",
+      "secondaryCta": "View Security Logs",
+      "summary": "Manage your ABHA identity, emergency medical contacts, allergy alerts, and cryptographic audit records."
+    }
+  },
+  "home": {
+    "hero_title": "Quantum Precision Diagnostic AI & Tele-Consultation",
+    "hero_subtitle": "Detect cellular biomarker shifts up to 36 months before symptoms appear. Built for patients, verified by board-certified physicians.",
+    "start_cta": "Start Instant Health Checkup",
+    "consult_cta": "Consult a Specialist",
+    "explore_cta": "Explore Supported Protocols",
+    "stats_qubits": "Qubit Register",
+    "stats_accuracy": "Peak SOTA Accuracy",
+    "stats_lead_time": "Pre-Clinical Lead Time",
+    "stats_specialists": "Verified Clinicians",
+    "quick_actions_title": "Clinical Portals & Tools",
+    "why_quantum_title": "Why Quantum Machine Learning for Early Detection?",
+    "why_quantum_desc": "Standard classical machine learning models struggle to find complex, non-linear relationships across subtle cellular changes. Our Variational Quantum Classifiers (VQC) explore high-dimensional Hilbert spaces to identify critical shifts months earlier.",
+    "emergency_card_title": "Emergency Medical Passport",
+    "emergency_card_desc": "Access your vital medical alerts, allergies, blood type, and emergency contacts in seconds. Accessible via QR code."
+  },
+  "checkup": {
+    "select_disease": "Select Clinical Protocol",
+    "select_patient": "Select Patient Record",
+    "upload_instructions": "Upload your medical file or load a test sample to evaluate risk with Quantum AI",
+    "analyzing": "Analyzing Biomarkers with Quantum AI...",
+    "diagnosis_result": "Diagnostic Assessment Result",
+    "biomarker_values": "Clinical Biomarkers & Features",
+    "clinical_verdict": "Clinical Verdict & Recommendations",
+    "quantum_advantage_note": "Quantum feature mapping identified multi-variable correlations in high-dimensional state space.",
+    "step_protocol": "1. Select Protocol",
+    "step_input": "2. Input Biomarkers / Scan",
+    "step_analyze": "3. Quantum AI Computation",
+    "step_verdict": "4. Clinical Report & Action"
+  },
+  "risk": {
+    "optimal": "Optimal Health (Low Risk)",
+    "moderate": "Attention Needed (Moderate Risk)",
+    "elevated": "Elevated Risk (Action Required)",
+    "confidence": "AI Confidence",
+    "stage_0": "Stage 0 (Pre-Clinical / Cellular)",
+    "stage_1": "Stage I (Early Localized)",
+    "stage_2": "Stage II (Moderate Progression)",
+    "stage_3": "Stage III+ (Actionable Clinical)"
+  },
+  "timeline": {
+    "title": "Disease Early Detection Timeline & Trajectory",
+    "subtitle": "Comparing unmonitored symptom progression vs. quantum early intervention pathways.",
+    "unmonitored_curve": "Without Early Screening (High Risk Path)",
+    "early_detection_curve": "With Q-RAKSHAK Early Screening (Optimal Path)",
+    "detection_window": "Pre-Clinical Lead Time Window",
+    "standard_threshold": "Standard Symptom Detection Threshold",
+    "quantum_horizon": "Quantum AI Early Detection Horizon",
+    "patient_risk_pin": "Your Current Checkup Score",
+    "cellular_markers": "Cellular Biomarkers",
+    "action_plan": "Recommended Action Plan"
+  },
+  "twin": {
+    "title": "3D Digital Health Twin",
+    "subtitle": "Interactive multi-organ physiological model tracking vital signs and disease risk.",
+    "organ_brain": "Brain & Neurological",
+    "organ_heart": "Heart & Cardiovascular",
+    "organ_lungs": "Lungs & Pulmonary",
+    "organ_liver": "Liver & Metabolic",
+    "organ_pancreas": "Pancreas & Glycemic",
+    "organ_lymph": "Lymphatic & Immune",
+    "vitality_optimal": "Optimal Equilibrium",
+    "vitality_attention": "Early Biomarker Shift",
+    "vitality_critical": "Clinical Action Required",
+    "instructions": "Left-click to rotate, right-click to pan, scroll to zoom into specific organ systems."
+  },
+  "consultations": {
+    "title": "Board-Certified Medical Specialists",
+    "subtitle": "Book encrypted tele-consultations with verified physicians across 5 critical specialties.",
+    "search_specialist": "Search doctor by name, specialty, or hospital...",
+    "filter_all": "All Specialties",
+    "verified_physician": "ABDM Verified Physician",
+    "experience": "Years Experience",
+    "fee": "Consultation Fee",
+    "book_now": "Book Appointment",
+    "room_title": "Encrypted Tele-Consultation Room",
+    "media_mic_on": "Mute Microphone",
+    "media_mic_off": "Unmute Microphone",
+    "media_cam_on": "Stop Camera",
+    "media_cam_off": "Start Camera",
+    "media_screen": "Share Screen",
+    "leave_consultation": "Leave Video Room",
+    "rx_heading": "Certified Digital e-Prescription",
+    "rx_doctor": "Attending Clinician",
+    "rx_patient": "Patient Name & MRN",
+    "rx_date": "Prescription Date"
+  },
+  "triage": {
+    "title": "Clinician Ambulatory Triage & Queue",
+    "subtitle": "Real-time urgency prioritization for ambulatory patients and emergency arrivals.",
+    "queue_immediate": "Immediate (Red Flag)",
+    "queue_urgent": "Urgent Review",
+    "queue_priority": "Priority Follow-up",
+    "queue_routine": "Routine / Stable",
+    "waiting_patients": "Patients in Queue",
+    "average_wait": "Average Wait Time",
+    "open_room": "Open Consult Room",
+    "admit_patient": "Admit to Ward",
+    "override_title": "Formal Clinician Override",
+    "override_rationale": "State clinical rationale for changing the automated triage score:",
+    "override_submit": "Submit Clinical Override"
+  },
+  "ai_doctor": {
+    "studio_title": "AI Doctor 1-on-1 Voice Consultation",
+    "studio_subtitle": "Conversational clinical AI designed to help you understand symptoms and reports.",
+    "listening": "Listening... speak clearly into your microphone",
+    "thinking": "Synthesizing clinical insights...",
+    "speaking": "AI Doctor is speaking...",
+    "idle": "Ready to listen. Click the microphone to begin.",
+    "mic_start": "Start Speaking",
+    "mic_stop": "Stop Microphone",
+    "disclaimer": "AI Doctor is an educational assistant. In case of acute emergencies, please dial 108 or visit an emergency room."
+  },
+  "emergency": {
+    "hud_title": "Emergency Medical Passport",
+    "tap_to_call": "Emergency Call",
+    "blood_group": "Blood Group",
+    "allergies": "Known Allergies",
+    "chronic_conditions": "Chronic Diagnoses",
+    "emergency_contacts": "Emergency Contacts",
+    "primary_contact": "Primary Next of Kin",
+    "ambulance": "Call Ambulance (108)",
+    "police": "Emergency Services (112)",
+    "qr_instructions": "First responders can scan the QR code to access critical triage information instantly."
+  },
+  "compliance": {
+    "console_title": "Governance, Security & Audit Console",
+    "audit_trail": "Immutable WORM Audit Trail",
+    "hash_verified": "SHA-256 Checksum Verified",
+    "samd_status": "SaMD Software Class II Compliance: Active",
+    "hipaa_status": "HIPAA Omnibus & ABDM Security Standard: Enforced"
+  },
+  "benchmarks": {
+    "matrix_title": "AI Model Benchmark Matrix",
+    "subtitle": "Empirical comparison of Quantum AI against standard classical medical models.",
+    "quantum_model": "Quantum AI (VQC / QNN)",
+    "classical_rf": "Random Forest",
+    "classical_svm": "Support Vector Machine",
+    "accuracy": "Accuracy",
+    "sensitivity": "Sensitivity",
+    "auc_roc": "AUC-ROC"
+  },
+  "modals": {
+    "tour_title": "Welcome to Q-RAKSHAK Clinical Platform",
+    "tour_subtitle": "Here is a quick overview of how our early detection and telemedicine systems work.",
+    "auth_title": "Hospital Portal Authentication",
+    "email_label": "Work Email / Hospital ID",
+    "password_label": "Secure Password",
+    "role_label": "Select Operational Role"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "verified": "Verified",
+    "active": "Active",
+    "online": "Online",
+    "offline": "Offline",
+    "secure": "256-Bit Encrypted",
+    "notice": "Notice",
+    "technical_details": "Technical diagnostic details",
+    "disclaimer": "This platform is an AI clinical decision support tool and is designed to assist, not replace, certified medical evaluation.",
+    "all_rights_reserved": "All rights reserved.",
+    "copyright": "© 2026 Q-RAKSHAK Clinical Decision Support System."
+  }
+}

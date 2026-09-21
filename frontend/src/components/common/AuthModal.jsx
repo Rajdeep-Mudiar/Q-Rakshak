@@ -2,8 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import { Lock, User, Shield, X, CheckCircle2, Eye, EyeOff, KeyRound, LogIn, Sparkles, UserPlus, Stethoscope } from "lucide-react";
 import { authApi } from "../../api/auth";
 import { animateModalOpen } from "../../utils/motion";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
+  const { t } = useLanguage();
   const overlayRef = useRef(null);
   const modalRef = useRef(null);
   const [authMode, setAuthMode] = useState("login"); // 'login' | 'register'

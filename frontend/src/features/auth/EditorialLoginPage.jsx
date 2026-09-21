@@ -690,11 +690,10 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
     <section
       style={{
         margin: "clamp(32px, 5vw, 64px) clamp(16px, 3.5vw, 48px) 0 clamp(16px, 3.5vw, 48px)",
-        background: "#0A0A0A",
-        border: "1px solid rgba(255, 255, 255, 0.12)",
-        borderLeft: "2px solid #FFFFFF",
-        borderRadius: "0px",
-        padding: "clamp(18px, 3vw, 40px)",
+        background: "#0C0D12",
+        border: "1px solid rgba(255, 255, 255, 0.08)",
+        borderRadius: "16px",
+        padding: "clamp(20px, 3.5vw, 40px)",
         position: "relative",
         zIndex: 10,
         boxSizing: "border-box",
@@ -708,80 +707,78 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
           flexWrap: "wrap",
           gap: "16px",
           marginBottom: "24px",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
           paddingBottom: "20px",
         }}
       >
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
             <span
               style={{
-                fontSize: "0.68rem",
-                fontWeight: 700,
-                padding: "3px 8px",
-                background: "transparent",
-                color: "#FFFFFF",
-                border: "1px solid rgba(255, 255, 255, 0.25)",
-                borderRadius: "0px",
-                letterSpacing: "0.12em",
-                fontFamily: "var(--font-mono, monospace)",
+                fontSize: "0.75rem",
+                fontWeight: 600,
+                padding: "4px 12px",
+                background: "rgba(56, 189, 248, 0.1)",
+                color: "#38BDF8",
+                border: "1px solid rgba(56, 189, 248, 0.25)",
+                borderRadius: "9999px",
+                letterSpacing: "0.06em",
+                fontFamily: "var(--font-sans, inherit)",
                 textTransform: "uppercase",
               }}
             >
-              RESEARCH COMPLIANCE
+              Research Compliance
             </span>
             <span
               style={{
-                fontSize: "0.70rem",
-                color: "#777777",
-                fontFamily: "var(--font-mono, monospace)",
-                letterSpacing: "0.08em",
+                fontSize: "0.75rem",
+                color: "#94A3B8",
+                fontFamily: "var(--font-sans, inherit)",
               }}
             >
-              HYBRID QUANTUM-CLASSICAL MACHINE LEARNING AUDIT
+              Quantum-Classical ML Audit
             </span>
           </div>
           <h2
             style={{
               fontFamily: "var(--font-sans, inherit)",
-              fontSize: "clamp(1.25rem, 2.2vw, 1.8rem)",
-              fontWeight: 400,
+              fontSize: "clamp(1.3rem, 2.2vw, 1.8rem)",
+              fontWeight: 700,
               color: "#FFFFFF",
               margin: "0 0 8px 0",
-              letterSpacing: "-0.02em",
-              textTransform: "uppercase",
+              letterSpacing: "-0.015em",
             }}
           >
-            Research Objectives Compliance Matrix (OBJ-01 – OBJ-06)
+            Research Objectives Compliance (OBJ-01 – OBJ-06)
           </h2>
           <p
             style={{
-              fontSize: "0.85rem",
-              color: "#888888",
+              fontSize: "0.88rem",
+              color: "#94A3B8",
               margin: 0,
               lineHeight: 1.6,
               maxWidth: "780px",
+              fontFamily: "var(--font-sans, inherit)",
             }}
           >
             Evidence-based verification matrix auditing all defined research objectives against verified codebase implementations, mathematically audited pipelines, and zero-leakage protocols.
           </p>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
           <a
             href="https://github.com/ARYANCY/QDoc/blob/main/documentation/objectives/README.md"
             target="_blank"
             rel="noopener noreferrer"
             style={{
-              fontSize: "0.72rem",
+              fontSize: "0.75rem",
+              fontWeight: 500,
               color: "#FFFFFF",
-              background: "transparent",
-              border: "1px solid rgba(255, 255, 255, 0.25)",
-              padding: "6px 14px",
-              borderRadius: "0px",
-              fontFamily: "var(--font-mono, monospace)",
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
+              background: "rgba(255, 255, 255, 0.04)",
+              border: "1px solid rgba(255, 255, 255, 0.2)",
+              padding: "7px 14px",
+              borderRadius: "8px",
+              fontFamily: "var(--font-sans, inherit)",
               display: "inline-flex",
               alignItems: "center",
               gap: "6px",
@@ -793,7 +790,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
               e.currentTarget.style.color = "#000000";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "transparent";
+              e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.04)";
               e.currentTarget.style.color = "#FFFFFF";
             }}
           >
@@ -802,52 +799,52 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
           </a>
           <span
             style={{
-              fontSize: "0.72rem",
-              color: "#FFFFFF",
-              background: "rgba(255, 255, 255, 0.06)",
-              border: "1px solid rgba(255, 255, 255, 0.2)",
-              padding: "6px 14px",
-              borderRadius: "0px",
-              fontFamily: "var(--font-mono, monospace)",
-              letterSpacing: "0.08em",
+              fontSize: "0.75rem",
+              fontWeight: 600,
+              color: "#34D399",
+              background: "rgba(16, 185, 129, 0.12)",
+              border: "1px solid rgba(16, 185, 129, 0.3)",
+              padding: "7px 14px",
+              borderRadius: "9999px",
+              fontFamily: "var(--font-sans, inherit)",
               display: "inline-flex",
               alignItems: "center",
               gap: "6px",
             }}
           >
-            <CheckCircle2 size={13} color="#FFFFFF" /> 6 / 6 SATISFIED
+            <CheckCircle2 size={13} color="#34D399" /> 6 / 6 SATISFIED
           </span>
         </div>
       </div>
 
-      {/* Objectives Data Table - Zara Minimalist */}
+      {/* Objectives Data Table - Clean Minimalist */}
       <div
         style={{
           overflowX: "auto",
           WebkitOverflowScrolling: "touch",
-          border: "1px solid rgba(255, 255, 255, 0.1)",
-          borderRadius: "0px",
-          background: "#0A0A0A",
+          border: "1px solid rgba(255, 255, 255, 0.08)",
+          borderRadius: "12px",
+          background: "#08090C",
         }}
       >
-        <table style={{ width: "100%", minWidth: "780px", borderCollapse: "collapse", textAlign: "left", fontSize: "0.80rem" }}>
+        <table style={{ width: "100%", minWidth: "780px", borderCollapse: "collapse", textAlign: "left", fontSize: "0.85rem" }}>
           <thead>
             <tr
               style={{
-                background: "#111111",
-                borderBottom: "1px solid rgba(255, 255, 255, 0.12)",
-                color: "#777777",
-                fontFamily: "var(--font-mono, monospace)",
-                fontSize: "0.68rem",
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
+                background: "rgba(255, 255, 255, 0.02)",
+                borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                color: "#94A3B8",
+                fontFamily: "var(--font-sans, inherit)",
+                fontSize: "0.75rem",
+                fontWeight: 600,
+                letterSpacing: "0.04em",
               }}
             >
-              <th style={{ padding: "12px 14px", width: "80px" }}>ID</th>
-              <th style={{ padding: "12px 14px", fontWeight: 600, color: "#FFFFFF", width: "230px" }}>Research Objective</th>
-              <th style={{ padding: "12px 14px", fontWeight: 600, color: "#FFFFFF" }}>Implementation & Code Evidence</th>
-              <th style={{ padding: "12px 14px", fontWeight: 600, color: "#FFFFFF", width: "190px" }}>Repository Reference</th>
-              <th style={{ padding: "12px 14px", fontWeight: 600, color: "#FFFFFF", textAlign: "right", width: "140px" }}>Status</th>
+              <th style={{ padding: "14px 16px", width: "80px" }}>ID</th>
+              <th style={{ padding: "14px 16px", width: "230px" }}>Research Objective</th>
+              <th style={{ padding: "14px 16px" }}>Implementation & Code Evidence</th>
+              <th style={{ padding: "14px 16px", width: "190px" }}>Repository Reference</th>
+              <th style={{ padding: "14px 16px", textAlign: "right", width: "130px" }}>Status</th>
             </tr>
           </thead>
           <tbody>
@@ -904,23 +901,23 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
               <tr
                 key={item.id}
                 style={{
-                  borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
-                  background: index % 2 === 0 ? "#0A0A0A" : "#0E0E0E",
+                  borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+                  background: index % 2 === 0 ? "transparent" : "rgba(255, 255, 255, 0.015)",
                   transition: "background 0.15s ease",
                 }}
                 onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255, 255, 255, 0.03)")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = index % 2 === 0 ? "#0A0A0A" : "#0E0E0E")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = index % 2 === 0 ? "transparent" : "rgba(255, 255, 255, 0.015)")}
               >
-                <td style={{ padding: "14px", fontFamily: "var(--font-mono, monospace)", color: "#FFFFFF", fontSize: "0.74rem", fontWeight: 700 }}>
+                <td style={{ padding: "16px", fontFamily: "var(--font-sans, inherit)", color: "#38BDF8", fontSize: "0.78rem", fontWeight: 700 }}>
                   {item.id}
                 </td>
-                <td style={{ padding: "14px", color: "#EDEDED", fontWeight: 600, lineHeight: 1.4 }}>
+                <td style={{ padding: "16px", color: "#F8FAFC", fontWeight: 600, lineHeight: 1.4, fontFamily: "var(--font-sans, inherit)", fontSize: "0.88rem" }}>
                   {item.title}
                 </td>
-                <td style={{ padding: "14px", color: "#888888", lineHeight: 1.5, fontSize: "0.78rem" }}>
+                <td style={{ padding: "16px", color: "#94A3B8", lineHeight: 1.55, fontSize: "0.82rem", fontFamily: "var(--font-sans, inherit)" }}>
                   {item.evidence}
                 </td>
-                <td style={{ padding: "14px" }}>
+                <td style={{ padding: "16px" }}>
                   <a
                     href={item.readmeAnchor}
                     target="_blank"
@@ -928,38 +925,48 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
-                      gap: "5px",
-                      fontSize: "0.70rem",
-                      color: "#CCCCCC",
-                      background: "transparent",
-                      border: "1px solid rgba(255, 255, 255, 0.2)",
-                      padding: "4px 8px",
-                      borderRadius: "0px",
+                      gap: "6px",
+                      fontSize: "0.74rem",
+                      color: "#E2E8F0",
+                      background: "rgba(255, 255, 255, 0.04)",
+                      border: "1px solid rgba(255, 255, 255, 0.15)",
+                      padding: "5px 10px",
+                      borderRadius: "6px",
                       textDecoration: "none",
-                      fontFamily: "var(--font-mono, monospace)",
+                      fontFamily: "var(--font-sans, inherit)",
+                      transition: "all 0.15s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.borderColor = "#FFFFFF";
+                      e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.08)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.15)";
+                      e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.04)";
                     }}
                   >
                     <span>{item.readmeLabel}</span>
-                    <ExternalLink size={10} />
+                    <ExternalLink size={11} />
                   </a>
                 </td>
-                <td style={{ padding: "14px", textAlign: "right" }}>
+                <td style={{ padding: "16px", textAlign: "right" }}>
                   <span
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
                       gap: "5px",
-                      fontSize: "0.65rem",
-                      fontWeight: 700,
-                      padding: "3px 8px",
-                      borderRadius: "0px",
-                      background: "rgba(255, 255, 255, 0.06)",
-                      color: "#FFFFFF",
-                      border: "1px solid rgba(255, 255, 255, 0.2)",
-                      fontFamily: "var(--font-mono, monospace)",
+                      fontSize: "0.70rem",
+                      fontWeight: 600,
+                      padding: "4px 10px",
+                      borderRadius: "9999px",
+                      background: "rgba(16, 185, 129, 0.12)",
+                      color: "#34D399",
+                      border: "1px solid rgba(16, 185, 129, 0.3)",
+                      fontFamily: "var(--font-sans, inherit)",
+                      letterSpacing: "0.04em",
                     }}
                   >
-                    <CheckCircle2 size={11} color="#FFFFFF" />
+                    <CheckCircle2 size={11} color="#34D399" />
                     {item.status}
                   </span>
                 </td>
@@ -971,11 +978,11 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
     </section>
 
 
-    {/* Zara High-Fashion Minimalist Footer */}
+    {/* Clean Minimalist Footer */}
     <footer
       style={{
         margin: "80px clamp(24px, 3.5vw, 48px) 0 clamp(24px, 3.5vw, 48px)",
-        borderTop: "1px solid rgba(255, 255, 255, 0.12)",
+        borderTop: "1px solid rgba(255, 255, 255, 0.08)",
         paddingTop: "32px",
         paddingBottom: "40px",
         display: "flex",
@@ -985,14 +992,13 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
         gap: "16px",
         position: "relative",
         zIndex: 10,
-        fontFamily: "var(--font-mono, monospace)",
-        fontSize: "0.72rem",
-        color: "#666666",
-        letterSpacing: "0.08em",
+        fontFamily: "var(--font-sans, inherit)",
+        fontSize: "0.78rem",
+        color: "#64748B",
       }}
     >
       <div>
-        &copy; 2026 Q-RAKSHAK // CLINICAL AUDIT & QUANTUM BENCHMARKS.
+        &copy; 2026 Q-Rakshak • Clinical Audit & Quantum Benchmarks
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: "24px", flexWrap: "wrap" }}>
         <a
@@ -1000,7 +1006,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
           target="_blank"
           rel="noopener noreferrer"
           style={{
-            color: "#EEEEEE",
+            color: "#94A3B8",
             textDecoration: "none",
             display: "inline-flex",
             alignItems: "center",
@@ -1008,24 +1014,24 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
             transition: "color 0.15s ease",
           }}
           onMouseEnter={(e) => (e.currentTarget.style.color = "#FFFFFF")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "#EEEEEE")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "#94A3B8")}
         >
-          <span>GITHUB REPOSITORY</span>
+          <span>GitHub Repository</span>
           <ExternalLink size={11} />
         </a>
         <span
           style={{ cursor: "pointer", transition: "color 0.15s ease" }}
           onMouseEnter={(e) => (e.currentTarget.style.color = "#FFFFFF")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "#666666")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "#64748B")}
         >
-          PRIVACY PROTOCOL
+          Privacy Protocol
         </span>
         <span
           style={{ cursor: "pointer", transition: "color 0.15s ease" }}
           onMouseEnter={(e) => (e.currentTarget.style.color = "#FFFFFF")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "#666666")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "#64748B")}
         >
-          GOVERNANCE & TERMS
+          Governance & Terms
         </span>
       </div>
     </footer>

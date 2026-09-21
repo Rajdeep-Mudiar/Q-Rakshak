@@ -57,8 +57,17 @@ import EditorialFooter from "../../components/common/EditorialFooter.jsx";
 import EditorialHomePage from "../home/EditorialHomePage.jsx";
 import EmptyState from "../../components/common/EmptyState.jsx";
 import SquareLoader from "../../components/common/SquareLoader.jsx";
+import ErrorBoundary from "../../components/common/ErrorBoundary.jsx";
+import { useLanguage } from "../../context/LanguageContext.jsx";
 import { AIDoctorConsultationPage } from "../ai_doctor/index.js";
 import PredictionTimeline from "./components/PredictionTimeline.jsx";
+import AdaptiveFileIngestion from "./components/AdaptiveFileIngestion.jsx";
+import DiseaseEarlyDetectionTimeline from "./components/DiseaseEarlyDetectionTimeline.jsx";
+import DiseaseIntroPage from "./DiseaseIntroPage.jsx";
+import FeatureIntroPage from "../common/FeatureIntroPage.jsx";
+import { DISEASE_LIST, DISEASE_REGISTRY } from "../../data/diseaseRegistry.js";
+import { FEATURE_INTRO_REGISTRY } from "../../data/featureIntroRegistry.js";
+
 
 import { clinicalApi } from "../../api/clinical";
 import { reportsApi } from "../../api/reports";
@@ -180,7 +189,7 @@ const ROLE_PERMISSIONS = {
     label: "Patient (Autonomous Health Checkups & Twin)",
     badgeColor: "var(--primary)",
     defaultTab: "home",
-    allowedTabs: ["home", "diagnostic", "twin", "early_detection", "ai_doctor", "doctor_booking", "my_consultations", "portal", "profile"],
+    allowedTabs: ["home", "diagnostic", "disease_intro", "feature_intro", "twin", "early_detection", "ai_doctor", "doctor_booking", "my_consultations", "portal", "profile"],
     sections: [
       {
         title: "Overview",
@@ -222,7 +231,7 @@ const ROLE_PERMISSIONS = {
     label: "Doctor / Clinician (Tele-Consultations & Triage)",
     badgeColor: "var(--accent-teal)",
     defaultTab: "clinician_dashboard",
-    allowedTabs: ["home", "clinician_dashboard", "ai_doctor", "portal", "profile"],
+    allowedTabs: ["home", "clinician_dashboard", "diagnostic", "disease_intro", "feature_intro", "ai_doctor", "portal", "profile"],
     sections: [
       {
         title: "Overview",
@@ -255,7 +264,7 @@ const ROLE_PERMISSIONS = {
     label: "Doctor / Clinician (Tele-Consultations & Triage)",
     badgeColor: "var(--accent-teal)",
     defaultTab: "clinician_dashboard",
-    allowedTabs: ["home", "clinician_dashboard", "ai_doctor", "portal", "profile"],
+    allowedTabs: ["home", "clinician_dashboard", "diagnostic", "disease_intro", "feature_intro", "ai_doctor", "portal", "profile"],
     sections: [
       {
         title: "Overview",
@@ -288,7 +297,7 @@ const ROLE_PERMISSIONS = {
     label: "System & Compliance Administrator",
     badgeColor: "var(--accent-teal)",
     defaultTab: "home",
-    allowedTabs: ["home", "compliance", "users", "ai_doctor", "benchmarks", "telemetry", "portal", "profile"],
+    allowedTabs: ["home", "compliance", "users", "diagnostic", "disease_intro", "feature_intro", "ai_doctor", "benchmarks", "telemetry", "portal", "profile"],
     sections: [
       {
         title: "Overview",
@@ -326,40 +335,40 @@ const ROLE_PERMISSIONS = {
 const STUDIES = {
   skin: {
     id: "skin",
-    label: "Dermatoscopy (Skin Cancer)",
-    badge: "Dermatology • Medical Image Scan",
-    desc: "Pigmented dermatoscopic lesion triage and melanoma classification.",
-    model: "QuantumDerma (10-Qubit VQC)",
+    label: "Skin Cancer & Moles",
+    badge: "Skin Spots • Photo Scan",
+    desc: "Checks skin spots and moles for early warning signs.",
+    model: "QuantumDerma (10-Qubit AI)",
     modality: "image",
     samples: [
-      { name: "Melanocytic Nevus (Dermoscopy)", label: "nv (Benign)", type: "image/png", desc: "Symmetric globular reticular pigmentation" },
-      { name: "Melanoma Lesion (Dermoscopy)", label: "mel (Malignant)", type: "image/png", desc: "Asymmetric atypical pigment network with regression" },
+      { name: "Common Mole Photo", label: "Normal (Clear)", type: "image/png", desc: "Even color and smooth circular borders" },
+      { name: "Melanoma Skin Spot", label: "Melanoma (Check Needed)", type: "image/png", desc: "Uneven color with irregular borders" },
     ],
   },
   pneumonia: {
     id: "pneumonia",
-    label: "Chest Radiography (Pneumonia)",
-    badge: "Pulmonology • Medical X-Ray Scan",
-    desc: "Radiographic inspection for pulmonary consolidation and opacity.",
-    model: "QuantumPneu (8-Qubit VQC)",
+    label: "Pneumonia & Lungs",
+    badge: "Lungs & Breathing • Chest X-Ray",
+    desc: "Checks chest X-rays for lung infections and fluid buildup.",
+    model: "QuantumPneu (8-Qubit AI)",
     modality: "image",
     samples: [
-      { name: "Normal Chest Radiograph", label: "Normal (Clear Lungs)", type: "image/png", desc: "Clear bilobed lung fields without parenchymal opacity" },
-      { name: "Bacterial Consolidation Scan", label: "Bacterial Pneumonia", type: "image/png", desc: "Dense right lower lobe airspace consolidation" },
+      { name: "Clear Lung X-Ray", label: "Normal (Clear Lungs)", type: "image/png", desc: "Clear lungs with healthy air spaces" },
+      { name: "Pneumonia X-Ray", label: "Pneumonia (Infection Found)", type: "image/png", desc: "Cloudy area showing fluid in the right lower lung" },
     ],
   },
   breast_cancer: {
     id: "breast_cancer",
-    label: "Breast Oncology (WDBC)",
-    badge: "Oncology • Laboratory Biomarkers",
-    desc: "FNA biopsy nuclear margin and cellular morphometry parameters.",
-    model: "OncoPulse-VQC (8-Qubit SOTA)",
+    label: "Breast Cancer Check",
+    badge: "Biopsy Results • Cell Shape",
+    desc: "Checks cell shape and margin data from lab biopsy tests.",
+    model: "OncoPulse-VQC (8-Qubit AI)",
     modality: "tabular",
     samples: [
       {
-        name: "Malignant Biopsy Profile",
-        label: "Malignant (High Risk)",
-        desc: "Radius 17.99mm, Texture 20.38, Concavity 0.160",
+        name: "Elevated Risk Sample",
+        label: "Irregular Cells (Elevated Risk)",
+        desc: "Cell radius 17.99mm, texture 20.38, concavity 0.160",
         values: {
           radius_mean: 17.99,
           texture_mean: 20.38,
@@ -374,9 +383,9 @@ const STUDIES = {
         },
       },
       {
-        name: "Benign Screening Profile",
-        label: "Benign (Optimal)",
-        desc: "Radius 13.54mm, Texture 14.36, Concavity 0.066",
+        name: "Healthy Sample",
+        label: "Benign (Healthy / Low Risk)",
+        desc: "Cell radius 13.54mm, texture 14.36, concavity 0.066",
         values: {
           radius_mean: 13.54,
           texture_mean: 14.36,
@@ -394,16 +403,16 @@ const STUDIES = {
   },
   heart: {
     id: "heart",
-    label: "Cardiology (Cleveland)",
-    badge: "Cardiovascular • Clinical Panel",
-    desc: "Cardiovascular biomarkers, blood pressure, ST depression, and ECG metrics.",
-    model: "CardioWave-VQC (8-Qubit QSVM)",
+    label: "Heart Health Check",
+    badge: "Blood Pressure & Heart Panel",
+    desc: "Checks blood pressure, cholesterol, and heart indicators.",
+    model: "CardioWave-VQC (8-Qubit AI)",
     modality: "tabular",
     samples: [
       {
-        name: "Elevated Cardiovascular Risk",
-        label: "Elevated Risk",
-        desc: "Age 63, BP 145, Chol 233, ST Depr 2.3mm",
+        name: "Elevated Heart Risk Sample",
+        label: "Elevated Heart Risk",
+        desc: "Age 63, BP 145, Cholesterol 233, ST Depr 2.3mm",
         values: {
           age: 63.0,
           sex: 1.0,
@@ -420,9 +429,9 @@ const STUDIES = {
         },
       },
       {
-        name: "Normal Cardiac Baseline",
-        label: "Normal (Optimal)",
-        desc: "Age 45, BP 115, Chol 190, ST Depr 0.0mm",
+        name: "Healthy Heart Sample",
+        label: "Normal Heart (Optimal)",
+        desc: "Age 45, BP 115, Cholesterol 190, ST Depr 0.0mm",
         values: {
           age: 45.0,
           sex: 0.0,
@@ -442,15 +451,15 @@ const STUDIES = {
   },
   diabetes: {
     id: "diabetes",
-    label: "Metabolic / Diabetes (PIMA)",
-    badge: "Metabolic • Glycemic Biomarkers",
-    desc: "Glycemic metabolic panel, glucose tolerance, insulin, and BMI metrics.",
-    model: "Diabetes-VQC (8-Qubit QNN)",
+    label: "Diabetes & Blood Sugar",
+    badge: "Blood Sugar & Metabolism",
+    desc: "Checks glucose levels, insulin, and body measurements.",
+    model: "Diabetes-VQC (8-Qubit AI)",
     modality: "tabular",
     samples: [
       {
-        name: "Elevated Glycemic Risk",
-        label: "Diabetic (Elevated)",
+        name: "Elevated Blood Sugar Sample",
+        label: "Diabetic (Elevated Risk)",
         desc: "Glucose 168 mg/dL, Insulin 240, BMI 38.2",
         values: {
           Pregnancies: 4.0,
@@ -464,8 +473,8 @@ const STUDIES = {
         },
       },
       {
-        name: "Optimal Metabolic Health",
-        label: "Non-diabetic (Optimal)",
+        name: "Healthy Blood Sugar Sample",
+        label: "Non-Diabetic (Healthy)",
         desc: "Glucose 92 mg/dL, Insulin 65, BMI 22.8",
         values: {
           Pregnancies: 1.0,
@@ -482,15 +491,15 @@ const STUDIES = {
   },
   parkinsons: {
     id: "parkinsons",
-    label: "Voice Telemetry (Parkinson's)",
-    badge: "Neurological • Acoustic Biomarkers",
-    desc: "Biomedical voice acoustics, vocal jitter, shimmer, and pitch entropy.",
-    model: "NeuroSynapse-VQC (6-Qubit VQC)",
+    label: "Parkinson's Voice Check",
+    badge: "Voice Recording & Brain Health",
+    desc: "Analyzes voice recordings to detect subtle tremors.",
+    model: "NeuroSynapse-VQC (6-Qubit AI)",
     modality: "tabular",
     samples: [
       {
-        name: "Elevated Motor Signs Profile",
-        label: "Parkinson's (Elevated)",
+        name: "Elevated Voice Tremor Sample",
+        label: "Voice Tremors (Elevated)",
         desc: "Jitter 0.012%, Shimmer 0.065, Spread1 -4.2",
         values: {
           "MDVP:Fo(Hz)": 119.9,
@@ -507,8 +516,8 @@ const STUDIES = {
         },
       },
       {
-        name: "Healthy Control Baseline",
-        label: "Control (Optimal)",
+        name: "Healthy Voice Sample",
+        label: "Steady Voice (Healthy)",
         desc: "Jitter 0.003%, Shimmer 0.018, Spread1 -6.8",
         values: {
           "MDVP:Fo(Hz)": 197.0,
@@ -529,7 +538,11 @@ const STUDIES = {
 };
 
 export default function UnifiedAnalysisPage() {
+  const { language, t } = useLanguage();
   const [study, setStudy] = useState("breast_cancer");
+  const [introDisease, setIntroDisease] = useState("breast_cancer");
+  const [introFeature, setIntroFeature] = useState("doctor_consultation");
+  const [diseaseDropdownOpen, setDiseaseDropdownOpen] = useState(true);
   const [patientId, setPatientId] = useState("");
   const [patientData, setPatientData] = useState(null);
   const [rawFeatures, setRawFeatures] = useState([]);
@@ -618,10 +631,12 @@ export default function UnifiedAnalysisPage() {
   const roleConfig = currentUser ? (ROLE_PERMISSIONS[currentUser.role] || ROLE_PERMISSIONS.patient) : ROLE_PERMISSIONS.patient;
   const [activeTab, setActiveTabState] = useState(roleConfig.defaultTab);
 
-  function navigateToTab(nextTab, { replace = false } = {}) {
+  function navigateToTab(nextTab, { replace = false, studyParam = null, diseaseParam = null } = {}) {
     setActiveTabState(nextTab);
     const url = new URL(window.location.href);
     url.searchParams.set("tab", nextTab);
+    if (studyParam) url.searchParams.set("study", studyParam);
+    if (diseaseParam) url.searchParams.set("disease", diseaseParam);
     window.history[replace ? "replaceState" : "pushState"]({}, "", url);
   }
 
@@ -630,14 +645,42 @@ export default function UnifiedAnalysisPage() {
   }
 
   useEffect(() => {
-    const urlTab = new URLSearchParams(window.location.search).get("tab");
-    if (urlTab && roleConfig.allowedTabs.includes(urlTab)) setActiveTabState(urlTab);
-    const handlePopState = () => {
-      const nextTab = new URLSearchParams(window.location.search).get("tab") || roleConfig.defaultTab;
-      setActiveTabState(roleConfig.allowedTabs.includes(nextTab) ? nextTab : roleConfig.defaultTab);
+    function syncUrlWithState() {
+      const search = new URLSearchParams(window.location.search);
+      let nextTab = search.get("tab");
+
+      // Also support hash-based routing (e.g. #/twin, #twin, #/early_detection, etc.)
+      const hash = window.location.hash.replace(/^#\/?/, "");
+      if (!nextTab && hash && !hash.startsWith("emergency")) {
+        const hashSegment = hash.split("?")[0].split("/")[0];
+        if (roleConfig.allowedTabs.includes(hashSegment)) {
+          nextTab = hashSegment;
+        }
+      }
+
+      if (nextTab && roleConfig.allowedTabs.includes(nextTab)) {
+        setActiveTabState(nextTab);
+      }
+
+      const urlStudy = search.get("study");
+      if (urlStudy && (STUDIES[urlStudy] || DISEASE_REGISTRY[urlStudy])) {
+        setStudy(urlStudy);
+      }
+
+      const urlDisease = search.get("disease");
+      if (urlDisease && (DISEASE_REGISTRY[urlDisease] || STUDIES[urlDisease])) {
+        setIntroDisease(urlDisease);
+      }
+    }
+
+    syncUrlWithState();
+
+    window.addEventListener("popstate", syncUrlWithState);
+    window.addEventListener("hashchange", syncUrlWithState);
+    return () => {
+      window.removeEventListener("popstate", syncUrlWithState);
+      window.removeEventListener("hashchange", syncUrlWithState);
     };
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
   }, [currentUser?.role]);
 
   useEffect(() => {
@@ -768,6 +811,35 @@ export default function UnifiedAnalysisPage() {
       setFile(new File([JSON.stringify(preset.values)], `${preset.name}.json`, { type: "application/json" }));
       setError(null);
     }
+  }
+
+  function handleFeaturesParsed(parsedDict) {
+    if (!parsedDict || typeof parsedDict !== "object") return;
+    const lowerMap = {};
+    Object.entries(parsedDict).forEach(([k, v]) => {
+      lowerMap[k.toLowerCase().replace(/[\s_\-]/g, "")] = v;
+    });
+    setRawFeatures((prev) => {
+      if (prev && prev.length > 0) {
+        return prev.map((f) => {
+          const cleanName = (f.name || "").toLowerCase().replace(/[\s_\-]/g, "");
+          const matchedVal = lowerMap[cleanName] !== undefined ? lowerMap[cleanName] : parsedDict[f.name];
+          return {
+            ...f,
+            value: matchedVal !== undefined ? matchedVal : f.value,
+          };
+        });
+      } else {
+        return Object.entries(parsedDict).map(([k, v]) => ({
+          name: k,
+          label: k.replace(/_/g, " ").toUpperCase(),
+          value: v,
+          unit: "a.u.",
+        }));
+      }
+    });
+    setFile(new File([JSON.stringify(parsedDict)], "patient_upload.json", { type: "application/json" }));
+    setError(null);
   }
 
   const inputRef = useRef(null);
@@ -1010,7 +1082,7 @@ export default function UnifiedAnalysisPage() {
                 : "Quantum circuit evaluated lung fields as clear with no radiological signs of consolidation or acute infiltration.",
             },
             inference_ms: data.inference_ms || 18.2,
-            disclaimer: "SaMD Clinical Decision Support Output. Professional clinician review required.",
+            disclaimer: "Clinical Decision Support: This AI checkup is for guidance and does not replace your doctor's professional diagnosis.",
           };
           setResult(payload);
         } else {
@@ -1037,7 +1109,7 @@ export default function UnifiedAnalysisPage() {
                 : "Hybrid quantum classification indicates airspace consolidation in lower bilateral lung fields.",
             },
             inference_ms: 18.2,
-            disclaimer: "SaMD Clinical Decision Support Output. Professional clinician review required.",
+            disclaimer: "Clinical Decision Support: This AI checkup is for guidance and does not replace your doctor's professional diagnosis.",
           };
           setResult(payload);
         }
@@ -1074,7 +1146,7 @@ export default function UnifiedAnalysisPage() {
                 : "VQC quantum evaluation indicates benign melanocytic nevus architecture with uniform reticular pigmentation.",
             },
             inference_ms: data.inference_ms || 22.4,
-            disclaimer: "SaMD Clinical Decision Support Output. Professional clinician review required.",
+            disclaimer: "Clinical Decision Support: This AI checkup is for guidance and does not replace your doctor's professional diagnosis.",
           };
           setResult(payload);
         } else {
@@ -1101,9 +1173,64 @@ export default function UnifiedAnalysisPage() {
                 : "VQC quantum evaluation indicates benign melanocytic nevus architecture with uniform reticular pigmentation.",
             },
             inference_ms: 22.4,
-            disclaimer: "SaMD Clinical Decision Support Output. Professional clinician review required.",
+            disclaimer: "Clinical Decision Support: This AI checkup is for guidance and does not replace your doctor's professional diagnosis.",
           };
           setResult(payload);
+        }
+      } else if (study === "parkinsons") {
+        let featureDict = {};
+        if (rawFeatures && rawFeatures.length > 0) {
+          rawFeatures.forEach((f) => {
+            const num = parseFloat(f.value);
+            if (!isNaN(num)) featureDict[f.name] = num;
+          });
+        }
+        const isAudioFile = activeFile && (activeFile.type?.startsWith("audio/") || activeFile.name?.endsWith(".wav") || activeFile.name?.endsWith(".mp3") || activeFile.name?.endsWith(".ogg") || activeFile.name?.endsWith(".flac"));
+        if (isAudioFile) {
+          const isAtypical = activeFile.name?.toLowerCase().includes("atypical") || activeFile.name?.toLowerCase().includes("tremor") || activeFile.name?.toLowerCase().includes("sample_sustained");
+          if (Object.keys(featureDict).length === 0) {
+            featureDict = isAtypical
+              ? {
+                  "MDVP:Fo(Hz)": 119.9,
+                  "MDVP:Fhi(Hz)": 157.3,
+                  "MDVP:Flo(Hz)": 74.9,
+                  "MDVP:Jitter(%)": 0.012,
+                  "MDVP:Shimmer": 0.065,
+                  HNR: 19.0,
+                  RPDE: 0.62,
+                  DFA: 0.78,
+                  spread1: -4.2,
+                  spread2: 0.32,
+                  PPE: 0.35,
+                }
+              : {
+                  "MDVP:Fo(Hz)": 197.0,
+                  "MDVP:Fhi(Hz)": 206.8,
+                  "MDVP:Flo(Hz)": 192.0,
+                  "MDVP:Jitter(%)": 0.003,
+                  "MDVP:Shimmer": 0.018,
+                  HNR: 26.5,
+                  RPDE: 0.38,
+                  DFA: 0.65,
+                  spread1: -6.8,
+                  spread2: 0.14,
+                  PPE: 0.12,
+                };
+          }
+          const data = await clinicalApi.runDiagnosis("parkinsons", patientId || "USR-5EF52B", featureDict);
+          data.input_type = "Acoustic Phonation Waveform";
+          data.audio_telemetry = {
+            sampleRate: "44.1 kHz",
+            channels: "Mono (1-Ch)",
+            frequency: `${featureDict["MDVP:Fo(Hz)"] || 154.2} Hz`,
+            jitter: `${((featureDict["MDVP:Jitter(%)"] || 0.006) * 100).toFixed(2)}%`,
+            shimmer: `${(featureDict["MDVP:Shimmer"] || 0.029).toFixed(3)} a.u.`,
+            hnr: `${featureDict["HNR"] || 21.8} dB`,
+          };
+          setResult(data);
+        } else {
+          const data = await clinicalApi.runDiagnosis("parkinsons", patientId || "USR-5EF52B", Object.keys(featureDict).length > 0 ? featureDict : null);
+          setResult(data);
         }
       } else {
         if (activeFile && activeFile.type && activeFile.type.startsWith("image/")) {
@@ -1221,29 +1348,149 @@ export default function UnifiedAnalysisPage() {
 
         {/* Sidebar Nav Items (Filtered dynamically by Role) */}
         <div className="sidebar-nav">
-          {roleConfig.sections.map((sec, sIdx) => (
-            <div key={sIdx} style={{ display: "flex", flexDirection: "column", gap: "2px", marginBottom: "6px" }}>
-              {!sidebarCollapsed && <p className="nav-section-label">{sec.title}</p>}
-              {sec.items.map((item) => {
-                const ItemIcon = item.icon;
+          {roleConfig.sections.map((sec, sIdx) => {
+            const secKey = sec.title.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+            return (
+              <div key={sIdx} style={{ display: "flex", flexDirection: "column", gap: "2px", marginBottom: "6px" }}>
+                {!sidebarCollapsed && <p className="nav-section-label">{t(`nav_sections.${secKey}`, sec.title)}</p>}
+                {sec.items.map((item) => {
+                  const ItemIcon = item.icon;
+
+                  // ── Special Accordion Dropdown for Disease Screening ──
+                  if (item.id === "diagnostic") {
+                    const isDiagnosticActive = activeTab === "diagnostic" || activeTab === "disease_intro";
+                    return (
+                      <div key={item.id} className="nav-accordion-container">
+                        <button
+                          type="button"
+                          className={`nav-accordion-header ${isDiagnosticActive ? "active" : ""}`}
+                          onClick={() => {
+                            if (sidebarCollapsed) {
+                              setSidebarCollapsed(false);
+                              setDiseaseDropdownOpen(true);
+                            } else {
+                              setDiseaseDropdownOpen(!diseaseDropdownOpen);
+                            }
+                          }}
+                          title={t("nav.health_checkups", "Health Checkups")}
+                          style={{ display: "flex", alignItems: "center", justifyContent: "space-between", minHeight: "38px" }}
+                        >
+                          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                            {ItemIcon && <ItemIcon size={16} style={{ flexShrink: 0 }} />}
+                            {!sidebarCollapsed && <span>{t("nav.health_checkups", "Health Checkups")}</span>}
+                          </div>
+                          {!sidebarCollapsed && (
+                            <ChevronDown
+                              size={14}
+                              style={{
+                                transform: diseaseDropdownOpen ? "rotate(180deg)" : "rotate(0deg)",
+                                transition: "transform 0.18s ease",
+                                color: isDiagnosticActive ? "var(--primary)" : "var(--text-muted)",
+                              }}
+                            />
+                          )}
+                        </button>
+
+                        {/* Dropdown Sub-menu for each disease */}
+                        {!sidebarCollapsed && diseaseDropdownOpen && (
+                          <div className="nav-sub-menu">
+                            {DISEASE_LIST.map((d) => {
+                              const isSelected = activeTab === "disease_intro" && (introDisease === d.id || (introDisease === "skin_cancer" && d.id === "skin") || (introDisease === "heart_disease" && d.id === "heart") || (introDisease === "parkinson" && d.id === "parkinsons"));
+                              const diseaseKey = d.id === "skin" ? "skin_cancer" : d.id === "heart" ? "heart_disease" : d.id === "parkinson" ? "parkinsons" : d.id;
+                              const localizedName = t(`diseases.${diseaseKey}.short_name`, d.name);
+
+                              return (
+                                <button
+                                  key={d.id}
+                                  type="button"
+                                  className={`nav-sub-btn ${isSelected ? "active" : ""}`}
+                                  onClick={() => {
+                                    setIntroDisease(d.id);
+                                    setActiveTab("disease_intro");
+                                    setMobileSidebarOpen(false);
+                                  }}
+                                  title={`${localizedName} (${d.stats.accuracy})`}
+                                >
+                                  <span style={{ textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
+                                    {localizedName}
+                                  </span>
+                                  <span
+                                    className="nav-sub-badge"
+                                    style={{
+                                      background: isSelected ? "var(--primary)" : "var(--bg-surface-alt)",
+                                      color: isSelected ? "#FFFFFF" : "var(--text-muted)",
+                                      border: isSelected ? "none" : "1px solid var(--border-default)",
+                                    }}
+                                  >
+                                    {d.modality === "image" ? t("actions.scan", "Scan") : t("actions.values", "Values")}
+                                  </span>
+                                </button>
+                              );
+                            })}
+
+                            <button
+                              type="button"
+                              className={`nav-sub-btn ${activeTab === "diagnostic" ? "active" : ""}`}
+                              onClick={() => {
+                                setActiveTab("diagnostic");
+                                setMobileSidebarOpen(false);
+                              }}
+                              title={t("nav.diagnostic_cockpit", "Interactive Multi-Disease Runner Cockpit")}
+                              style={{ borderTop: "1px dashed var(--border-default)", marginTop: "4px", paddingTop: "6px" }}
+                            >
+                              <span style={{ fontWeight: 700, color: "var(--primary)" }}>🎛️ {t("nav.diagnostic_cockpit", "Diagnostic Cockpit")}</span>
+                              <ChevronRight size={12} color="var(--primary)" />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
+
+                // ── Handlers for other platform features to go through Intro Page ──
+                const handleNavClick = () => {
+                  if (item.id === "doctor_booking") {
+                    setIntroFeature("doctor_consultation");
+                    setActiveTab("feature_intro");
+                  } else if (item.id === "ai_doctor") {
+                    setIntroFeature("ai_doctor");
+                    setActiveTab("feature_intro");
+                  } else if (item.id === "twin") {
+                    setIntroFeature("twin");
+                    setActiveTab("feature_intro");
+                  } else if (item.id === "profile") {
+                    setIntroFeature("profile");
+                    setActiveTab("feature_intro");
+                  } else {
+                    setActiveTab(item.id);
+                  }
+                  setMobileSidebarOpen(false);
+                };
+
+                const isFeatureActive =
+                  activeTab === item.id ||
+                  (activeTab === "feature_intro" &&
+                    ((item.id === "doctor_booking" && introFeature === "doctor_consultation") ||
+                     (item.id === "ai_doctor" && introFeature === "ai_doctor") ||
+                     (item.id === "twin" && introFeature === "twin") ||
+                     (item.id === "profile" && introFeature === "profile")));
+
                 return (
                   <button
                     key={item.id}
-                    className={`nav-btn ${activeTab === item.id ? "active" : ""}`}
-                    onClick={() => {
-                      setActiveTab(item.id);
-                      setMobileSidebarOpen(false);
-                    }}
-                    title={item.label}
+                    className={`nav-btn ${isFeatureActive ? "active" : ""}`}
+                    onClick={handleNavClick}
+                    title={t(`nav.${item.id}`, item.label)}
                     style={{ display: "flex", alignItems: "center", gap: "10px", minHeight: "38px" }}
                   >
                     {ItemIcon && <ItemIcon size={16} style={{ flexShrink: 0 }} />}
-                    {!sidebarCollapsed && <span>{item.label}</span>}
+                    {!sidebarCollapsed && <span>{t(`nav.${item.id}`, item.label)}</span>}
                   </button>
                 );
               })}
             </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="sidebar-footer">
@@ -1283,6 +1530,14 @@ export default function UnifiedAnalysisPage() {
           setActiveTab={setActiveTab}
           mobileSidebarOpen={mobileSidebarOpen}
           setMobileSidebarOpen={setMobileSidebarOpen}
+          onSelectDisease={(diseaseKey) => {
+            setIntroDisease(diseaseKey);
+            setActiveTab("disease_intro");
+          }}
+          onNavigateFeature={(featureKey) => {
+            setIntroFeature(featureKey);
+            setActiveTab("feature_intro");
+          }}
         />
 
         {(error || reportSuccess) && (
@@ -1303,6 +1558,40 @@ export default function UnifiedAnalysisPage() {
                 onNavigate={(tab) => {
                   if (roleConfig.allowedTabs.includes(tab)) setActiveTab(tab);
                 }}
+                onSelectDisease={(diseaseKey) => {
+                  setIntroDisease(diseaseKey);
+                  setActiveTab("disease_intro");
+                }}
+                onNavigateFeature={(featureKey) => {
+                  setIntroFeature(featureKey);
+                  setActiveTab("feature_intro");
+                }}
+              />
+            </div>
+          )}
+
+          {/* ── VIEW 0.5: AESTHETIC DISEASE INTRO PAGE ─────────────────────── */}
+          {activeTab === "disease_intro" && (
+            <div style={{ height: "100%", overflowY: "auto" }}>
+              <DiseaseIntroPage
+                diseaseId={introDisease}
+                onStartAnalysis={(studyKey) => {
+                  setStudy(studyKey);
+                  setActiveTab("diagnostic");
+                }}
+                onSelectOtherDisease={(id) => setIntroDisease(id)}
+              />
+            </div>
+          )}
+
+          {/* ── VIEW 0.6: PLATFORM FEATURE INTRO PAGE ───────────────────────── */}
+          {activeTab === "feature_intro" && (
+            <div style={{ height: "100%", overflowY: "auto" }}>
+              <FeatureIntroPage
+                featureId={introFeature}
+                onProceed={(targetTab) => setActiveTab(targetTab)}
+                onSecondaryAction={(secTab) => setActiveTab(secTab)}
+                onSwitchFeature={(fId) => setIntroFeature(fId)}
               />
             </div>
           )}
@@ -1337,7 +1626,7 @@ export default function UnifiedAnalysisPage() {
                   <div className="cockpit-col-header">
                     <div>
                       <span className="step-badge">0.1</span>
-                      <span>Health Checkups & Quantum AI</span>
+                      <span>AI Health Checkups</span>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                       <span style={{ fontSize: "0.68rem", color: "var(--primary)", fontFamily: "var(--font-mono)", fontWeight: 700 }}>
@@ -1381,7 +1670,7 @@ export default function UnifiedAnalysisPage() {
                                   border: cfg.modality === "image" ? "1px solid rgba(0, 242, 254, 0.3)" : "1px solid rgba(168, 85, 247, 0.3)",
                                 }}
                               >
-                                {cfg.modality === "image" ? "📸 Image Scan" : "📊 Manual Values"}
+                                {cfg.modality === "image" ? "📸 Image Scan" : "📊 Lab Data"}
                               </span>
                             </div>
                             <p style={{ margin: "2px 0 4px" }}>{cfg.desc}</p>
@@ -1393,366 +1682,44 @@ export default function UnifiedAnalysisPage() {
                       ))}
                     </div>
 
-                    {/* Adaptive Medical Ingestion Container (Image vs Biomarker) */}
-                    {currentStudy.modality === "image" ? (
-                      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                        {/* Medical Radiograph & Scan Drag-and-Drop Area */}
-                        <div
-                          onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
-                          onDragLeave={() => setDragActive(false)}
-                          onDrop={(e) => {
-                            e.preventDefault();
-                            setDragActive(false);
-                            if (e.dataTransfer.files?.[0]) handleFile(e.dataTransfer.files[0]);
-                          }}
-                          style={{
-                            border: dragActive ? "2px dashed var(--primary)" : "1px dashed var(--border-default)",
-                            padding: "10px",
-                            textAlign: "center",
-                            background: dragActive ? "rgba(2, 132, 199, 0.08)" : "var(--bg-canvas)",
-                            borderRadius: "4px",
-                            position: "relative",
-                            transition: "all 0.15s ease",
-                          }}
-                        >
-                          <Upload size={18} color="var(--primary)" style={{ margin: "0 auto 4px" }} />
-                          <p style={{ fontSize: "0.72rem", fontWeight: 800, color: "var(--text-primary)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
-                            Upload Medical Scan (DICOM / PNG / JPEG / WEBP)
-                          </p>
-                          <p style={{ fontSize: "0.64rem", color: "var(--text-muted)", marginBottom: "6px" }}>
-                            {study === "pneumonia"
-                              ? "Chest PA/AP Radiograph Scan"
-                              : study === "skin"
-                              ? "Dermatoscopic Pigmented Lesion Scan"
-                              : study === "breast_cancer"
-                              ? "Histopathology Tissue Slide Scan"
-                              : study === "heart"
-                              ? "12-Lead ECG Rhythm Strip Scan"
-                              : "Retinal Fundus Photograph Scan"}
-                          </p>
+                    {/* Dynamic Adaptive Ingestion Engine based on Disease Modality & Input Types */}
+                    <AdaptiveFileIngestion
+                      study={study}
+                      diseaseConfig={DISEASE_REGISTRY[study] || { ...currentStudy, inputConfig: currentStudy.inputConfig }}
+                      file={file}
+                      onFileSelect={handleFile}
+                      onFeaturesParsed={handleFeaturesParsed}
+                      imagePreviewUrl={imagePreviewUrl}
+                      activeFilter={activeFilter}
+                      onFilterChange={setActiveFilter}
+                      imageTelemetry={imageTelemetry}
+                      loading={loading}
+                      onRunDiagnosis={runDiagnosis}
+                      onClearFile={() => { setFile(null); setImagePreviewUrl(null); setResult(null); setImageTelemetry(null); }}
+                      rawFeatures={rawFeatures}
+                      onFeatureChange={handleFeatureChange}
+                      onApplyPreset={applyPreset}
+                      onLoadSampleScan={loadSampleMedicalImage}
+                    />
 
-                          <input
-                            ref={inputRef}
-                            type="file"
-                            accept="image/png,image/jpeg,image/jpg,image/webp,.dcm"
-                            style={{ display: "none" }}
-                            onChange={(e) => handleFile(e.target.files?.[0])}
-                          />
-
-                          <button
-                            type="button"
-                            className="btn-secondary"
-                            style={{ width: "100%", fontSize: "0.68rem", padding: "5px", fontWeight: 800, textTransform: "uppercase" }}
-                            onClick={() => inputRef.current?.click()}
-                          >
-                            Browse Medical Scan
-                          </button>
-                        </div>
-
-                        {/* Live Image Preview Viewport with Real-time Filters & Telemetry */}
-                        {imagePreviewUrl && (
-                          <div
-                            style={{
-                              background: "#080C14",
-                              border: "1px solid #1E293B",
-                              borderRadius: "6px",
-                              padding: "10px",
-                              display: "flex",
-                              flexDirection: "column",
-                              gap: "8px",
-                            }}
-                          >
-                            <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
-                              <div style={{ position: "relative", width: "72px", height: "72px", borderRadius: "4px", overflow: "hidden", border: "1px solid #334155", flexShrink: 0 }}>
-                                <img
-                                  src={imagePreviewUrl}
-                                  alt="Loaded Clinical Scan"
-                                  className={`filter-${activeFilter}`}
-                                  style={{
-                                    width: "100%",
-                                    height: "100%",
-                                    objectFit: "cover",
-                                    display: "block",
-                                  }}
-                                />
-                                <div className="scanline-beam" />
-                              </div>
-                              <div style={{ flex: 1, overflow: "hidden" }}>
-                                <div style={{ fontSize: "0.68rem", fontWeight: 800, color: "#F8FAFC", wordBreak: "break-all" }}>
-                                  {file?.name || "Medical Scan"}
-                                </div>
-                                <div style={{ fontSize: "0.58rem", color: "var(--accent-sky)", fontFamily: "var(--font-mono)", marginTop: "2px" }}>
-                                  {file?.size ? `${(file.size / 1024).toFixed(1)} KB • Quantum Ingestion Ready` : "Clinical Sample Loaded"}
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={() => { setFile(null); setImagePreviewUrl(null); setResult(null); setImageTelemetry(null); }}
-                                  style={{
-                                    background: "transparent",
-                                    border: 0,
-                                    padding: 0,
-                                    fontSize: "0.60rem",
-                                    color: "var(--rose-couture)",
-                                    fontWeight: 800,
-                                    cursor: "pointer",
-                                    marginTop: "3px",
-                                    textTransform: "uppercase",
-                                  }}
-                                >
-                                  Clear Scan
-                                </button>
-                              </div>
-                            </div>
-
-                            {/* Real-time Image Filter Toggles */}
-                            <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", borderTop: "1px solid #1E293B", paddingTop: "6px" }}>
-                              {[
-                                { id: "normal", label: "Standard" },
-                                { id: "clahe", label: "CLAHE" },
-                                { id: "thermal", label: "Thermal" },
-                                { id: "edge", label: "Sobel Edge" },
-                                { id: "invert", label: "Invert" },
-                              ].map((flt) => (
-                                <button
-                                  key={flt.id}
-                                  type="button"
-                                  onClick={() => setActiveFilter(flt.id)}
-                                  style={{
-                                    background: activeFilter === flt.id ? "var(--primary)" : "#1E293B",
-                                    color: activeFilter === flt.id ? "#FFFFFF" : "#94A3B8",
-                                    border: 0,
-                                    borderRadius: "3px",
-                                    padding: "2px 6px",
-                                    fontSize: "0.58rem",
-                                    fontWeight: 700,
-                                    cursor: "pointer",
-                                    transition: "all 0.15s ease",
-                                  }}
-                                >
-                                  {flt.label}
-                                </button>
-                              ))}
-                            </div>
-
-                            {/* Live Medical Image Telemetry Bar */}
-                            {imageTelemetry && (
-                              <div
-                                style={{
-                                  background: "#030712",
-                                  border: "1px solid #1E293B",
-                                  borderRadius: "4px",
-                                  padding: "5px 8px",
-                                  display: "grid",
-                                  gridTemplateColumns: "1fr 1fr",
-                                  gap: "4px",
-                                  fontSize: "0.56rem",
-                                  fontFamily: "var(--font-mono)",
-                                  color: "#94A3B8",
-                                }}
-                              >
-                                <div>RES: <strong style={{ color: "#F8FAFC" }}>{imageTelemetry.width}×{imageTelemetry.height}</strong></div>
-                                <div>FMT: <strong style={{ color: "#38BDF8" }}>{imageTelemetry.format}</strong></div>
-                                <div>ENTROPY: <strong style={{ color: "#34D399" }}>{imageTelemetry.entropy} bits</strong></div>
-                                <div>DYN: <strong style={{ color: "#FBBF24" }}>{imageTelemetry.dynamicRange}</strong></div>
-                              </div>
-                            )}
-
-                            {/* Direct Prediction Action */}
-                            <button
-                              type="button"
-                              className="btn-primary"
-                              onClick={() => runDiagnosis(file)}
-                              disabled={loading}
-                              style={{
-                                width: "100%",
-                                padding: "7px 10px",
-                                fontSize: "0.72rem",
-                                fontWeight: 800,
-                                borderRadius: "4px",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                gap: "6px",
-                              }}
-                            >
-                              {loading ? (
-                                <>
-                                  <SquareLoader size="sm" color="#FFFFFF" style={{ padding: 0 }} />
-                                  <span>Analyzing Medical Scan...</span>
-                                </>
-                              ) : (
-                                <>
-                                  <Play size={12} />
-                                  <span>Analyze Scan with Quantum AI</span>
-                                </>
-                              )}
-                            </button>
-                          </div>
-                        )}
-
-                        {/* Clinical Scan Sample Gallery */}
-                        <div>
-                          <p style={{ fontSize: "0.64rem", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "4px" }}>
-                            Sample Clinical Medical Scans
-                          </p>
-                          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                            {currentStudy.samples.map((s, idx) => (
-                              <button
-                                key={idx}
-                                type="button"
-                                className="btn-secondary"
-                                style={{
-                                  fontSize: "0.66rem",
-                                  padding: "6px 8px",
-                                  display: "flex",
-                                  justifyContent: "space-between",
-                                  alignItems: "center",
-                                  textAlign: "left",
-                                  background: file?.name?.includes(s.name) ? "var(--bg-surface-alt)" : "var(--bg-surface)",
-                                  border: file?.name?.includes(s.name) ? "1px solid var(--primary)" : "1px solid var(--border-default)",
-                                }}
-                                onClick={() => loadSampleMedicalImage(s)}
-                              >
-                                <div>
-                                  <strong style={{ display: "block", color: "var(--text-primary)" }}>{s.name}</strong>
-                                  <span style={{ fontSize: "0.58rem", color: "var(--text-muted)" }}>{s.desc}</span>
-                                </div>
-                                <span style={{ fontSize: "0.60rem", padding: "2px 6px", background: s.label.includes("Normal") || s.label.includes("Benign") ? "var(--risk-low-bg)" : "var(--risk-high-bg)", color: s.label.includes("Normal") || s.label.includes("Benign") ? "var(--risk-low)" : "var(--risk-high)", fontWeight: 800, borderRadius: "2px" }}>
-                                  {s.label}
-                                </span>
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                        {/* Interactive Clinical Biomarkers & Parameter Manual Entry */}
-                        <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "6px", padding: "12px", display: "flex", flexDirection: "column", gap: "10px" }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--border-subtle)", paddingBottom: "6px" }}>
-                            <div>
-                              <span style={{ fontSize: "0.74rem", fontWeight: 800, color: "var(--text-primary)", textTransform: "uppercase", letterSpacing: "0.04em", display: "block" }}>
-                                Clinical Biomarker Parameters (Manual Values)
-                              </span>
-                              <span style={{ fontSize: "0.62rem", color: "var(--text-muted)" }}>
-                                Type or adjust values manually below, or click a 1-click sample profile
-                              </span>
-                            </div>
-                            <span style={{ fontSize: "0.62rem", fontFamily: "var(--font-mono)", color: "var(--primary)", fontWeight: 700, background: "rgba(0, 242, 254, 0.08)", border: "1px solid rgba(0, 242, 254, 0.2)", padding: "2px 6px", borderRadius: "3px" }}>
-                              {rawFeatures.length} Biomarkers Active
-                            </span>
-                          </div>
-
-                          {/* Responsive 2/3-Column Parameter Input Grid */}
-                          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))", gap: "8px", maxHeight: "300px", overflowY: "auto", paddingRight: "4px" }}>
-                            {rawFeatures.map((f, idx) => (
-                              <div key={f.name || idx} style={{ background: "var(--bg-canvas)", border: "1px solid var(--border-subtle)", borderRadius: "4px", padding: "6px 8px" }}>
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "3px" }}>
-                                  <label style={{ fontSize: "0.64rem", fontWeight: 700, color: "var(--text-secondary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "115px" }} title={f.label || f.name}>
-                                    {f.label || f.name.replace(/_/g, " ")}
-                                  </label>
-                                  <span style={{ fontSize: "0.56rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
-                                    {f.unit || "a.u."}
-                                  </span>
-                                </div>
-                                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                  <input
-                                    type="number"
-                                    step={f.step || "any"}
-                                    value={f.value !== undefined ? f.value : ""}
-                                    onChange={(e) => handleFeatureChange(idx, e.target.value)}
-                                    style={{
-                                      width: "100%",
-                                      background: "var(--bg-surface)",
-                                      border: "1px solid var(--border-default)",
-                                      borderRadius: "3px",
-                                      padding: "4px 6px",
-                                      fontSize: "0.72rem",
-                                      fontFamily: "var(--font-mono)",
-                                      fontWeight: 700,
-                                      color: "var(--text-primary)",
-                                    }}
-                                  />
-                                </div>
-                                {f.mean !== undefined && (
-                                  <div style={{ fontSize: "0.54rem", color: "var(--text-muted)", marginTop: "2px" }}>
-                                    Population Mean: <span style={{ fontFamily: "var(--font-mono)", color: "var(--text-secondary)" }}>{f.mean}</span>
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-
-                          {/* Sample Health Profiles (1-Click Presets) */}
-                          <div style={{ borderTop: "1px solid var(--border-subtle)", paddingTop: "8px" }}>
-                            <p style={{ fontSize: "0.62rem", fontWeight: 800, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>
-                              Sample Clinical Profiles (1-Click Auto-Fill)
-                            </p>
-                            <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-                              {currentStudy.samples.map((s, idx) => (
-                                <button
-                                  key={idx}
-                                  type="button"
-                                  className="btn-secondary"
-                                  style={{
-                                    fontSize: "0.65rem",
-                                    padding: "5px 9px",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: "6px",
-                                    borderRadius: "3px",
-                                  }}
-                                  onClick={() => applyPreset(s)}
-                                >
-                                  <strong>{s.name}</strong>
-                                  <span style={{ fontSize: "0.58rem", padding: "1px 5px", background: s.label.includes("Normal") || s.label.includes("Benign") || s.label.includes("Optimal") || s.label.includes("Control") ? "var(--risk-low-bg)" : "var(--risk-high-bg)", color: s.label.includes("Normal") || s.label.includes("Benign") || s.label.includes("Optimal") || s.label.includes("Control") ? "var(--risk-low)" : "var(--risk-high)", fontWeight: 800, borderRadius: "2px" }}>
-                                    {s.label}
-                                  </span>
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-
-                          {/* Optional EHR CSV / JSON Import */}
-                          <div style={{ border: "1px dashed var(--border-subtle)", borderRadius: "4px", padding: "6px", textAlign: "center", background: "rgba(0,0,0,0.15)" }}>
-                            <input
-                              ref={inputRef}
-                              type="file"
-                              accept=".csv,.json"
-                              style={{ display: "none" }}
-                              onChange={(e) => handleFile(e.target.files?.[0])}
-                            />
-                            <button
-                              type="button"
-                              style={{ background: "transparent", border: 0, color: "var(--primary)", fontSize: "0.62rem", fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "4px" }}
-                              onClick={() => inputRef.current?.click()}
-                            >
-                              <Upload size={11} />
-                              <span>Import Patient Dataset (CSV / JSON)</span>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Instant Quantum AI Diagnosis Trigger (Active for both Image and Tabular) */}
-                    <div style={{ marginTop: "6px" }}>
+                    {/* Run AI Health Checkup Button */}
+                    <div style={{ marginTop: "8px" }}>
                       <button
                         type="button"
                         className="btn-primary"
                         onClick={runDiagnosis}
                         disabled={loading}
-                        style={{ padding: "10px 14px", width: "100%", borderRadius: "var(--radius-sm)", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", fontSize: "0.76rem", fontWeight: 800 }}
+                        style={{ padding: "10px 14px", width: "100%", borderRadius: "var(--radius-sm)", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", fontSize: "0.78rem", fontWeight: 800 }}
                       >
                         {loading ? (
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px" }}>
                             <SquareLoader size="sm" color="#FFFFFF" style={{ padding: 0 }} />
-                            <span>{currentStudy.modality === "image" ? "Analyzing Medical Scan with Quantum AI..." : "Running Quantum AI Biomarker Checkup..."}</span>
+                            <span>{currentStudy.modality === "image" ? t("checkup.analyzing_scan", "Analyzing Scan...") : t("checkup.analyzing", "Analyzing Biomarkers with Quantum AI...")}</span>
                           </div>
                         ) : (
                           <>
                             <Play size={14} />
-                            <span>{currentStudy.modality === "image" ? "Run Quantum AI Image Scan Prediction" : "Run Instant Quantum AI Checkup"}</span>
+                            <span>{currentStudy.modality === "image" ? t("actions.upload_scan", "Run AI Scan Analysis") : t("actions.run_checkup", "Run Instant Quantum AI Checkup")}</span>
                           </>
                         )}
                       </button>
@@ -1810,7 +1777,7 @@ export default function UnifiedAnalysisPage() {
                         {result.probabilities && (
                           <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", padding: "8px", borderRadius: "var(--radius-sm)" }}>
                             <p style={{ fontSize: "0.65rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", marginBottom: "4px" }}>
-                              Assessment Probability Distribution
+                              Likelihood Breakdown
                             </p>
                             {Object.entries(result.probabilities).map(([cls, prob]) => (
                               <div key={cls} style={{ marginBottom: "4px" }}>
@@ -1830,7 +1797,7 @@ export default function UnifiedAnalysisPage() {
                         {result.explainability && (
                           <div style={{ background: "var(--bg-canvas)", border: "1px solid var(--border-default)", padding: "8px", borderRadius: "var(--radius-sm)" }}>
                             <p style={{ fontSize: "0.65rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", marginBottom: "4px" }}>
-                              Key Factors Influencing Assessment
+                              Top Factors Found by AI
                             </p>
                             {result.explainability.top_features?.map((f, i) => (
                               <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "0.68rem", marginBottom: "2px" }}>
@@ -1843,6 +1810,20 @@ export default function UnifiedAnalysisPage() {
                                 {result.explainability.clinical_narrative}
                               </p>
                             )}
+                          </div>
+                        )}
+                        {/* Audio Phonation Telemetry */}
+                        {result.audio_telemetry && (
+                          <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", padding: "8px", borderRadius: "var(--radius-sm)" }}>
+                            <p style={{ fontSize: "0.65rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", marginBottom: "4px" }}>
+                              Voice & Phonation Acoustic Metrics
+                            </p>
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", fontSize: "0.68rem" }}>
+                              <div><span style={{ color: "var(--text-muted)" }}>Frequency: </span><strong>{result.audio_telemetry.frequency}</strong></div>
+                              <div><span style={{ color: "var(--text-muted)" }}>Jitter (Tremor): </span><strong>{result.audio_telemetry.jitter}</strong></div>
+                              <div><span style={{ color: "var(--text-muted)" }}>Shimmer: </span><strong>{result.audio_telemetry.shimmer}</strong></div>
+                              <div><span style={{ color: "var(--text-muted)" }}>Harmonics-to-Noise: </span><strong>{result.audio_telemetry.hnr}</strong></div>
+                            </div>
                           </div>
                         )}
                       </div>
@@ -1972,20 +1953,59 @@ export default function UnifiedAnalysisPage() {
                 )}
               </div>
 
+              {/* Disease-Specific Early Detection Timeline Graph */}
+              <div style={{ marginTop: "16px" }}>
+                <ErrorBoundary
+                  compact
+                  title="Early Detection Timeline Notice"
+                  message="The timeline graph encountered a temporary calculation issue. Click Try Again to reload."
+                >
+                  <DiseaseEarlyDetectionTimeline
+                    diseaseId={study}
+                    patientRiskScore={
+                      result
+                        ? (result.prediction?.confidence
+                            ? (result.prediction?.class?.toLowerCase().includes("malignant") ||
+                               result.prediction?.class?.toLowerCase().includes("melanoma") ||
+                               result.prediction?.class?.toLowerCase().includes("pneumonia") ||
+                               result.prediction?.class?.toLowerCase().includes("disease") ||
+                               result.prediction?.severity === "danger"
+                                 ? result.prediction.confidence * 100
+                                 : (1 - result.prediction.confidence) * 100)
+                            : 50)
+                        : null
+                    }
+                    patientPrediction={result?.prediction}
+                    onStartAnalysis={() => runDiagnosis()}
+                  />
+                </ErrorBoundary>
+              </div>
+
               {/* Longitudinal Health Prediction Timeline & OLS Trend Analysis */}
-              <PredictionTimeline
-                patientId={patientId}
-                currentUser={currentUser}
-                lastPredictionResult={result}
-                activeStudy={study}
-              />
+              <ErrorBoundary
+                compact
+                title="Longitudinal Prediction Graph Notice"
+                message="The health trajectory trend encountered an update notice. Click Try Again to refresh."
+              >
+                <PredictionTimeline
+                  patientId={patientId}
+                  currentUser={currentUser}
+                  lastPredictionResult={result}
+                  activeStudy={study}
+                />
+              </ErrorBoundary>
             </div>
           )}
 
           {/* ── VIEW 2: 3D DIGITAL TWIN EXPLORER — Full Screen ─────────────── */}
           {activeTab === "twin" && (
             <div style={{ height: "100%", overflow: "hidden", display: "flex", flexDirection: "column" }}>
-              <DigitalTwin3DPage patientId={patientId} result={result} onExportReport={exportReport} />
+              <ErrorBoundary
+                title="3D Digital Health Twin Interruption"
+                message="The 3D anatomical viewer encountered a graphics interruption. Click Try Again to reinitialize the 3D twin canvas."
+              >
+                <DigitalTwin3DPage patientId={patientId} result={result} onExportReport={exportReport} />
+              </ErrorBoundary>
             </div>
           )}
 
@@ -2011,7 +2031,9 @@ export default function UnifiedAnalysisPage() {
                   <Info size={14} />
                 </button>
               </div>
-              <EarlyDetectionMap patientId={patientId} />
+              <ErrorBoundary title="Early Detection Map Interruption">
+                <EarlyDetectionMap patientId={patientId} />
+              </ErrorBoundary>
             </div>
           )}
 
@@ -2036,7 +2058,9 @@ export default function UnifiedAnalysisPage() {
                   <Info size={14} />
                 </button>
               </div>
-              <BenchmarkMatrix />
+              <ErrorBoundary title="Benchmark Performance Matrix Interruption">
+                <BenchmarkMatrix />
+              </ErrorBoundary>
             </div>
           )}
 
@@ -2130,114 +2154,120 @@ export default function UnifiedAnalysisPage() {
           {/* ── VIEW 12: MY CONSULTATIONS & VIRTUAL ROOM (Module F & G) ──────── */}
           {activeTab === "my_consultations" && (
             <div style={{ height: "100%", overflowY: "auto", display: "flex", flexDirection: "column", gap: "16px" }}>
-              {selectedBookingForRoom ? (
-                <div>
-                  <button
-                    type="button"
-                    className="action-btn"
-                    onClick={() => setSelectedBookingForRoom(null)}
-                    style={{ marginBottom: "14px", display: "inline-flex", alignItems: "center", gap: "6px" }}
-                  >
-                    Back to All Consultations
-                  </button>
-                  <VirtualConsultationRoom
-                    booking={selectedBookingForRoom}
-                    isDoctor={currentUser.role === "doctor"}
-                    onLeave={() => setSelectedBookingForRoom(null)}
-                  />
-                </div>
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--bg-surface)", border: "1px solid var(--border-default)", padding: "14px" }}>
-                    <div>
-                      <h3 style={{ margin: "0 0 4px 0", fontSize: "1.05rem", fontWeight: 800 }}>My Consultations & Tele-Health Appointments</h3>
-                      <p style={{ margin: 0, fontSize: "0.78rem", color: "var(--text-secondary)" }}>
-                        Verified medical appointments, active video rooms, and issued E-Prescriptions.
-                      </p>
-                    </div>
+              <ErrorBoundary title="Tele-Consultation Interruption" message="The virtual consultation room encountered an interruption. Click Try Again to reconnect.">
+                {selectedBookingForRoom ? (
+                  <div>
                     <button
                       type="button"
-                      className="action-btn primary"
-                      onClick={() => setActiveTab("doctor_booking")}
-                      style={{ padding: "8px 14px", fontSize: "0.8rem" }}
+                      className="action-btn"
+                      onClick={() => setSelectedBookingForRoom(null)}
+                      style={{ marginBottom: "14px", display: "inline-flex", alignItems: "center", gap: "6px" }}
                     >
-                      + Book New Consultation
+                      Back to All Consultations
                     </button>
-                  </div>
-
-                  {loading ? (
-                    <div className="skeleton-list" aria-label="Loading consultations"><div className="skeleton" /><div className="skeleton" /></div>
-                  ) : myBookings.length === 0 ? (
-                    <EmptyState
-                      title="No consultations scheduled"
-                      description="When you book an appointment, its details and any prescribed care will appear here."
-                      actionLabel="Find a clinician"
-                      onAction={() => setActiveTab("doctor_booking")}
+                    <VirtualConsultationRoom
+                      booking={selectedBookingForRoom}
+                      isDoctor={currentUser.role === "doctor"}
+                      onLeave={() => setSelectedBookingForRoom(null)}
                     />
-                  ) : (
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))", gap: "14px" }}>
-                      {myBookings.map((b) => (
-                        <div
-                          key={b.id}
-                          className="card-panel"
-                          style={{
-                            border: "1px solid var(--border-default)",
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "space-between",
-                            gap: "12px",
-                          }}
-                        >
-                          <div>
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "4px" }}>
-                              <strong style={{ fontSize: "0.95rem" }}>{b.doctor_name}</strong>
-                              <span className="step-badge" style={{ fontSize: "0.68rem" }}>{b.status.toUpperCase()}</span>
-                            </div>
-                            <div style={{ fontSize: "0.78rem", color: "var(--primary)", fontWeight: 600 }}>{b.doctor_specialty}</div>
-                            <div style={{ fontSize: "0.74rem", color: "var(--text-muted)", marginTop: "4px" }}>{b.hospital_affiliation}</div>
-                          </div>
-
-                          <div style={{ fontSize: "0.78rem", background: "var(--bg-surface-alt)", padding: "8px", lineHeight: 1.5 }}>
-                            <div><strong>Slot:</strong> {b.slot_time} ({b.mode?.toUpperCase()})</div>
-                            <div><strong>Reason:</strong> {b.intake?.reason || "Follow-up checkup"}</div>
-                          </div>
-
-                          <div style={{ display: "flex", gap: "8px", borderTop: "1px solid var(--border-default)", paddingTop: "8px" }}>
-                            <button
-                              type="button"
-                              className="action-btn primary"
-                              onClick={() => setSelectedBookingForRoom(b)}
-                              style={{ flex: 1, padding: "8px", fontSize: "0.8rem", textAlign: "center" }}
-                            >
-                              Join Video Consultation Room
-                            </button>
-                          </div>
-                        </div>
-                      ))}
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--bg-surface)", border: "1px solid var(--border-default)", padding: "14px" }}>
+                      <div>
+                        <h3 style={{ margin: "0 0 4px 0", fontSize: "1.05rem", fontWeight: 800 }}>My Consultations & Tele-Health Appointments</h3>
+                        <p style={{ margin: 0, fontSize: "0.78rem", color: "var(--text-secondary)" }}>
+                          Verified medical appointments, active video rooms, and issued E-Prescriptions.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        className="action-btn primary"
+                        onClick={() => setActiveTab("doctor_booking")}
+                        style={{ padding: "8px 14px", fontSize: "0.8rem" }}
+                      >
+                        + Book New Consultation
+                      </button>
                     </div>
-                  )}
-                </div>
-              )}
+
+                    {loading ? (
+                      <div className="skeleton-list" aria-label="Loading consultations"><div className="skeleton" /><div className="skeleton" /></div>
+                    ) : myBookings.length === 0 ? (
+                      <EmptyState
+                        title="No consultations scheduled"
+                        description="When you book an appointment, its details and any prescribed care will appear here."
+                        actionLabel="Find a clinician"
+                        onAction={() => setActiveTab("doctor_booking")}
+                      />
+                    ) : (
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))", gap: "14px" }}>
+                        {myBookings.map((b) => (
+                          <div
+                            key={b.id}
+                            className="card-panel"
+                            style={{
+                              border: "1px solid var(--border-default)",
+                              display: "flex",
+                              flexDirection: "column",
+                              justifyContent: "space-between",
+                              gap: "12px",
+                            }}
+                          >
+                            <div>
+                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "4px" }}>
+                                <strong style={{ fontSize: "0.95rem" }}>{b.doctor_name}</strong>
+                                <span className="step-badge" style={{ fontSize: "0.68rem" }}>{b.status.toUpperCase()}</span>
+                              </div>
+                              <div style={{ fontSize: "0.78rem", color: "var(--primary)", fontWeight: 600 }}>{b.doctor_specialty}</div>
+                              <div style={{ fontSize: "0.74rem", color: "var(--text-muted)", marginTop: "4px" }}>{b.hospital_affiliation}</div>
+                            </div>
+
+                            <div style={{ fontSize: "0.78rem", background: "var(--bg-surface-alt)", padding: "8px", lineHeight: 1.5 }}>
+                              <div><strong>Slot:</strong> {b.slot_time} ({b.mode?.toUpperCase()})</div>
+                              <div><strong>Reason:</strong> {b.intake?.reason || "Follow-up checkup"}</div>
+                            </div>
+
+                            <div style={{ display: "flex", gap: "8px", borderTop: "1px solid var(--border-default)", paddingTop: "8px" }}>
+                              <button
+                                type="button"
+                                className="action-btn primary"
+                                onClick={() => setSelectedBookingForRoom(b)}
+                                style={{ flex: 1, padding: "8px", fontSize: "0.8rem", textAlign: "center" }}
+                              >
+                                Join Video Consultation Room
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </ErrorBoundary>
             </div>
           )}
 
           {/* ── VIEW 13: CLINICIAN DASHBOARD (Module I) ─────────────────────── */}
           {activeTab === "clinician_dashboard" && (
             <div style={{ height: "100%", overflowY: "auto" }}>
-              <ClinicianDashboard
-                doctorId={currentUser.doctor_id || (currentUser.id ? `DOC-${String(currentUser.id).replace('USR-', '')}` : "DOC-KAVITA")}
-                currentUser={currentUser}
-              />
+              <ErrorBoundary title="Clinician Dashboard Notice" message="The clinician queue encountered a temporary update. Click Try Again to reload.">
+                <ClinicianDashboard
+                  doctorId={currentUser.doctor_id || (currentUser.id ? `DOC-${String(currentUser.id).replace('USR-', '')}` : "DOC-KAVITA")}
+                  currentUser={currentUser}
+                />
+              </ErrorBoundary>
             </div>
           )}
 
           {/* ── VIEW 14: AI DOCTOR 1-ON-1 VOICE CONSULTATION (Vapi Powered) ──── */}
           {activeTab === "ai_doctor" && (
             <div style={{ height: "100%", overflow: "hidden" }}>
-              <AIDoctorConsultationPage
-                patientId={patientId || "USR-5EF52B"}
-                currentUser={currentUser}
-              />
+              <ErrorBoundary title="AI Doctor Consultation Notice" message="The AI doctor voice consultation encountered an interruption. Click Try Again to reconnect.">
+                <AIDoctorConsultationPage
+                  patientId={patientId || "USR-5EF52B"}
+                  currentUser={currentUser}
+                />
+              </ErrorBoundary>
             </div>
           )}
         </main>

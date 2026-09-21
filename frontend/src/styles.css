@@ -5043,3 +5043,158 @@ html, body {
     gap: 4px !important;
   }
 }
+
+/* ── Disease Navigation Accordion & Dropdowns ── */
+.nav-accordion-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  text-align: left;
+}
+
+.nav-accordion-header:hover {
+  background: var(--bg-surface-alt);
+  color: var(--ink-primary);
+}
+
+.nav-accordion-header.active {
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 700;
+  border-color: rgba(8, 127, 140, 0.22);
+}
+
+.nav-sub-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: 14px;
+  padding-left: 10px;
+  border-left: 1.5px solid var(--border-default);
+  margin-top: 2px;
+  margin-bottom: 4px;
+}
+
+.nav-sub-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border-radius: var(--radius-xs);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.74rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.14s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.nav-sub-btn:hover {
+  background: var(--bg-surface-alt);
+  color: var(--ink-primary);
+  transform: translateX(2px);
+}
+
+.nav-sub-btn.active {
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 700;
+  border-color: rgba(8, 127, 140, 0.2);
+}
+
+.nav-sub-badge {
+  font-size: 0.60rem;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-weight: 700;
+}
+
+/* Header Dropdowns */
+.header-nav-dropdown {
+  position: relative;
+}
+
+.header-dropdown-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-surface-alt);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xs);
+  padding: 5px 11px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.header-dropdown-btn:hover {
+  border-color: var(--primary);
+  background: var(--bg-surface);
+}
+
+.header-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 6px;
+  min-width: 250px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  padding: 6px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.header-dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: var(--radius-xs);
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.76rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.12s ease;
+  width: 100%;
+}
+
+.header-dropdown-item:hover {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.header-dropdown-item.active {
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 700;
+}
+

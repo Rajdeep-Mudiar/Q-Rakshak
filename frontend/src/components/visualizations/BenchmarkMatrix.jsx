@@ -3,8 +3,10 @@ import { BarChart3, Zap, Activity, CheckCircle2, RefreshCw } from "lucide-react"
 import { benchmarksApi } from "../../api/benchmarks";
 import { animateEntrance, animateCardStagger } from "../../utils/motion";
 import SquareLoader from "../common/SquareLoader.jsx";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function BenchmarkMatrix({ disease = "breast_cancer" }) {
+  const { t } = useLanguage();
   const containerRef = useRef(null);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);

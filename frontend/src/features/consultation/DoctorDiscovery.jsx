@@ -17,8 +17,10 @@ import {
 import { consultationsApi } from "../../api/consultations";
 import BookingModal from "./BookingModal";
 import { animateEntrance, animateCardStagger } from "../../utils/motion";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function DoctorDiscovery({ onOpenBooking, onJoinRoom, patientId }) {
+  const { t } = useLanguage();
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedSpecialty, setSelectedSpecialty] = useState("all");

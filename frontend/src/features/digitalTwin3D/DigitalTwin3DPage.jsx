@@ -13,8 +13,10 @@ import {
   CheckCircle2, AlertTriangle, Activity, User, FileText, ArrowRight, RefreshCw
 } from 'lucide-react';
 import './digitalTwin.css';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function DigitalTwin3DPage({ patientId, result, onExportReport }) {
+  const { t } = useLanguage();
   const canvasRef = useRef();
   const loadPatientFromDB = useTwinStore((s) => s.loadPatientFromDB);
   const currentPatient = useTwinStore((s) => s.patient);

@@ -18,7 +18,6 @@ const EVALUATION_SECTIONS = [
   {
     id: "breast-cancer",
     index: "01",
-    headingLine: "---> [Evaluating Breast Cancer Models] <---",
     headingTitle: "Evaluating Breast Cancer Models",
     category: "ONCOLOGY // WDBC COHORT",
     title: "Wisconsin Diagnostic Breast Cancer",
@@ -111,7 +110,6 @@ const EVALUATION_SECTIONS = [
   {
     id: "heart-disease",
     index: "02",
-    headingLine: "---> [Evaluating Heart Disease Models] <---",
     headingTitle: "Evaluating Heart Disease Models",
     category: "CARDIOLOGY // CARDIO-WAVE",
     title: "Cleveland & Statlog Cardiac Cohort",
@@ -185,7 +183,6 @@ const EVALUATION_SECTIONS = [
   {
     id: "parkinsons",
     index: "03",
-    headingLine: "---> [Evaluating Parkinson's Models] <---",
     headingTitle: "Evaluating Parkinson's Models",
     category: "NEUROLOGY // NEURO-SYNAPSE",
     title: "Oxford Phonation Telemonitoring",
@@ -259,7 +256,6 @@ const EVALUATION_SECTIONS = [
   {
     id: "diabetes",
     index: "04",
-    headingLine: "---> [Evaluating Diabetes Models] <---",
     headingTitle: "Evaluating Diabetes Models",
     category: "METABOLIC // ENDOCRINE SUITE",
     title: "Pima Indians Diabetes Diagnostic",
@@ -333,7 +329,6 @@ const EVALUATION_SECTIONS = [
   {
     id: "pneumonia",
     index: "05",
-    headingLine: "---> [Evaluating Pneumonia Models] <---",
     headingTitle: "Evaluating Pneumonia Models",
     category: "PULMONOLOGY // CHEST X-RAY",
     title: "Guangzhou Pediatric Radiograph Cohort",
@@ -388,7 +383,6 @@ const EVALUATION_SECTIONS = [
   {
     id: "skin-cancer",
     index: "06",
-    headingLine: "---> [Evaluating Skin Cancer Models] <---",
     headingTitle: "Evaluating Skin Cancer Models",
     category: "DERMATOLOGY // HAM10000",
     title: "HAM10000 Multi-Source Dermoscopy",
@@ -484,16 +478,12 @@ export default function ModelEvaluationShowcase() {
           }
         );
 
-        // Sexy heading banner & arrow animation
-        const headingBanner = sectionElem.querySelector(".sexy-heading-banner");
-        const arrowLeft = sectionElem.querySelector(".sexy-arrow-left");
-        const arrowRight = sectionElem.querySelector(".sexy-arrow-right");
-        const headingTitle = sectionElem.querySelector(".sexy-heading-title");
-
-        if (headingBanner) {
+        // Clean heading entrance animation
+        const headingTitle = sectionElem.querySelector(".showcase-heading-title");
+        if (headingTitle) {
           gsap.fromTo(
-            headingBanner,
-            { opacity: 0, y: 20 },
+            headingTitle,
+            { opacity: 0, y: 16 },
             {
               opacity: 1,
               y: 0,
@@ -502,57 +492,6 @@ export default function ModelEvaluationShowcase() {
               scrollTrigger: {
                 trigger: sectionElem,
                 start: "top 82%",
-                toggleActions: "play none none reverse",
-              },
-            }
-          );
-        }
-
-        if (arrowLeft && arrowRight) {
-          gsap.fromTo(
-            arrowLeft,
-            { x: -18, opacity: 0 },
-            {
-              x: 0,
-              opacity: 1,
-              duration: 0.7,
-              ease: "power2.out",
-              scrollTrigger: {
-                trigger: sectionElem,
-                start: "top 80%",
-                toggleActions: "play none none reverse",
-              },
-            }
-          );
-          gsap.fromTo(
-            arrowRight,
-            { x: 18, opacity: 0 },
-            {
-              x: 0,
-              opacity: 1,
-              duration: 0.7,
-              ease: "power2.out",
-              scrollTrigger: {
-                trigger: sectionElem,
-                start: "top 80%",
-                toggleActions: "play none none reverse",
-              },
-            }
-          );
-        }
-
-        if (headingTitle) {
-          gsap.fromTo(
-            headingTitle,
-            { letterSpacing: "0.02em", opacity: 0.6 },
-            {
-              letterSpacing: "0.08em",
-              opacity: 1,
-              duration: 0.9,
-              ease: "power2.out",
-              scrollTrigger: {
-                trigger: sectionElem,
-                start: "top 80%",
                 toggleActions: "play none none reverse",
               },
             }
@@ -656,44 +595,48 @@ export default function ModelEvaluationShowcase() {
         >
           <span
             style={{
-              fontFamily: "var(--font-mono, monospace)",
-              fontSize: "0.72rem",
-              letterSpacing: "0.22em",
+              fontFamily: "var(--font-sans, inherit)",
+              fontSize: "0.75rem",
+              fontWeight: 600,
+              letterSpacing: "0.08em",
               textTransform: "uppercase",
-              color: "#888888",
+              color: "#38BDF8",
+              backgroundColor: "rgba(56, 189, 248, 0.1)",
+              border: "1px solid rgba(56, 189, 248, 0.25)",
+              padding: "4px 10px",
+              borderRadius: "9999px",
             }}
           >
-            VOL. 2026 // SCIENTIFIC AUDIT
+            Scientific Audit
           </span>
 
           <span
             style={{
-              fontFamily: "var(--font-mono, monospace)",
-              fontSize: "0.72rem",
-              letterSpacing: "0.15em",
-              textTransform: "uppercase",
-              color: "#888888",
+              fontFamily: "var(--font-sans, inherit)",
+              fontSize: "0.75rem",
+              color: "#94A3B8",
+              letterSpacing: "0.02em",
             }}
           >
-            5-SEED STRATIFIED VERIFICATION
+            5-Seed Patient Stratified Verification
           </span>
         </div>
 
         <h2
           className="zara-masthead-title"
           style={{
-            fontSize: "clamp(2.4rem, 5.2vw, 4.8rem)",
-            fontWeight: 400,
-            letterSpacing: "-0.04em",
-            lineHeight: 0.98,
-            margin: "0 0 24px 0",
+            fontSize: "clamp(2rem, 3.8vw, 3.4rem)",
+            fontFamily: "var(--font-sans, inherit)",
+            fontWeight: 700,
+            letterSpacing: "-0.025em",
+            lineHeight: 1.1,
+            margin: "0 0 20px 0",
             color: "#FFFFFF",
-            textTransform: "uppercase",
           }}
         >
-          Quantum vs Classical. <br />
-          <span style={{ color: "#777777", fontWeight: 300 }}>
-            Model Evaluation Matrix.
+          Quantum vs Classical <br />
+          <span style={{ color: "#94A3B8", fontWeight: 400 }}>
+            Model Evaluation Matrix
           </span>
         </h2>
 
@@ -709,11 +652,11 @@ export default function ModelEvaluationShowcase() {
           <p
             style={{
               fontSize: "0.96rem",
-              color: "#A0A0A0",
+              color: "#94A3B8",
               margin: 0,
               lineHeight: 1.65,
               maxWidth: "720px",
-              fontWeight: 400,
+              fontFamily: "var(--font-sans, inherit)",
             }}
           >
             Rigorous, mathematically validated comparison between PennyLane Variational Quantum Classifiers (VQC), Quantum Kernel QSVMs, and standard Classical Sentinel baselines. Fully reproducible with zero data leakage.
@@ -721,17 +664,17 @@ export default function ModelEvaluationShowcase() {
 
           <div
             style={{
-              borderLeft: "1px solid rgba(255, 255, 255, 0.15)",
-              paddingLeft: "24px",
-              fontFamily: "var(--font-mono, monospace)",
-              fontSize: "0.70rem",
-              color: "#777777",
+              borderLeft: "2px solid rgba(255, 255, 255, 0.15)",
+              paddingLeft: "20px",
+              fontFamily: "var(--font-sans, inherit)",
+              fontSize: "0.75rem",
+              color: "#64748B",
               lineHeight: 1.8,
             }}
           >
-            <div>PLATFORM: Q-RAKSHAK</div>
-            <div>SPECIFICATION: v1.0 AUDITED</div>
-            <div>FALLBACK PROTOCOL: ACTIVE</div>
+            <div><strong style={{ color: "#CBD5E1" }}>Platform:</strong> Q-Rakshak Clinical Suite</div>
+            <div><strong style={{ color: "#CBD5E1" }}>Audit Status:</strong> Zero Leakage Verified</div>
+            <div><strong style={{ color: "#CBD5E1" }}>Protocol:</strong> Dual-Engine Shadow Routing</div>
           </div>
         </div>
       </div>
@@ -756,8 +699,8 @@ export default function ModelEvaluationShowcase() {
               backgroundColor: section.cardBg,
               border: `1px solid ${section.borderColor}`,
               borderLeft: `4px solid ${section.accentColor}`,
-              borderRadius: "0px", // Zara sharp
-              padding: "clamp(24px, 3.5vh, 56px) clamp(16px, 3.5vw, 56px)",
+              borderRadius: "14px",
+              padding: "clamp(24px, 3.5vh, 48px) clamp(16px, 3.5vw, 48px)",
               position: "relative",
               boxSizing: "border-box",
               display: "flex",
@@ -773,9 +716,9 @@ export default function ModelEvaluationShowcase() {
                 alignItems: "flex-start",
                 flexWrap: "wrap",
                 gap: "16px",
-                borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
-                paddingBottom: "20px",
-                marginBottom: "24px",
+                borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                paddingBottom: "18px",
+                marginBottom: "22px",
               }}
             >
               <div>
@@ -783,104 +726,47 @@ export default function ModelEvaluationShowcase() {
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "12px",
-                    marginBottom: "8px",
+                    gap: "8px",
+                    marginBottom: "6px",
                   }}
                 >
                   <span
                     style={{
-                      fontFamily: "var(--font-mono, monospace)",
-                      fontSize: "0.70rem",
-                      fontWeight: 700,
-                      letterSpacing: "0.15em",
-                      color: section.accentColor,
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    [{section.index}] {section.category}
-                  </span>
-                </div>
-
-                {/* The Sexy Heading Line */}
-                <div
-                  className="sexy-heading-banner showcase-banner-heading"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "12px",
-                    background: "rgba(255, 255, 255, 0.03)",
-                    border: `1px solid ${section.borderColor || "rgba(255, 255, 255, 0.15)"}`,
-                    borderLeft: `3px solid ${section.accentColor}`,
-                    padding: "10px 18px",
-                    borderRadius: "0px",
-                    margin: "0 0 10px 0",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <span
-                    className="sexy-arrow-left"
-                    style={{
-                      fontFamily: "var(--font-mono, monospace)",
-                      fontSize: "1.05rem",
-                      fontWeight: 800,
-                      color: section.accentColor,
-                      letterSpacing: "0.02em",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      userSelect: "none",
-                    }}
-                  >
-                    ───►
-                  </span>
-
-                  <h3
-                    className="sexy-heading-line"
-                    style={{
-                      margin: 0,
-                      fontFamily: "var(--font-mono, monospace)",
-                      fontSize: "clamp(1.02rem, 1.7vw, 1.3rem)",
-                      fontWeight: 700,
+                      fontFamily: "var(--font-sans, inherit)",
+                      fontSize: "0.72rem",
+                      fontWeight: 600,
                       letterSpacing: "0.08em",
-                      color: "#FFFFFF",
-                      textTransform: "uppercase",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "6px",
-                    }}
-                  >
-                    <span style={{ color: section.accentColor, opacity: 0.9 }}>[</span>
-                    <span className="sexy-heading-title" style={{ color: "#FFFFFF" }}>
-                      {section.headingTitle || section.headingLine.replace(/--->\s*\[(.*)\]\s*<---/, "$1")}
-                    </span>
-                    <span style={{ color: section.accentColor, opacity: 0.9 }}>]</span>
-                  </h3>
-
-                  <span
-                    className="sexy-arrow-right"
-                    style={{
-                      fontFamily: "var(--font-mono, monospace)",
-                      fontSize: "1.05rem",
-                      fontWeight: 800,
                       color: section.accentColor,
-                      letterSpacing: "0.02em",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      userSelect: "none",
+                      textTransform: "uppercase",
                     }}
                   >
-                    ◄───
+                    {section.index} • {section.category}
                   </span>
                 </div>
+
+                <h3
+                  className="showcase-heading-title"
+                  style={{
+                    margin: "0 0 6px 0",
+                    fontFamily: "var(--font-sans, inherit)",
+                    fontSize: "clamp(1.3rem, 2.2vw, 1.7rem)",
+                    fontWeight: 700,
+                    color: "#FFFFFF",
+                    letterSpacing: "-0.015em",
+                  }}
+                >
+                  {section.headingTitle || section.title}
+                </h3>
 
                 <p
                   style={{
                     fontSize: "0.82rem",
-                    color: "#888888",
+                    color: "#94A3B8",
                     margin: 0,
-                    fontFamily: "var(--font-mono, monospace)",
+                    fontFamily: "var(--font-sans, inherit)",
                   }}
                 >
-                  {section.sampleSize}
+                  {section.title} — {section.sampleSize}
                 </p>
               </div>
 
@@ -893,24 +779,23 @@ export default function ModelEvaluationShowcase() {
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "6px",
-                  padding: "6px 14px",
-                  background: "transparent",
-                  border: "1px solid rgba(255, 255, 255, 0.2)",
-                  borderRadius: "0px",
+                  padding: "7px 14px",
+                  background: "rgba(255, 255, 255, 0.04)",
+                  border: "1px solid rgba(255, 255, 255, 0.18)",
+                  borderRadius: "8px",
                   color: "#EEEEEE",
-                  fontSize: "0.72rem",
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase",
+                  fontSize: "0.75rem",
+                  fontWeight: 500,
                   textDecoration: "none",
-                  transition: "border-color 0.2s, color 0.2s, background 0.2s",
+                  transition: "all 0.15s ease",
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.borderColor = "#FFFFFF";
-                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.06)";
+                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.2)";
-                  e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.18)";
+                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.04)";
                 }}
               >
                 <span>Full Specification</span>
@@ -918,14 +803,15 @@ export default function ModelEvaluationShowcase() {
               </a>
             </div>
 
-            {/* Shortened, Simplified Zara Table - Full Desktop Size */}
+            {/* Shortened, Simplified Clean Table */}
             <div
               className="table-scroll-container editorial-table-scroll table-responsive"
               style={{
                 width: "100%",
                 overflowX: "auto",
                 WebkitOverflowScrolling: "touch",
-                borderRadius: "0px",
+                borderRadius: "10px",
+                border: "1px solid rgba(255, 255, 255, 0.06)",
                 margin: "auto 0",
               }}
             >
@@ -933,7 +819,7 @@ export default function ModelEvaluationShowcase() {
                 className="zara-table-responsive"
                 style={{
                   width: "100%",
-                  minWidth: "720px",
+                  minWidth: "680px",
                   borderCollapse: "collapse",
                   textAlign: "left",
                   fontSize: "0.85rem",
@@ -942,23 +828,22 @@ export default function ModelEvaluationShowcase() {
                 <thead>
                   <tr
                     style={{
-                      borderBottom: "1px solid rgba(255, 255, 255, 0.12)",
-                      color: "#777777",
-                      fontFamily: "var(--font-mono, monospace)",
-                      fontSize: "0.70rem",
-                      letterSpacing: "0.14em",
-                      textTransform: "uppercase",
+                      background: "rgba(255, 255, 255, 0.02)",
+                      borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                      color: "#94A3B8",
+                      fontFamily: "var(--font-sans, inherit)",
+                      fontSize: "0.74rem",
+                      fontWeight: 600,
+                      letterSpacing: "0.04em",
                     }}
                   >
-                    <th style={{ padding: "16px 16px 16px 0", fontWeight: 600, width: "24%" }}>Model / Architecture</th>
-                    <th style={{ padding: "16px 14px", fontWeight: 600, textAlign: "right", width: "10%" }}>Accuracy</th>
-                    <th style={{ padding: "16px 14px", fontWeight: 600, textAlign: "right", width: "9%" }}>AUC-ROC</th>
-                    <th style={{ padding: "16px 14px", fontWeight: 600, textAlign: "right", width: "13%" }}>Sens / Spec</th>
-                    <th style={{ padding: "16px 14px", fontWeight: 600, textAlign: "right", width: "13%" }}>Prec / F1</th>
-                    <th style={{ padding: "16px 14px", fontWeight: 600, textAlign: "right", width: "9%" }}>MCC</th>
-                    <th style={{ padding: "16px 14px", fontWeight: 600, textAlign: "right", width: "9%" }}>ECE Error</th>
-                    <th style={{ padding: "16px 14px", fontWeight: 600, textAlign: "center", width: "11%" }}>Status</th>
-                    <th style={{ padding: "16px 0 16px 14px", fontWeight: 600, textAlign: "right", width: "7%" }}>Action</th>
+                    <th style={{ padding: "14px 16px", width: "30%" }}>Model / Architecture</th>
+                    <th style={{ padding: "14px 14px", textAlign: "right", width: "12%" }}>Accuracy</th>
+                    <th style={{ padding: "14px 14px", textAlign: "right", width: "11%" }}>AUC-ROC</th>
+                    <th style={{ padding: "14px 14px", textAlign: "right", width: "12%" }}>Sensitivity</th>
+                    <th style={{ padding: "14px 14px", textAlign: "right", width: "12%" }}>Specificity</th>
+                    <th style={{ padding: "14px 14px", textAlign: "center", width: "13%" }}>Status</th>
+                    <th style={{ padding: "14px 16px", textAlign: "right", width: "10%" }}>Specs</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -967,47 +852,47 @@ export default function ModelEvaluationShowcase() {
                       key={model.name}
                       className="zara-table-row"
                       style={{
-                        borderBottom: mIdx !== section.models.length - 1 ? "1px solid rgba(255, 255, 255, 0.06)" : "none",
+                        borderBottom: mIdx !== section.models.length - 1 ? "1px solid rgba(255, 255, 255, 0.05)" : "none",
                         transition: "background-color 0.15s ease",
                       }}
-                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.02)")}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.03)")}
                       onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
                     >
                       {/* Model & Architecture */}
-                      <td style={{ padding: "18px 14px 18px 0" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                      <td style={{ padding: "16px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                           <span
                             style={{
-                              width: "24px",
-                              height: "24px",
+                              width: "26px",
+                              height: "26px",
                               display: "inline-flex",
                               alignItems: "center",
                               justifyContent: "center",
-                              border: "1px solid rgba(255, 255, 255, 0.15)",
+                              border: "1px solid rgba(255, 255, 255, 0.12)",
+                              backgroundColor: model.isQuantum ? "rgba(196, 181, 253, 0.1)" : "rgba(167, 243, 208, 0.1)",
                               color: model.isQuantum ? "#C4B5FD" : "#A7F3D0",
                               fontSize: "0.68rem",
-                              borderRadius: "0px",
+                              borderRadius: "6px",
                               flexShrink: 0,
                             }}
                           >
-                            {model.isQuantum ? <Zap size={12} /> : <Cpu size={12} />}
+                            {model.isQuantum ? <Zap size={13} /> : <Cpu size={13} />}
                           </span>
                           <div>
                             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                               <strong
                                 style={{
                                   color: "#FFFFFF",
-                                  fontSize: "0.92rem",
+                                  fontSize: "0.90rem",
                                   fontWeight: 600,
-                                  letterSpacing: "-0.01em",
                                 }}
                               >
                                 {model.name}
                               </strong>
                               <span
                                 style={{
-                                  fontSize: "0.64rem",
-                                  color: "#777777",
+                                  fontSize: "0.66rem",
+                                  color: "#64748B",
                                   fontFamily: "var(--font-mono, monospace)",
                                 }}
                               >
@@ -1016,9 +901,8 @@ export default function ModelEvaluationShowcase() {
                             </div>
                             <span
                               style={{
-                                color: "#888888",
-                                fontSize: "0.74rem",
-                                fontFamily: "var(--font-mono, monospace)",
+                                color: "#94A3B8",
+                                fontSize: "0.76rem",
                                 display: "block",
                                 marginTop: "2px",
                               }}
@@ -1032,12 +916,12 @@ export default function ModelEvaluationShowcase() {
                       {/* Accuracy */}
                       <td
                         style={{
-                          padding: "18px 14px",
+                          padding: "16px 14px",
                           textAlign: "right",
                           fontFamily: "var(--font-mono, monospace)",
                           fontWeight: 700,
-                          fontSize: "0.96rem",
-                          color: model.isChampion ? "#FFFFFF" : "#D4D4D4",
+                          fontSize: "0.95rem",
+                          color: model.isChampion ? "#34D399" : "#F8FAFC",
                         }}
                       >
                         {model.accuracy}
@@ -1046,85 +930,60 @@ export default function ModelEvaluationShowcase() {
                       {/* AUC-ROC */}
                       <td
                         style={{
-                          padding: "18px 14px",
+                          padding: "16px 14px",
                           textAlign: "right",
                           fontFamily: "var(--font-mono, monospace)",
                           fontWeight: 600,
-                          color: "#D4D4D4",
+                          color: "#E2E8F0",
                           fontSize: "0.88rem",
                         }}
                       >
                         {model.aucRoc}
                       </td>
 
-                      {/* Sensitivity / Specificity */}
+                      {/* Sensitivity */}
                       <td
                         style={{
-                          padding: "18px 14px",
+                          padding: "16px 14px",
                           textAlign: "right",
                           fontFamily: "var(--font-mono, monospace)",
-                          color: "#AAAAAA",
-                          fontSize: "0.80rem",
+                          color: "#E2E8F0",
+                          fontSize: "0.88rem",
                         }}
                       >
-                        {model.sensSpec}
+                        {model.sensitivity ? (parseFloat(model.sensitivity) * 100).toFixed(1) + "%" : "-"}
                       </td>
 
-                      {/* Precision / F1 */}
+                      {/* Specificity */}
                       <td
                         style={{
-                          padding: "18px 14px",
+                          padding: "16px 14px",
                           textAlign: "right",
                           fontFamily: "var(--font-mono, monospace)",
-                          color: "#AAAAAA",
-                          fontSize: "0.80rem",
+                          color: "#E2E8F0",
+                          fontSize: "0.88rem",
                         }}
                       >
-                        {model.precF1}
-                      </td>
-
-                      {/* MCC Score */}
-                      <td
-                        style={{
-                          padding: "18px 14px",
-                          textAlign: "right",
-                          fontFamily: "var(--font-mono, monospace)",
-                          color: "#999999",
-                          fontSize: "0.80rem",
-                        }}
-                      >
-                        {model.mccScore}
-                      </td>
-
-                      {/* ECE Error */}
-                      <td
-                        style={{
-                          padding: "18px 14px",
-                          textAlign: "right",
-                          fontFamily: "var(--font-mono, monospace)",
-                          color: "#AAAAAA",
-                          fontSize: "0.80rem",
-                        }}
-                      >
-                        {model.eceError}
+                        {model.specificity ? (parseFloat(model.specificity) * 100).toFixed(1) + "%" : "-"}
                       </td>
 
                       {/* Status Tag */}
-                      <td style={{ padding: "18px 14px", textAlign: "center" }}>
+                      <td style={{ padding: "16px 14px", textAlign: "center" }}>
                         <span
                           style={{
-                            fontFamily: "var(--font-mono, monospace)",
-                            fontSize: "0.64rem",
-                            letterSpacing: "0.08em",
-                            padding: "4px 9px",
+                            fontFamily: "var(--font-sans, inherit)",
+                            fontSize: "0.68rem",
+                            fontWeight: 600,
+                            letterSpacing: "0.04em",
+                            padding: "4px 10px",
                             border: `1px solid ${
                               model.isChampion
-                                ? "rgba(255, 255, 255, 0.4)"
+                                ? "rgba(52, 211, 153, 0.35)"
                                 : "rgba(255, 255, 255, 0.12)"
                             }`,
-                            backgroundColor: model.isChampion ? "rgba(255, 255, 255, 0.08)" : "transparent",
-                            color: model.isChampion ? "#FFFFFF" : "#888888",
-                            borderRadius: "0px",
+                            backgroundColor: model.isChampion ? "rgba(52, 211, 153, 0.1)" : "rgba(255, 255, 255, 0.04)",
+                            color: model.isChampion ? "#34D399" : "#94A3B8",
+                            borderRadius: "9999px",
                             textTransform: "uppercase",
                             display: "inline-block",
                           }}
@@ -1134,7 +993,7 @@ export default function ModelEvaluationShowcase() {
                       </td>
 
                       {/* Action */}
-                      <td style={{ padding: "18px 0 18px 14px", textAlign: "right" }}>
+                      <td style={{ padding: "16px", textAlign: "right" }}>
                         <button
                           type="button"
                           onClick={() =>
@@ -1145,16 +1004,19 @@ export default function ModelEvaluationShowcase() {
                             })
                           }
                           style={{
-                            background: "transparent",
-                            border: "1px solid rgba(255, 255, 255, 0.2)",
-                            borderRadius: "0px",
+                            background: "rgba(255, 255, 255, 0.04)",
+                            border: "1px solid rgba(255, 255, 255, 0.18)",
+                            borderRadius: "6px",
                             padding: "5px 12px",
-                            color: "#FFFFFF",
-                            fontFamily: "var(--font-mono, monospace)",
-                            fontSize: "0.68rem",
-                            letterSpacing: "0.08em",
+                            color: "#F8FAFC",
+                            fontFamily: "var(--font-sans, inherit)",
+                            fontSize: "0.72rem",
+                            fontWeight: 500,
                             cursor: "pointer",
                             transition: "all 0.15s ease",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "4px",
                           }}
                           onMouseEnter={(e) => {
                             e.currentTarget.style.backgroundColor = "#FFFFFF";
@@ -1162,12 +1024,13 @@ export default function ModelEvaluationShowcase() {
                             e.currentTarget.style.borderColor = "#FFFFFF";
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = "transparent";
-                            e.currentTarget.style.color = "#FFFFFF";
-                            e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.2)";
+                            e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.04)";
+                            e.currentTarget.style.color = "#F8FAFC";
+                            e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.18)";
                           }}
                         >
-                          DOCS ↗
+                          <span>Specs</span>
+                          <ExternalLink size={11} />
                         </button>
                       </td>
                     </tr>
@@ -1186,16 +1049,14 @@ export default function ModelEvaluationShowcase() {
                 gap: "12px",
                 paddingTop: "16px",
                 borderTop: "1px solid rgba(255, 255, 255, 0.08)",
-                fontSize: "0.70rem",
-                fontFamily: "var(--font-mono, monospace)",
-                color: "#777777",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
+                fontSize: "0.76rem",
+                fontFamily: "var(--font-sans, inherit)",
+                color: "#94A3B8",
               }}
             >
               <span>{section.description}</span>
-              <span style={{ color: section.accentColor, opacity: 0.9 }}>
-                5-SEED STRATIFIED HELD-OUT AUDIT // ZERO DATA LEAKAGE
+              <span style={{ color: section.accentColor, fontWeight: 500 }}>
+                5-Seed Stratified Held-Out Audit • Zero Data Leakage
               </span>
             </div>
           </section>

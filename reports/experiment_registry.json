@@ -4468,5 +4468,350 @@
     "runtime_sec": 0.195,
     "artifact_paths": [],
     "git_commit": "35c2679"
+  },
+  {
+    "experiment_id": "EXP-6802AE37",
+    "timestamp": 1790001411.0268874,
+    "date": "2026-09-21 20:06:51",
+    "dataset": "Test_Clinical_Cohort",
+    "dataset_version": "v1.0",
+    "split_version": "patient_stratified_v1",
+    "encoder": "RawFeatures",
+    "encoder_version": "1.0",
+    "embedding_dimension": 12,
+    "reduction_method": "none",
+    "reduced_dimension": 12,
+    "feature_selection": "none",
+    "classifier": "Logistic Regression",
+    "qml_method": null,
+    "qubits": null,
+    "depth": null,
+    "shots": null,
+    "backend": "cpu",
+    "seed": 42,
+    "metrics": {
+      "accuracy": 0.375,
+      "balanced_accuracy": 0.3667,
+      "sensitivity": 0.4,
+      "specificity": 0.3333,
+      "precision": 0.5,
+      "ppv": 0.5,
+      "npv": 0.25,
+      "f1": 0.4444,
+      "auc_roc": 0.4,
+      "auprc": 0.6783,
+      "mcc": -0.2582,
+      "brier_score": 0.4908,
+      "calibration_error": 0.5584,
+      "confusion_matrix": [
+        [
+          1,
+          2
+        ],
+        [
+          3,
+          2
+        ]
+      ],
+      "inference_time_ms": 56.223,
+      "peak_memory_mb": 0.752,
+      "bootstrap_ci_95": {
+        "mean": 0.3865,
+        "ci_lower": 0.0,
+        "ci_upper": 0.899,
+        "std": 0.2504
+      }
+    },
+    "runtime_sec": 0.45,
+    "artifact_paths": [],
+    "git_commit": "35c2679"
+  },
+  {
+    "experiment_id": "EXP-ED752FA4",
+    "timestamp": 1790001411.8144262,
+    "date": "2026-09-21 20:06:51",
+    "dataset": "Test_Clinical_Cohort",
+    "dataset_version": "v1.0",
+    "split_version": "patient_stratified_v1",
+    "encoder": "BiomedCLIP_Representation",
+    "encoder_version": "1.0.0",
+    "embedding_dimension": 512,
+    "reduction_method": "none",
+    "reduced_dimension": 12,
+    "feature_selection": "none",
+    "classifier": "MLP Classifier (64, 32)",
+    "qml_method": null,
+    "qubits": null,
+    "depth": null,
+    "shots": null,
+    "backend": "cpu",
+    "seed": 42,
+    "metrics": {
+      "accuracy": 0.625,
+      "balanced_accuracy": 0.5,
+      "sensitivity": 1.0,
+      "specificity": 0.0,
+      "precision": 0.625,
+      "ppv": 0.625,
+      "npv": 0.0,
+      "f1": 0.7692,
+      "auc_roc": 0.6667,
+      "auprc": 0.835,
+      "mcc": 0.0,
+      "brier_score": 0.2324,
+      "calibration_error": 0.1707,
+      "confusion_matrix": [
+        [
+          0,
+          3
+        ],
+        [
+          0,
+          5
+        ]
+      ],
+      "inference_time_ms": 0.075,
+      "peak_memory_mb": 0.006,
+      "bootstrap_ci_95": {
+        "mean": 0.6616,
+        "ci_lower": 0.2,
+        "ci_upper": 1.0,
+        "std": 0.2223
+      }
+    },
+    "runtime_sec": 0.001,
+    "artifact_paths": [],
+    "git_commit": "35c2679"
+  },
+  {
+    "experiment_id": "EXP-931F0F6F",
+    "timestamp": 1790001414.017267,
+    "date": "2026-09-21 20:06:54",
+    "dataset": "Test_Clinical_Cohort",
+    "dataset_version": "v1.0",
+    "split_version": "patient_stratified_v1",
+    "encoder": "BiomedCLIP",
+    "encoder_version": "1.0.0",
+    "embedding_dimension": 512,
+    "reduction_method": "PCA",
+    "reduced_dimension": 4,
+    "feature_selection": "train_pca",
+    "classifier": "QSVM (Fidelity Kernel)",
+    "qml_method": "QSVM",
+    "qubits": 4,
+    "depth": 1,
+    "shots": null,
+    "backend": "default.qubit",
+    "seed": 42,
+    "metrics": {
+      "accuracy": 0.5,
+      "balanced_accuracy": 0.4667,
+      "sensitivity": 0.6,
+      "specificity": 0.3333,
+      "precision": 0.6,
+      "ppv": 0.6,
+      "npv": 0.3333,
+      "f1": 0.6,
+      "auc_roc": 0.7333,
+      "auprc": 0.81,
+      "mcc": -0.0667,
+      "brier_score": 0.3883,
+      "calibration_error": 0.5032,
+      "confusion_matrix": [
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          3
+        ]
+      ],
+      "inference_time_ms": 175.483,
+      "peak_memory_mb": 0.049,
+      "bootstrap_ci_95": {
+        "mean": 0.7442,
+        "ci_lower": 0.1429,
+        "ci_upper": 1.0,
+        "std": 0.2523
+      }
+    },
+    "runtime_sec": 1.404,
+    "artifact_paths": [],
+    "git_commit": "35c2679"
+  },
+  {
+    "experiment_id": "EXP-4E1A4077",
+    "timestamp": 1790001417.088039,
+    "date": "2026-09-21 20:06:57",
+    "dataset": "Test_Clinical_Cohort",
+    "dataset_version": "v1.0",
+    "split_version": "patient_stratified_v1",
+    "encoder": "BiomedCLIP",
+    "encoder_version": "1.0.0",
+    "embedding_dimension": 512,
+    "reduction_method": "PCA",
+    "reduced_dimension": 8,
+    "feature_selection": "train_pca",
+    "classifier": "VQC (8-Qubit Circular CNOT)",
+    "qml_method": "VQC",
+    "qubits": 8,
+    "depth": 2,
+    "shots": 2048,
+    "backend": "default.qubit",
+    "seed": 42,
+    "metrics": {
+      "accuracy": 0.5,
+      "balanced_accuracy": 0.5333,
+      "sensitivity": 0.4,
+      "specificity": 0.6667,
+      "precision": 0.6667,
+      "ppv": 0.6667,
+      "npv": 0.4,
+      "f1": 0.5,
+      "auc_roc": 0.6667,
+      "auprc": 0.7862,
+      "mcc": 0.0667,
+      "brier_score": 0.2441,
+      "calibration_error": 0.1407,
+      "confusion_matrix": [
+        [
+          2,
+          1
+        ],
+        [
+          3,
+          2
+        ]
+      ],
+      "inference_time_ms": 279.528,
+      "peak_memory_mb": 0.649,
+      "bootstrap_ci_95": {
+        "mean": 0.6683,
+        "ci_lower": 0.125,
+        "ci_upper": 1.0,
+        "std": 0.2532
+      },
+      "circuit_depth": 2,
+      "total_gates": 64
+    },
+    "runtime_sec": 2.236,
+    "artifact_paths": [],
+    "git_commit": "35c2679"
+  },
+  {
+    "experiment_id": "EXP-73AF4F45",
+    "timestamp": 1790001417.9619033,
+    "date": "2026-09-21 20:06:57",
+    "dataset": "Test_Clinical_Cohort",
+    "dataset_version": "v1.0",
+    "split_version": "patient_stratified_v1",
+    "encoder": "BiomedCLIP",
+    "encoder_version": "1.0.0",
+    "embedding_dimension": 512,
+    "reduction_method": "PCA",
+    "reduced_dimension": 4,
+    "feature_selection": "train_pca",
+    "classifier": "Hybrid QNN (TorchLayer + MLP)",
+    "qml_method": "HybridQNN",
+    "qubits": 4,
+    "depth": 2,
+    "shots": null,
+    "backend": "default.qubit",
+    "seed": 42,
+    "metrics": {
+      "accuracy": 0.375,
+      "balanced_accuracy": 0.5,
+      "sensitivity": 0.0,
+      "specificity": 1.0,
+      "precision": 0.0,
+      "ppv": 0.0,
+      "npv": 0.375,
+      "f1": 0.0,
+      "auc_roc": 0.4667,
+      "auprc": 0.7593,
+      "mcc": 0.0,
+      "brier_score": 0.2705,
+      "calibration_error": 0.1914,
+      "confusion_matrix": [
+        [
+          3,
+          0
+        ],
+        [
+          5,
+          0
+        ]
+      ],
+      "inference_time_ms": 7.072,
+      "peak_memory_mb": 0.079,
+      "bootstrap_ci_95": {
+        "mean": 0.4645,
+        "ci_lower": 0.0,
+        "ci_upper": 1.0,
+        "std": 0.2295
+      }
+    },
+    "runtime_sec": 0.057,
+    "artifact_paths": [],
+    "git_commit": "35c2679"
+  },
+  {
+    "experiment_id": "EXP-1D63DC99",
+    "timestamp": 1790001419.1950583,
+    "date": "2026-09-21 20:06:59",
+    "dataset": "Test_Clinical_Cohort",
+    "dataset_version": "v1.0",
+    "split_version": "patient_stratified_v1",
+    "encoder": "BiomedCLIP",
+    "encoder_version": "1.0.0",
+    "embedding_dimension": 512,
+    "reduction_method": "PCA",
+    "reduced_dimension": 8,
+    "feature_selection": "train_pca",
+    "classifier": "Calibrated VQC+RF Ensemble Champion",
+    "qml_method": "Ensemble",
+    "qubits": 8,
+    "depth": 2,
+    "shots": 2048,
+    "backend": "default.qubit",
+    "seed": 42,
+    "metrics": {
+      "accuracy": 0.25,
+      "balanced_accuracy": 0.2667,
+      "sensitivity": 0.2,
+      "specificity": 0.3333,
+      "precision": 0.3333,
+      "ppv": 0.3333,
+      "npv": 0.2,
+      "f1": 0.25,
+      "auc_roc": 0.4667,
+      "auprc": 0.6962,
+      "mcc": -0.4667,
+      "brier_score": 0.2509,
+      "calibration_error": 0.2549,
+      "confusion_matrix": [
+        [
+          1,
+          2
+        ],
+        [
+          4,
+          1
+        ]
+      ],
+      "inference_time_ms": 27.92,
+      "peak_memory_mb": 0.38,
+      "bootstrap_ci_95": {
+        "mean": 0.4544,
+        "ci_lower": 0.0,
+        "ci_upper": 1.0,
+        "std": 0.2802
+      },
+      "generalization_gap": 0.75
+    },
+    "runtime_sec": 0.223,
+    "artifact_paths": [],
+    "git_commit": "35c2679"
   }
 ]

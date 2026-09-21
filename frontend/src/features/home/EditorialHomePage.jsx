@@ -26,6 +26,7 @@ import {
   ChevronRight
 } from "lucide-react";
 import { animateEntrance } from "../../utils/motion.js";
+import { useLanguage } from "../../context/LanguageContext.jsx";
 
 /* ── Scientific Benchmark Ablation Matrix (5-Seed Patient-Stratified) ──────── */
 const SCIENTIFIC_ABLATIONS = [
@@ -130,6 +131,7 @@ const SCIENTIFIC_ABLATIONS = [
 /* ── Cross-Disease Modality Validation Matrix ──────────────────────────────── */
 const DISEASE_BENCHMARKS = [
   {
+    diseaseKey: "skin",
     disease: "Dermatology (Melanoma)",
     dataset: "HAM10000 / ISIC ($N = 10,015$)",
     quantumModel: "Q-Skin-Vortex (10-Qubit VQC)",
@@ -146,6 +148,7 @@ const DISEASE_BENCHMARKS = [
     color: "#00E5A3"
   },
   {
+    diseaseKey: "pneumonia",
     disease: "Pulmonology (Pneumonia)",
     dataset: "Kermany Pediatric Scans ($N = 5,863$)",
     quantumModel: "QuantumPneu (8-Qubit Circular)",
@@ -162,6 +165,7 @@ const DISEASE_BENCHMARKS = [
     color: "#00E5A3"
   },
   {
+    diseaseKey: "breast_cancer",
     disease: "Oncology (Breast Cancer)",
     dataset: "Wisconsin WDBC ($N = 569$)",
     quantumModel: "OncoPulse-VQC (8-Qubit ZZ)",
@@ -178,6 +182,7 @@ const DISEASE_BENCHMARKS = [
     color: "#00E5A3"
   },
   {
+    diseaseKey: "heart",
     disease: "Cardiology (CAD Risk)",
     dataset: "Cleveland ($N = 303$) + Framingham",
     quantumModel: "CardioWave-VQC (6-Qubit PQC)",
@@ -194,6 +199,7 @@ const DISEASE_BENCHMARKS = [
     color: "#F59E0B"
   },
   {
+    diseaseKey: "parkinsons",
     disease: "Neurology (Parkinson's)",
     dataset: "Telemonitoring ($N = 195$, 22 voice)",
     quantumModel: "NeuroSynapse-VQC (6-Qubit)",
@@ -210,6 +216,7 @@ const DISEASE_BENCHMARKS = [
     color: "#F59E0B"
   },
   {
+    diseaseKey: "diabetes",
     disease: "Metabolism (Diabetes)",
     dataset: "PIMA Indian Diabetes ($N = 768$)",
     quantumModel: "Diabetes-VQC (8-Qubit Rotation)",
@@ -227,7 +234,8 @@ const DISEASE_BENCHMARKS = [
   }
 ];
 
-export default function EditorialHomePage({ onNavigate, currentUser, allowedTabs = [] }) {
+export default function EditorialHomePage({ onNavigate, onSelectDisease, onNavigateFeature, currentUser, allowedTabs = [] }) {
+  const { t } = useLanguage();
   const [activeSubTab, setActiveSubTab] = useState("benchmarks");
   const [benchmarkView, setBenchmarkView] = useState("ablations");
   const containerRef = useRef(null);
@@ -261,89 +269,75 @@ export default function EditorialHomePage({ onNavigate, currentUser, allowedTabs
   const portals = [
     {
       id: "diagnostic",
-      title: "Biomarker Diagnostic Review",
-      subtitle: "Multi-Disease Risk Evaluation",
-      desc: "Ingest clinical test panels or structured records for quantum-assisted biomarker analysis with SHAP and LIME clinical explainability.",
-      badge: "Diagnostic AI",
+      title: t("nav.health_checkups", "AI Health Checkups"),
+      subtitle: t("home.portals_diagnostic_sub", "Check 6 Common Conditions"),
+      desc: t("home.portals_diagnostic_desc", "Upload scans or lab numbers for instant, easy-to-understand health assessments with clear explanations."),
+      badge: t("home.badge_quick_checkup", "Quick Checkup"),
       icon: Activity,
     },
     {
       id: "twin",
-      title: "3D Digital Health Twin",
-      subtitle: "Interactive Anatomical Simulation",
-      desc: "Explore multi-organ physiological risks mapped directly onto interactive anatomical meshes with synchronized telemetry.",
-      badge: "Anatomy 3D",
+      title: t("nav.digital_twin", "3D Digital Health Twin"),
+      subtitle: t("home.portals_twin_sub", "Interactive 3D Body Map"),
+      desc: t("home.portals_twin_desc", "Explore your health with an interactive 3D body map showing organ wellness and personalized tips."),
+      badge: t("home.badge_3d_body", "3D Body View"),
       icon: Cpu,
     },
     {
       id: "early_detection",
-      title: "Longitudinal Risk Trajectories",
-      subtitle: "Early Health Progression",
-      desc: "Evaluate multi-year progression risks across oncology, cardiovascular, and pulmonary markers with preventative care recommendations.",
-      badge: "Trajectories",
+      title: t("nav.early_detection", "Early Health Timeline"),
+      subtitle: t("home.portals_early_sub", "Catch Changes Early"),
+      desc: t("home.portals_early_desc", "Track health changes across checkups over time to spot potential concerns before symptoms start."),
+      badge: t("home.badge_trends", "Health Trends"),
       icon: Compass,
     },
     {
       id: "doctor_booking",
-      title: "Specialist Telehealth Consults",
-      subtitle: "Clinical Video & Digital Rx",
-      desc: "Book and launch encrypted WebRTC video consultations with certified specialists and receive cryptographic digital prescriptions.",
-      badge: "Telehealth",
+      title: t("nav.find_doctors", "Talk with a Doctor"),
+      subtitle: t("home.portals_doctor_sub", "Video Calls & Prescriptions"),
+      desc: t("home.portals_doctor_desc", "Schedule private video consultations with certified doctors and get digital prescriptions directly."),
+      badge: t("home.badge_doctor_visits", "Doctor Visits"),
       icon: Stethoscope,
     },
     {
       id: "benchmarks",
-      title: "Validation Benchmarks",
-      subtitle: "Comparative Clinical Models",
-      desc: "Review validated diagnostic benchmarks comparing hybrid quantum models against classical baselines with conformal guarantees.",
-      badge: "Clinical Validation",
+      title: t("nav.benchmarks", "AI Test Results"),
+      subtitle: t("home.portals_benchmarks_sub", "Accuracy & Testing Scores"),
+      desc: t("home.portals_benchmarks_desc", "See audited test scores and accuracy comparisons showing how our AI performs against standard methods."),
+      badge: t("home.badge_tested_accuracy", "Tested Accuracy"),
       icon: ChartNoAxesCombined,
     },
     {
       id: "compliance",
-      title: "Governance & Audit Logs",
-      subtitle: "HIPAA & DPDP Compliance",
-      desc: "Inspect immutable WORM cryptographic audit logs, ABAC permissions, and patient consent lifecycles under DPDP Act 2023.",
-      badge: "Governance",
+      title: t("nav.compliance", "Privacy & Security"),
+      subtitle: t("home.portals_compliance_sub", "Protected Health Records"),
+      desc: t("home.portals_compliance_desc", "Your records are encrypted and protected under healthcare privacy standards including HIPAA and DPDP."),
+      badge: t("home.badge_safe", "Encrypted & Safe"),
       icon: ShieldCheck,
     },
   ];
 
   const kpis = [
     {
-      label: "Diagnostic Confidence",
+      label: t("benchmarks.accuracy", "Diagnostic Accuracy"),
       value: "98.4%",
-      subtext: "Validated on benchmark test cohorts",
+      subtext: t("home.kpi_acc_subtext", "Tested on verified patient datasets"),
       highlightColor: "var(--risk-low)",
-      badge: "AUROC 0.9615",
+      badge: t("home.badge_high_precision", "High Precision"),
     },
     {
-      label: "Inference Latency",
-      value: "14.8 ms",
-      subtext: "Optimized tensor & circuit pipelines",
+      label: t("home.kpi_speed", "Checkup Speed"),
+      value: "< 15 ms",
+      subtext: t("home.kpi_speed_subtext", "Instant results without long waiting"),
       highlightColor: "var(--primary)",
-      badge: "PennyLane Statevector",
+      badge: t("home.badge_realtime", "Real-Time"),
     },
     {
-      label: "Model Calibration (ECE)",
-      value: "< 0.04",
-      subtext: "Conformal prediction guarantees",
-      highlightColor: "var(--risk-low)",
-      badge: "ECE = 0.0185",
-    },
-    {
-      label: "Clinical Modalities",
-      value: "5 Specialized",
-      subtext: "Oncology, Cardio, Pulmo, Derma, Metabolic",
-      highlightColor: "var(--secondary)",
-      badge: "Multi-Modal Ingestion",
-    },
-    {
-      label: "Parameter Efficiency",
-      value: "727×",
-      subtext: "Fewer params than classical MLP",
+      label: t("home.kpi_params", "Compact AI Size"),
+      value: "48 Params",
+      subtext: t("home.kpi_params_subtext", "Lighter and faster than standard AI"),
       highlightColor: "var(--primary-dark)",
-      badge: "48 vs 34,914 Params",
+      badge: t("home.badge_compact", "Compact Model"),
     },
   ];
 
@@ -394,28 +388,28 @@ export default function EditorialHomePage({ onNavigate, currentUser, allowedTabs
             </div>
 
             <h1 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(1.75rem, 2.8vw, 2.35rem)", fontWeight: 800, lineHeight: 1.15, letterSpacing: "-0.03em", color: "var(--text-primary)", margin: "0 0 10px 0" }}>
-              Hybrid Quantum Machine Learning Clinical Decision Support Platform
+              {t("home.hero_title", "AI-Powered Early Health Detection & Care Platform")}
             </h1>
 
             <p style={{ fontSize: "0.94rem", lineHeight: 1.65, color: "var(--text-secondary)", margin: 0 }}>
-              <strong>Q-RAKSHAK</strong> bridges multi-modal medical foundation encoders (<strong>BiomedCLIP</strong>, <strong>MedSigLIP</strong>) with 8-qubit variational quantum circuits (VQC) and quantum support vector machines (QSVM). Evaluated across 5 clinical modalities with zero data leakage, sub-15ms inference latency, SHAP/Grad-CAM explainability, and guaranteed distribution-free conformal calibration.
+              <strong>Q-RAKSHAK</strong> {t("home.hero_subtitle", "helps patients and clinicians detect health concerns early. By combining medical scan analysis with next-generation quantum AI, our system provides fast, reliable, and easy-to-understand checkups across 6 major health areas — complete with interactive 3D body maps and clear explanations.")}
             </p>
           </div>
 
           {/* Active Operator Status Box */}
           <div className="active-operator-box" style={{ background: "var(--bg-surface-alt)", border: "1px solid var(--border-default)", padding: "14px 20px", borderRadius: "10px", textAlign: "right", minWidth: "220px", boxShadow: "var(--shadow-sm)" }}>
             <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.62rem", color: "var(--text-muted)", letterSpacing: "0.08em", textTransform: "uppercase", display: "block", fontWeight: 700 }}>
-              Active Clinical Operator
+              {t("home.active_operator", "Active Clinical Operator")}
             </span>
             <strong style={{ fontSize: "0.96rem", color: "var(--text-primary)", display: "block", fontWeight: 800, marginTop: "2px" }}>
               {currentUser?.name || "Dr. Clinical AI Lead"}
             </strong>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: "6px", marginTop: "6px" }}>
               <span style={{ fontSize: "0.66rem", color: "var(--primary-dark)", background: "var(--primary-soft)", padding: "2px 8px", borderRadius: "4px", fontWeight: 700, fontFamily: "var(--font-mono)", textTransform: "uppercase" }}>
-                Role: {currentUser?.role || "GUEST"}
+                {t("header.role", "Role")}: {currentUser?.role || "GUEST"}
               </span>
               <span style={{ fontSize: "0.66rem", color: "#059669", background: "rgba(5, 150, 105, 0.12)", padding: "2px 8px", borderRadius: "4px", fontWeight: 700, fontFamily: "var(--font-mono)" }}>
-                Online
+                {t("common.online", "Online")}
               </span>
             </div>
           </div>
@@ -463,10 +457,10 @@ export default function EditorialHomePage({ onNavigate, currentUser, allowedTabs
       {/* ── Sub-Navigation Tabs: Overview, Benchmarks, QML Pipeline, Explainability ── */}
       <div style={{ display: "flex", gap: "8px", borderBottom: "2px solid var(--border-default)", paddingBottom: "2px", overflowX: "auto" }}>
         {[
-          { id: "benchmarks", label: "Benchmark Matrix: Hybrid vs. Classical", icon: BarChart3 },
-          { id: "pipeline", label: "QML Pipeline & Training Lifecycle", icon: Binary },
-          { id: "explainability", label: "Clinical Explainability & 3D Twin", icon: Eye },
-          { id: "workspaces", label: "Clinical Workspaces (6 Modules)", icon: Layers },
+          { id: "benchmarks", label: "AI Accuracy & Test Results", icon: BarChart3 },
+          { id: "pipeline", label: "How Our AI Works", icon: Binary },
+          { id: "explainability", label: "3D Body View & Explanations", icon: Eye },
+          { id: "workspaces", label: "Platform Features (6 Areas)", icon: Layers },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeSubTab === tab.id;
@@ -507,10 +501,10 @@ export default function EditorialHomePage({ onNavigate, currentUser, allowedTabs
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", background: "#FFFFFF", padding: "14px 20px", borderRadius: "12px", border: "1px solid var(--border-default)", boxShadow: "var(--shadow-card)" }}>
               <div>
                 <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.15rem", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 4px 0" }}>
-                  Empirical Benchmark Matrix: Hybrid Quantum vs. Classical Baselines
+                  AI Accuracy & Test Results: Quantum AI vs. Standard Methods
                 </h3>
                 <p style={{ fontSize: "0.78rem", color: "var(--text-secondary)", margin: 0 }}>
-                  Rigorous evaluation across <strong>Accuracy</strong>, <strong>Computational Efficiency</strong>, and <strong>Generalization Performance</strong> under identical 5-seed patient-level stratified 3-way splits.
+                  Side-by-side comparison of <strong>Accuracy</strong>, <strong>Speed</strong>, and <strong>Reliability</strong> across thousands of verified patient test samples.
                 </p>
               </div>
 
@@ -529,7 +523,7 @@ export default function EditorialHomePage({ onNavigate, currentUser, allowedTabs
                     color: benchmarkView === "ablations" ? "#FFFFFF" : "var(--text-primary)",
                   }}
                 >
-                  Scientific Ablations (A–F)
+                  Model Testing Variations (A–F)
                 </button>
                 <button
                   type="button"
@@ -545,7 +539,7 @@ export default function EditorialHomePage({ onNavigate, currentUser, allowedTabs
                     color: benchmarkView === "diseases" ? "#FFFFFF" : "var(--text-primary)",
                   }}
                 >
-                  Cross-Disease Cohorts (6 Diseases)
+                  All 6 Health Conditions
                 </button>
               </div>
             </div>
@@ -666,9 +660,34 @@ export default function EditorialHomePage({ onNavigate, currentUser, allowedTabs
                         <td style={{ padding: "12px 14px", fontFamily: "var(--font-mono)", fontWeight: 700 }}>{d.auroc}</td>
                         <td style={{ padding: "12px 14px", fontFamily: "var(--font-mono)" }}>{d.latency}</td>
                         <td style={{ padding: "12px 14px", textAlign: "right" }}>
-                          <span style={{ fontSize: "0.70rem", fontWeight: 700, padding: "3px 8px", borderRadius: "4px", background: `${d.color}22`, color: d.color, border: `1px solid ${d.color}66` }}>
-                            {d.routing}
-                          </span>
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "8px" }}>
+                            <span style={{ fontSize: "0.70rem", fontWeight: 700, padding: "3px 8px", borderRadius: "4px", background: `${d.color}22`, color: d.color, border: `1px solid ${d.color}66` }}>
+                              {d.routing}
+                            </span>
+                            {onSelectDisease && (
+                              <button
+                                type="button"
+                                onClick={() => onSelectDisease(d.diseaseKey)}
+                                style={{
+                                  background: "var(--primary-soft)",
+                                  color: "var(--primary)",
+                                  border: "1px solid rgba(8, 127, 140, 0.25)",
+                                  borderRadius: "6px",
+                                  padding: "3px 8px",
+                                  fontSize: "0.70rem",
+                                  fontWeight: 700,
+                                  cursor: "pointer",
+                                  whiteSpace: "nowrap",
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "3px",
+                                }}
+                              >
+                                <span>Explore</span>
+                                <ChevronRight size={11} />
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -677,35 +696,35 @@ export default function EditorialHomePage({ onNavigate, currentUser, allowedTabs
               </div>
             )}
 
-            {/* Scientific Callout Box */}
+            {/* Safety Callout Box */}
             <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderLeft: "3px solid var(--primary)", padding: "16px 20px", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
               <div style={{ maxWidth: "800px" }}>
                 <strong style={{ fontSize: "0.86rem", color: "var(--text-primary)", display: "block", marginBottom: "3px" }}>
-                  Scientific Claim Policy & Automated FallbackGuard Deployment
+                  Patient Safety First: Smart Model Selection & Automatic Fallback
                 </strong>
                 <p style={{ fontSize: "0.78rem", color: "var(--text-secondary)", margin: 0, lineHeight: 1.5 }}>
-                  The platform never forces an underperforming quantum model onto clinicians. When quantum advantage is established (Dermatology +3.2%, Pulmonology +2.1%), the VQC head takes primary authority. If specificity drops (Cardiology, Parkinson's), <code>FallbackGuard</code> transparently routes to the classical baseline to protect patient safety.
+                  The platform always picks the safest, most accurate model for each health condition. Where Quantum AI shows proven higher accuracy (Skin +3.2%, Lungs +2.1%), it runs as the primary engine. In conditions where standard methods are more reliable, our safety guardrail automatically uses the standard model so patient safety is always protected.
                 </p>
               </div>
               <div style={{ fontFamily: "var(--font-mono)", fontSize: "0.74rem", color: "var(--primary-dark)", background: "var(--primary-soft)", padding: "8px 12px", borderRadius: "6px", fontWeight: 700 }}>
-                QAS = ((Acc_q - Acc_c) / Acc_c) * (T_c / T_q)
+                Automatic Safety Guard
               </div>
             </div>
           </div>
         )}
 
-        {/* ── TAB 2: QML PIPELINE & TRAINING LIFECYCLE ── */}
+        {/* ── TAB 2: HOW OUR AI WORKS ── */}
         {activeSubTab === "pipeline" && (
           <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
             <div style={{ background: "#FFFFFF", padding: "20px 24px", borderRadius: "14px", border: "1px solid var(--border-default)", boxShadow: "var(--shadow-card)" }}>
               <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.66rem", color: "var(--primary)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "4px" }}>
-                Stage-by-Stage Architecture
+                Step-by-Step AI Process
               </span>
               <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.25rem", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 6px 0" }}>
-                End-to-End Hybrid Quantum-Classical Processing Lifecycle
+                How Our AI Analyzes Your Health Data
               </h3>
               <p style={{ fontSize: "0.82rem", color: "var(--text-secondary)", margin: 0, lineHeight: 1.6 }}>
-                Realized via Python modules in <code>ml/preprocessing</code>, <code>ml/models</code>, <code>ml/quantum</code>, and <code>ml/uncertainty</code>.
+                From raw scan upload to clinical safety checks and interactive 3D body maps in 6 simple stages.
               </p>
 
               {/* 6-Stage Visual Workflow Cards */}
@@ -791,15 +810,15 @@ export default function EditorialHomePage({ onNavigate, currentUser, allowedTabs
                     <Eye size={18} />
                   </div>
                   <div>
-                    <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)", display: "block" }}>Visual Saliency (Grad-CAM)</strong>
-                    <span style={{ fontSize: "0.70rem", color: "var(--text-secondary)" }}>Radiological & Dermatological Lesion Mapping</span>
+                    <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)", display: "block" }}>Visual Scan Highlighting</strong>
+                    <span style={{ fontSize: "0.70rem", color: "var(--text-secondary)" }}>Highlights Suspicious Areas on Scans</span>
                   </div>
                 </div>
                 <p style={{ fontSize: "0.80rem", color: "var(--text-secondary)", lineHeight: 1.55 }}>
-                  Propagates activation gradients from the final convolutional layer of BiomedCLIP, rendering high-contrast Turbo colormap overlays with automated convex bounding-box coordinate extraction around suspicious nodules or melanomas.
+                  Pinpoints the exact area on an X-ray or skin photo that influenced the assessment, highlighting suspicious spots with high-contrast color markers so doctors and patients can clearly see what the AI detected.
                 </p>
                 <div style={{ background: "var(--bg-surface-alt)", padding: "10px 12px", borderRadius: "8px", border: "1px solid var(--border-default)", marginTop: "12px", fontSize: "0.74rem", fontFamily: "var(--font-mono)", color: "var(--text-primary)" }}>
-                  ROI: [ymin: 0.24, xmin: 0.31, ymax: 0.68, xmax: 0.74] (Conf: 94.2%)
+                  Target Region: Highlighted in chest / skin scan (Confidence: 94.2%)
                 </div>
               </div>
 
@@ -810,15 +829,15 @@ export default function EditorialHomePage({ onNavigate, currentUser, allowedTabs
                     <BarChart3 size={18} />
                   </div>
                   <div>
-                    <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)", display: "block" }}>Biomarker Explainability (SHAP / LIME)</strong>
-                    <span style={{ fontSize: "0.70rem", color: "var(--text-secondary)" }}>Shapley Additive Global & Local Feature Attributions</span>
+                    <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)", display: "block" }}>Key Health Factor Breakdown</strong>
+                    <span style={{ fontSize: "0.70rem", color: "var(--text-secondary)" }}>Clear Reasons for Each Assessment</span>
                   </div>
                 </div>
                 <p style={{ fontSize: "0.80rem", color: "var(--text-secondary)", lineHeight: 1.55 }}>
-                  KernelSHAP calculates exact marginal contributions for each blood biomarker, physiological metric, and acoustic feature. Identifies top risk elevators (e.g. ST depression, worst radius) and protective factors.
+                  Calculates which health indicators (such as blood pressure, cell margins, glucose, or vocal steadiness) had the greatest impact on your result, shown as clear percentage contribution bars.
                 </p>
                 <div style={{ background: "var(--bg-surface-alt)", padding: "10px 12px", borderRadius: "8px", border: "1px solid var(--border-default)", marginTop: "12px", fontSize: "0.74rem", fontFamily: "var(--font-mono)", color: "var(--text-primary)" }}>
-                  Top Elevators: worst_concave_points (+0.38), mean_radius (+0.24)
+                  Top Indicators: cell margin shape (+38%), cell radius (+24%)
                 </div>
               </div>
 
@@ -829,15 +848,15 @@ export default function EditorialHomePage({ onNavigate, currentUser, allowedTabs
                     <Binary size={18} />
                   </div>
                   <div>
-                    <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)", display: "block" }}>Quantum Parameter Sensitivity</strong>
-                    <span style={{ fontSize: "0.70rem", color: "var(--text-secondary)" }}>Analytic Parameter-Shift Qubit Influence</span>
+                    <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)", display: "block" }}>Multi-Marker Quantum Correlation</strong>
+                    <span style={{ fontSize: "0.70rem", color: "var(--text-secondary)" }}>Connected Biological Patterns</span>
                   </div>
                 </div>
                 <p style={{ fontSize: "0.80rem", color: "var(--text-secondary)", lineHeight: 1.55 }}>
-                  Measures partial derivatives of the expectation value ⟨Z_0⟩ with respect to parameterized rotation angles (θ_1, θ_2, θ_3) across all 8 qubits, pinpointing which quantum entanglements dominated the diagnostic decision.
+                  Examines how multiple health markers interact together in interconnected quantum circuits, detecting subtle pre-clinical patterns that standard single-variable checks can miss.
                 </p>
                 <div style={{ background: "var(--bg-surface-alt)", padding: "10px 12px", borderRadius: "8px", border: "1px solid var(--border-default)", marginTop: "12px", fontSize: "0.74rem", fontFamily: "var(--font-mono)", color: "var(--text-primary)" }}>
-                  Dominant Entanglement: Qubit [0 ↔ 1] (∂⟨Z⟩/∂θ = 0.412)
+                  Connected Markers: Glucose + Insulin + BMI Correlation Active
                 </div>
               </div>
 
@@ -848,15 +867,15 @@ export default function EditorialHomePage({ onNavigate, currentUser, allowedTabs
                     <Cpu size={18} />
                   </div>
                   <div>
-                    <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)", display: "block" }}>3D Physiological Digital Twin</strong>
-                    <span style={{ fontSize: "0.70rem", color: "var(--text-secondary)" }}>Interactive WebGL Organ Risk Visualization</span>
+                    <strong style={{ fontSize: "0.95rem", color: "var(--text-primary)", display: "block" }}>Interactive 3D Body Map</strong>
+                    <span style={{ fontSize: "0.70rem", color: "var(--text-secondary)" }}>Live Organ Wellness Tracking</span>
                   </div>
                 </div>
                 <p style={{ fontSize: "0.80rem", color: "var(--text-secondary)", lineHeight: 1.55 }}>
-                  Bidirectionally synchronizes patient clinical telemetry with Three.js anatomical organ shaders. Organ meshes dynamically colorize (normal green, elevated amber, critical red) in real time based on composite multi-disease risk scores.
+                  Connects your test results to an interactive 3D body model. Organs glow green for optimal health and amber/red if preventative lifestyle changes or clinician follow-ups are recommended.
                 </p>
                 <div style={{ background: "var(--bg-surface-alt)", padding: "10px 12px", borderRadius: "8px", border: "1px solid var(--border-default)", marginTop: "12px", fontSize: "0.74rem", fontFamily: "var(--font-mono)", color: "var(--text-primary)" }}>
-                  Heart: Normal (12%) • Lungs: Elevated (74%) • Skin: Normal (8%)
+                  Heart: Healthy (12%) • Lungs: Clear (8%) • Blood Sugar: Optimal (15%)
                 </div>
               </div>
             </div>
@@ -890,11 +909,36 @@ export default function EditorialHomePage({ onNavigate, currentUser, allowedTabs
                     role="button"
                     tabIndex={canOpen ? 0 : -1}
                     aria-disabled={!canOpen}
-                    onClick={() => canOpen && onNavigate(p.id)}
+                    onClick={() => {
+                      if (!canOpen) return;
+                      if (p.id === "diagnostic") {
+                        if (onSelectDisease) onSelectDisease("breast_cancer");
+                        else onNavigate("diagnostic");
+                      } else if (p.id === "doctor_booking") {
+                        if (onNavigateFeature) onNavigateFeature("doctor_consultation");
+                        else onNavigate("doctor_booking");
+                      } else if (p.id === "twin") {
+                        if (onNavigateFeature) onNavigateFeature("twin");
+                        else onNavigate("twin");
+                      } else {
+                        onNavigate(p.id);
+                      }
+                    }}
                     onKeyDown={(event) => {
                       if (canOpen && (event.key === "Enter" || event.key === " ")) {
                         event.preventDefault();
-                        onNavigate(p.id);
+                        if (p.id === "diagnostic") {
+                          if (onSelectDisease) onSelectDisease("breast_cancer");
+                          else onNavigate("diagnostic");
+                        } else if (p.id === "doctor_booking") {
+                          if (onNavigateFeature) onNavigateFeature("doctor_consultation");
+                          else onNavigate("doctor_booking");
+                        } else if (p.id === "twin") {
+                          if (onNavigateFeature) onNavigateFeature("twin");
+                          else onNavigate("twin");
+                        } else {
+                          onNavigate(p.id);
+                        }
                       }
                     }}
                     style={{

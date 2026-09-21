@@ -1,8 +1,10 @@
 import { useEffect, useRef } from "react";
 import { X, Info, Sparkles } from "lucide-react";
 import { animateModalOpen } from "../../utils/motion";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function SectionGuideModal({ isOpen, onClose, guideData }) {
+  const { t } = useLanguage();
   const overlayRef = useRef(null);
   const modalRef = useRef(null);
 
