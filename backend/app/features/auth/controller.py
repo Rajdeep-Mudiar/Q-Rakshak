@@ -142,7 +142,7 @@ async def login(req: LoginRequest):
     if not user and target_identifier != clean_identifier:
         user = DatabaseRepository.get_user_by_credentials(clean_identifier)
 
-    # Seed and demo accounts password sets
+    # Seed credentials are available only for the isolated demo database.
     seed_passwords = {
         "dr.kavita": "doctor123",
         "dr.rajesh": "doctor123",
@@ -154,7 +154,7 @@ async def login(req: LoginRequest):
         "priya.qml": "quantum123",
     }
 
-    if not user:
+    if not user and settings.IS_DEMO:
         # Check if the user is a known seed account that needs auto-initialization
         if clean_identifier in seed_passwords or target_identifier.lower() in seed_passwords:
             from backend.app.db.database import init_database
@@ -162,23 +162,14 @@ async def login(req: LoginRequest):
             user = DatabaseRepository.get_user_by_credentials(target_identifier) or DatabaseRepository.get_user_by_credentials(clean_identifier)
 
     if not user:
-        # Auto-provision custom/new user credentials so visitors and reviewers are never trapped in a 401 loop
-        user_role = req.role or ("doctor" if "dr." in clean_identifier else "patient")
-        name_part = raw_identifier.split("@")[0].replace(".", " ").title()
-        user = DatabaseRepository.create_user({
-            "username": clean_identifier,
-            "password_hash": hash_password(req.password),
-            "name": name_part,
-            "email": raw_identifier if "@" in raw_identifier else f"{clean_identifier}@q-rakshak.health",
-            "role": user_role,
-        })
+        raise HTTPException(status_code=401, detail="Invalid username or password.")
 
     stored_hash = user.get("password_hash", "")
     pwd_match = verify_password(req.password, stored_hash)
 
     # Allow official demo passwords for seed personas
     user_uname = user.get("username", "").lower()
-    if not pwd_match and (user_uname in seed_passwords or str(user.get("id", "")).startswith(("PT-", "DOC-", "ADM-", "RES-", "USR-5EF"))):
+    if settings.IS_DEMO and not pwd_match and (user_uname in seed_passwords or str(user.get("id", "")).startswith(("PT-", "DOC-", "ADM-", "RES-", "USR-5EF"))):
         if req.password in (seed_passwords.get(user_uname), "patient123", "clinician123", "doctor123", "admin123", "quantum123"):
             pwd_match = True
 

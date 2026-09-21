@@ -34,6 +34,7 @@ class BiomedCLIPEncoder(MedicalEncoder):
         self.model: Any = None
         self.transform: Any = None
         self.is_loaded = False
+        self.using_fallback = False
         self._init_transform()
 
     def _init_transform(self) -> None:
@@ -68,6 +69,7 @@ class BiomedCLIPEncoder(MedicalEncoder):
             except Exception:
                 pass
         self.model = None
+        self.using_fallback = True
         self.is_loaded = True
 
     def preprocess(self, input_data: Union[Image.Image, np.ndarray, torch.Tensor, str]) -> torch.Tensor:
@@ -111,7 +113,7 @@ class BiomedCLIPEncoder(MedicalEncoder):
             except Exception:
                 pass
 
-        # Robust, deterministic feature generation from tensor statistics
+        # Explicit development fallback, never represented as trained BiomedCLIP.
         batch_size = tensor.shape[0] if tensor.ndim > 1 else 1
         if tensor.ndim == 4:
             pooled = torch.nn.functional.adaptive_avg_pool2d(tensor, (16, 16))
@@ -137,12 +139,13 @@ class BiomedCLIPEncoder(MedicalEncoder):
 
     def metadata(self) -> dict[str, Any]:
         return {
-            "name": "BiomedCLIP",
+            "name": "DeterministicFeatureFallback" if self.using_fallback else "BiomedCLIP",
             "huggingface_id": "microsoft/BiomedCLIP-PubMedBERT_256-vit_base_patch16_224",
             "embedding_dimension": self.dim,
             "architecture": "PubMedBERT-256 + ViT-B/16-224",
             "supported_modalities": ["chest_xray", "dermatology", "histopathology", "ophthalmology", "2d_medical_image", "text"],
             "state": "frozen",
+            "provenance_status": "fallback" if self.using_fallback else "trained_weights",
             "device": str(self.device),
             "license": "Microsoft Open Source / Research",
             "license_type": "Research Only",

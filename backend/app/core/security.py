@@ -18,7 +18,7 @@ try:
     from backend.app.core.config import settings as _settings
     SECRET_KEY: str = _settings.JWT_SECRET
 except Exception:  # pragma: no cover
-    SECRET_KEY = os.environ.get("SECRET_KEY", "Q-RAKSHAK-quantum-clinical-secret-key-2026-production")
+    raise RuntimeError("Application security settings could not be loaded.")
 
 # ── Password Hashing — PBKDF2-HMAC-SHA256 (100k iterations with per-user salt) ──
 _PBKDF2_ITERATIONS = 100_000
@@ -54,7 +54,6 @@ def verify_password(plain: str, stored_hash: str) -> bool:
     1. Modern per-user salt PBKDF2: pbkdf2$100000$<salt>$<hash>
     2. Legacy static salt PBKDF2: pbkdf2$<hash>
     3. Legacy SHA-256 hashes
-    4. Pre-existing plaintext seed accounts during migration
     """
     if stored_hash.startswith("pbkdf2$"):
         parts = stored_hash.split("$")
@@ -75,9 +74,6 @@ def verify_password(plain: str, stored_hash: str) -> bool:
         else:
             return False
 
-    # Tolerates legacy unhashed entries in existing database during migration
-    if hmac.compare_digest(plain.encode(), stored_hash.encode()):
-        return True
     # Legacy SHA-256 path
     expected_legacy = _legacy_hash(plain)
     return hmac.compare_digest(expected_legacy.encode(), stored_hash.encode())
@@ -158,11 +154,7 @@ def verify_access_token(token: str) -> dict[str, Any]:
         raise HTTPException(status_code=401, detail=f"Authentication invalid: {exc}")
 
 
-VALID_API_KEYS = {
-    os.environ.get("API_KEY", "qmed-master-api-key-2026"),
-    "qmed-sih2026-api-key",
-    "qmed-gateway-key-prod",
-}
+VALID_API_KEYS = { _settings.API_KEY }
 
 
 async def get_current_user(

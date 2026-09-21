@@ -34,6 +34,7 @@ class MedSigLIPEncoder(MedicalEncoder):
         self.model: Any = None
         self.transform: Any = None
         self.is_loaded = False
+        self.using_fallback = False
         self._init_transform()
 
     def _init_transform(self) -> None:
@@ -56,6 +57,7 @@ class MedSigLIPEncoder(MedicalEncoder):
             except Exception:
                 pass
         self.model = None
+        self.using_fallback = True
         self.is_loaded = True
 
     def preprocess(self, input_data: Union[Image.Image, np.ndarray, torch.Tensor, str]) -> torch.Tensor:
@@ -104,12 +106,13 @@ class MedSigLIPEncoder(MedicalEncoder):
 
     def metadata(self) -> dict[str, Any]:
         return {
-            "name": "MedSigLIP",
+            "name": "DeterministicFeatureFallback" if self.using_fallback else "MedSigLIP",
             "huggingface_id": "google/medsiglip-448",
             "embedding_dimension": self.dim,
             "architecture": "SigLIP-448 Medical Vision-Language",
             "supported_modalities": ["chest_xray", "dermatology", "ophthalmology", "2d_medical_image"],
             "state": "frozen",
+            "provenance_status": "fallback" if self.using_fallback else "trained_weights",
             "device": str(self.device),
             "license": "Google Health AI Developer Foundations Terms of Use",
             "license_type": "Restricted Health AI Developer Foundations",

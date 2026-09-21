@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import json
+import logging
 import uuid
 from datetime import datetime, timezone
 from typing import Any
 
 from backend.app.db.database import get_db_connection
+
+logger = logging.getLogger(__name__)
 
 
 def save_prediction(record: dict[str, Any]) -> None:
@@ -33,7 +36,8 @@ def save_prediction(record: dict[str, Any]) -> None:
         ))
         conn.commit()
         conn.close()
-    except Exception:
+    except Exception as exc:
+        raise RuntimeError("Unable to persist skin-cancer prediction") from exc
         pass  # Silently tolerate DB write failures — prediction is still returned to caller
 
 
@@ -47,11 +51,11 @@ def list_predictions(limit: int = 50) -> list[dict[str, Any]]:
         ).fetchall()
         conn.close()
         return [dict(r) for r in rows]
-    except Exception:
+    except Exception as exc:
+        logger.exception("Unable to load skin-cancer prediction history: %s", exc)
         return []
 
 
 def register_model(meta: dict[str, Any]) -> None:
     """Stub — kept for backward compatibility."""
     pass
-

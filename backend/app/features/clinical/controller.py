@@ -16,7 +16,7 @@ from backend.app.core.qr_service import (
     generate_qr_png_bytes,
     generate_qr_svg_string,
 )
-from backend.app.core.security import check_inference_rate_limit, get_optional_user
+from backend.app.core.security import check_inference_rate_limit, get_current_user, get_optional_user
 from backend.app.core.config import settings
 from backend.app.db.repository import DatabaseRepository
 from ml.data.dataset_registry import load_disease_benchmark
@@ -70,25 +70,23 @@ def get_trained_module(disease: str):
         vqc = VariationalQuantumClassifier(n_qubits=n_qubits, n_layers=n_layers, data_reupload=True)
         ckpt_path = settings.MODELS_DIR / "quantum" / ckpt_filename
 
+        baselines = ClassicalBaselineSuite()
+        baselines.fit_all(df.values[:100], target.values[:100])
+
+        # API requests must never train a quantum model. A missing or incompatible
+        # checkpoint is a deployment problem, not a reason to block a patient request.
+        quantum_available = False
         if ckpt_path.exists():
             try:
                 vqc.load_checkpoint(ckpt_path)
+                quantum_available = True
             except Exception:
                 try:
                     state = torch.load(ckpt_path, map_location="cpu", weights_only=True)
                     vqc.load_state_dict(state.get("state_dict", state.get("model", state)))
+                    quantum_available = True
                 except Exception:
-                    vqc.fit_dataset(X_q[:64], target.values[:64], epochs=4, lr=0.03, batch_size=16)
-        else:
-            vqc.fit_dataset(X_q[:64], target.values[:64], epochs=4, lr=0.03, batch_size=16)
-            try:
-                ckpt_path.parent.mkdir(parents=True, exist_ok=True)
-                vqc.save_checkpoint(ckpt_path)
-            except Exception:
-                pass
-
-        baselines = ClassicalBaselineSuite()
-        baselines.fit_all(df.values[:100], target.values[:100])
+                    quantum_available = False
 
         explainer = ExplainabilityEngine(feat_names)
 
@@ -98,6 +96,7 @@ def get_trained_module(disease: str):
             "feat_names": feat_names,
             "preprocessor": preprocessor,
             "vqc": vqc,
+            "quantum_available": quantum_available,
             "baselines": baselines,
             "explainer": explainer,
             "arch": config.get("arch", "VQC"),
@@ -107,7 +106,10 @@ def get_trained_module(disease: str):
 
 
 @router.post("/diagnose", dependencies=[Depends(check_inference_rate_limit)])
-async def run_clinical_diagnosis(req: DiagnosticRequest, current_user: dict[str, Any] = Depends(get_optional_user)):
+async def run_clinical_diagnosis(
+    req: DiagnosticRequest,
+    current_user: dict[str, Any] = Depends(get_optional_user if settings.IS_DEMO else get_current_user),
+):
     """Executes hybrid quantum-classical clinical diagnostic pipeline with explainability and fallback."""
     user_role = current_user.get("role", "patient")
     user_id = current_user.get("user_id", "")
@@ -162,10 +164,16 @@ async def run_clinical_diagnosis(req: DiagnosticRequest, current_user: dict[str,
     # Dual-Engine Hybrid Execution: Quantum + Classical Sentinel Baseline
     fallback_used = False
     q_start = time.perf_counter()
-    try:
-        sample_q = await anyio.to_thread.run_sync(preprocessor.transform, sample_vec.reshape(1, -1))
-        q_probs = (await anyio.to_thread.run_sync(vqc.predict_proba, sample_q))[0]
-    except Exception:
+    sample_q = None
+    if module["quantum_available"]:
+        try:
+            sample_q = await anyio.to_thread.run_sync(preprocessor.transform, sample_vec.reshape(1, -1))
+            q_probs = (await anyio.to_thread.run_sync(vqc.predict_proba, sample_q))[0]
+        except Exception:
+            fallback_used = True
+            c_rf_probs = (await anyio.to_thread.run_sync(baselines.models["Random Forest"].predict_proba, sample_vec.reshape(1, -1)))[0]
+            q_probs = c_rf_probs
+    else:
         fallback_used = True
         c_rf_probs = (await anyio.to_thread.run_sync(baselines.models["Random Forest"].predict_proba, sample_vec.reshape(1, -1)))[0]
         q_probs = c_rf_probs
@@ -210,6 +218,14 @@ async def run_clinical_diagnosis(req: DiagnosticRequest, current_user: dict[str,
         q_latency_ms=q_latency_ms,
         c_latency_ms=c_latency_ms,
     )
+
+    if fallback_used:
+        arbitration["active_engine"] = "classical"
+        arbitration["primary_model"] = arbitration["classical_prediction"]["model"]
+        arbitration["primary_model_type"] = "Classical Sentinel Fallback"
+        arbitration["primary_label"] = arbitration["classical_prediction"]["label"]
+        arbitration["primary_confidence"] = arbitration["classical_prediction"]["confidence"]
+        arbitration["routing_rationale"] = "Quantum inference was unavailable; the classical sentinel baseline produced this result."
 
     primary_label = arbitration["primary_label"]
     primary_conf = arbitration["primary_confidence"]
@@ -283,7 +299,7 @@ async def run_clinical_diagnosis(req: DiagnosticRequest, current_user: dict[str,
             "version": "1.0.0",
         },
         "quantum": {
-            "enabled": active_engine == "quantum",
+            "enabled": active_engine == "quantum" and not fallback_used,
             "method": "VQC" if not fallback_used else "None",
             "qubits": q_qubits,
             "depth": q_layers,
@@ -316,7 +332,7 @@ async def run_clinical_diagnosis(req: DiagnosticRequest, current_user: dict[str,
         "disclaimer": "This output is generated by an AI clinical decision-support tool (SaMD) and does not replace professional diagnostic judgment.",
     }
 
-    # Persist execution into database and log audit trail non-blockingly
+    # A clinical result is not complete until its audit record is durable.
     try:
         await anyio.to_thread.run_sync(DatabaseRepository.save_diagnostic_record, result_payload)
         await anyio.to_thread.run_sync(
@@ -329,8 +345,7 @@ async def run_clinical_diagnosis(req: DiagnosticRequest, current_user: dict[str,
             )
         )
     except Exception as exc:
-        import logging
-        logging.getLogger(__name__).error("Failed to persist diagnostic record: %s", exc)
+        raise HTTPException(status_code=503, detail="Unable to persist the diagnostic result. Please retry.") from exc
 
 
     return result_payload

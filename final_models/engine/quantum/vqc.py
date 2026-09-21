@@ -135,11 +135,14 @@ class VariationalQuantumClassifier(nn.Module):
             epoch_loss = 0.0
             correct = 0
             total = 0
+            gradient_variances: list[float] = []
             for bx, by in loader:
                 optimizer.zero_grad()
                 out = self(bx)
                 loss = criterion(out, by)
                 loss.backward()
+                if self.weights.grad is not None:
+                    gradient_variances.append(float(self.weights.grad.detach().var(unbiased=False).item()))
                 optimizer.step()
 
                 epoch_loss += loss.item() * bx.size(0)
@@ -177,6 +180,7 @@ class VariationalQuantumClassifier(nn.Module):
                 "train_accuracy": train_acc,
                 "val_loss": val_loss,
                 "val_accuracy": val_acc,
+                "grad_var": float(sum(gradient_variances) / max(len(gradient_variances), 1)),
             })
 
             print(f"      [Epoch {epoch+1:02d}/{epochs:02d}] Train Loss: {train_loss:.4f} Acc: {train_acc:.3f} | Val Loss: {val_loss:.4f} Acc: {val_acc:.3f}", flush=True)

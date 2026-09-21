@@ -29,7 +29,9 @@ class AblationMatrixRunner:
     """
 
     def __init__(self, registry: Optional[ExperimentRegistry] = None):
-        self.registry = registry or ExperimentRegistry()
+        # Library callers and tests should not append experiment records merely by
+        # evaluating a model. The CLI supplies a persistent registry explicitly.
+        self.registry = registry or ExperimentRegistry(persist=False)
 
     def run_matrix(
         self,
@@ -313,7 +315,7 @@ def run_cli_ablation():
     X_val, y_val = val_df[feat_cols].values, val_df["target"].values
     X_test, y_test = test_df[feat_cols].values, test_df["target"].values
 
-    runner = AblationMatrixRunner()
+    runner = AblationMatrixRunner(registry=ExperimentRegistry(persist=True))
     results = runner.run_matrix(X_train, y_train, X_val, y_val, X_test, y_test, dataset_name=dataset_name)
 
     print("\n" + "=" * 118)

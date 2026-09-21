@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import secrets
 import sys
 from pathlib import Path
 from typing import List
@@ -28,6 +29,16 @@ elif (PROJECT_ROOT / ".env").exists():
     load_dotenv(PROJECT_ROOT / ".env")
 
 
+def _security_value(name: str) -> str:
+    """Require deployment secrets outside the isolated demo/test environment."""
+    value = os.getenv(name, "").strip()
+    if value and not value.startswith(("replace-", "your-")):
+        return value
+    if os.getenv("QMED_DB_MODE", "production").strip().lower() == "demo":
+        return secrets.token_urlsafe(48)
+    raise RuntimeError(f"{name} must be configured with a non-placeholder value in production.")
+
+
 class Settings:
     PROJECT_NAME: str = "Q-RAKSHAK — Quantum Clinical Decision Support API"
     VERSION: str = "2.0.0"
@@ -39,6 +50,7 @@ class Settings:
     BACKEND_DIR: Path = BACKEND_ROOT
     DATA_DIR: Path = BACKEND_DIR
     DB_MODE: str = os.getenv("QMED_DB_MODE", "production").strip().lower()
+    IS_DEMO: bool = DB_MODE == "demo"
 
     # Always ensure database paths are resolved absolutely to prevent root vs backend cwd drift
     _raw_real_db = os.getenv("QMED_REAL_DB_PATH", "q-rakshak.db")
@@ -56,14 +68,14 @@ class Settings:
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
     # Security & Auth
-    JWT_SECRET: str = os.getenv("JWT_SECRET", "qmed-sih2026-super-secret-key-change-in-prod")
+    JWT_SECRET: str = _security_value("JWT_SECRET")
     JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "480"))
-    API_KEY: str = os.getenv("API_KEY", "qmed-master-api-key-2026")
+    API_KEY: str = _security_value("API_KEY")
 
     # Model Microservice
     MODEL_SERVICE_URL: str = os.getenv("MODEL_SERVICE_URL", "http://localhost:8001")
-    MODEL_SERVICE_API_KEY: str = os.getenv("MODEL_SERVICE_API_KEY", "qmed-internal-model-key-secure-prod-2026")
+    MODEL_SERVICE_API_KEY: str = _security_value("MODEL_SERVICE_API_KEY")
 
     # Quantum Backend & Execution
     QUANTUM_BACKEND: str = os.getenv("QUANTUM_BACKEND", "simulator")
@@ -76,7 +88,7 @@ class Settings:
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "").strip()
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "").strip()
     # Google OAuth 2.0
-    GOOGLE_CLIENT_ID: str = os.getenv("GOOGLE_CLIENT_ID", "985994695248-4615o9ba17tahv2q94ba01t322r3aunr.apps.googleusercontent.com").strip()
+    GOOGLE_CLIENT_ID: str = os.getenv("GOOGLE_CLIENT_ID", "").strip()
     GOOGLE_CLIENT_SECRET: str = os.getenv("GOOGLE_CLIENT_SECRET", "").strip()
     GOOGLE_REDIRECT_URI: str = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8000/api/v1/auth/google/callback").strip()
 

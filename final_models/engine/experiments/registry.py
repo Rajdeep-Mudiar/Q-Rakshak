@@ -13,9 +13,11 @@ logger = logging.getLogger("ml.experiments.registry")
 class ExperimentRegistry:
     """Reproducible Experiment Registry recording full provenance, hyperparameters, and metrics."""
 
-    def __init__(self, registry_file: Path | str = "reports/experiment_registry.json"):
+    def __init__(self, registry_file: Path | str = "reports/experiment_registry.json", persist: bool = True):
         self.registry_file = Path(registry_file)
-        self.registry_file.parent.mkdir(parents=True, exist_ok=True)
+        self.persist = persist
+        if self.persist:
+            self.registry_file.parent.mkdir(parents=True, exist_ok=True)
         self._entries: list[dict[str, Any]] = self._load()
 
     def _load(self) -> list[dict[str, Any]]:
@@ -27,6 +29,8 @@ class ExperimentRegistry:
         return []
 
     def _save(self) -> None:
+        if not self.persist:
+            return
         self.registry_file.write_text(json.dumps(self._entries, indent=2), encoding="utf-8")
 
     def log_experiment(

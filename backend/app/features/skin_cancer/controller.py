@@ -50,8 +50,7 @@ async def predict(
             "fallback_mode": False,
         })
     except Exception as exc:
-        import logging
-        logging.getLogger(__name__).error("Failed to persist skin cancer record: %s", exc)
+        raise HTTPException(status_code=503, detail="Unable to persist the skin-cancer result. Please retry.") from exc
 
     return result
 

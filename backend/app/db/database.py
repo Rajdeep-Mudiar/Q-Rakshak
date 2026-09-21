@@ -401,6 +401,11 @@ def init_database():
     """)
     conn.commit()
 
+    if not settings.IS_DEMO:
+        conn.close()
+        logger.info("Production database schema initialized without demo records.")
+        return
+
     # Seed Default Users (Purged all dummy patient accounts)
     seed_users = [
         ("ADM-SYSTEM", "admin.audit", hash_password("admin123"), "Audit & Security Admin", "compliance.lead@egreenquanta.health", "admin.sec@gmail.com", "+91 98222 33445", "admin", "Q-RAKSHAK Governance Board", "SEC-DPDP-001"),
