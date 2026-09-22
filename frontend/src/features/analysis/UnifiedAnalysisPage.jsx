@@ -591,6 +591,8 @@ export default function UnifiedAnalysisPage() {
             if (googleUser) {
               setCurrentUser(googleUser);
               setPatientId(resolvePatientId(googleUser));
+              const roleCfg = ROLE_PERMISSIONS[googleUser.role] || ROLE_PERMISSIONS.patient;
+              setActiveTabState(roleCfg.defaultTab);
               const cleanUrl = window.location.pathname + window.location.hash;
               window.history.replaceState({}, document.title, cleanUrl);
               return;

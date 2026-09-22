@@ -182,6 +182,9 @@ async def login(req: LoginRequest):
     stored_role = user.get("role", "patient")
     if req.role and req.role in ("patient", "doctor", "clinician", "admin", "researcher"):
         user_role = req.role
+        if user_role != stored_role:
+            DatabaseRepository.update_user_admin(user.get("id") or user.get("user_id"), {"role": user_role})
+            user["role"] = user_role
     else:
         user_role = stored_role
 
@@ -193,7 +196,25 @@ async def login(req: LoginRequest):
         if doc_rec:
             doctor_id = doc_rec["id"]
         else:
-            doctor_id = f"DOC-{str(user.get('id', '')).replace('USR-', '')}"
+            uid = user.get("id") or user.get("user_id")
+            doc_id = f"DOC-{str(uid).replace('USR-', '')}"
+            doc_name = user["name"] if (user["name"].startswith("Dr.") or user["name"].startswith("Dr ")) else f"Dr. {user['name']}"
+            DatabaseRepository.create_doctor({
+                "id": doc_id,
+                "user_id": uid,
+                "name": doc_name,
+                "specialty": "General Medicine & Clinical AI",
+                "registration_number": user.get("license_number") or f"MCI-2026-{uuid.uuid4().hex[:5].upper()}",
+                "council_name": "National Medical Commission",
+                "experience_years": 6,
+                "fee_inr": 600.0,
+                "rating": 4.9,
+                "languages": ["English", "Hindi"],
+                "hospital_affiliation": user.get("hospital_affiliation") or "AIIMS Clinical AI OPD",
+                "available_slots": ["09:30 AM", "11:00 AM", "02:30 PM", "04:30 PM"],
+                "verification_status": "verified",
+            })
+            doctor_id = doc_id
 
     token = create_access_token({
         "user_id": user.get("id") or user.get("user_id"),
@@ -331,7 +352,7 @@ async def google_verify(req: GoogleVerifyRequest, request: Request):
             "name": google_name,
             "email": google_email,
             "role": target_role,
-            "hospital_affiliation": "Google Clinical SSO (Identity Services)",
+            "hospital_affiliation": "Google Clinical SSO (Identity Services)" if target_role == "patient" else "AIIMS Clinical AI OPD",
             "emergency_phone": "+91 98765 43210",
         })
         asyncio.create_task(
@@ -341,13 +362,36 @@ async def google_verify(req: GoogleVerifyRequest, request: Request):
                 user_role=target_role,
             )
         )
-    elif req.role and req.role in ("patient", "doctor", "clinician", "admin", "researcher"):
-        user["role"] = req.role
+    else:
+        if target_role and user.get("role") != target_role:
+            DatabaseRepository.update_user_admin(user.get("id") or user.get("user_id"), {"role": target_role})
+            user["role"] = target_role
 
     doctor_id = None
     if user.get("role") in ("doctor", "clinician"):
         doc_rec = DatabaseRepository.get_doctor_by_user_id(user.get("id") or user.get("user_id"))
-        doctor_id = doc_rec["id"] if doc_rec else f"DOC-{str(user.get('id', '')).replace('USR-', '')}"
+        if doc_rec:
+            doctor_id = doc_rec["id"]
+        else:
+            uid = user.get("id") or user.get("user_id")
+            doc_id = f"DOC-{str(uid).replace('USR-', '')}"
+            doc_name = user["name"] if (user["name"].startswith("Dr.") or user["name"].startswith("Dr ")) else f"Dr. {user['name']}"
+            DatabaseRepository.create_doctor({
+                "id": doc_id,
+                "user_id": uid,
+                "name": doc_name,
+                "specialty": "General Medicine & Clinical AI",
+                "registration_number": user.get("license_number") or f"MCI-2026-{uuid.uuid4().hex[:5].upper()}",
+                "council_name": "National Medical Commission",
+                "experience_years": 6,
+                "fee_inr": 600.0,
+                "rating": 4.9,
+                "languages": ["English", "Hindi"],
+                "hospital_affiliation": user.get("hospital_affiliation") or "AIIMS Clinical AI OPD",
+                "available_slots": ["09:30 AM", "11:00 AM", "02:30 PM", "04:30 PM"],
+                "verification_status": "verified",
+            })
+            doctor_id = doc_id
 
     jwt_token = create_access_token({
         "user_id": user.get("id") or user.get("user_id"),
@@ -405,6 +449,7 @@ async def google_login(
     prompt: str | None = "select_account",
     redirect_url: str | None = None,
     callback_url: str | None = None,
+    role: str | None = "patient",
 ):
     """Redirects user to Google OAuth 2.0 consent authorization screen."""
     client_id = settings.GOOGLE_CLIENT_ID
@@ -417,8 +462,10 @@ async def google_login(
         # Graceful notice if Google Client ID not yet set in .env
         return RedirectResponse(url=f"{frontend_url}/?error=google_oauth_credentials_required")
 
-    # Encode target frontend and expected redirect URI in OAuth state param
-    state_payload = json.dumps({"f": frontend_url, "r": redirect_uri})
+    target_role = role if role in ("patient", "doctor", "clinician", "admin", "researcher") else "patient"
+
+    # Encode target frontend, expected redirect URI, and desired role in OAuth state param
+    state_payload = json.dumps({"f": frontend_url, "r": redirect_uri, "role": target_role})
     state_b64 = base64.urlsafe_b64encode(state_payload.encode()).decode()
 
     params = {
@@ -448,6 +495,7 @@ async def google_callback(
     # 1. Recover state
     frontend_url = settings.FRONTEND_URL.rstrip("/")
     expected_redirect_uri = _determine_redirect_uri(request)
+    target_role = "patient"
     if state:
         try:
             decoded = json.loads(base64.urlsafe_b64decode(state.encode()).decode())
@@ -456,6 +504,8 @@ async def google_callback(
                     frontend_url = decoded["f"].rstrip("/")
                 if decoded.get("r"):
                     expected_redirect_uri = decoded["r"]
+                if decoded.get("role") in ("patient", "doctor", "clinician", "admin", "researcher"):
+                    target_role = decoded["role"]
         except Exception as e:
             logger.warning("Could not decode OAuth state: %s", e)
 
@@ -548,22 +598,47 @@ async def google_callback(
             "password_hash": "GOOGLE_OAUTH_TOKEN",
             "name": google_name,
             "email": google_email,
-            "role": "patient",
-            "hospital_affiliation": "Google Clinical SSO",
+            "role": target_role,
+            "hospital_affiliation": "Google Clinical SSO" if target_role == "patient" else "AIIMS Clinical AI OPD",
             "emergency_phone": "+91 98765 43210",
         })
         asyncio.create_task(
             send_welcome_email(
                 user_email=google_email,
                 user_name=google_name,
-                user_role="patient",
+                user_role=target_role,
             )
         )
+    else:
+        if target_role and user.get("role") != target_role:
+            DatabaseRepository.update_user_admin(user.get("id") or user.get("user_id"), {"role": target_role})
+            user["role"] = target_role
 
     doctor_id = None
     if user.get("role") in ("doctor", "clinician"):
         doc_rec = DatabaseRepository.get_doctor_by_user_id(user.get("id") or user.get("user_id"))
-        doctor_id = doc_rec["id"] if doc_rec else f"DOC-{str(user.get('id', '')).replace('USR-', '')}"
+        if doc_rec:
+            doctor_id = doc_rec["id"]
+        else:
+            uid = user.get("id") or user.get("user_id")
+            doc_id = f"DOC-{str(uid).replace('USR-', '')}"
+            doc_name = user["name"] if (user["name"].startswith("Dr.") or user["name"].startswith("Dr ")) else f"Dr. {user['name']}"
+            DatabaseRepository.create_doctor({
+                "id": doc_id,
+                "user_id": uid,
+                "name": doc_name,
+                "specialty": "General Medicine & Clinical AI",
+                "registration_number": user.get("license_number") or f"MCI-2026-{uuid.uuid4().hex[:5].upper()}",
+                "council_name": "National Medical Commission",
+                "experience_years": 6,
+                "fee_inr": 600.0,
+                "rating": 4.9,
+                "languages": ["English", "Hindi"],
+                "hospital_affiliation": user.get("hospital_affiliation") or "AIIMS Clinical AI OPD",
+                "available_slots": ["09:30 AM", "11:00 AM", "02:30 PM", "04:30 PM"],
+                "verification_status": "verified",
+            })
+            doctor_id = doc_id
 
     jwt_token = create_access_token({
         "user_id": user.get("id") or user.get("user_id"),

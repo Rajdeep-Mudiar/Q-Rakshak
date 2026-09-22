@@ -381,6 +381,19 @@ class DatabaseRepository:
         status_val = record.get("analysis_status") or "completed"
         features_dict = record.get("input_features") or record.get("features") or {}
 
+        # Ensure patient exists in patients table so foreign key constraint is satisfied
+        try:
+            p_check = conn.execute("SELECT id FROM patients WHERE id = ?;", (patient_id,)).fetchone()
+            if not p_check:
+                conn.execute("""
+                INSERT INTO patients (id, mrn, name, age, gender, blood_group, height_cm, weight_kg, conditions_json, baseline_vitals_json, emergency_contact)
+                VALUES (?, ?, ?, 35, 'Not Specified', 'O+', 175.0, 70.0, '[]', '{}', '+91 98765 43210')
+                ON CONFLICT (id) DO NOTHING;
+                """, (patient_id, f"MRN-{str(patient_id).replace('USR-', '')}", f"Patient {patient_id}"))
+                conn.commit()
+        except Exception:
+            pass
+
         # Safely extract prediction fields
         pred = record.get("prediction", {})
         if isinstance(pred, dict):
