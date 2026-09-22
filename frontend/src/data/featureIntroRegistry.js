@@ -309,6 +309,37 @@ export function getFeatureIntroById(id) {
 export function getLocalizedFeatureIntroById(id, t) {
   const base = getFeatureIntroById(id);
   if (!t || typeof t !== "function") return base;
+
+  const locBenefits = t(`features.${base.id}.benefits`);
+  const locHowItWorks = t(`features.${base.id}.howItWorks`);
+  const locStats = t(`features.${base.id}.stats`);
+
+  const benefits = Array.isArray(locBenefits)
+    ? base.benefits.map((b, idx) => ({
+        ...b,
+        title: locBenefits[idx]?.title || b.title,
+        desc: locBenefits[idx]?.desc || b.desc,
+      }))
+    : base.benefits;
+
+  const howItWorks = Array.isArray(locHowItWorks)
+    ? base.howItWorks.map((s, idx) => ({
+        ...s,
+        title: locHowItWorks[idx]?.title || s.title,
+        desc: locHowItWorks[idx]?.desc || s.desc,
+      }))
+    : base.howItWorks;
+
+  const stats = locStats && typeof locStats === "object"
+    ? Object.keys(base.stats).reduce((acc, k) => {
+        acc[k] = {
+          label: locStats[k]?.label || base.stats[k]?.label,
+          value: locStats[k]?.value || base.stats[k]?.value,
+        };
+        return acc;
+      }, {})
+    : base.stats;
+
   return {
     ...base,
     title: t(`features.${base.id}.title`, base.title),
@@ -317,6 +348,9 @@ export function getLocalizedFeatureIntroById(id, t) {
     badge: t(`features.${base.id}.badge`, base.badge),
     primaryCta: t(`features.${base.id}.primaryCta`, base.primaryCta),
     secondaryCta: t(`features.${base.id}.secondaryCta`, base.secondaryCta),
+    stats,
+    benefits,
+    howItWorks,
     overview: {
       ...base.overview,
       summary: t(`features.${base.id}.summary`, base.overview?.summary),

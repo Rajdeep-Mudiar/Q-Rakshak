@@ -111,7 +111,7 @@ export default function FeatureIntroPage({
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "0.82rem", color: "var(--text-secondary)" }}>
-          <span style={{ fontWeight: 600, color: "var(--primary)" }}>Platform Modules</span>
+          <span style={{ fontWeight: 600, color: "var(--primary)" }}>{t("features.ui.platform_modules", "Platform Modules")}</span>
           <ChevronRight size={14} color="var(--text-muted)" />
           <span style={{ fontWeight: 500 }}>{feature.category}</span>
           <ChevronRight size={14} color="var(--text-muted)" />
@@ -121,28 +121,31 @@ export default function FeatureIntroPage({
         {/* Feature Pill Switcher */}
         <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
           <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginRight: "4px" }}>
-            Explore Module:
+            {t("features.ui.explore_module", "Explore Module:")}
           </span>
-          {Object.values(FEATURE_INTRO_REGISTRY).map((f) => (
-            <button
-              key={f.id}
-              type="button"
-              onClick={() => onSwitchFeature && onSwitchFeature(f.id)}
-              style={{
-                background: f.id === feature.id ? "var(--primary)" : "var(--bg-surface)",
-                color: f.id === feature.id ? "#FFFFFF" : "var(--text-secondary)",
-                border: f.id === feature.id ? "1px solid var(--primary)" : "1px solid var(--border-default)",
-                borderRadius: "var(--radius-pill)",
-                padding: "4px 10px",
-                fontSize: "0.72rem",
-                fontWeight: 600,
-                cursor: "pointer",
-                transition: "all 0.18s ease",
-              }}
-            >
-              {f.title.split(" ")[0]}
-            </button>
-          ))}
+          {Object.values(FEATURE_INTRO_REGISTRY).map((f) => {
+            const locF = getLocalizedFeatureIntroById(f.id, t);
+            return (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => onSwitchFeature && onSwitchFeature(f.id)}
+                style={{
+                  background: f.id === feature.id ? "var(--primary)" : "var(--bg-surface)",
+                  color: f.id === feature.id ? "#FFFFFF" : "var(--text-secondary)",
+                  border: f.id === feature.id ? "1px solid var(--primary)" : "1px solid var(--border-default)",
+                  borderRadius: "var(--radius-pill)",
+                  padding: "4px 10px",
+                  fontSize: "0.72rem",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  transition: "all 0.18s ease",
+                }}
+              >
+                {locF.title.split(" ")[0]}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -357,7 +360,7 @@ export default function FeatureIntroPage({
             >
               <ShieldCheck size={14} color="var(--risk-low)" />
               <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "var(--text-primary)" }}>
-                Verified Medical Interface
+                {t("features.ui.verified_interface", "Verified Medical Interface")}
               </span>
             </div>
           </div>
@@ -395,7 +398,7 @@ export default function FeatureIntroPage({
       {/* ── 4 KEY BENEFITS / CAPABILITIES GRID ── */}
       <div ref={cardsRef} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
         <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>
-          Core Capabilities & Clinical Advantage
+          {t("features.ui.core_capabilities", "Core Capabilities & Clinical Advantage")}
         </h3>
         <div
           style={{
@@ -459,7 +462,7 @@ export default function FeatureIntroPage({
         }}
       >
         <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary)", margin: "0 0 20px" }}>
-          How This Module Works (Step-by-Step)
+          {t("features.ui.how_it_works", "How This Module Works (Step-by-Step)")}
         </h3>
 
         <div
@@ -515,7 +518,7 @@ export default function FeatureIntroPage({
         <ShieldCheck size={24} color="var(--risk-low)" style={{ flexShrink: 0 }} />
         <div>
           <h4 style={{ fontSize: "0.86rem", fontWeight: 700, color: "var(--text-primary)", margin: "0 0 2px" }}>
-            Clinical Rigor & Zero-Trust Privacy Compliance
+            {t("features.ui.compliance_title", "Clinical Rigor & Zero-Trust Privacy Compliance")}
           </h4>
           <p style={{ fontSize: "0.80rem", color: "var(--text-secondary)", margin: 0 }}>
             {feature.overview.clinicalStandards}
@@ -551,13 +554,13 @@ export default function FeatureIntroPage({
               marginBottom: "4px",
             }}
           >
-            READY TO PROCEED
+            {t("features.ui.ready_to_proceed", "READY TO PROCEED")}
           </span>
           <h3 style={{ fontSize: "1.35rem", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 6px" }}>
-            Launch {feature.title}
+            {t("features.ui.launch_module", `Launch ${feature.title}`, { title: feature.title })}
           </h3>
           <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: 0 }}>
-            Enter the active working environment with all verified privacy protections active.
+            {t("features.ui.launch_desc", "Enter the active working environment with all verified privacy protections active.")}
           </p>
         </div>
 
@@ -589,7 +592,7 @@ export default function FeatureIntroPage({
           }}
         >
           <Play size={16} fill="#FFFFFF" />
-          <span>Launch Module Now</span>
+          <span>{t("features.ui.launch_btn", "Launch Module Now")}</span>
           <ArrowRight size={16} />
         </button>
       </div>

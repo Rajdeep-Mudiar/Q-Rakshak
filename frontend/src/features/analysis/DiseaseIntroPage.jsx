@@ -94,7 +94,7 @@ export default function DiseaseIntroPage({
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "0.82rem", color: "var(--text-secondary)" }}>
-          <span style={{ fontWeight: 600, color: "var(--primary)" }}>Clinical Screening</span>
+          <span style={{ fontWeight: 600, color: "var(--primary)" }}>{t("diseases.clinical_screening", "Clinical Screening")}</span>
           <ChevronRight size={14} color="var(--text-muted)" />
           <span style={{ fontWeight: 500 }}>{disease.category}</span>
           <ChevronRight size={14} color="var(--text-muted)" />
@@ -104,28 +104,32 @@ export default function DiseaseIntroPage({
         {/* Quick Disease Pill Switcher */}
         <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
           <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginRight: "4px" }}>
-            Switch Protocol:
+            {t("diseases.switch_protocol", "Switch Protocol:")}
           </span>
-          {DISEASE_LIST.map((d) => (
-            <button
-              key={d.id}
-              type="button"
-              onClick={() => onSelectOtherDisease && onSelectOtherDisease(d.id)}
-              style={{
-                background: d.id === disease.id ? "var(--primary)" : "var(--bg-surface)",
-                color: d.id === disease.id ? "#FFFFFF" : "var(--text-secondary)",
-                border: d.id === disease.id ? "1px solid var(--primary)" : "1px solid var(--border-default)",
-                borderRadius: "var(--radius-pill)",
-                padding: "4px 10px",
-                fontSize: "0.72rem",
-                fontWeight: 600,
-                cursor: "pointer",
-                transition: "all 0.18s ease",
-              }}
-            >
-              {d.name.split(" ")[0]}
-            </button>
-          ))}
+          {DISEASE_LIST.map((d) => {
+            const diseaseKey = d.id === "skin" ? "skin_cancer" : d.id === "heart" ? "heart_disease" : d.id === "parkinson" ? "parkinsons" : d.id;
+            const localizedName = t(`diseases.${diseaseKey}.short_name`, d.name);
+            return (
+              <button
+                key={d.id}
+                type="button"
+                onClick={() => onSelectOtherDisease && onSelectOtherDisease(d.id)}
+                style={{
+                  background: d.id === disease.id ? "var(--primary)" : "var(--bg-surface)",
+                  color: d.id === disease.id ? "#FFFFFF" : "var(--text-secondary)",
+                  border: d.id === disease.id ? "1px solid var(--primary)" : "1px solid var(--border-default)",
+                  borderRadius: "var(--radius-pill)",
+                  padding: "4px 10px",
+                  fontSize: "0.72rem",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  transition: "all 0.18s ease",
+                }}
+              >
+                {localizedName.split(" ")[0]}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -272,7 +276,7 @@ export default function DiseaseIntroPage({
                 }}
               >
                 <Play size={16} fill="#FFFFFF" />
-                <span>Start AI Analysis & Detection</span>
+                <span>{t("actions.start_checkup", "Start AI Analysis & Detection")}</span>
                 <ArrowRight size={16} />
               </button>
 
@@ -303,7 +307,7 @@ export default function DiseaseIntroPage({
                 }}
               >
                 <BarChart3 size={15} color={disease.accentColor} />
-                <span>Inspect Benchmarks</span>
+                <span>{t("diseases.tab_benchmarks", "Inspect Benchmarks")}</span>
               </button>
             </div>
           </div>
@@ -357,7 +361,7 @@ export default function DiseaseIntroPage({
             >
               <ShieldCheck size={14} color="var(--risk-low)" />
               <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "var(--text-primary)" }}>
-                Verified Medical Visualization
+                {t("features.ui.verified_interface", "Verified Medical Visualization")}
               </span>
             </div>
           </div>

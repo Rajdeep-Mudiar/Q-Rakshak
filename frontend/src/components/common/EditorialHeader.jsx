@@ -121,7 +121,7 @@ export default function EditorialHeader({
               letterSpacing: "0.02em",
             }}
           >
-            Clinical Platform
+            {t("app.platform_tag", "Clinical Platform")}
           </span>
         </button>
 
@@ -155,7 +155,7 @@ export default function EditorialHeader({
               background: "var(--risk-low)",
             }}
           />
-          <span style={{ fontWeight: 600 }}>SYSTEM READY</span>
+          <span style={{ fontWeight: 600 }}>{t("app.system_ready", "SYSTEM READY")}</span>
           <span style={{ color: "var(--border-hover)" }}>•</span>
           <span>{timeString}</span>
         </div>
@@ -170,34 +170,38 @@ export default function EditorialHeader({
               setModuleMenuOpen(false);
               setMenuOpen(false);
             }}
-            title="Browse Disease Protocols"
+            title={t("header.explore_diseases", "Browse Disease Protocols")}
           >
             <Stethoscope size={13} color="var(--primary)" />
-            <span>Diseases</span>
+            <span>{t("header.explore_diseases", "Diseases")}</span>
             <ChevronDown size={12} color="var(--text-muted)" style={{ transform: diseaseMenuOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.15s ease" }} />
           </button>
 
           {diseaseMenuOpen && (
             <div className="header-dropdown-menu">
               <div style={{ padding: "6px 8px", borderBottom: "1px solid var(--border-default)", fontSize: "0.64rem", fontWeight: 800, textTransform: "uppercase", color: "var(--text-muted)", letterSpacing: "0.06em" }}>
-                Select Disease Protocol
+                {t("header.select_disease_protocol", "Select Disease Protocol")}
               </div>
-              {DISEASE_LIST.map((d) => (
-                <button
-                  key={d.id}
-                  type="button"
-                  className="header-dropdown-item"
-                  onClick={() => {
-                    setDiseaseMenuOpen(false);
-                    onSelectDisease && onSelectDisease(d.id);
-                  }}
-                >
-                  <span style={{ fontWeight: 600 }}>{d.name}</span>
-                  <span style={{ fontSize: "0.62rem", color: d.accentColor, background: d.accentBg, padding: "2px 6px", borderRadius: "4px", fontWeight: 700 }}>
-                    {d.category}
-                  </span>
-                </button>
-              ))}
+              {DISEASE_LIST.map((d) => {
+                const diseaseKey = d.id === "skin" ? "skin_cancer" : d.id === "heart" ? "heart_disease" : d.id === "parkinson" ? "parkinsons" : d.id;
+                const localizedName = t(`diseases.${diseaseKey}.short_name`, d.name);
+                return (
+                  <button
+                    key={d.id}
+                    type="button"
+                    className="header-dropdown-item"
+                    onClick={() => {
+                      setDiseaseMenuOpen(false);
+                      onSelectDisease && onSelectDisease(d.id);
+                    }}
+                  >
+                    <span style={{ fontWeight: 600 }}>{localizedName}</span>
+                    <span style={{ fontSize: "0.62rem", color: d.accentColor, background: d.accentBg, padding: "2px 6px", borderRadius: "4px", fontWeight: 700 }}>
+                      {d.category}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
@@ -212,34 +216,37 @@ export default function EditorialHeader({
               setDiseaseMenuOpen(false);
               setMenuOpen(false);
             }}
-            title="Explore Platform Features"
+            title={t("header.platform_tour", "Explore Platform Features")}
           >
             <Sparkles size={13} color="var(--accent-violet)" />
-            <span>Modules</span>
+            <span>{t("header.modules", "Modules")}</span>
             <ChevronDown size={12} color="var(--text-muted)" style={{ transform: moduleMenuOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.15s ease" }} />
           </button>
 
           {moduleMenuOpen && (
             <div className="header-dropdown-menu">
               <div style={{ padding: "6px 8px", borderBottom: "1px solid var(--border-default)", fontSize: "0.64rem", fontWeight: 800, textTransform: "uppercase", color: "var(--text-muted)", letterSpacing: "0.06em" }}>
-                Platform Modules
+                {t("header.platform_modules", "Platform Modules")}
               </div>
-              {Object.values(FEATURE_INTRO_REGISTRY).map((f) => (
-                <button
-                  key={f.id}
-                  type="button"
-                  className="header-dropdown-item"
-                  onClick={() => {
-                    setModuleMenuOpen(false);
-                    onNavigateFeature && onNavigateFeature(f.id);
-                  }}
-                >
-                  <span style={{ fontWeight: 600 }}>{f.title.split("&")[0].trim()}</span>
-                  <span style={{ fontSize: "0.62rem", color: f.accentColor, background: f.accentBg, padding: "2px 6px", borderRadius: "4px", fontWeight: 700 }}>
-                    Intro
-                  </span>
-                </button>
-              ))}
+              {Object.values(FEATURE_INTRO_REGISTRY).map((f) => {
+                const locF = getLocalizedFeatureIntroById(f.id, t);
+                return (
+                  <button
+                    key={f.id}
+                    type="button"
+                    className="header-dropdown-item"
+                    onClick={() => {
+                      setModuleMenuOpen(false);
+                      onNavigateFeature && onNavigateFeature(f.id);
+                    }}
+                  >
+                    <span style={{ fontWeight: 600 }}>{locF.title.split("&")[0].trim()}</span>
+                    <span style={{ fontSize: "0.62rem", color: f.accentColor, background: f.accentBg, padding: "2px 6px", borderRadius: "4px", fontWeight: 700 }}>
+                      {t("actions.intro", "Intro")}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
@@ -429,10 +436,10 @@ export default function EditorialHeader({
                   fontWeight: 700,
                 }}
               >
-                {currentUser?.role || "GUEST"}
+                {t(`login.role_${currentUser?.role || 'patient'}`, currentUser?.role || "GUEST")}
               </div>
             </div>
-            <span className="header-more">More</span>
+            <span className="header-more">{t("actions.more", "More")}</span>
           </button>
 
           {/* Menu dropdown */}
