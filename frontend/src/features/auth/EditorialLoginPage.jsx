@@ -68,17 +68,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
     if (typeof window === "undefined" || !pageContainerRef.current || !heroSectionRef.current) return;
 
     const ctx = gsap.context(() => {
-      // Smooth light-to-dark transition as user scrolls down from hero
-      gsap.to(pageContainerRef.current, {
-        backgroundColor: "#080808",
-        scrollTrigger: {
-          trigger: heroSectionRef.current,
-          start: "bottom 95%",
-          end: "bottom 15%",
-          scrub: 1.4,
-        },
-      });
-
+      // Keep crisp clean clinical background throughout scroll
       // Subtle parallax fade on hero cockpit as user scrolls into the benchmark showcase
       gsap.to(heroSectionRef.current, {
         opacity: 0.12,
