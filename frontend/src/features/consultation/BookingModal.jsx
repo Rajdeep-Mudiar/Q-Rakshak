@@ -16,8 +16,10 @@ import {
 } from "lucide-react";
 import { consultationsApi } from "../../api/consultations";
 import { animateModalOpen } from "../../utils/motion";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function BookingModal({ doctor, initialSlot, onClose, onSuccess, patientId }) {
+  const { t } = useLanguage();
   const [step, setStep] = useState(1);
   const [slot, setSlot] = useState(initialSlot || doctor?.available_slots?.[0] || "Today at 02:00 PM");
   const [mode, setMode] = useState("video");
@@ -131,10 +133,10 @@ export default function BookingModal({ doctor, initialSlot, onClose, onSuccess, 
         >
           <div>
             <span className="step-badge" style={{ marginBottom: "4px", display: "inline-block" }}>
-              STEP {step} OF 4 • CONSULTATION BOOKING
+              {`${t("telemedicine.step_of", "STEP")} ${step} ${t("telemedicine.of_4", "OF 4")} • ${t("telemedicine.consultation_booking", "CONSULTATION BOOKING")}`}
             </span>
             <h3 style={{ margin: 0, fontSize: "1.05rem", color: "var(--text-primary)", fontWeight: 800 }}>
-              Book with {doctor.name}
+              {`${t("telemedicine.book_with", "Book with")} ${doctor.name}`}
             </h3>
           </div>
           <button
@@ -172,7 +174,7 @@ export default function BookingModal({ doctor, initialSlot, onClose, onSuccess, 
             <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
               <div className="responsive-grid-two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
                 <div>
-                  <label className="metric-label" style={{ display: "block", marginBottom: "4px" }}>Select Slot</label>
+                  <label className="metric-label" style={{ display: "block", marginBottom: "4px" }}>{t("telemedicine.select_slot", "Select Slot")}</label>
                   <select
                     className="terminal-input"
                     value={slot}
@@ -186,12 +188,12 @@ export default function BookingModal({ doctor, initialSlot, onClose, onSuccess, 
                 </div>
 
                 <div>
-                  <label className="metric-label" style={{ display: "block", marginBottom: "4px" }}>Consultation Mode</label>
+                  <label className="metric-label" style={{ display: "block", marginBottom: "4px" }}>{t("telemedicine.consultation_mode", "Consultation Mode")}</label>
                   <div style={{ display: "flex", gap: "6px" }}>
                     {[
-                      { id: "video", label: "Video", icon: Video },
-                      { id: "audio", label: "Audio", icon: Phone },
-                      { id: "in_person", label: "Clinic", icon: UserCheck },
+                      { id: "video", label: t("telemedicine.mode_video", "Video"), icon: Video },
+                      { id: "audio", label: t("telemedicine.mode_audio", "Audio"), icon: Phone },
+                      { id: "in_person", label: t("telemedicine.mode_clinic", "Clinic"), icon: UserCheck },
                     ].map((m) => {
                       const Icon = m.icon;
                       return (
@@ -211,20 +213,20 @@ export default function BookingModal({ doctor, initialSlot, onClose, onSuccess, 
               </div>
 
               <div>
-                <label className="metric-label" style={{ display: "block", marginBottom: "4px" }}>Reason for Consultation</label>
+                <label className="metric-label" style={{ display: "block", marginBottom: "4px" }}>{t("telemedicine.reason_label", "Reason for Consultation")}</label>
                 <input
                   type="text"
                   className="terminal-input"
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   style={{ width: "100%", padding: "8px" }}
-                  placeholder="e.g. Follow-up after Quantum AI Cardiac Checkup"
+                  placeholder={t("telemedicine.reason_placeholder", "e.g. Follow-up after Quantum AI Cardiac Checkup")}
                 />
               </div>
 
               <div>
                 <label className="metric-label" style={{ display: "block", marginBottom: "4px" }}>
-                  Clinical Symptoms & Observations (Crucial for Triage)
+                  {t("telemedicine.symptoms_label", "Clinical Symptoms & Observations (Crucial for Triage)")}
                 </label>
                 <textarea
                   className="terminal-input"

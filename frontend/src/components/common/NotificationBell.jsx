@@ -1,42 +1,51 @@
 import { useState, useEffect, useRef } from "react";
 import { Bell, ShieldCheck, Check, Clock, AlertCircle } from "lucide-react";
 import { notificationsApi } from "../../api/notifications";
+import { authApi } from "../../api/auth";
 
 export default function NotificationBell() {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const dropdownRef = useRef(null);
+  const backoffRef = useRef(10000);
 
   useEffect(() => {
-    loadNotifications();
-    const interval = setInterval(loadNotifications, 10000); // 10s poll
-    return () => clearInterval(interval);
-  }, []);
+    let timerId = null;
+    let isCancelled = false;
 
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setOpen(false);
+    async function poll() {
+      if (!authApi.hasToken()) {
+        // Do not poll if user is not authenticated
+        timerId = setTimeout(poll, 30000);
+        return;
+      }
+      try {
+        const fetchFn = notificationsApi?.getNotifications || notificationsApi?.listNotifications;
+        if (fetchFn) {
+          const res = await fetchFn(10);
+          if (!isCancelled && res?.notifications) {
+            setNotifications(res.notifications);
+            setUnreadCount(res.unread_count || 0);
+            backoffRef.current = 15000; // reset to 15s on success
+          }
+        }
+      } catch (err) {
+        // Exponential backoff on error, cap at 60s
+        backoffRef.current = Math.min(backoffRef.current * 2, 60000);
+      } finally {
+        if (!isCancelled) {
+          timerId = setTimeout(poll, backoffRef.current);
+        }
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
-  async function loadNotifications() {
-    try {
-      const fetchFn = notificationsApi?.getNotifications || notificationsApi?.listNotifications;
-      if (!fetchFn) return;
-      const res = await fetchFn(10);
-      if (res?.notifications) {
-        setNotifications(res.notifications);
-        setUnreadCount(res.unread_count || 0);
-      }
-    } catch (err) {
-      console.error("Notifications fetch failed:", err);
-    }
-  }
+    poll();
+    return () => {
+      isCancelled = true;
+      if (timerId) clearTimeout(timerId);
+    };
+  }, []);
 
   async function handleMarkRead(id, e) {
     e?.stopPropagation?.();

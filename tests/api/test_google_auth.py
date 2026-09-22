@@ -14,6 +14,18 @@ from backend.app.db.repository import DatabaseRepository
 client = TestClient(app)
 
 
+@pytest.fixture(autouse=True)
+def mock_google_settings():
+    from backend.app.core.config import settings
+    orig_id = settings.GOOGLE_CLIENT_ID
+    orig_sec = settings.GOOGLE_CLIENT_SECRET
+    settings.GOOGLE_CLIENT_ID = "mock-google-client-id.apps.googleusercontent.com"
+    settings.GOOGLE_CLIENT_SECRET = "mock-google-client-secret"
+    yield
+    settings.GOOGLE_CLIENT_ID = orig_id
+    settings.GOOGLE_CLIENT_SECRET = orig_sec
+
+
 def test_google_login_redirect_url_generation():
     """Verifies that GET /api/v1/auth/google produces a valid OAuth 2.0 authorization redirect."""
     res = client.get("/api/v1/auth/google", follow_redirects=False)

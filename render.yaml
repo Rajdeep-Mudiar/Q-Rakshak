@@ -14,6 +14,8 @@ services:
         value: production
       - key: CORS_ORIGIN_REGEX
         value: "https://.*\\.(onrender\\.com|vercel\\.app)"
+      - key: CORS_ALLOWED_ORIGINS
+        value: "https://q-rakshak-frontend.onrender.com,https://q-rakshak.health,http://localhost:5173"
       - key: CORS_ALLOW_CREDENTIALS
         value: "true"
       - key: API_KEY
@@ -29,8 +31,12 @@ services:
         source: /*
         destination: /index.html
     envVars:
+      - key: VITE_API_BASE_URL
+        value: "https://q-rakshak-backend.onrender.com/api/v1"
       - key: VITE_API_KEY
         value: qmed-master-api-key-2026
+      - key: VITE_GOOGLE_CLIENT_ID
+        value: "985994695248-4615o9ba17tahv2q94ba01t322r3aunr.apps.googleusercontent.com"
       - key: VITE_ENVIRONMENT
         value: production
       - key: VITE_ENABLE_3D_DIGITAL_TWIN

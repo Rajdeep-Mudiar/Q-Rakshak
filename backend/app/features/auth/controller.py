@@ -178,17 +178,10 @@ async def login(req: LoginRequest):
 
     is_test_account = settings.DB_MODE == "demo"
 
-    # Retain the user's authentic database role; allow role persona test override only for demo/admin accounts
+    # Allow user to choose their persona / role on login (patient, doctor, admin)
     stored_role = user.get("role", "patient")
-    if req.role and req.role != stored_role:
-        if (
-            stored_role == "admin"
-            or str(user.get("id", "")).startswith("ADM-")
-            or str(user.get("id", "")) in ("DOC-USR-KAVITA", "DOC-USR-ARYAN", "USR-5EF52B", "RES-PRIYA")
-        ):
-            user_role = req.role
-        else:
-            user_role = stored_role
+    if req.role and req.role in ("patient", "doctor", "clinician", "admin", "researcher"):
+        user_role = req.role
     else:
         user_role = stored_role
 
@@ -330,14 +323,14 @@ async def google_verify(req: GoogleVerifyRequest, request: Request):
     google_picture = token_info.get("picture", "")
 
     user = DatabaseRepository.get_user_by_credentials(google_email)
+    target_role = req.role if req.role in ("patient", "doctor", "clinician", "admin", "researcher") else "patient"
     if not user:
-        role = req.role if req.role in ("patient", "doctor", "clinician", "researcher") else "patient"
         user = DatabaseRepository.create_user({
             "username": google_email,
             "password_hash": "GOOGLE_VERIFIED_CREDENTIAL",
             "name": google_name,
             "email": google_email,
-            "role": role,
+            "role": target_role,
             "hospital_affiliation": "Google Clinical SSO (Identity Services)",
             "emergency_phone": "+91 98765 43210",
         })
@@ -345,9 +338,11 @@ async def google_verify(req: GoogleVerifyRequest, request: Request):
             send_welcome_email(
                 user_email=google_email,
                 user_name=google_name,
-                user_role=user.get("role", "patient"),
+                user_role=target_role,
             )
         )
+    elif req.role and req.role in ("patient", "doctor", "clinician", "admin", "researcher"):
+        user["role"] = req.role
 
     doctor_id = None
     if user.get("role") in ("doctor", "clinician"):

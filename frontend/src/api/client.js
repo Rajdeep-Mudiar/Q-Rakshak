@@ -12,7 +12,9 @@ function notifyAuthExpired(endpoint) {
   }
 }
 
-async function executeFetchWithRetry(endpoint, fetchOptions, timeoutId, maxRetries = 3) {
+const inFlightGets = new Map();
+
+async function executeFetchWithRetry(endpoint, fetchOptions, timeoutId, maxRetries = 2) {
   let attempt = 0;
   while (attempt <= maxRetries) {
     try {
@@ -28,15 +30,24 @@ async function executeFetchWithRetry(endpoint, fetchOptions, timeoutId, maxRetri
       const isColdStartError = [502, 503, 504].includes(response.status);
       if (isColdStartError && attempt < maxRetries) {
         attempt++;
-        const backoffMs = Math.min(attempt * 1200, 4000);
+        const backoffMs = Math.min(attempt * 1500, 5000);
         console.warn(`[Cold Start Notice] Server gateway responding with ${response.status}. Retrying in ${backoffMs}ms (attempt ${attempt}/${maxRetries})...`);
         window.dispatchEvent(new CustomEvent("qmed:cold_start_retry", { detail: { attempt, maxRetries, backoffMs } }));
         await new Promise((resolve) => setTimeout(resolve, backoffMs));
         continue;
       }
 
+      const contentType = response.headers.get("content-type") || "";
+      const isJson = contentType.includes("application/json") || contentType.includes("application/problem+json");
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        let errorData = {};
+        if (isJson) {
+          errorData = await response.json().catch(() => ({}));
+        } else {
+          const rawText = await response.text().catch(() => "");
+          errorData = { detail: rawText.slice(0, 200) || `HTTP error ${response.status}` };
+        }
         const errorMessage = errorData.detail || errorData.message || `API Error (${response.status})`;
         const err = new Error(errorMessage);
         err.status = response.status;
@@ -44,17 +55,40 @@ async function executeFetchWithRetry(endpoint, fetchOptions, timeoutId, maxRetri
         throw err;
       }
 
-      return await response.json();
+      // Successful 2xx response
+      if (isJson) {
+        return await response.json();
+      }
+
+      // If text or HTML returned (e.g. static site SPA fallback returning HTML instead of JSON)
+      const rawText = await response.text();
+      if (rawText.trim().startsWith("<!DOCTYPE") || rawText.trim().startsWith("<html")) {
+        const err = new Error(`Endpoint '${endpoint}' returned HTML instead of JSON. Ensure backend API is accessible.`);
+        err.status = 404;
+        err.isHtmlFallback = true;
+        throw err;
+      }
+
+      try {
+        return JSON.parse(rawText);
+      } catch {
+        return rawText;
+      }
     } catch (error) {
+      // Never retry on client errors, auth expired, or HTML fallback from static rewrite
+      if (error.status && error.status < 500) {
+        if (timeoutId) clearTimeout(timeoutId);
+        throw error;
+      }
+
       attempt++;
-      // Retry on network failures (Failed to fetch, network dropped)
       const isGet = !fetchOptions.method || fetchOptions.method === "GET";
       const isNetworkError = error.message === "Failed to fetch" || error.name === "TypeError";
       const isAuthEndpoint = endpoint.includes("/auth/login") || endpoint.includes("/auth/register");
 
       if (attempt <= maxRetries && (isGet || isAuthEndpoint) && isNetworkError) {
-        const delayMs = Math.min(attempt * 1000, 3000);
-        console.warn(`[Connection Retry] Network connection re-attempt ${attempt}/${maxRetries} to ${endpoint} in ${delayMs}ms...`);
+        const delayMs = Math.min(attempt * 1200, 3500);
+        console.warn(`[Connection Retry] Network re-attempt ${attempt}/${maxRetries} to ${endpoint} in ${delayMs}ms...`);
         await new Promise((resolve) => setTimeout(resolve, delayMs));
         continue;
       }
@@ -101,6 +135,19 @@ export async function request(endpoint, options = {}) {
     signal: controller.signal,
     mode: "cors",
   };
+
+  const isGet = !options.method || options.method === "GET";
+  if (isGet && !options.noDedupe) {
+    const dedupeKey = `${endpoint}:${token || ""}`;
+    if (inFlightGets.has(dedupeKey)) {
+      return inFlightGets.get(dedupeKey);
+    }
+    const promise = executeFetchWithRetry(endpoint, fetchOptions, timeoutId).finally(() => {
+      inFlightGets.delete(dedupeKey);
+    });
+    inFlightGets.set(dedupeKey, promise);
+    return promise;
+  }
 
   return executeFetchWithRetry(endpoint, fetchOptions, timeoutId);
 }

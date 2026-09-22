@@ -102,20 +102,19 @@ export default function DoctorDiscovery({ onOpenBooking, onJoinRoom, patientId }
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
               <span className="step-badge" style={{ background: "var(--primary-soft)", color: "var(--primary-dark)", borderColor: "var(--border-default)" }}>
-                CLINICAL NETWORK
+                {t("telemedicine.clinical_network", "CLINICAL NETWORK")}
               </span>
               <h2 style={{ fontFamily: "var(--font-display)", fontSize: "1.35rem", color: "var(--text-primary)", fontWeight: 700, margin: 0, letterSpacing: "-0.01em" }}>
-                Verified Medical Specialists & Tele-Consultation
+                {t("telemedicine.title", "Verified Medical Specialists & Tele-Consultation")}
               </h2>
             </div>
             <p style={{ color: "var(--text-secondary)", fontSize: "0.82rem", margin: 0, maxWidth: "700px" }}>
-              Connect with board-certified oncologists, cardiologists, and pulmonologists. Two-way synchronized calendar
-              with soft-lock protection prevents double-booking.
+              {t("telemedicine.subtitle", "Connect with board-certified oncologists, cardiologists, and pulmonologists. Two-way synchronized calendar with soft-lock protection prevents double-booking.")}
             </p>
           </div>
           <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
             <span className="step-badge" style={{ padding: "6px 12px", fontSize: "0.74rem", background: "var(--risk-low-bg)", color: "var(--risk-low)", borderColor: "var(--risk-low-border)", display: "flex", alignItems: "center", gap: "6px" }}>
-              <ShieldCheck size={14} /> Medical Council Verified
+              <ShieldCheck size={14} /> {t("telemedicine.verified_badge", "Medical Council Verified")}
             </span>
           </div>
         </div>
@@ -127,7 +126,7 @@ export default function DoctorDiscovery({ onOpenBooking, onJoinRoom, patientId }
             <input
               type="text"
               className="input-control"
-              placeholder="Search by doctor name, condition, or hospital..."
+              placeholder={t("telemedicine.search_placeholder", "Search by doctor name, condition, or hospital...")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{ paddingLeft: "36px", width: "100%" }}
@@ -136,11 +135,11 @@ export default function DoctorDiscovery({ onOpenBooking, onJoinRoom, patientId }
 
           <div style={{ display: "flex", gap: "8px", overflowX: "auto", WebkitOverflowScrolling: "touch", scrollbarWidth: "none", maxWidth: "100%", paddingBottom: "4px" }}>
             {[
-              { id: "all", label: "All Specialties" },
-              { id: "cardiology", label: "Cardiology" },
-              { id: "oncology", label: "Oncology" },
-              { id: "pulmonary", label: "Pulmonology" },
-              { id: "dermatology", label: "Dermatology" },
+              { id: "all", label: t("telemedicine.spec_all", "All Specialties") },
+              { id: "cardiology", label: t("telemedicine.spec_cardiology", "Cardiology") },
+              { id: "oncology", label: t("telemedicine.spec_oncology", "Oncology") },
+              { id: "pulmonary", label: t("telemedicine.spec_pulmonary", "Pulmonology") },
+              { id: "dermatology", label: t("telemedicine.spec_dermatology", "Dermatology") },
             ].map((spec) => (
               <button
                 key={spec.id}
@@ -180,11 +179,11 @@ export default function DoctorDiscovery({ onOpenBooking, onJoinRoom, patientId }
       {loading ? (
         <div className="card-panel" style={{ textAlign: "center", padding: "40px" }}>
           <span className="spinner-icon" style={{ display: "inline-block", marginRight: "8px" }}>⚙️</span>
-          <span>Loading verified clinical specialists...</span>
+          <span>{t("telemedicine.loading_specialists", "Loading verified clinical specialists...")}</span>
         </div>
       ) : filteredDoctors.length === 0 ? (
         <div className="card-panel" style={{ textAlign: "center", padding: "40px" }}>
-          <p style={{ color: "var(--text-muted)" }}>No medical specialists match your search criteria.</p>
+          <p style={{ color: "var(--text-muted)" }}>{t("telemedicine.no_match", "No medical specialists match your search criteria.")}</p>
         </div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 300px), 1fr))", gap: "16px" }}>
@@ -232,7 +231,7 @@ export default function DoctorDiscovery({ onOpenBooking, onJoinRoom, patientId }
 
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginTop: "8px", fontSize: "0.75rem", color: "var(--text-secondary)" }}>
                     <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                      <Award size={13} color="var(--primary)" /> {doc.experience_years} Years Experience
+                      <Award size={13} color="var(--primary)" /> {doc.experience_years} {t("telemedicine.years_experience", "Years Experience")}
                     </span>
                     <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
                       <MapPin size={13} /> {doc.hospital_affiliation}
@@ -240,7 +239,7 @@ export default function DoctorDiscovery({ onOpenBooking, onJoinRoom, patientId }
                   </div>
 
                   <div style={{ marginTop: "6px", fontSize: "0.72rem", color: "var(--text-muted)" }}>
-                    Council Reg: <code style={{ fontFamily: "var(--font-mono)", color: "var(--text-secondary)" }}>{doc.registration_number}</code> ({doc.council_name})
+                    {t("telemedicine.council_reg", "Council Reg")}: <code style={{ fontFamily: "var(--font-mono)", color: "var(--text-secondary)" }}>{doc.registration_number}</code> ({doc.council_name})
                   </div>
                 </div>
 
@@ -248,7 +247,7 @@ export default function DoctorDiscovery({ onOpenBooking, onJoinRoom, patientId }
                 <div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
                     <span style={{ fontSize: "0.76rem", fontWeight: 700, color: "var(--text-secondary)" }}>
-                      Next Available Slots:
+                      {t("telemedicine.next_slots", "Next Available Slots:")}
                     </span>
                     <span style={{ fontSize: "0.75rem", color: "var(--accent-teal)", fontWeight: 700 }}>
                       ₹{doc.fee_inr} / Consult
@@ -295,7 +294,7 @@ export default function DoctorDiscovery({ onOpenBooking, onJoinRoom, patientId }
                       }}
                     >
                       <Lock size={12} />
-                      <span>Slot <strong>{selectedSlot}</strong> soft-locked for you. Ready to complete intake.</span>
+                      <span>{t("telemedicine.slot_locked_prefix", "Slot")} <strong>{selectedSlot}</strong> {t("telemedicine.slot_locked_suffix", "soft-locked for you. Ready to complete intake.")}</span>
                     </div>
                   )}
                 </div>
@@ -308,7 +307,7 @@ export default function DoctorDiscovery({ onOpenBooking, onJoinRoom, patientId }
                     onClick={() => handleStartBooking(doc)}
                     style={{ flex: 1, padding: "8px", fontSize: "0.82rem", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
                   >
-                    <Video size={14} /> Book Video Consult
+                    <Video size={14} /> {t("telemedicine.book_video_consult", "Book Video Consult")}
                   </button>
                 </div>
               </div>

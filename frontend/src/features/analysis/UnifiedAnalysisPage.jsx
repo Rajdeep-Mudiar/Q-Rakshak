@@ -1301,13 +1301,22 @@ export default function UnifiedAnalysisPage() {
   if (!currentUser) {
     return (
       <EditorialLoginPage
-        onGoogleLogin={() => {
+        onGoogleLogin={(role) => {
           const returnUrl = encodeURIComponent(window.location.origin + window.location.pathname);
-          window.location.href = `${ENDPOINTS.AUTH_GOOGLE}?redirect_url=${returnUrl}`;
+          const roleParam = role ? `&role=${encodeURIComponent(role)}` : "";
+          window.location.href = `${ENDPOINTS.AUTH_GOOGLE}?redirect_url=${returnUrl}${roleParam}`;
         }}
         onGoogleVerifySuccess={(user) => {
           setCurrentUser(user);
           setPatientId(resolvePatientId(user));
+          const roleCfg = ROLE_PERMISSIONS[user.role] || ROLE_PERMISSIONS.patient;
+          setActiveTabState(roleCfg.defaultTab);
+        }}
+        onLoginSuccess={(user) => {
+          setCurrentUser(user);
+          setPatientId(resolvePatientId(user));
+          const roleCfg = ROLE_PERMISSIONS[user.role] || ROLE_PERMISSIONS.patient;
+          setActiveTabState(roleCfg.defaultTab);
         }}
         loading={loading}
         error={error}

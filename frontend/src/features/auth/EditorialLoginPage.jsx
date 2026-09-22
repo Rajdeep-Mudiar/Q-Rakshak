@@ -17,20 +17,45 @@ import {
   AlertCircle,
   Activity,
   Layers,
-  ExternalLink
+  ExternalLink,
+  Eye,
+  EyeOff,
+  UserPlus,
+  ChevronDown
 } from "lucide-react";
 import { animateErrorShake } from "../../utils/motion.js";
 import ModelEvaluationShowcase from "./components/ModelEvaluationShowcase.jsx";
 import { authApi } from "../../api/auth.js";
+import { useLanguage } from "../../context/LanguageContext.jsx";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySuccess, loading, error }) {
+export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySuccess, onLoginSuccess, loading, error }) {
+  const { t } = useLanguage();
   const [showGuideModal, setShowGuideModal] = useState(false);
   const [gisLoading, setGisLoading] = useState(false);
   const [localError, setLocalError] = useState(null);
+  const [selectedRole, setSelectedRole] = useState("patient"); // 'patient' | 'doctor' | 'admin'
+  const selectedRoleRef = useRef(selectedRole);
+  useEffect(() => {
+    selectedRoleRef.current = selectedRole;
+  }, [selectedRole]);
+
+  const [authMode, setAuthMode] = useState("login"); // 'login' | 'register'
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  // Registration state
+  const [regName, setRegName] = useState("");
+  const [regEmail, setRegEmail] = useState("");
+  const [regUsername, setRegUsername] = useState("");
+  const [regPassword, setRegPassword] = useState("");
+  const [regPhone, setRegPhone] = useState("");
+
   const modalContainerRef = useRef(null);
   const narrativeRef = useRef(null);
   const formContainerRef = useRef(null);
@@ -92,9 +117,11 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                 try {
                   setGisLoading(true);
                   setLocalError(null);
-                  const verifiedUser = await authApi.verifyGoogleCredential(response.credential);
+                  const verifiedUser = await authApi.verifyGoogleCredential(response.credential, selectedRoleRef.current);
                   if (verifiedUser) {
-                    if (onGoogleVerifySuccess) {
+                    if (onLoginSuccess) {
+                      onLoginSuccess(verifiedUser);
+                    } else if (onGoogleVerifySuccess) {
                       onGoogleVerifySuccess(verifiedUser);
                     } else {
                       window.location.reload();
@@ -136,26 +163,86 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
     return () => {
       isMounted = false;
     };
-  }, [onGoogleVerifySuccess]);
+  }, [onGoogleVerifySuccess, onLoginSuccess]);
 
   const handleGoogleClick = () => {
     if (typeof window !== "undefined" && window.google?.accounts?.id) {
       try {
         window.google.accounts.id.prompt((notification) => {
           if (notification.isNotDisplayed() || notification.isSkippedMoment() || notification.isDismissedMoment()) {
-            if (onGoogleLogin) onGoogleLogin();
+            if (onGoogleLogin) onGoogleLogin(selectedRoleRef.current);
           }
         });
         return;
       } catch {
-        if (onGoogleLogin) onGoogleLogin();
+        if (onGoogleLogin) onGoogleLogin(selectedRoleRef.current);
         return;
       }
     }
     if (onGoogleLogin) {
-      onGoogleLogin();
+      onGoogleLogin(selectedRoleRef.current);
     }
   };
+
+  async function handleCredentialSubmit(e) {
+    if (e) e.preventDefault();
+    if (!username.trim() || !password) {
+      setLocalError("Please enter both username and password.");
+      return;
+    }
+    setSubmitting(true);
+    setLocalError(null);
+    try {
+      const data = await authApi.login(username.trim(), password, selectedRole);
+      if (data?.user) {
+        if (onLoginSuccess) onLoginSuccess(data.user);
+        else if (onGoogleVerifySuccess) onGoogleVerifySuccess(data.user);
+        else window.location.reload();
+      }
+    } catch (err) {
+      setLocalError(err?.message || "Invalid credentials. Please verify your handle and password.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleRegisterSubmit(e) {
+    if (e) e.preventDefault();
+    if (!regName.trim() || !regEmail.trim() || !regUsername.trim() || !regPassword) {
+      setLocalError("Please complete all registration fields.");
+      return;
+    }
+    setSubmitting(true);
+    setLocalError(null);
+    try {
+      const defaultLicense = selectedRole === "doctor"
+        ? `DOC-LIC-${Math.floor(10000 + Math.random() * 90000)}`
+        : selectedRole === "admin"
+        ? `ADM-SEC-${Math.floor(1000 + Math.random() * 9000)}`
+        : `PT-REC-${Math.floor(10000 + Math.random() * 90000)}`;
+
+      const data = await authApi.register({
+        name: regName.trim(),
+        email: regEmail.trim(),
+        username: regUsername.trim().toLowerCase(),
+        password: regPassword,
+        role: selectedRole,
+        emergency_phone: regPhone || "+91 98765 43210",
+        hospital_affiliation: selectedRole === "doctor" ? "AIIMS Clinical AI OPD" : "Community Healthcare",
+        license_number: defaultLicense,
+        specialty: selectedRole === "doctor" ? "General Medicine & Clinical AI" : undefined,
+      });
+      if (data?.user) {
+        if (onLoginSuccess) onLoginSuccess(data.user);
+        else if (onGoogleVerifySuccess) onGoogleVerifySuccess(data.user);
+        else window.location.reload();
+      }
+    } catch (err) {
+      setLocalError(err?.message || "Registration failed. Username may already be taken.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   useEffect(() => {
     function handleKeyDown(e) {
@@ -452,7 +539,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
             >
               Clinical Precision. <br />
               <span style={{ color: "#059669" }}>
-                Objective Triage.
+                {t("login.hero_title_2", "Objective Triage.")}
               </span>
             </h1>
           </div>
@@ -466,7 +553,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
               margin: 0,
             }}
           >
-            Fast and reliable clinical triage, verified medical records, and secure doctor consultations powered by Quantum AI.
+            {t("login.hero_desc", "Fast and reliable clinical triage, verified medical records, and secure doctor consultations powered by Quantum AI.")}
           </p>
 
           {/* Spec Cards */}
@@ -483,47 +570,47 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
             <div className="editorial-spec-card">
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{ fontSize: "0.70rem", color: "#64748B", fontWeight: 700, textTransform: "uppercase" }}>
-                  Early Detection
+                  {t("login.early_detection_badge", "Early Detection")}
                 </span>
                 <span style={{ fontSize: "0.68rem", color: "#059669", background: "#ECFDF5", border: "1px solid #A7F3D0", padding: "2px 7px", borderRadius: "4px", fontWeight: 700 }}>
                   ESI 1-5
                 </span>
               </div>
               <strong style={{ display: "block", fontSize: "0.92rem", color: "#0F172A", marginTop: "12px", fontWeight: 700 }}>
-                Deterministic Triage
+                {t("login.deterministic_triage", "Deterministic Triage")}
               </strong>
               <span style={{ display: "block", fontSize: "0.78rem", color: "#64748B", marginTop: "5px", lineHeight: 1.5 }}>
-                Standardized priority screening with instant vital sign and anomaly checks.
+                {t("login.deterministic_triage_desc", "Standardized priority screening with instant vital sign and anomaly checks.")}
               </span>
             </div>
 
             <div className="editorial-spec-card">
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{ fontSize: "0.70rem", color: "#64748B", fontWeight: 700, textTransform: "uppercase" }}>
-                  Secure Records
+                  {t("login.secure_records", "Secure Records")}
                 </span>
                 <span style={{ fontSize: "0.68rem", color: "#0284C7", background: "#F0F9FF", border: "1px solid #BAE6FD", padding: "2px 7px", borderRadius: "4px", fontWeight: 700 }}>
-                  Audit Trail
+                  {t("login.audit_trail", "Audit Trail")}
                 </span>
               </div>
               <strong style={{ display: "block", fontSize: "0.92rem", color: "#0F172A", marginTop: "12px", fontWeight: 700 }}>
-                Tamper-Proof Audit
+                {t("login.tamper_proof_audit", "Tamper-Proof Audit")}
               </strong>
               <span style={{ display: "block", fontSize: "0.78rem", color: "#64748B", marginTop: "5px", lineHeight: 1.5 }}>
-                End-to-end cryptographic logging with clinical protocol verification.
+                {t("login.tamper_proof_audit_desc", "End-to-end cryptographic logging with clinical protocol verification.")}
               </span>
             </div>
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap", borderTop: "1px solid #E2E8F0", paddingTop: "16px" }}>
             <span style={{ fontSize: "0.72rem", color: "#475569", display: "inline-flex", alignItems: "center", gap: "6px", fontWeight: 600 }}>
-              <CheckCircle2 size={14} color="#059669" /> Verified Security
+              <CheckCircle2 size={14} color="#059669" /> {t("login.verified_security", "Verified Security")}
             </span>
             <span style={{ fontSize: "0.72rem", color: "#475569", display: "inline-flex", alignItems: "center", gap: "6px", fontWeight: 600 }}>
-              <Lock size={14} color="#059669" /> Encrypted Data
+              <Lock size={14} color="#059669" /> {t("login.encrypted_data", "Encrypted Data")}
             </span>
             <span style={{ fontSize: "0.72rem", color: "#475569", display: "inline-flex", alignItems: "center", gap: "6px", fontWeight: 600 }}>
-              <Cpu size={14} color="#059669" /> Fast Triage
+              <Cpu size={14} color="#059669" /> {t("login.fast_triage", "Fast Triage")}
             </span>
           </div>
         </div>
@@ -535,80 +622,472 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
           style={{
             background: "#FFFFFF",
             border: "1px solid #E2E8F0",
-            borderRadius: "12px",
-            padding: "clamp(28px, 4vw, 54px) clamp(20px, 4vw, 42px)",
+            borderRadius: "14px",
+            padding: "clamp(24px, 3.5vw, 40px) clamp(20px, 3.5vw, 36px)",
             position: "relative",
-            boxShadow: "0 12px 36px rgba(0, 0, 0, 0.06)",
+            boxShadow: "0 12px 36px rgba(0, 0, 0, 0.07)",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            justifyContent: "center",
-            textAlign: "center",
             width: "100%",
-            maxWidth: "520px",
+            maxWidth: "480px",
             margin: "0 auto",
             boxSizing: "border-box",
           }}
         >
-          <div style={{ marginBottom: "32px" }}>
-            <div style={{ 
-              display: "inline-flex", 
-              alignItems: "center", 
-              justifyContent: "center", 
-              width: "60px", 
-              height: "60px", 
-              background: "#F0FDF4", 
-              border: "1px solid #BBF7D0", 
-              borderRadius: "50%",
-              marginBottom: "20px"
-            }}>
-              <ShieldCheck size={28} color="#059669" />
+          {/* Header & Icon */}
+          <div style={{ marginBottom: "20px", textAlign: "center" }}>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "52px",
+                height: "52px",
+                background: selectedRole === "doctor" ? "#F0F9FF" : selectedRole === "admin" ? "#FAF5FF" : "#F0FDF4",
+                border: `1px solid ${selectedRole === "doctor" ? "#BAE6FD" : selectedRole === "admin" ? "#E9D5FF" : "#BBF7D0"}`,
+                borderRadius: "50%",
+                marginBottom: "14px",
+                transition: "all 0.3s ease",
+              }}
+            >
+              {selectedRole === "doctor" ? (
+                <Stethoscope size={24} color="#0284C7" />
+              ) : selectedRole === "admin" ? (
+                <ShieldCheck size={24} color="#7C3AED" />
+              ) : (
+                <User size={24} color="#059669" />
+              )}
             </div>
             <h2
               style={{
                 fontFamily: "var(--font-sans, inherit)",
-                fontSize: "1.8rem",
+                fontSize: "1.6rem",
                 fontWeight: 800,
                 color: "#0F172A",
                 letterSpacing: "-0.02em",
-                margin: "0 0 12px 0",
+                margin: "0 0 6px 0",
               }}
             >
-              Sign in to Q-RAKSHAK
+              {authMode === "register" ? t("login.create_account", "Create Q-RAKSHAK Account") : t("login.title", "Sign in to Q-RAKSHAK")}
             </h2>
-            <p style={{ fontSize: "0.95rem", color: "#64748B", margin: 0, lineHeight: 1.5, maxWidth: "300px" }}>
-              Your Google account secures your clinical workspace.
+            <p style={{ fontSize: "0.85rem", color: "#64748B", margin: 0, lineHeight: 1.4 }}>
+              {t("login.role_desc", "Select your clinical role to access your dedicated workspace.")}
             </p>
           </div>
 
-          <div style={{ width: "100%", maxWidth: "320px", marginBottom: "26px" }}>
+          {/* 1. Explicit Role Selector Dropdown */}
+          <div style={{ width: "100%", marginBottom: "14px", textAlign: "left" }}>
+            <label
+              htmlFor="login-role-select"
+              style={{
+                display: "block",
+                fontSize: "0.70rem",
+                fontWeight: 700,
+                color: "#475569",
+                textTransform: "uppercase",
+                letterSpacing: "0.06em",
+                marginBottom: "5px",
+              }}
+            >
+              {t("login.workspace_role", "Workspace Role")}
+            </label>
+            <div style={{ position: "relative" }}>
+              <select
+                id="login-role-select"
+                value={selectedRole}
+                onChange={(e) => setSelectedRole(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "10px 14px",
+                  paddingRight: "36px",
+                  borderRadius: "8px",
+                  border: `1.5px solid ${selectedRole === "doctor" ? "#0284C7" : selectedRole === "admin" ? "#7C3AED" : "#059669"}`,
+                  fontSize: "0.88rem",
+                  fontWeight: 600,
+                  color: "#0F172A",
+                  background: "#FFFFFF",
+                  appearance: "none",
+                  cursor: "pointer",
+                  outline: "none",
+                  transition: "border-color 0.2s ease",
+                }}
+              >
+                <option value="patient">👤 {t("login.role_patient_opt", "Patient — Health Checkups & 3D Digital Twin")}</option>
+                <option value="doctor">🩺 {t("login.role_doctor_opt", "Doctor / Clinician — OPD Queue & Telemedicine")}</option>
+                <option value="admin">🛡️ {t("login.role_admin_opt", "System Administrator — Governance & Audit Trail")}</option>
+              </select>
+              <ChevronDown
+                size={16}
+                color="#64748B"
+                style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
+              />
+            </div>
+          </div>
+
+          {/* 2. Visual Role Cards */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr 1fr",
+              gap: "8px",
+              width: "100%",
+              marginBottom: "16px",
+            }}
+          >
+            {[
+              { id: "patient", label: t("login.role_patient", "Patient"), sub: t("login.role_patient_sub", "Personal"), color: "#059669", bg: "#F0FDF4", border: "#A7F3D0", icon: User },
+              { id: "doctor", label: t("login.role_doctor", "Doctor"), sub: t("login.role_doctor_sub", "Clinician"), color: "#0284C7", bg: "#F0F9FF", border: "#BAE6FD", icon: Stethoscope },
+              { id: "admin", label: t("login.role_admin", "Admin"), sub: t("login.role_admin_sub", "Security"), color: "#7C3AED", bg: "#FAF5FF", border: "#E9D5FF", icon: ShieldCheck },
+            ].map((r) => {
+              const Icon = r.icon;
+              const isActive = selectedRole === r.id;
+              return (
+                <button
+                  key={r.id}
+                  type="button"
+                  onClick={() => setSelectedRole(r.id)}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: "3px",
+                    padding: "8px 4px",
+                    borderRadius: "8px",
+                    border: isActive ? `2px solid ${r.color}` : "1px solid #E2E8F0",
+                    background: isActive ? r.bg : "#F8FAFC",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  <Icon size={16} color={isActive ? r.color : "#64748B"} />
+                  <span style={{ fontSize: "0.78rem", fontWeight: 700, color: isActive ? r.color : "#334155" }}>
+                    {r.label}
+                  </span>
+                  <span style={{ fontSize: "0.62rem", color: "#64748B" }}>{r.sub}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* 3. Auth Mode Switcher (Sign In vs Register) */}
+          <div
+            style={{
+              display: "flex",
+              background: "#F1F5F9",
+              padding: "3px",
+              borderRadius: "8px",
+              width: "100%",
+              marginBottom: "16px",
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setAuthMode("login")}
+              style={{
+                flex: 1,
+                padding: "6px 0",
+                fontSize: "0.78rem",
+                fontWeight: 700,
+                borderRadius: "6px",
+                border: "none",
+                background: authMode === "login" ? "#FFFFFF" : "transparent",
+                color: authMode === "login" ? "#0F172A" : "#64748B",
+                boxShadow: authMode === "login" ? "0 2px 6px rgba(0,0,0,0.06)" : "none",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+              }}
+            >
+              {t("login.sign_in", "Sign In")}
+            </button>
+            <button
+              type="button"
+              onClick={() => setAuthMode("register")}
+              style={{
+                flex: 1,
+                padding: "6px 0",
+                fontSize: "0.78rem",
+                fontWeight: 700,
+                borderRadius: "6px",
+                border: "none",
+                background: authMode === "register" ? "#FFFFFF" : "transparent",
+                color: authMode === "register" ? "#0F172A" : "#64748B",
+                boxShadow: authMode === "register" ? "0 2px 6px rgba(0,0,0,0.06)" : "none",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+              }}
+            >
+              {t("login.register", "Create Account")}
+            </button>
+          </div>
+
+          {/* 4. Credentials Form */}
+          {authMode === "login" ? (
+            <form onSubmit={handleCredentialSubmit} style={{ width: "100%", display: "flex", flexDirection: "column", gap: "12px" }}>
+              <div style={{ textAlign: "left" }}>
+                <label style={{ display: "block", fontSize: "0.70rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", marginBottom: "4px" }}>
+                  {t("login.username_label", "Username / Handle")}
+                </label>
+                <div style={{ position: "relative" }}>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder={
+                      selectedRole === "doctor"
+                        ? t("login.username_ph_doctor", "e.g. dr.kavita")
+                        : selectedRole === "admin"
+                        ? t("login.username_ph_admin", "e.g. admin.audit")
+                        : t("login.username_ph_patient", "e.g. alex.patient")
+                    }
+                    autoComplete="username"
+                    style={{
+                      width: "100%",
+                      padding: "10px 12px",
+                      paddingLeft: "36px",
+                      borderRadius: "8px",
+                      border: "1px solid #CBD5E1",
+                      fontSize: "0.88rem",
+                      boxSizing: "border-box",
+                      outline: "none",
+                    }}
+                  />
+                  <User size={16} color="#94A3B8" style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)" }} />
+                </div>
+              </div>
+
+              <div style={{ textAlign: "left" }}>
+                <label style={{ display: "block", fontSize: "0.70rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", marginBottom: "4px" }}>
+                  {t("login.password_label", "Password")}
+                </label>
+                <div style={{ position: "relative" }}>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder={t("login.password_placeholder", "Enter account password")}
+                    autoComplete="current-password"
+                    style={{
+                      width: "100%",
+                      padding: "10px 12px",
+                      paddingLeft: "36px",
+                      paddingRight: "36px",
+                      borderRadius: "8px",
+                      border: "1px solid #CBD5E1",
+                      fontSize: "0.88rem",
+                      boxSizing: "border-box",
+                      outline: "none",
+                    }}
+                  />
+                  <KeyRound size={16} color="#94A3B8" style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)" }} />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                      position: "absolute",
+                      right: "10px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      padding: 0,
+                      color: "#94A3B8",
+                    }}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={submitting || loading}
+                style={{
+                  width: "100%",
+                  padding: "11px 16px",
+                  borderRadius: "8px",
+                  border: "none",
+                  background:
+                    selectedRole === "doctor"
+                      ? "#0284C7"
+                      : selectedRole === "admin"
+                      ? "#7C3AED"
+                      : "#059669",
+                  color: "#FFFFFF",
+                  fontWeight: 700,
+                  fontSize: "0.88rem",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                  marginTop: "4px",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                  transition: "opacity 0.2s ease",
+                }}
+              >
+                <LogIn size={16} />
+                <span>
+                  {submitting ? t("login.signing_in", "Authenticating...") : `${t("login.sign_in_as", "Sign in as")} ${selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}`}
+                </span>
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleRegisterSubmit} style={{ width: "100%", display: "flex", flexDirection: "column", gap: "10px" }}>
+              <div style={{ textAlign: "left" }}>
+                <label style={{ display: "block", fontSize: "0.68rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", marginBottom: "3px" }}>
+                  {t("login.full_name_label", "Full Legal Name")}
+                </label>
+                <input
+                  type="text"
+                  value={regName}
+                  onChange={(e) => setRegName(e.target.value)}
+                  placeholder="e.g. Dr. Aryan Sharma / Alex Patient"
+                  required
+                  style={{ width: "100%", padding: "8px 12px", borderRadius: "6px", border: "1px solid #CBD5E1", fontSize: "0.84rem", boxSizing: "border-box" }}
+                />
+              </div>
+
+              <div style={{ textAlign: "left" }}>
+                <label style={{ display: "block", fontSize: "0.68rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", marginBottom: "3px" }}>
+                  {t("login.email_label", "Email Address")}
+                </label>
+                <input
+                  type="email"
+                  value={regEmail}
+                  onChange={(e) => setRegEmail(e.target.value)}
+                  placeholder="name@hospital.org"
+                  required
+                  style={{ width: "100%", padding: "8px 12px", borderRadius: "6px", border: "1px solid #CBD5E1", fontSize: "0.84rem", boxSizing: "border-box" }}
+                />
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                <div style={{ textAlign: "left" }}>
+                  <label style={{ display: "block", fontSize: "0.68rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", marginBottom: "3px" }}>
+                    {t("login.username_label", "Username")}
+                  </label>
+                  <input
+                    type="text"
+                    value={regUsername}
+                    onChange={(e) => setRegUsername(e.target.value)}
+                    placeholder="handle"
+                    required
+                    style={{ width: "100%", padding: "8px 10px", borderRadius: "6px", border: "1px solid #CBD5E1", fontSize: "0.84rem", boxSizing: "border-box" }}
+                  />
+                </div>
+                <div style={{ textAlign: "left" }}>
+                  <label style={{ display: "block", fontSize: "0.68rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", marginBottom: "3px" }}>
+                    {t("login.password_label", "Password")}
+                  </label>
+                  <input
+                    type="password"
+                    value={regPassword}
+                    onChange={(e) => setRegPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    style={{ width: "100%", padding: "8px 10px", borderRadius: "6px", border: "1px solid #CBD5E1", fontSize: "0.84rem", boxSizing: "border-box" }}
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={submitting || loading}
+                style={{
+                  width: "100%",
+                  padding: "10px 16px",
+                  borderRadius: "8px",
+                  border: "none",
+                  background: selectedRole === "doctor" ? "#0284C7" : selectedRole === "admin" ? "#7C3AED" : "#059669",
+                  color: "#FFFFFF",
+                  fontWeight: 700,
+                  fontSize: "0.86rem",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                  marginTop: "4px",
+                }}
+              >
+                <UserPlus size={16} />
+                <span>{submitting ? t("login.registering", "Registering...") : `${t("login.register_as", "Register as")} ${selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}`}</span>
+              </button>
+            </form>
+          )}
+
+          {/* Google Sign-In with Selected Role */}
+          <div style={{ width: "100%", marginTop: "14px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+              <div style={{ flex: 1, height: "1px", background: "#E2E8F0" }} />
+              <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#94A3B8", textTransform: "uppercase" }}>{t("common.or", "Or")}</span>
+              <div style={{ flex: 1, height: "1px", background: "#E2E8F0" }} />
+            </div>
+
             <button
               type="button"
               onClick={handleGoogleClick}
               disabled={loading || gisLoading}
               className="editorial-google-btn"
+              style={{ width: "100%", boxSizing: "border-box" }}
             >
-              <svg width="20" height="20" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M17.64 9.20455C17.64 8.56636 17.5827 7.95273 17.4764 7.36364H9V10.845H13.8436C13.635 11.97 13.0009 12.9232 12.0477 13.5614V15.8195H14.9564C16.6582 14.2527 17.64 11.9455 17.64 9.20455Z" fill="#4285F4"/>
                 <path d="M9 18C11.43 18 13.4673 17.1941 14.9564 15.8195L12.0477 13.5614C11.2418 14.1014 10.2109 14.4205 9 14.4205C6.65591 14.4205 4.67182 12.8373 3.96409 10.71H0.957275V13.0418C2.43818 15.9832 5.48182 18 9 18Z" fill="#34A853"/>
                 <path d="M3.96409 10.71C3.78409 10.17 3.68182 9.59318 3.68182 9C3.68182 8.40682 3.78409 7.83 3.96409 7.29V4.95818H0.957275C0.347727 6.17318 0 7.54773 0 9C0 10.4523 0.347727 11.8268 0.957275 13.0418L3.96409 10.71Z" fill="#FBBC05"/>
                 <path d="M9 3.57955C10.3214 3.57955 11.5077 4.03364 12.4405 4.92545L15.0218 2.34409C13.4632 0.891818 11.4259 0 9 0C5.48182 0 2.43818 2.01682 0.957275 4.95818L3.96409 7.29C4.67182 5.16273 6.65591 3.57955 9 3.57955Z" fill="#EA4335"/>
               </svg>
-              <span>{loading || gisLoading ? "Connecting..." : "Sign in with Google"}</span>
+              <span>
+                  {loading || gisLoading
+                    ? t("common.loading", "Connecting...")
+                    : `${t("login.google_btn", "Continue with Google as")} ${selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}`}
+              </span>
             </button>
           </div>
 
-          <div style={{ background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: "6px", padding: "12px", maxWidth: "320px" }}>
-            <p style={{ fontSize: "0.75rem", color: "#15803D", margin: 0, lineHeight: 1.5, fontWeight: 500 }}>
-              A security notification will be sent to your Gmail upon successful sign-in.
-            </p>
-          </div>
-
+          {/* 7. Error Display */}
           {(error || localError) && (
-            <div style={{ marginTop: "20px", color: "#DC2626", fontSize: "0.85rem", fontWeight: 600 }}>
+            <div
+              style={{
+                marginTop: "14px",
+                padding: "8px 12px",
+                background: "#FEF2F2",
+                border: "1px solid #FECACA",
+                borderRadius: "6px",
+                color: "#DC2626",
+                fontSize: "0.80rem",
+                fontWeight: 600,
+                width: "100%",
+                boxSizing: "border-box",
+                textAlign: "left",
+              }}
+            >
               {error || localError}
             </div>
           )}
+
+          {/* 8. HIPAA & ABDM Compliance Footer Badge */}
+          <div
+            style={{
+              marginTop: "16px",
+              padding: "8px 10px",
+              background: "#F8FAFC",
+              border: "1px solid #E2E8F0",
+              borderRadius: "6px",
+              width: "100%",
+              boxSizing: "border-box",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}
+          >
+            <ShieldCheck size={14} color="#059669" />
+            <span style={{ fontSize: "0.70rem", color: "#64748B", lineHeight: 1.3 }}>
+              {t("login.hipaa_notice", "Protected under HIPAA, ABDM M1-M3 & ISO 27001 cryptographic security protocols.")}
+            </span>
+          </div>
         </div>
       </main>
 
@@ -675,7 +1154,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
               letterSpacing: "-0.01em",
             }}
           >
-            Scroll down to explore Quantum vs Classical Models & Clinical Benchmarks
+            {t("login.scroll_cue", "Scroll down to explore Quantum vs Classical Models & Clinical Benchmarks")}
           </span>
 
           <ArrowDown size={14} color="#059669" className="scroll-arrow-anim" />

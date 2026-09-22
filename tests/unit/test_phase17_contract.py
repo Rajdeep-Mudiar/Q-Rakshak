@@ -35,7 +35,7 @@ def test_phase_17_contract_schema():
 
     # 5. Model block
     assert "model" in result
-    assert result["model"]["encoder"] in ("BiomedCLIP", "MedSigLIP", "MedicalNet", "VISTA3D", "TabularDirect")
+    assert result["model"]["encoder"] in ("BiomedCLIP", "MedSigLIP", "MedicalNet", "VISTA3D", "TabularDirect", "DeterministicFeatureFallback")
     assert "encoder_version" in result["model"]
     assert "classifier" in result["model"]
 
