@@ -381,7 +381,7 @@ export default function DiseaseIntroPage({
         >
           <div>
             <div style={{ fontSize: "0.68rem", fontWeight: 700, textTransform: "uppercase", color: "var(--text-muted)", letterSpacing: "0.05em" }}>
-              Diagnostic Accuracy
+              {t("disease_intro.fast_stats.diagnostic_accuracy", "Diagnostic Accuracy")}
             </div>
             <div
               className="disease-stat-val"
@@ -394,7 +394,7 @@ export default function DiseaseIntroPage({
 
           <div>
             <div style={{ fontSize: "0.68rem", fontWeight: 700, textTransform: "uppercase", color: "var(--text-muted)", letterSpacing: "0.05em" }}>
-              Quantum Sensitivity
+              {t("disease_intro.fast_stats.quantum_sensitivity", "Quantum Sensitivity")}
             </div>
             <div
               className="disease-stat-val"
@@ -407,7 +407,7 @@ export default function DiseaseIntroPage({
 
           <div>
             <div style={{ fontSize: "0.68rem", fontWeight: 700, textTransform: "uppercase", color: "var(--text-muted)", letterSpacing: "0.05em" }}>
-              Quantum Register
+              {t("disease_intro.fast_stats.quantum_register", "Quantum Register")}
             </div>
             <div style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--text-primary)", fontFamily: "var(--font-mono)" }}>
               {disease.stats.qubits}
@@ -416,7 +416,7 @@ export default function DiseaseIntroPage({
 
           <div>
             <div style={{ fontSize: "0.68rem", fontWeight: 700, textTransform: "uppercase", color: "var(--text-muted)", letterSpacing: "0.05em" }}>
-              Early Detection Impact
+              {t("disease_intro.fast_stats.early_detection_impact", "Early Detection Impact")}
             </div>
             <div style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--text-primary)", marginTop: "3px" }}>
               {disease.stats.earlyDetectionSurvival}
@@ -425,7 +425,7 @@ export default function DiseaseIntroPage({
 
           <div>
             <div style={{ fontSize: "0.68rem", fontWeight: 700, textTransform: "uppercase", color: "var(--text-muted)", letterSpacing: "0.05em" }}>
-              Inference Latency
+              {t("disease_intro.fast_stats.inference_latency", "Inference Latency")}
             </div>
             <div
               className="disease-stat-val"
@@ -449,11 +449,11 @@ export default function DiseaseIntroPage({
         }}
       >
         {[
-          { id: "overview", label: t("diseases.tab_overview", "1. Overview & Facts"), icon: FileText },
-          { id: "quantum", label: t("diseases.tab_ai", "2. How Our AI Works"), icon: Cpu },
-          { id: "benchmarks", label: t("diseases.tab_benchmarks", "3. Accuracy & Test Scores"), icon: BarChart3 },
-          { id: "prep", label: t("diseases.tab_prep", "4. Checkup Checklist & File Types"), icon: CheckCircle2 },
-          { id: "early_detection", label: t("diseases.tab_timeline", "5. Early Detection Timeline"), icon: TrendingUp },
+          { id: "overview", label: t("disease_intro.tab_overview", "1. Clinical Overview & Facts"), icon: FileText },
+          { id: "quantum", label: t("disease_intro.tab_ai", "2. How Our Quantum AI Works"), icon: Cpu },
+          { id: "benchmarks", label: t("disease_intro.tab_benchmarks", "3. Accuracy & Test Scores"), icon: BarChart3 },
+          { id: "prep", label: t("disease_intro.tab_prep", "4. Patient Checklist & File Types"), icon: CheckCircle2 },
+          { id: "early_detection", label: t("disease_intro.tab_timeline", "5. Early Detection Timeline"), icon: TrendingUp },
         ].map((tab) => {
           const TabIcon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -563,7 +563,7 @@ export default function DiseaseIntroPage({
                   <div>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                       <strong style={{ fontSize: "0.92rem", color: "var(--text-primary)" }}>
-                        Early Detection Lead Time: {disease.earlyDetection.leadTime}
+                        {t("disease_intro.lead_time_prefix", "Early Detection Lead Time:")} {disease.earlyDetection.leadTime}
                       </strong>
                       <span
                         style={{
@@ -603,7 +603,7 @@ export default function DiseaseIntroPage({
                   }}
                 >
                   <Clock size={14} />
-                  <span>Inspect Timeline Graph</span>
+                  <span>{t("disease_intro.inspect_timeline_graph", "Inspect Timeline Graph")}</span>
                   <ArrowRight size={13} />
                 </button>
               </div>
@@ -622,7 +622,7 @@ export default function DiseaseIntroPage({
             >
               <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary)", margin: "0 0 12px", display: "flex", alignItems: "center", gap: "8px" }}>
                 <Microscope size={18} color={disease.accentColor} />
-                Clinical Pathology & Diagnostic Target
+                {t("disease_intro.clinical_pathology_title", "Clinical Pathology & Diagnostic Target")}
               </h3>
               <p style={{ fontSize: "0.90rem", lineHeight: 1.65, color: "var(--text-secondary)", margin: 0 }}>
                 {disease.overview.clinicalDefinition}
@@ -650,7 +650,7 @@ export default function DiseaseIntroPage({
               >
                 <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text-primary)", margin: "0 0 16px", display: "flex", alignItems: "center", gap: "8px" }}>
                   <AlertTriangle size={17} color="var(--risk-mid)" />
-                  Key Clinical Signs & Symptoms
+                  {t("disease_intro.warning_signs_title", "Key Clinical Signs & Symptoms")}
                 </h3>
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                   {disease.overview.warningSigns.map((sign, sIdx) => (
@@ -686,7 +686,7 @@ export default function DiseaseIntroPage({
               >
                 <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text-primary)", margin: "0 0 16px", display: "flex", alignItems: "center", gap: "8px" }}>
                   <Activity size={17} color={disease.accentColor} />
-                  Epidemiological Risk Factors
+                  {t("disease_intro.risk_factors_title", "Epidemiological Risk Factors")}
                 </h3>
                 <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                   {disease.overview.riskFactors.map((rf, rIdx) => (
@@ -1214,13 +1214,13 @@ export default function DiseaseIntroPage({
               marginBottom: "4px",
             }}
           >
-            READY TO EVALUATE BIOLOGICAL DATA
+            {t("disease_intro.ready_evaluate_tag", "READY TO EVALUATE BIOLOGICAL DATA")}
           </span>
           <h3 style={{ fontSize: "1.35rem", fontWeight: 800, color: "var(--text-primary)", margin: "0 0 6px" }}>
-            Launch {disease.name} Screening Cockpit
+            {t("disease_intro.launch_cockpit_title", `Launch ${disease.name} Screening Cockpit`, { name: disease.name })}
           </h3>
           <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: 0 }}>
-            Execute {disease.quantumModel.name} on sample profiles or upload custom patient test records.
+            {t("disease_intro.launch_cockpit_desc", `Execute ${disease.quantumModel.name} on sample profiles or upload custom patient test records.`, { model: disease.quantumModel.name })}
           </p>
         </div>
 
@@ -1252,7 +1252,7 @@ export default function DiseaseIntroPage({
           }}
         >
           <Play size={16} fill="#FFFFFF" />
-          <span>Launch Analysis & Detection Now</span>
+          <span>{t("disease_intro.launch_cockpit_btn", "Launch Analysis & Detection Now")}</span>
           <ArrowRight size={16} />
         </button>
       </div>

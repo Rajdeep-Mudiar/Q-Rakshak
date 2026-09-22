@@ -18,7 +18,7 @@ import {
   Heart,
   Stethoscope
 } from "lucide-react";
-import { getDiseaseById, DISEASE_LIST } from "../../../data/diseaseRegistry.js";
+import { getDiseaseById, getLocalizedDiseaseById, DISEASE_LIST } from "../../../data/diseaseRegistry.js";
 import { earlyDetectionApi } from "../../../api/earlyDetection.js";
 import { useLanguage } from "../../../context/LanguageContext.jsx";
 
@@ -37,7 +37,7 @@ export default function DiseaseEarlyDetectionTimeline({
   onSelectDisease = null,
 }) {
   const { t } = useLanguage();
-  const disease = getDiseaseById(diseaseId);
+  const disease = getLocalizedDiseaseById(diseaseId, t);
   const earlyDet = disease.earlyDetection || {};
   const [selectedStageId, setSelectedStageId] = useState(
     earlyDet.stages?.[0]?.id || "stage_0"
@@ -48,13 +48,13 @@ export default function DiseaseEarlyDetectionTimeline({
   // Sync internal state when diseaseId changes
   useEffect(() => {
     setActiveDiseaseId(diseaseId);
-    const d = getDiseaseById(diseaseId);
+    const d = getLocalizedDiseaseById(diseaseId, t);
     if (d?.earlyDetection?.stages?.[0]?.id) {
       setSelectedStageId(d.earlyDetection.stages[0].id);
     }
   }, [diseaseId]);
 
-  const activeDisease = getDiseaseById(activeDiseaseId);
+  const activeDisease = getLocalizedDiseaseById(activeDiseaseId, t);
   const currentEarlyDet = activeDisease.earlyDetection || earlyDet;
   const stages = currentEarlyDet.stages || [];
   const activeStage = stages.find((s) => s.id === selectedStageId) || stages[0] || {};
@@ -130,7 +130,7 @@ export default function DiseaseEarlyDetectionTimeline({
       {showDiseaseSelector && (
         <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", paddingBottom: "12px", borderBottom: "1px solid var(--border-subtle, #F1F5F9)" }}>
           <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-            Select Disease Trajectory:
+            {t("early_detection.select_trajectory", "Select Disease Trajectory:")}
           </span>
           {DISEASE_LIST.map((d) => (
             <button
@@ -174,7 +174,7 @@ export default function DiseaseEarlyDetectionTimeline({
                 borderRadius: "4px",
               }}
             >
-              Early Detection Pathway
+              {t("early_detection.pathway_badge", "Early Detection Pathway")}
             </span>
             <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 500 }}>
               {currentEarlyDet.targetOrgan}
@@ -182,7 +182,7 @@ export default function DiseaseEarlyDetectionTimeline({
           </div>
 
           <h3 style={{ fontSize: "1.25rem", fontWeight: 800, margin: "2px 0 4px", color: "var(--text-primary)" }}>
-            {activeDisease.name} — Early Detection Timeline
+            {activeDisease.name} {t("early_detection.timeline_title_suffix", "— Early Detection Timeline")}
           </h3>
           <p style={{ fontSize: "0.78rem", color: "var(--text-secondary)", margin: 0, maxWidth: "680px", lineHeight: 1.45 }}>
             {currentEarlyDet.keyInsight}
@@ -202,13 +202,13 @@ export default function DiseaseEarlyDetectionTimeline({
             }}
           >
             <div style={{ fontSize: "0.64rem", color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase" }}>
-              Lead Time Window
+              {t("early_detection.lead_time_window", "Lead Time Window")}
             </div>
             <div style={{ fontSize: "1.1rem", fontWeight: 800, color: activeDisease.accentColor, fontFamily: "var(--font-mono)" }}>
               {currentEarlyDet.leadTime}
             </div>
             <div style={{ fontSize: "0.62rem", color: "var(--risk-low, #16A34A)", fontWeight: 600 }}>
-              Pre-clinical lead
+              {t("early_detection.pre_clinical_lead", "Pre-clinical lead")}
             </div>
           </div>
 
@@ -223,7 +223,7 @@ export default function DiseaseEarlyDetectionTimeline({
             }}
           >
             <div style={{ fontSize: "0.64rem", color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase" }}>
-              Stage 0 Impact
+              {t("early_detection.stage_0_impact", "Stage 0 Impact")}
             </div>
             <div style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--risk-low, #16A34A)", fontFamily: "var(--font-mono)" }}>
               {currentEarlyDet.stages?.[0]?.outcomeMetric?.split(" ")[0] || "99%"}
@@ -244,13 +244,13 @@ export default function DiseaseEarlyDetectionTimeline({
             }}
           >
             <div style={{ fontSize: "0.64rem", color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase" }}>
-              Sensitivity Gain
+              {t("early_detection.sensitivity_gain", "Sensitivity Gain")}
             </div>
             <div style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--primary, #0284C7)", fontFamily: "var(--font-mono)" }}>
               {currentEarlyDet.sensitivityGain?.split(" ")[0] || "+4.2%"}
             </div>
             <div style={{ fontSize: "0.62rem", color: "var(--text-secondary)", fontWeight: 500 }}>
-              vs standard screening
+              {t("early_detection.vs_standard", "vs Standard Screening")}
             </div>
           </div>
         </div>
@@ -271,13 +271,13 @@ export default function DiseaseEarlyDetectionTimeline({
           <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <span style={{ width: "12px", height: "3px", background: "#DC2626", borderRadius: "2px" }} />
-              <strong style={{ color: "#DC2626" }}>Unmonitored Progression</strong>
+              <strong style={{ color: "#DC2626" }}>{t("early_detection.unmonitored_progression", "Unmonitored Progression")}</strong>
               <span style={{ color: "var(--text-muted)", fontSize: "0.66rem" }}>(Crosses severe threshold)</span>
             </div>
 
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <span style={{ width: "12px", height: "3px", background: "#16A34A", borderRadius: "2px" }} />
-              <strong style={{ color: "#16A34A" }}>Quantum Early Intervention</strong>
+              <strong style={{ color: "#16A34A" }}>{t("early_detection.quantum_intervention", "Quantum Early Intervention")}</strong>
               <span style={{ color: "var(--text-muted)", fontSize: "0.66rem" }}>(Intercepted & stabilized)</span>
             </div>
           </div>
@@ -285,11 +285,11 @@ export default function DiseaseEarlyDetectionTimeline({
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "4px", color: "#D97706", fontSize: "0.68rem", fontWeight: 600 }}>
               <span style={{ width: "8px", height: "1px", borderTop: "2px dashed #D97706" }} />
-              <span>Standard Symptom Threshold ({clinicalThresholdVal}%)</span>
+              <span>{t("early_detection.standard_threshold", `Standard Symptom Threshold (${clinicalThresholdVal}%)`)}</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "4px", color: "var(--primary, #0284C7)", fontSize: "0.68rem", fontWeight: 600 }}>
               <span style={{ width: "8px", height: "1px", borderTop: "2px dashed var(--primary, #0284C7)" }} />
-              <span>Quantum Detection Horizon ({qmlThresholdVal}%)</span>
+              <span>{t("early_detection.quantum_horizon", `Quantum Detection Horizon (${qmlThresholdVal}%)`)}</span>
             </div>
           </div>
         </div>
@@ -372,7 +372,7 @@ export default function DiseaseEarlyDetectionTimeline({
                 fill="var(--primary, #0284C7)"
                 letterSpacing="0.04em"
               >
-                EARLY DETECTION WINDOW ({currentEarlyDet.leadTime?.toUpperCase()})
+                {t("early_detection.window_label", `EARLY DETECTION WINDOW (${currentEarlyDet.leadTime?.toUpperCase()})`, { months: currentEarlyDet.leadTime?.toUpperCase() })}
               </text>
             </g>
           )}
@@ -716,7 +716,7 @@ export default function DiseaseEarlyDetectionTimeline({
             >
               <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.68rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", marginBottom: "4px" }}>
                 <Activity size={13} color={activeDisease.accentColor} />
-                <span>Cellular Biomarkers & Shape Shifts</span>
+                <span>{t("early_detection.cellular_biomarker_title", "Cellular Biomarkers & Shape Shifts")}</span>
               </div>
               <p style={{ fontSize: "0.75rem", color: "var(--text-primary)", margin: 0, lineHeight: 1.4 }}>
                 {activeStage.cellularBiomarker}
@@ -734,7 +734,7 @@ export default function DiseaseEarlyDetectionTimeline({
             >
               <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.68rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", marginBottom: "4px" }}>
                 <Info size={13} color="#F59E0B" />
-                <span>Patient Symptoms & Detectability</span>
+                <span>{t("early_detection.symptoms_title", "Patient Symptoms & Detectability")}</span>
               </div>
               <p style={{ fontSize: "0.75rem", color: "var(--text-primary)", margin: 0, lineHeight: 1.4 }}>
                 {activeStage.symptoms}
@@ -752,7 +752,7 @@ export default function DiseaseEarlyDetectionTimeline({
             >
               <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.68rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", marginBottom: "4px" }}>
                 <Zap size={13} color="var(--primary, #0284C7)" />
-                <span>Quantum AI Detection Engine</span>
+                <span>{t("early_detection.detection_engine_title", "Quantum AI Detection Engine")}</span>
               </div>
               <p style={{ fontSize: "0.75rem", color: "var(--text-primary)", margin: 0, lineHeight: 1.4 }}>
                 {activeStage.detectionMethod}
@@ -770,7 +770,7 @@ export default function DiseaseEarlyDetectionTimeline({
             >
               <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.68rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", marginBottom: "4px" }}>
                 <ShieldCheck size={13} color="var(--risk-low, #16A34A)" />
-                <span>Recommended Clinical Action</span>
+                <span>{t("early_detection.recommended_action_title", "Recommended Clinical Action")}</span>
               </div>
               <p style={{ fontSize: "0.75rem", color: "var(--text-primary)", margin: 0, lineHeight: 1.4 }}>
                 {activeStage.recommendedIntervention}
@@ -792,7 +792,7 @@ export default function DiseaseEarlyDetectionTimeline({
         >
           <div style={{ fontSize: "0.70rem", fontWeight: 800, color: "var(--primary, #0284C7)", textTransform: "uppercase", marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px" }}>
             <Compass size={14} />
-            <span>Key Research-Backed Prevention Rules:</span>
+            <span>{t("early_detection.prevention_rules_title", "Key Research-Backed Prevention Rules:")}</span>
           </div>
           <ul style={{ margin: 0, paddingLeft: "18px", fontSize: "0.74rem", color: "var(--text-secondary)", display: "flex", flexDirection: "column", gap: "4px" }}>
             {currentEarlyDet.preventiveActions.map((action, i) => (
@@ -829,7 +829,7 @@ export default function DiseaseEarlyDetectionTimeline({
             }}
           >
             <Play size={14} fill="#FFFFFF" />
-            <span>Start {activeDisease.name} Checkup</span>
+            <span>{t("early_detection.start_checkup_btn", `Start ${activeDisease.name} Checkup`, { name: activeDisease.name })}</span>
             <ArrowRight size={14} />
           </button>
         </div>

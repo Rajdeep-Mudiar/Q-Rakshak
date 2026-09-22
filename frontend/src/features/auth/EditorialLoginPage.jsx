@@ -746,6 +746,49 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
             </p>
           </div>
 
+          {/* Language Switcher Bar on Login Card */}
+          <div
+            style={{
+              width: "100%",
+              marginBottom: "16px",
+              padding: "8px 12px",
+              background: "#F8FAFC",
+              border: "1px solid #E2E8F0",
+              borderRadius: "8px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "8px",
+              boxSizing: "border-box",
+            }}
+          >
+            <span style={{ fontSize: "0.70rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.05em", display: "inline-flex", alignItems: "center", gap: "5px" }}>
+              🌐 {t("header.language", "Language")}:
+            </span>
+            <div style={{ display: "flex", gap: "6px" }}>
+              {availableLanguages.map((l) => (
+                <button
+                  key={l.code}
+                  type="button"
+                  onClick={() => setLanguage(l.code)}
+                  style={{
+                    padding: "4px 10px",
+                    borderRadius: "6px",
+                    border: l.code === language ? "1.5px solid #059669" : "1px solid #CBD5E1",
+                    background: l.code === language ? "#ECFDF5" : "#FFFFFF",
+                    color: l.code === language ? "#059669" : "#334155",
+                    fontSize: "0.74rem",
+                    fontWeight: l.code === language ? 700 : 500,
+                    cursor: "pointer",
+                    transition: "all 0.15s ease",
+                  }}
+                >
+                  {l.flag} {l.shortBadge || l.nativeName}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* 1. Explicit Role Selector Dropdown */}
           <div style={{ width: "100%", marginBottom: "14px", textAlign: "left" }}>
             <label
