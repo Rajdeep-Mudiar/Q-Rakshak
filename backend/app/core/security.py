@@ -182,20 +182,34 @@ async def get_optional_user(
     Use this for endpoints where unauthenticated (guest) access is intentional.
     """
     if x_api_key and x_api_key in VALID_API_KEYS:
-        return {"user_id": "API-GATEWAY", "username": "api.gateway", "role": "admin", "name": "API Gateway Client"}
+        return {"user_id": "API-GATEWAY", "username": "api.gateway", "role": "service", "name": "API Gateway Service"}
     if not authorization or not authorization.startswith("Bearer "):
-        return {"user_id": "GUEST-USER", "username": "guest", "role": "patient", "name": "Guest Patient"}
+        return {"user_id": "GUEST-USER", "username": "guest", "role": "guest", "name": "Guest Patient"}
     token = authorization.split(" ", 1)[1]
     try:
         return verify_access_token(token)
     except HTTPException:
-        return {"user_id": "GUEST-USER", "username": "guest", "role": "patient", "name": "Guest Patient"}
+        return {"user_id": "GUEST-USER", "username": "guest", "role": "guest", "name": "Guest Patient"}
 
 
 def require_admin(user: dict[str, Any]) -> dict[str, Any]:
     """Guard helper — raises HTTP 403 if the authenticated user is not an admin."""
     if user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Administrator access required.")
+    return user
+
+
+def require_doctor(user: dict[str, Any]) -> dict[str, Any]:
+    """Guard helper — raises HTTP 403 if the authenticated user is not a doctor or admin."""
+    if user.get("role") not in ("doctor", "clinician", "admin"):
+        raise HTTPException(status_code=403, detail="Doctor / Clinician authorization required.")
+    return user
+
+
+def require_role(user: dict[str, Any], allowed_roles: tuple[str, ...] | list[str]) -> dict[str, Any]:
+    """Guard helper — raises HTTP 403 if the user role is not in the allowed roles."""
+    if user.get("role") not in allowed_roles:
+        raise HTTPException(status_code=403, detail=f"Access denied. Requires one of roles: {', '.join(allowed_roles)}.")
     return user
 
 

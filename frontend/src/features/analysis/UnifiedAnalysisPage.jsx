@@ -569,6 +569,10 @@ export default function UnifiedAnalysisPage() {
   const [activeGuide, setActiveGuide] = useState(null);
   const [selectedBookingForRoom, setSelectedBookingForRoom] = useState(null);
   const [myBookings, setMyBookings] = useState([]);
+  
+  // Track explicit session determination state
+  const [authLoading, setAuthLoading] = useState(() => Boolean(authApi.getToken()));
+  
   // Dynamic authenticated user state with session recovery
   const [currentUser, setCurrentUser] = useState(() => {
     if (authApi.hasToken()) {
@@ -581,55 +585,60 @@ export default function UnifiedAnalysisPage() {
   // Restore and validate session on mount
   useEffect(() => {
     async function restoreSession() {
-      // 1. Process Google OAuth callback token or error from URL query
-      if (typeof window !== "undefined" && window.location.search) {
-        const params = new URLSearchParams(window.location.search);
-        const urlToken = params.get("token");
-        const urlError = params.get("error");
+      try {
+        // 1. Process Google OAuth callback token or error from URL query
+        if (typeof window !== "undefined" && window.location.search) {
+          const params = new URLSearchParams(window.location.search);
+          const urlToken = params.get("token");
+          const urlError = params.get("error");
 
-        if (urlError) {
-          setError(`Google Sign-In Notice: ${urlError.replace(/_/g, " ")}`);
-          const cleanUrl = window.location.pathname + window.location.hash;
-          window.history.replaceState({}, document.title, cleanUrl);
-        } else if (urlToken) {
-          try {
-            const googleUser = await authApi.loginWithGoogleToken(urlToken);
-            if (googleUser) {
-              setCurrentUser(googleUser);
-              setPatientId(resolvePatientId(googleUser));
-              const roleCfg = ROLE_PERMISSIONS[googleUser.role] || ROLE_PERMISSIONS.patient;
-              setActiveTabState(roleCfg.defaultTab);
-              const cleanUrl = window.location.pathname + window.location.hash;
-              window.history.replaceState({}, document.title, cleanUrl);
-              return;
+          if (urlError) {
+            setError(`Google Sign-In Notice: ${urlError.replace(/_/g, " ")}`);
+            const cleanUrl = window.location.pathname + window.location.hash;
+            window.history.replaceState({}, document.title, cleanUrl);
+          } else if (urlToken) {
+            try {
+              const googleUser = await authApi.loginWithGoogleToken(urlToken);
+              if (googleUser) {
+                setCurrentUser(googleUser);
+                setPatientId(resolvePatientId(googleUser));
+                const roleCfg = ROLE_PERMISSIONS[googleUser.role] || ROLE_PERMISSIONS.patient;
+                setActiveTabState(roleCfg.defaultTab);
+                const cleanUrl = window.location.pathname + window.location.hash;
+                window.history.replaceState({}, document.title, cleanUrl);
+                return;
+              }
+            } catch (err) {
+              console.error("Google token validation error:", err);
             }
-          } catch (err) {
-            console.error("Google token validation error:", err);
           }
         }
-      }
 
-      if (authApi.hasToken()) {
-        try {
-          const validUser = await authApi.validateSession();
-          if (validUser) {
-            setCurrentUser(validUser);
-            setPatientId(resolvePatientId(validUser));
-          } else {
-            setCurrentUser(null);
-            setError(null);
+        if (authApi.hasToken()) {
+          try {
+            const validUser = await authApi.validateSession();
+            if (validUser) {
+              setCurrentUser(validUser);
+              setPatientId(resolvePatientId(validUser));
+            } else {
+              setCurrentUser(null);
+              setError(null);
+            }
+          } catch {
+            // Keep current stored user on network cold start
           }
-        } catch {
-          // Keep current stored user on network cold start
+        } else {
+          setCurrentUser(null);
         }
-      } else {
-        setCurrentUser(null);
+      } finally {
+        setAuthLoading(false);
       }
     }
     restoreSession();
 
     function handleAuthExpired() {
       setCurrentUser(null);
+      setAuthLoading(false);
       setError(null); // clear error so login page renders clean; the session lapse is self-evident from the redirect
     }
 
@@ -736,6 +745,16 @@ export default function UnifiedAnalysisPage() {
   function handleLogout() {
     authApi.logout();
     setCurrentUser(null);
+    setPatientId("");
+    setPatientData(null);
+    setRawFeatures([]);
+    setResult(null);
+    setFile(null);
+    setError(null);
+    if (typeof window !== "undefined") {
+      const cleanUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+    }
   }
 
   // WCAG Accessibility Modes
@@ -1306,6 +1325,26 @@ export default function UnifiedAnalysisPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  if (authLoading) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          width: "100vw",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#FFFFFF",
+          gap: "16px",
+          fontFamily: "var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif)",
+        }}
+      >
+        <SquareLoader message="Validating Clinical Session..." />
+      </div>
+    );
   }
 
   if (!currentUser) {
