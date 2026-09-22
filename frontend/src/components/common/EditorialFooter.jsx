@@ -1,6 +1,9 @@
 import React from "react";
+import { useLanguage } from "../../context/LanguageContext.jsx";
 
 export default function EditorialFooter() {
+  const { t } = useLanguage();
+
   return (
     <footer
       className="editorial-footer editorial-footer-container"
@@ -22,11 +25,11 @@ export default function EditorialFooter() {
     >
       <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
         <span style={{ fontWeight: 600, color: "var(--text-primary)" }}>
-          QRakshak Medical Technology © 2026
+          {t("footer.copyright", "QRakshak Medical Technology © 2026")}
         </span>
         <span style={{ color: "var(--border-default)" }}>|</span>
         <span style={{ fontSize: "0.70rem", color: "var(--text-secondary)", fontFamily: "var(--font-mono)" }}>
-          HIPAA Safe Harbor 18 • DPDP Act 2023 • WORM Audit Trail
+          {t("footer.standards", "HIPAA Safe Harbor 18 • DPDP Act 2023 • WORM Audit Trail")}
         </span>
       </div>
 
@@ -35,11 +38,11 @@ export default function EditorialFooter() {
           href="mailto:support@qrakshak.health" 
           style={{ color: "var(--primary)", textDecoration: "none", fontWeight: 600 }}
         >
-          support@qrakshak.health
+          {t("footer.support", "support@qrakshak.health")}
         </a>
         <span style={{ color: "var(--border-default)" }}>•</span>
         <span style={{ color: "var(--text-secondary)", fontSize: "0.72rem" }}>
-          Protected Healthcare Environment
+          {t("footer.env", "Protected Healthcare Environment")}
         </span>
       </div>
     </footer>

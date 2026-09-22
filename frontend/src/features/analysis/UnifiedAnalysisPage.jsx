@@ -1614,12 +1614,12 @@ export default function UnifiedAnalysisPage() {
               <div className="workflow-stepper">
                 <div className={`step-chip ${study ? "active" : ""}`}>
                   <span className="step-badge">0.1</span>
-                  <span>Select & Run Checkup</span>
+                  <span>{t("checkup.step1_title", "Select & Run Checkup")}</span>
                 </div>
                 <ChevronRight size={12} color="var(--text-muted)" />
                 <div className={`step-chip ${result ? "active" : ""}`}>
                   <span className="step-badge">0.2</span>
-                  <span>Health Assessment & 3D Twin</span>
+                  <span>{t("checkup.step2_title", "Health Assessment & 3D Twin")}</span>
                 </div>
               </div>
 
@@ -1637,7 +1637,7 @@ export default function UnifiedAnalysisPage() {
                   <div className="cockpit-col-header">
                     <div>
                       <span className="step-badge">0.1</span>
-                      <span>AI Health Checkups</span>
+                      <span>{t("nav.health_checkups", "AI Health Checkups")}</span>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                       <span style={{ fontSize: "0.68rem", color: "var(--primary)", fontFamily: "var(--font-mono)", fontWeight: 700 }}>
@@ -1655,42 +1655,48 @@ export default function UnifiedAnalysisPage() {
                   </div>
                   <div className="cockpit-col-body">
                     <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                      {Object.entries(STUDIES).map(([k, cfg]) => (
-                        <button
-                          key={k}
-                          type="button"
-                          className={`study-card-btn ${study === k ? "active" : ""}`}
-                          onClick={() => {
-                            setStudy(k);
-                            setResult(null);
-                            setFile(null);
-                          }}
-                        >
-                          <div style={{ flex: 1 }}>
-                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "2px" }}>
-                              <h4 style={{ margin: 0 }}>{cfg.label}</h4>
-                              <span
-                                style={{
-                                  fontSize: "0.58rem",
-                                  fontWeight: 800,
-                                  padding: "2px 6px",
-                                  borderRadius: "3px",
-                                  textTransform: "uppercase",
-                                  background: cfg.modality === "image" ? "rgba(0, 242, 254, 0.12)" : "rgba(168, 85, 247, 0.12)",
-                                  color: cfg.modality === "image" ? "var(--primary)" : "#C084FC",
-                                  border: cfg.modality === "image" ? "1px solid rgba(0, 242, 254, 0.3)" : "1px solid rgba(168, 85, 247, 0.3)",
-                                }}
-                              >
-                                {cfg.modality === "image" ? "📸 Image Scan" : "📊 Lab Data"}
+                      {Object.entries(STUDIES).map(([k, cfg]) => {
+                        const diseaseKey = k === "skin" ? "skin_cancer" : k === "heart" ? "heart_disease" : k === "parkinson" ? "parkinsons" : k;
+                        const localizedLabel = t(`diseases.${diseaseKey}.name`, cfg.label);
+                        const localizedDesc = t(`diseases.${diseaseKey}.tagline`, cfg.desc);
+
+                        return (
+                          <button
+                            key={k}
+                            type="button"
+                            className={`study-card-btn ${study === k ? "active" : ""}`}
+                            onClick={() => {
+                              setStudy(k);
+                              setResult(null);
+                              setFile(null);
+                            }}
+                          >
+                            <div style={{ flex: 1 }}>
+                              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "2px" }}>
+                                <h4 style={{ margin: 0 }}>{localizedLabel}</h4>
+                                <span
+                                  style={{
+                                    fontSize: "0.58rem",
+                                    fontWeight: 800,
+                                    padding: "2px 6px",
+                                    borderRadius: "3px",
+                                    textTransform: "uppercase",
+                                    background: cfg.modality === "image" ? "rgba(0, 242, 254, 0.12)" : "rgba(168, 85, 247, 0.12)",
+                                    color: cfg.modality === "image" ? "var(--primary)" : "#C084FC",
+                                    border: cfg.modality === "image" ? "1px solid rgba(0, 242, 254, 0.3)" : "1px solid rgba(168, 85, 247, 0.3)",
+                                  }}
+                                >
+                                  {cfg.modality === "image" ? `📸 ${t("actions.scan", "Image Scan")}` : `📊 ${t("actions.values", "Lab Data")}`}
+                                </span>
+                              </div>
+                              <p style={{ margin: "2px 0 4px" }}>{localizedDesc}</p>
+                              <span style={{ fontSize: "0.64rem", color: "var(--primary)", fontWeight: 700 }}>
+                                {cfg.model}
                               </span>
                             </div>
-                            <p style={{ margin: "2px 0 4px" }}>{cfg.desc}</p>
-                            <span style={{ fontSize: "0.64rem", color: "var(--primary)", fontWeight: 700 }}>
-                              {cfg.model}
-                            </span>
-                          </div>
-                        </button>
-                      ))}
+                          </button>
+                        );
+                      })}
                     </div>
 
                     {/* Dynamic Adaptive Ingestion Engine based on Disease Modality & Input Types */}
@@ -1950,11 +1956,11 @@ export default function UnifiedAnalysisPage() {
                           style={{ padding: "10px", borderRadius: "var(--radius-sm)", width: "100%" }}
                         >
                           <Download size={14} />
-                          <span>Download Verified Health Report (PDF)</span>
+                          <span>{t("actions.download_report", "Download Verified Health Report (PDF)")}</span>
                         </button>
                         {reportSuccess && (
                           <p style={{ fontSize: "0.66rem", color: "var(--risk-low)", textAlign: "center", marginTop: "4px", fontWeight: 700 }}>
-                            Health Report downloaded successfully.
+                            {t("clinical_portal.report_downloaded", "Health Report downloaded successfully.")}
                           </p>
                         )}
                       </div>

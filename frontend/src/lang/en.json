@@ -28,7 +28,8 @@
     "user_management": "User Management",
     "patient_registry": "Patient Registry",
     "benchmarks": "AI Health Benchmarks",
-    "telemetry": "System Activity"
+    "telemetry": "System Activity",
+    "diagnostic_cockpit": "Diagnostic Cockpit"
   },
   "header": {
     "search_placeholder": "Search checkups, doctors, organs, medical terms...",
@@ -73,7 +74,9 @@
     "view_details": "View Details",
     "override": "Clinical Override",
     "print": "Print Document",
-    "copy_link": "Copy Secure Link"
+    "copy_link": "Copy Secure Link",
+    "scan": "Scan",
+    "values": "Values"
   },
   "diseases": {
     "breast_cancer": {
@@ -213,7 +216,12 @@
         "Maintain vocal phonation for at least 3 seconds",
         "Review baseline acoustic jitter and shimmer metrics"
       ]
-    }
+    },
+    "tab_overview": "Clinical Overview",
+    "tab_timeline": "Early Detection Timeline",
+    "tab_ai": "Quantum AI Architecture",
+    "tab_prep": "Patient Preparation & Checklist",
+    "tab_benchmarks": "Verified Clinical Benchmarks"
   },
   "features": {
     "doctor_consultation": {
@@ -268,7 +276,34 @@
     "why_quantum_title": "Why Quantum Machine Learning for Early Detection?",
     "why_quantum_desc": "Standard classical machine learning models struggle to find complex, non-linear relationships across subtle cellular changes. Our Variational Quantum Classifiers (VQC) explore high-dimensional Hilbert spaces to identify critical shifts months earlier.",
     "emergency_card_title": "Emergency Medical Passport",
-    "emergency_card_desc": "Access your vital medical alerts, allergies, blood type, and emergency contacts in seconds. Accessible via QR code."
+    "emergency_card_desc": "Access your vital medical alerts, allergies, blood type, and emergency contacts in seconds. Accessible via QR code.",
+    "active_operator": "Active Clinical Operator",
+    "badge_3d_body": "3D Body View",
+    "badge_compact": "Compact Model",
+    "badge_doctor_visits": "Doctor Visits",
+    "badge_high_precision": "High Precision",
+    "badge_quick_checkup": "Quick Checkup",
+    "badge_realtime": "Real-Time",
+    "badge_safe": "Encrypted & Safe",
+    "badge_tested_accuracy": "Tested Accuracy",
+    "badge_trends": "Health Trends",
+    "kpi_acc_subtext": "Tested on verified patient datasets",
+    "kpi_params": "Compact AI Size",
+    "kpi_params_subtext": "Lighter and faster than standard AI",
+    "kpi_speed": "Checkup Speed",
+    "kpi_speed_subtext": "Instant results without long waiting",
+    "portals_benchmarks_desc": "See audited test scores and accuracy comparisons showing how our AI performs against standard methods.",
+    "portals_benchmarks_sub": "Accuracy & Testing Scores",
+    "portals_compliance_desc": "Your records are encrypted and protected under healthcare privacy standards including HIPAA and DPDP.",
+    "portals_compliance_sub": "Protected Health Records",
+    "portals_diagnostic_desc": "Upload scans or lab numbers for instant, easy-to-understand health assessments with clear explanations.",
+    "portals_diagnostic_sub": "Check 6 Common Conditions",
+    "portals_doctor_desc": "Schedule private video consultations with certified doctors and get digital prescriptions directly.",
+    "portals_doctor_sub": "Video Calls & Prescriptions",
+    "portals_early_desc": "Track health changes across checkups over time to spot potential concerns before symptoms start.",
+    "portals_early_sub": "Catch Changes Early",
+    "portals_twin_desc": "Explore your health with an interactive 3D body map showing organ wellness and personalized tips.",
+    "portals_twin_sub": "Interactive 3D Body Map"
   },
   "checkup": {
     "select_disease": "Select Clinical Protocol",
@@ -282,7 +317,19 @@
     "step_protocol": "1. Select Protocol",
     "step_input": "2. Input Biomarkers / Scan",
     "step_analyze": "3. Quantum AI Computation",
-    "step_verdict": "4. Clinical Report & Action"
+    "step_verdict": "4. Clinical Report & Action",
+    "ai_summary_guidance": "Quantum AI Guidance & Biomarker Summary",
+    "analyzing_scan": "Analyzing medical indicators with Quantum AI...",
+    "awaiting_checkup": "Awaiting Checkup Execution",
+    "biological_factors": "Key Biological Indicator Factors",
+    "factor_weights": "Factor Weight Contributions",
+    "select_protocol": "Select Health Checkup Protocol",
+    "upload_or_sample": "Upload Records or Load Sample Data",
+    "run_button": "Run Instant Quantum AI Checkup",
+    "step1_title": "Select & Run Checkup",
+    "step2_title": "Health Assessment & 3D Twin",
+    "confidence_score": "Diagnostic Confidence",
+    "lead_time": "Early Detection Window"
   },
   "risk": {
     "optimal": "Optimal Health (Low Risk)",
@@ -417,7 +464,8 @@
     "technical_details": "Technical diagnostic details",
     "disclaimer": "This platform is an AI clinical decision support tool and is designed to assist, not replace, certified medical evaluation.",
     "all_rights_reserved": "All rights reserved.",
-    "copyright": "© 2026 Q-RAKSHAK Clinical Decision Support System."
+    "copyright": "© 2026 Q-RAKSHAK Clinical Decision Support System.",
+    "or": "OR"
   },
   "login": {
     "title": "Sign in to Q-RAKSHAK",
@@ -428,8 +476,8 @@
     "role_doctor_opt": "🩺 Doctor / Clinician — OPD Queue & Telemedicine",
     "role_admin_opt": "🛡️ System Administrator — Governance & Audit Trail",
     "role_patient": "Patient",
-    "role_doctor": "Doctor",
-    "role_admin": "Admin",
+    "role_doctor": "Doctor / Clinician",
+    "role_admin": "System Administrator",
     "role_patient_sub": "Personal",
     "role_doctor_sub": "Clinician",
     "role_admin_sub": "Security",
@@ -460,7 +508,19 @@
     "tamper_proof_audit_desc": "End-to-end cryptographic logging with clinical protocol verification.",
     "verified_security": "Verified Security",
     "encrypted_data": "Encrypted Data",
-    "fast_triage": "Fast Triage"
+    "fast_triage": "Fast Triage",
+    "audit_trail": "Immutable WORM Audit Trail Active",
+    "hipaa_notice": "HIPAA Safe Harbor 18 & DPDP Act 2023 Compliant",
+    "register_as": "Register New Account as",
+    "scroll_cue": "Explore Certified Model Evaluations & Benchmarks Below",
+    "secure_records": "All patient health records encrypted with AES-256 GCM",
+    "sign_in_as": "Sign in to your Q-Rakshak workspace as",
+    "username_ph_admin": "Enter administrator username (e.g. admin_corp)",
+    "username_ph_doctor": "Enter clinician ID or username (e.g. dr_arun_kumar)",
+    "username_ph_patient": "Enter patient ID or username (e.g. USR-5EF52B)",
+    "role_patient_desc": "View checkups, 3D body twin, book specialists & emergency card",
+    "role_doctor_desc": "Access consultation queue, verify AI diagnostics & write Rx",
+    "role_admin_desc": "Audit HIPAA logs, manage users, models & system security"
   },
   "portal": {
     "clinical_practice": "CLINICAL PRACTICE",
@@ -582,14 +642,35 @@
     "med_duration": "Duration (Days)",
     "med_instructions": "Instructions (e.g. After meals)",
     "check_interactions": "Run Drug-Drug Interaction Check",
-    "sign_and_issue": "Digitally Sign & Issue Prescription"
+    "sign_and_issue": "Digitally Sign & Issue Prescription",
+    "title": "Verified Medical Specialists & Tele-Consultation",
+    "subtitle": "Connect with board-certified oncologists, cardiologists, and pulmonologists. Two-way synchronized calendar with soft-lock protection prevents double-booking.",
+    "verified_badge": "Medical Council Verified",
+    "loading_specialists": "Loading verified clinical specialists...",
+    "no_match": "No medical specialists match your search criteria.",
+    "book_with": "Book with",
+    "consultation_booking": "CONSULTATION BOOKING",
+    "consultation_mode": "Consultation Mode",
+    "mode_video": "Video",
+    "mode_audio": "Audio",
+    "mode_clinic": "Clinic Visit",
+    "next_slots": "Next Available Slots",
+    "select_slot": "Select Slot",
+    "step_of": "STEP",
+    "of_4": "OF 4",
+    "reason_label": "Reason for Consultation",
+    "reason_placeholder": "e.g. Follow-up after Quantum AI Cardiac Checkup",
+    "symptoms_label": "Clinical Symptoms & Observations (Crucial for Triage)",
+    "years_experience": "{years} Yrs Exp",
+    "slot_locked_prefix": "Slot held for",
+    "slot_locked_suffix": "seconds (soft-lock active)"
   },
   "profile": {
     "page_title": "Patient Profile & Emergency Vault",
     "page_desc": "Manage your verified clinical identity, ABHA registration, and emergency responder details.",
     "personal_info": "Personal Identity & Contact",
     "legal_name": "Legal Name",
-    "abha_id": "ABHA ID (Ayushman Bharat Digital Health)",
+    "abha_id": "ABHA Health ID",
     "contact_email": "Contact Email",
     "contact_phone": "Phone Number",
     "emergency_contacts": "Emergency & Next of Kin",
@@ -603,7 +684,33 @@
     "change_password": "Change Account Password",
     "new_password": "New Password",
     "confirm_password": "Confirm New Password",
-    "update_password": "Update Password"
+    "update_password": "Update Password",
+    "title": "Patient Profile & Medical Record",
+    "subtitle": "Personal clinical details, emergency escalation, and digital healthcare card configuration.",
+    "tab_identity": "Personal Identity",
+    "tab_clinical": "Clinical Vitals",
+    "tab_records": "Medical History & Meds",
+    "tab_card": "Medical ID & Card",
+    "tab_security": "Account Security & Danger Zone",
+    "name": "Full Legal Name",
+    "age": "Age",
+    "gender": "Gender",
+    "primary_email": "Primary Email",
+    "phone": "Phone Number",
+    "emergency_contact_name": "Emergency Contact Name",
+    "emergency_contact_relation": "Relationship",
+    "organ_donor": "Registered Organ Donor",
+    "allergies": "Known Allergies",
+    "medications": "Active Prescriptions & Medications",
+    "medical_history": "Pre-Existing Medical Conditions",
+    "save_success": "Profile updated successfully.",
+    "syncing": "Saving changes...",
+    "synced": "All changes saved",
+    "view_card": "View Physical Health ID Card",
+    "print_sheet": "Print Wallet Cards (Sheet)",
+    "danger_zone": "Account Deletion (Danger Zone)",
+    "danger_desc": "Permanently purge all diagnostic scans, emergency QR tokens, and personal credentials.",
+    "confirm_delete_placeholder": "Type \"CONFIRM DELETION ACCOUNT\" to proceed"
   },
   "admin": {
     "user_mgmt_title": "Hospital User & Access Management",
@@ -623,5 +730,11 @@
     "worm_storage": "WORM Audit Trail Active",
     "sha256_verified": "Cryptographic Hash Validation: Passed",
     "export_audit": "Export Immutable Audit Log"
+  },
+  "footer": {
+    "copyright": "QRakshak Medical Technology © 2026",
+    "standards": "HIPAA Safe Harbor 18 • DPDP Act 2023 • WORM Audit Trail",
+    "env": "Protected Healthcare Environment",
+    "support": "support@qrakshak.health"
   }
 }

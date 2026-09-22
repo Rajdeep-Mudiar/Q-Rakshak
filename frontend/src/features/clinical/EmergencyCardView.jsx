@@ -15,7 +15,7 @@ import { animateCard3DFlip } from '../../utils/motion.js';
 import { useLanguage } from '../../context/LanguageContext';
 
 export default function EmergencyCardView({ patientId = 'USR-5EF52B' }) {
-  const { t } = useLanguage();
+  const { language, setLanguage, t, availableLanguages } = useLanguage();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -330,24 +330,39 @@ export default function EmergencyCardView({ patientId = 'USR-5EF52B' }) {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }} className="no-print">
+          {/* Language Selector */}
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+            className="triage-pill-btn triage-outline-btn"
+            style={{ padding: '6px 10px', fontSize: '0.74rem', background: '#FFFFFF', cursor: 'pointer' }}
+            aria-label="Select Language"
+          >
+            {availableLanguages.map((lang) => (
+              <option key={lang.code} value={lang.code}>
+                {lang.flag} {lang.nativeName}
+              </option>
+            ))}
+          </select>
+
           <button
             type="button"
             onClick={copyTriageLink}
             className="triage-pill-btn triage-outline-btn"
-            title="Copy permanent emergency link"
+            title={t("actions.copy_link", "Copy permanent emergency link")}
           >
             {copiedLink ? <Check size={14} color="#059669" /> : <Copy size={14} />}
-            <span>{copiedLink ? 'Copied Link!' : 'Share Pass'}</span>
+            <span>{copiedLink ? t("actions.copied", "Copied Link!") : t("actions.share", "Share Pass")}</span>
           </button>
 
           <button
             type="button"
             onClick={handlePrint}
             className="triage-pill-btn triage-outline-btn"
-            title="Print or Save PDF"
+            title={t("actions.print", "Print or Save PDF")}
           >
             <Printer size={14} />
-            <span>Print Medical ID</span>
+            <span>{t("actions.print", "Print Medical ID")}</span>
           </button>
 
           <button
@@ -356,7 +371,7 @@ export default function EmergencyCardView({ patientId = 'USR-5EF52B' }) {
             className="triage-pill-btn triage-call-cta"
           >
             <Smartphone size={14} />
-            <span>SOS Direct Call</span>
+            <span>{t("app.helpline", "SOS Direct Call")}</span>
           </button>
         </div>
       </header>

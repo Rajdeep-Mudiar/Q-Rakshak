@@ -33,7 +33,8 @@ if (typeof window !== "undefined") {
 }
 
 export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySuccess, onLoginSuccess, loading, error }) {
-  const { t } = useLanguage();
+  const { t, language, setLanguage, availableLanguages } = useLanguage();
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const [showGuideModal, setShowGuideModal] = useState(false);
   const [gisLoading, setGisLoading] = useState(false);
   const [localError, setLocalError] = useState(null);
@@ -480,6 +481,75 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+            {/* Language Selector Dropdown */}
+            <div style={{ position: "relative" }}>
+              <button
+                type="button"
+                onClick={() => setLangDropdownOpen(!langDropdownOpen)}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "7px 12px",
+                  background: "#F8FAFC",
+                  color: "#0F172A",
+                  border: "1px solid #CBD5E1",
+                  borderRadius: "0px",
+                  fontSize: "0.72rem",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                <span>{availableLanguages.find((l) => l.code === language)?.flag || "🌐"}</span>
+                <span>{availableLanguages.find((l) => l.code === language)?.nativeName || "English"}</span>
+                <ChevronDown size={12} />
+              </button>
+
+              {langDropdownOpen && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "calc(100% + 4px)",
+                    right: 0,
+                    minWidth: "150px",
+                    background: "#FFFFFF",
+                    border: "1px solid #CBD5E1",
+                    boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
+                    zIndex: 100,
+                    padding: "4px",
+                  }}
+                >
+                  {availableLanguages.map((l) => (
+                    <button
+                      key={l.code}
+                      type="button"
+                      onClick={() => {
+                        setLanguage(l.code);
+                        setLangDropdownOpen(false);
+                      }}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        width: "100%",
+                        padding: "8px 10px",
+                        background: l.code === language ? "#F0FDF4" : "transparent",
+                        color: l.code === language ? "#059669" : "#0F172A",
+                        border: "none",
+                        cursor: "pointer",
+                        fontSize: "0.76rem",
+                        fontWeight: l.code === language ? 700 : 500,
+                        textAlign: "left",
+                      }}
+                    >
+                      <span>{l.flag} {l.nativeName}</span>
+                      <span style={{ fontSize: "0.65rem", color: "#64748B", fontFamily: "monospace" }}>{l.shortBadge}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <a
               href="https://github.com/ARYANCY/QDoc"
               target="_blank"

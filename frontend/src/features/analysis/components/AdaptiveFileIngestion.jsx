@@ -580,7 +580,7 @@ export default function AdaptiveFileIngestion({
                   inputRef.current?.click();
                 }}
               >
-                Browse File
+                {t("actions.browse_file", "Browse File")}
               </button>
 
               {/* Live Mic Recording for Parkinson's Voice */}
@@ -634,7 +634,7 @@ export default function AdaptiveFileIngestion({
                   }}
                 >
                   <FileCheck size={13} />
-                  <span>Load Sample CSV</span>
+                  <span>{t("actions.load_sample", "Load Sample Data")}</span>
                 </button>
               )}
 
@@ -660,8 +660,8 @@ export default function AdaptiveFileIngestion({
                     onLoadSampleScan(diseaseConfig.samples[0]);
                   }}
                 >
-                  <Camera size={13} />
-                  <span>Load Sample Scan</span>
+                  <Sparkles size={13} />
+                  <span>{t("actions.load_sample", "Load Sample Scan")}</span>
                 </button>
               )}
 
