@@ -68,7 +68,7 @@ export default function EditorialHeader({
         alignItems: "center",
         justifyContent: "space-between",
         flexShrink: 0,
-        zIndex: 40,
+        zIndex: 1000,
         position: "relative",
       }}
     >
@@ -305,7 +305,7 @@ export default function EditorialHeader({
                 borderRadius: "10px",
                 boxShadow: "0 8px 24px rgba(15, 23, 42, 0.12)",
                 padding: "6px",
-                zIndex: 120,
+                zIndex: 9999,
               }}
             >
               <div

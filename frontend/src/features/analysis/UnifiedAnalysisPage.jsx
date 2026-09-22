@@ -570,7 +570,13 @@ export default function UnifiedAnalysisPage() {
   const [selectedBookingForRoom, setSelectedBookingForRoom] = useState(null);
   const [myBookings, setMyBookings] = useState([]);
   // Dynamic authenticated user state with session recovery
-  const [currentUser, setCurrentUser] = useState(() => authApi.getStoredUser());
+  const [currentUser, setCurrentUser] = useState(() => {
+    if (authApi.hasToken()) {
+      return authApi.getStoredUser();
+    }
+    authApi.clearSession();
+    return null;
+  });
 
   // Restore and validate session on mount
   useEffect(() => {
@@ -616,6 +622,8 @@ export default function UnifiedAnalysisPage() {
         } catch {
           // Keep current stored user on network cold start
         }
+      } else {
+        setCurrentUser(null);
       }
     }
     restoreSession();

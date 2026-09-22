@@ -21,7 +21,8 @@ import {
   Eye,
   EyeOff,
   UserPlus,
-  ChevronDown
+  ChevronDown,
+  Globe
 } from "lucide-react";
 import { animateErrorShake } from "../../utils/motion.js";
 import ModelEvaluationShowcase from "./components/ModelEvaluationShowcase.jsx";
@@ -506,47 +507,60 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
               </button>
 
               {langDropdownOpen && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "calc(100% + 4px)",
-                    right: 0,
-                    minWidth: "150px",
-                    background: "#FFFFFF",
-                    border: "1px solid #CBD5E1",
-                    boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
-                    zIndex: 100,
-                    padding: "4px",
-                  }}
-                >
-                  {availableLanguages.map((l) => (
-                    <button
-                      key={l.code}
-                      type="button"
-                      onClick={() => {
-                        setLanguage(l.code);
-                        setLangDropdownOpen(false);
-                      }}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        width: "100%",
-                        padding: "8px 10px",
-                        background: l.code === language ? "#F0FDF4" : "transparent",
-                        color: l.code === language ? "#059669" : "#0F172A",
-                        border: "none",
-                        cursor: "pointer",
-                        fontSize: "0.76rem",
-                        fontWeight: l.code === language ? 700 : 500,
-                        textAlign: "left",
-                      }}
-                    >
-                      <span>{l.flag} {l.nativeName}</span>
-                      <span style={{ fontSize: "0.65rem", color: "#64748B", fontFamily: "monospace" }}>{l.shortBadge}</span>
-                    </button>
-                  ))}
-                </div>
+                <>
+                  <div
+                    onClick={() => setLangDropdownOpen(false)}
+                    style={{
+                      position: "fixed",
+                      inset: 0,
+                      zIndex: 9998,
+                      background: "transparent",
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "calc(100% + 4px)",
+                      right: 0,
+                      minWidth: "160px",
+                      background: "#FFFFFF",
+                      border: "1px solid #CBD5E1",
+                      borderRadius: "6px",
+                      boxShadow: "0 10px 30px rgba(0,0,0,0.18)",
+                      zIndex: 9999,
+                      padding: "4px",
+                    }}
+                  >
+                    {availableLanguages.map((l) => (
+                      <button
+                        key={l.code}
+                        type="button"
+                        onClick={() => {
+                          setLanguage(l.code);
+                          setLangDropdownOpen(false);
+                        }}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          width: "100%",
+                          padding: "8px 10px",
+                          borderRadius: "4px",
+                          background: l.code === language ? "#F0FDF4" : "transparent",
+                          color: l.code === language ? "#059669" : "#0F172A",
+                          border: "none",
+                          cursor: "pointer",
+                          fontSize: "0.76rem",
+                          fontWeight: l.code === language ? 700 : 500,
+                          textAlign: "left",
+                        }}
+                      >
+                        <span>{l.flag} {l.nativeName}</span>
+                        <span style={{ fontSize: "0.65rem", color: "#64748B", fontFamily: "monospace" }}>{l.shortBadge}</span>
+                      </button>
+                    ))}
+                  </div>
+                </>
               )}
             </div>
 
@@ -762,8 +776,9 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
               boxSizing: "border-box",
             }}
           >
-            <span style={{ fontSize: "0.70rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.05em", display: "inline-flex", alignItems: "center", gap: "5px" }}>
-              🌐 {t("header.language", "Language")}:
+            <span style={{ fontSize: "0.70rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.05em", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+              <Globe size={13} color="#059669" />
+              <span>{t("header.language", "Language")}:</span>
             </span>
             <div style={{ display: "flex", gap: "6px" }}>
               {availableLanguages.map((l) => (
@@ -789,10 +804,10 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
             </div>
           </div>
 
-          {/* 1. Explicit Role Selector Dropdown */}
-          <div style={{ width: "100%", marginBottom: "14px", textAlign: "left" }}>
+          {/* Unified Accessible Role Selector (3-Card Group) */}
+          <div style={{ width: "100%", marginBottom: "16px", textAlign: "left" }}>
             <label
-              htmlFor="login-role-select"
+              id="login-role-group-label"
               style={{
                 display: "block",
                 fontSize: "0.70rem",
@@ -800,87 +815,83 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                 color: "#475569",
                 textTransform: "uppercase",
                 letterSpacing: "0.06em",
-                marginBottom: "5px",
+                marginBottom: "8px",
               }}
             >
               {t("login.workspace_role", "Workspace Role")}
             </label>
-            <div style={{ position: "relative" }}>
-              <select
-                id="login-role-select"
-                value={selectedRole}
-                onChange={(e) => setSelectedRole(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px 14px",
-                  paddingRight: "36px",
-                  borderRadius: "8px",
-                  border: `1.5px solid ${selectedRole === "doctor" ? "#0284C7" : selectedRole === "admin" ? "#7C3AED" : "#059669"}`,
-                  fontSize: "0.88rem",
-                  fontWeight: 600,
-                  color: "#0F172A",
-                  background: "#FFFFFF",
-                  appearance: "none",
-                  cursor: "pointer",
-                  outline: "none",
-                  transition: "border-color 0.2s ease",
-                }}
-              >
-                <option value="patient">👤 {t("login.role_patient_opt", "Patient — Health Checkups & 3D Digital Twin")}</option>
-                <option value="doctor">🩺 {t("login.role_doctor_opt", "Doctor / Clinician — OPD Queue & Telemedicine")}</option>
-                <option value="admin">🛡️ {t("login.role_admin_opt", "System Administrator — Governance & Audit Trail")}</option>
-              </select>
-              <ChevronDown
-                size={16}
-                color="#64748B"
-                style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
-              />
+            <div
+              role="radiogroup"
+              aria-labelledby="login-role-group-label"
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr 1fr",
+                gap: "8px",
+                width: "100%",
+              }}
+            >
+              {[
+                {
+                  id: "patient",
+                  label: t("login.role_patient", "Patient"),
+                  sub: t("login.role_patient_sub", "Personal Health"),
+                  color: "#059669",
+                  bg: "#F0FDF4",
+                  border: "#059669",
+                  icon: User,
+                },
+                {
+                  id: "doctor",
+                  label: t("login.role_doctor", "Doctor"),
+                  sub: t("login.role_doctor_sub", "OPD & Triage"),
+                  color: "#0284C7",
+                  bg: "#F0F9FF",
+                  border: "#0284C7",
+                  icon: Stethoscope,
+                },
+                {
+                  id: "admin",
+                  label: t("login.role_admin", "Admin"),
+                  sub: t("login.role_admin_sub", "Governance"),
+                  color: "#7C3AED",
+                  bg: "#FAF5FF",
+                  border: "#7C3AED",
+                  icon: ShieldCheck,
+                },
+              ].map((r) => {
+                const Icon = r.icon;
+                const isActive = selectedRole === r.id;
+                return (
+                  <button
+                    key={r.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={isActive}
+                    onClick={() => setSelectedRole(r.id)}
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: "4px",
+                      padding: "10px 6px",
+                      borderRadius: "8px",
+                      border: isActive ? `2px solid ${r.border}` : "1px solid #E2E8F0",
+                      background: isActive ? r.bg : "#F8FAFC",
+                      boxShadow: isActive ? "0 2px 8px rgba(0, 0, 0, 0.06)" : "none",
+                      cursor: "pointer",
+                      transition: "all 0.18s ease",
+                      outline: "none",
+                    }}
+                  >
+                    <Icon size={18} color={isActive ? r.color : "#64748B"} />
+                    <span style={{ fontSize: "0.80rem", fontWeight: 700, color: isActive ? r.color : "#334155" }}>
+                      {r.label}
+                    </span>
+                    <span style={{ fontSize: "0.64rem", color: "#64748B", textAlign: "center" }}>{r.sub}</span>
+                  </button>
+                );
+              })}
             </div>
-          </div>
-
-          {/* 2. Visual Role Cards */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr 1fr",
-              gap: "8px",
-              width: "100%",
-              marginBottom: "16px",
-            }}
-          >
-            {[
-              { id: "patient", label: t("login.role_patient", "Patient"), sub: t("login.role_patient_sub", "Personal"), color: "#059669", bg: "#F0FDF4", border: "#A7F3D0", icon: User },
-              { id: "doctor", label: t("login.role_doctor", "Doctor"), sub: t("login.role_doctor_sub", "Clinician"), color: "#0284C7", bg: "#F0F9FF", border: "#BAE6FD", icon: Stethoscope },
-              { id: "admin", label: t("login.role_admin", "Admin"), sub: t("login.role_admin_sub", "Security"), color: "#7C3AED", bg: "#FAF5FF", border: "#E9D5FF", icon: ShieldCheck },
-            ].map((r) => {
-              const Icon = r.icon;
-              const isActive = selectedRole === r.id;
-              return (
-                <button
-                  key={r.id}
-                  type="button"
-                  onClick={() => setSelectedRole(r.id)}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: "3px",
-                    padding: "8px 4px",
-                    borderRadius: "8px",
-                    border: isActive ? `2px solid ${r.color}` : "1px solid #E2E8F0",
-                    background: isActive ? r.bg : "#F8FAFC",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                  }}
-                >
-                  <Icon size={16} color={isActive ? r.color : "#64748B"} />
-                  <span style={{ fontSize: "0.78rem", fontWeight: 700, color: isActive ? r.color : "#334155" }}>
-                    {r.label}
-                  </span>
-                  <span style={{ fontSize: "0.62rem", color: "#64748B" }}>{r.sub}</span>
-                </button>
-              );
-            })}
           </div>
 
           {/* 3. Auth Mode Switcher (Sign In vs Register) */}

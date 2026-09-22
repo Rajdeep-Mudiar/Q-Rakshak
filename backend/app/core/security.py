@@ -157,17 +157,19 @@ def verify_access_token(token: str) -> dict[str, Any]:
 VALID_API_KEYS = { _settings.API_KEY }
 
 
+async def verify_api_key(x_api_key: str | None = Header(None)) -> bool:
+    """Validates X-API-Key for machine-to-machine integrations."""
+    if not x_api_key or x_api_key not in VALID_API_KEYS:
+        raise HTTPException(status_code=401, detail="Valid X-API-Key header required.")
+    return True
+
+
 async def get_current_user(
     authorization: str | None = Header(None),
-    x_api_key: str | None = Header(None),
 ) -> dict[str, Any]:
-    """Requires a valid Bearer token or valid X-API-Key header. Raises HTTP 401 if missing or invalid.
-    Use get_optional_user for endpoints that allow unauthenticated guest access.
-    """
-    if x_api_key and x_api_key in VALID_API_KEYS:
-        return {"user_id": "API-GATEWAY", "username": "api.gateway", "role": "admin", "name": "API Gateway Client"}
+    """Requires a valid Bearer JWT token. Raises HTTP 401 if missing or invalid."""
     if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Authorization header or valid X-API-Key required. Please log in.")
+        raise HTTPException(status_code=401, detail="Authorization Bearer token required. Please log in.")
     token = authorization.split(" ", 1)[1]
     return verify_access_token(token)
 

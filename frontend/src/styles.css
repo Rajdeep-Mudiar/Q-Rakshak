@@ -5164,7 +5164,7 @@ html, body {
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-md);
   padding: 6px;
-  z-index: 100;
+  z-index: 9999;
   display: flex;
   flex-direction: column;
   gap: 2px;

@@ -3,6 +3,7 @@ import base64
 import json
 import logging
 import urllib.parse
+import uuid
 from typing import Any
 
 import httpx
@@ -123,8 +124,22 @@ async def login(req: LoginRequest):
     raw_identifier = (req.username or "").strip()
     clean_identifier = raw_identifier.lower()
 
-    # Convenient persona aliases mapping
-    alias_map = {
+    # First try direct exact lookup by username or email
+    user = DatabaseRepository.get_user_by_credentials(clean_identifier) or DatabaseRepository.get_user_by_credentials(raw_identifier)
+
+    # Seed credentials dictionary for isolated demo / test environments
+    seed_passwords = {
+        "dr.kavita": "doctor123",
+        "dr.rajesh": "doctor123",
+        "dr.ananya": "doctor123",
+        "dr.vikram": "doctor123",
+        "dr.aryan": "clinician123",
+        "aryan": "patient123",
+        "admin.audit": "admin123",
+        "priya.qml": "quantum123",
+    }
+
+    demo_alias_map = {
         "patient": "aryan",
         "doctor": "dr.kavita",
         "kavita": "dr.kavita",
@@ -137,29 +152,14 @@ async def login(req: LoginRequest):
         "priya": "priya.qml",
     }
 
-    target_identifier = alias_map.get(clean_identifier, raw_identifier)
-    user = DatabaseRepository.get_user_by_credentials(target_identifier)
-    if not user and target_identifier != clean_identifier:
-        user = DatabaseRepository.get_user_by_credentials(clean_identifier)
-
-    # Seed credentials are available only for the isolated demo database.
-    seed_passwords = {
-        "dr.kavita": "doctor123",
-        "dr.rajesh": "doctor123",
-        "dr.ananya": "doctor123",
-        "dr.vikram": "doctor123",
-        "dr.aryan": "clinician123",
-        "aryan": "patient123",
-        "admin.audit": "admin123",
-        "priya.qml": "quantum123",
-    }
-
-    if not user and settings.IS_DEMO:
-        # Check if the user is a known seed account that needs auto-initialization
-        if clean_identifier in seed_passwords or target_identifier.lower() in seed_passwords:
+    # Only if not found and in demo mode, check demo alias
+    if not user and settings.IS_DEMO and clean_identifier in demo_alias_map:
+        target_alias = demo_alias_map[clean_identifier]
+        user = DatabaseRepository.get_user_by_credentials(target_alias)
+        if not user:
             from backend.app.db.database import init_database
             init_database()
-            user = DatabaseRepository.get_user_by_credentials(target_identifier) or DatabaseRepository.get_user_by_credentials(clean_identifier)
+            user = DatabaseRepository.get_user_by_credentials(target_alias)
 
     if not user:
         raise HTTPException(status_code=401, detail="Invalid username or password.")
