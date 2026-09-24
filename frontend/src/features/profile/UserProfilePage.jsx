@@ -29,6 +29,7 @@ import { ENDPOINTS, EMERGENCY_PORTAL_BASE } from "../../api/config";
 import QRCodeSVG from "../../components/common/QRCodeSVG";
 import TriagePhysicalCard from "../../components/clinical/TriagePhysicalCard";
 import PrintableMedicalCardSheet from "../../components/clinical/PrintableMedicalCardSheet";
+import { useLanguage } from "../../context/LanguageContext.jsx";
 
 function formatAllergies(allergies) {
   if (!allergies) return "";
@@ -96,6 +97,7 @@ function formatMedicalHistory(history) {
 }
 
 export default function UserProfilePage({ currentUser, onProfileUpdated, onProfileDeleted, openCard = false, onCardOpened }) {
+  const { t } = useLanguage();
   const containerRef = useRef(null);
   const activeUserId = currentUser?.user_id || currentUser?.id || currentUser?.username || "";
 
@@ -331,7 +333,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                 margin: 0,
               }}
             >
-              {profile.name || "Patient Profile & Medical Record"}
+              {profile.name || t("profile.title", "Patient Profile & Medical Record")}
             </h1>
             <span
               style={{
@@ -346,12 +348,12 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                 fontFamily: "var(--font-mono)",
               }}
             >
-              {effectiveRole}
+              {t(`login.role_${effectiveRole}`, effectiveRole)}
             </span>
           </div>
 
           <p style={{ fontSize: "0.82rem", color: "var(--text-secondary)", margin: 0 }}>
-            Personal clinical details, emergency escalation, and digital healthcare card configuration.
+            {t("profile.subtitle", "Personal clinical details, emergency escalation, and digital healthcare card configuration.")}
           </p>
         </div>
 
@@ -378,7 +380,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                 background: syncStatus === "saving" ? "var(--risk-mid)" : "var(--risk-low)",
               }}
             />
-            {syncStatus === "saving" ? "Saving Changes..." : "All Changes Saved to Cloud"}
+            {syncStatus === "saving" ? t("profile.syncing", "Saving Changes...") : t("profile.synced", "All Changes Saved to Cloud")}
           </div>
 
           <button
@@ -396,7 +398,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
             }}
           >
             <RefreshCw size={13} className={loading ? "spin" : ""} />
-            Sync
+            {t("actions.sync", "Sync")}
           </button>
 
           <button
@@ -413,7 +415,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
             }}
           >
             <CreditCard size={15} />
-            View Digital Pass
+            {t("profile.view_card", "View Digital Pass")}
           </button>
         </div>
       </div>
@@ -460,7 +462,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
             transition: "all 0.15s ease",
           }}
         >
-          <User size={15} /> Identity & Demographics
+          <User size={15} /> {t("profile.tab_identity", "Identity & Demographics")}
         </button>
 
         <button
@@ -485,7 +487,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
             transition: "all 0.15s ease",
           }}
         >
-          <Activity size={15} /> Clinical Records & Meds
+          <Activity size={15} /> {t("profile.tab_records", "Clinical Records & Meds")}
         </button>
 
         <button
@@ -510,7 +512,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
             transition: "all 0.15s ease",
           }}
         >
-          <CreditCard size={15} /> Emergency ID Pass
+          <CreditCard size={15} /> {t("profile.tab_card", "Emergency ID Pass")}
         </button>
 
         <button
@@ -535,7 +537,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
             transition: "all 0.15s ease",
           }}
         >
-          <Shield size={15} /> Security & Account
+          <Shield size={15} /> {t("profile.tab_security", "Security & Account")}
         </button>
       </div>
 

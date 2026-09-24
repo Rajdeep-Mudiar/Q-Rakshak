@@ -1393,19 +1393,60 @@ export function getLocalizedDiseaseById(id, t) {
   const key = base.id === "skin" ? "skin_cancer" : base.id === "heart" ? "heart_disease" : base.id;
   const localizedSigns = t(`diseases.${key}.warning_signs`);
   const localizedChecklist = t(`diseases.${key}.checklist`);
+  const localizedRiskFactors = t(`diseases.${key}.risk_factors`);
+  const localizedFacts = t(`diseases.${key}.facts`);
+  const localizedStages = t(`diseases.${key}.early_detection.stages`);
+  const localizedPreventiveActions = t(`diseases.${key}.early_detection.preventive_actions`);
+  const catKey = (base.category || "").toLowerCase();
+
+  const mergedStages = (base.earlyDetection?.stages || []).map((baseStage, idx) => {
+    const locStage = Array.isArray(localizedStages) ? localizedStages[idx] : null;
+    if (!locStage) return baseStage;
+    return {
+      ...baseStage,
+      stage: locStage.stage || baseStage.stage,
+      cellularBiomarker: locStage.cellular_biomarker || locStage.cellularBiomarker || baseStage.cellularBiomarker,
+      symptoms: locStage.symptoms || baseStage.symptoms,
+      detectionMethod: locStage.detection_method || locStage.detectionMethod || baseStage.detectionMethod,
+      recommendedIntervention: locStage.recommended_intervention || locStage.recommendedIntervention || baseStage.recommendedIntervention,
+      outcomeMetric: locStage.outcome_metric || locStage.outcomeMetric || baseStage.outcomeMetric,
+    };
+  });
 
   return {
     ...base,
     name: t(`diseases.${key}.name`, base.name),
     shortName: t(`diseases.${key}.short_name`, base.shortName || base.name),
     tagline: t(`diseases.${key}.tagline`, base.tagline),
+    category: t(`categories.${catKey}`, base.category),
     badge: t(`diseases.${key}.badge`, base.badge),
     desc: t(`diseases.${key}.desc`, base.desc),
+    stats: {
+      ...base.stats,
+      qubits: `${base.stats.qubits?.split(" ")[0] || "8"} ${t("disease_intro.qubits_unit", "Qubits")}`,
+      earlyDetectionSurvival: t(`diseases.${key}.early_detection.survival_lift`, base.stats?.earlyDetectionSurvival),
+    },
+    facts: Array.isArray(localizedFacts) ? localizedFacts : base.facts,
     overview: {
       ...base.overview,
+      patientSummary: t(`diseases.${key}.patient_summary`, base.overview?.patientSummary),
+      clinicalDefinition: t(`diseases.${key}.clinical_definition`, base.overview?.clinicalDefinition),
       whyItMatters: t(`diseases.${key}.why_it_matters`, base.overview?.whyItMatters),
+      riskFactors: Array.isArray(localizedRiskFactors) ? localizedRiskFactors : base.overview?.riskFactors,
       warningSigns: Array.isArray(localizedSigns) ? localizedSigns : base.overview?.warningSigns,
       checklist: Array.isArray(localizedChecklist) ? localizedChecklist : base.overview?.checklist,
     },
+    earlyDetection: {
+      ...base.earlyDetection,
+      targetOrgan: t(`diseases.${key}.early_detection.target_organ`, base.earlyDetection?.targetOrgan),
+      leadTime: t(`diseases.${key}.early_detection.lead_time`, base.earlyDetection?.leadTime),
+      leadTimeSubtext: t(`diseases.${key}.early_detection.lead_time_subtext`, base.earlyDetection?.leadTimeSubtext),
+      survivalLift: t(`diseases.${key}.early_detection.survival_lift`, base.earlyDetection?.survivalLift),
+      sensitivityGain: t(`diseases.${key}.early_detection.sensitivity_gain`, base.earlyDetection?.sensitivityGain),
+      keyInsight: t(`diseases.${key}.early_detection.key_insight`, base.earlyDetection?.keyInsight),
+      stages: mergedStages.length > 0 ? mergedStages : base.earlyDetection?.stages,
+      preventiveActions: Array.isArray(localizedPreventiveActions) ? localizedPreventiveActions : base.earlyDetection?.preventiveActions,
+    },
   };
 }
+

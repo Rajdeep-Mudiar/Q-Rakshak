@@ -15,6 +15,13 @@ def save_prediction(record: dict[str, Any]) -> None:
     """Persists a skin cancer prediction record to the SQLite skin_cancer_predictions table."""
     result = record.get("result", {})
     prediction = result.get("prediction", {})
+    if isinstance(prediction, dict):
+        pred_class = prediction.get("class", "unknown")
+        pred_conf = float(prediction.get("confidence", result.get("confidence", 0.0)))
+    else:
+        pred_class = str(prediction or "unknown")
+        pred_conf = float(result.get("confidence", 0.0))
+
     quantum = result.get("quantum")
     probs = result.get("probabilities", {})
 
@@ -28,8 +35,8 @@ def save_prediction(record: dict[str, Any]) -> None:
             str(uuid.uuid4()),
             record.get("filename", "unknown"),
             record.get("model", "unknown"),
-            prediction.get("class", "unknown"),
-            float(prediction.get("confidence", 0.0)),
+            pred_class,
+            pred_conf,
             json.dumps(probs),
             json.dumps(quantum) if quantum else None,
             float(result.get("inference_ms", 0.0)),
@@ -37,8 +44,7 @@ def save_prediction(record: dict[str, Any]) -> None:
         conn.commit()
         conn.close()
     except Exception as exc:
-        raise RuntimeError("Unable to persist skin-cancer prediction") from exc
-        pass  # Silently tolerate DB write failures — prediction is still returned to caller
+        logger.warning("Unable to persist skin-cancer prediction: %s", exc)
 
 
 def list_predictions(limit: int = 50) -> list[dict[str, Any]]:
