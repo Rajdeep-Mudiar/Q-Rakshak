@@ -63,6 +63,10 @@ export default function TriagePhysicalCard({
   const hr = hrRaw || '—';
   const spo2 = spo2Raw || '—';
 
+  const targetTriageUrl = emergencyPortalUrl || (typeof window !== 'undefined'
+    ? `${window.location.origin}/#triage/${patientId}`
+    : `https://q-rakshak.vercel.app/#triage/${patientId}`);
+
   return (
     <div className={`triage-card-shell metallic-sheen hardware-accelerated ${isDark ? 'triage-dark' : 'triage-light'} ${isBack ? 'triage-card-back-view' : ''}`}>
       
@@ -130,10 +134,11 @@ export default function TriagePhysicalCard({
                 <div className="triage-qr-meta-box">
                   <div className="triage-qr-wrap">
                     <QRCodeSVG
-                      value={emergencyPortalUrl || window.location.href}
-                      size={74}
+                      value={targetTriageUrl}
+                      size={66}
                       fgColor={isDark ? '#000000' : '#0F172A'}
                       bgColor="#FFFFFF"
+                      margin={2}
                     />
                   </div>
                   <div className="triage-meta-text">

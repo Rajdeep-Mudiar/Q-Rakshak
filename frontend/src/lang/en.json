@@ -233,7 +233,8 @@
       "badge": "Voice AI • Real-Time Triage",
       "primaryCta": "Start Voice Conversation",
       "secondaryCta": "Review Past Transcripts",
-      "summary": "Speak naturally with our Clinical Voice AI assistant to triage symptoms, explain lab reports, and prepare for your doctor visit."
+      "summary": "Speak naturally with our Clinical Voice AI assistant to triage symptoms, explain lab reports, and prepare for your doctor visit.",
+      "clinicalStandards": "The AI Doctor adheres strictly to WHO and ICMR clinical safety bounds with automated emergency red-flag triggers."
     },
     "digital_twin": {
       "title": "3D Digital Health Twin",
@@ -242,7 +243,18 @@
       "badge": "3D Bio-Twin • Spatial Health",
       "primaryCta": "Explore 3D Body Twin",
       "secondaryCta": "Inspect Vitality Layers",
-      "summary": "Visualize your multi-organ physiological status in an interactive 3D body model powered by real-time biomarker feeds."
+      "summary": "Visualize your multi-organ physiological status in an interactive 3D body model powered by real-time biomarker feeds.",
+      "clinicalStandards": "Biomarker calibration aligns with standard clinical laboratory reference intervals and WebGL anatomical bounds."
+    },
+    "twin": {
+      "title": "3D Digital Health Twin",
+      "tagline": "Personalized Anatomical Organ Simulation",
+      "category": "Advanced Visualization",
+      "badge": "3D Bio-Twin • Spatial Health",
+      "primaryCta": "Explore 3D Body Twin",
+      "secondaryCta": "Inspect Vitality Layers",
+      "summary": "Visualize your multi-organ physiological status in an interactive 3D body model powered by real-time biomarker feeds.",
+      "clinicalStandards": "Biomarker calibration aligns with standard clinical laboratory reference intervals and WebGL anatomical bounds."
     },
     "profile_security": {
       "title": "My Profile & Medical Security",
@@ -251,7 +263,18 @@
       "badge": "ABHA Linked • Zero-Knowledge",
       "primaryCta": "Manage Medical Profile",
       "secondaryCta": "View Security Logs",
-      "summary": "Manage your ABHA identity, emergency medical contacts, allergy alerts, and cryptographic audit records."
+      "summary": "Manage your ABHA identity, emergency medical contacts, allergy alerts, and cryptographic audit records.",
+      "clinicalStandards": "Complies fully with Digital Personal Data Protection (DPDP) Act 2023, ABDM standards, and SHA-256 integrity logs."
+    },
+    "profile": {
+      "title": "My Profile & Medical Security",
+      "tagline": "Cryptographic Identity & Patient Records",
+      "category": "Security & Identity",
+      "badge": "ABHA Linked • Zero-Knowledge",
+      "primaryCta": "Manage Medical Profile",
+      "secondaryCta": "View Security Logs",
+      "summary": "Manage your ABHA identity, emergency medical contacts, allergy alerts, and cryptographic audit records.",
+      "clinicalStandards": "Complies fully with Digital Personal Data Protection (DPDP) Act 2023, ABDM standards, and SHA-256 integrity logs."
     }
   },
   "home": {

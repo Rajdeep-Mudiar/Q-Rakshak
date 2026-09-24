@@ -1,132 +1,91 @@
 import React, { useMemo } from 'react';
+import QRCode from 'qrcode';
 import { EMERGENCY_PORTAL_BASE } from '../../api/config';
 
 /**
- * Lightweight Standalone QR Code SVG Renderer
- * Uses standard QR Matrix encoding algorithm to generate crisp, scannable SVG QR codes
- * without heavy external runtime dependencies.
+ * High-performance, 100% standard-compliant QR Code SVG Renderer.
+ * Uses the industry-standard 'qrcode' engine (ISO/IEC 18004 compliant)
+ * with single-path SVG compilation for maximum optical scanner accuracy.
  */
-
-// Simple robust QR Matrix Generator for standard URLs (Alphanumeric/Byte encoding)
-function generateQRMatrix(text) {
-  // 25x25 Version 2 QR Matrix with standard finder patterns and alignment
-  const size = 25;
-  const matrix = Array(size).fill(null).map(() => Array(size).fill(false));
-
-  // 1. Finder Patterns (Top-Left, Top-Right, Bottom-Left)
-  function drawFinder(r, c) {
-    for (let i = -1; i <= 7; i++) {
-      for (let j = -1; j <= 7; j++) {
-        const row = r + i;
-        const col = c + j;
-        if (row >= 0 && row < size && col >= 0 && col < size) {
-          if (i === -1 || i === 7 || j === -1 || j === 7) {
-            matrix[row][col] = false;
-          } else if (i === 0 || i === 6 || j === 0 || j === 6) {
-            matrix[row][col] = true;
-          } else if (i >= 2 && i <= 4 && j >= 2 && j <= 4) {
-            matrix[row][col] = true;
-          } else {
-            matrix[row][col] = false;
-          }
-        }
-      }
-    }
-  }
-
-  drawFinder(0, 0);
-  drawFinder(0, size - 7);
-  drawFinder(size - 7, 0);
-
-  // 2. Timing Patterns
-  for (let i = 8; i < size - 8; i++) {
-    matrix[6][i] = i % 2 === 0;
-    matrix[i][6] = i % 2 === 0;
-  }
-
-  // 3. Alignment Pattern (Center-right area for Version 2)
-  const alignR = 18, alignC = 18;
-  for (let i = -2; i <= 2; i++) {
-    for (let j = -2; j <= 2; j++) {
-      if (Math.abs(i) === 2 || Math.abs(j) === 2 || (i === 0 && j === 0)) {
-        matrix[alignR + i][alignC + j] = true;
-      } else {
-        matrix[alignR + i][alignC + j] = false;
-      }
-    }
-  }
-
-  // 4. Data hash encoding from input string
-  let hash = 0;
-  for (let i = 0; i < text.length; i++) {
-    hash = (hash << 5) - hash + text.charCodeAt(i);
-    hash |= 0;
-  }
-
-  // Populate data cells
-  let bitIdx = 0;
-  for (let col = size - 1; col > 0; col -= 2) {
-    if (col === 6) col--; // Skip vertical timing
-    for (let row = 0; row < size; row++) {
-      for (let c = 0; c < 2; c++) {
-        const currCol = col - c;
-        // Check if reserved
-        const isFinderTL = row <= 8 && currCol <= 8;
-        const isFinderTR = row <= 8 && currCol >= size - 8;
-        const isFinderBL = row >= size - 8 && currCol <= 8;
-        const isTiming = row === 6 || currCol === 6;
-        const isAlign = Math.abs(row - alignR) <= 2 && Math.abs(currCol - alignC) <= 2;
-
-        if (!isFinderTL && !isFinderTR && !isFinderBL && !isTiming && !isAlign) {
-          const charCode = text.charCodeAt(bitIdx % text.length) || 42;
-          const val = ((hash ^ (charCode * (row + 1) * (currCol + 1))) >> (bitIdx % 7)) & 1;
-          matrix[row][currCol] = val === 1;
-          bitIdx++;
-        }
-      }
-    }
-  }
-
-  return matrix;
-}
-
 export default function QRCodeSVG({
   value = '',
   size = 140,
-  fgColor = '#000000',
+  fgColor = '#0F172A',
   bgColor = '#FFFFFF',
+  level = 'M', // 'L' | 'M' | 'Q' | 'H'
+  margin = 2,  // Quiet-zone modules (minimum 2 modules for optical camera detection)
   className = '',
+  style = {},
 }) {
-  const matrix = useMemo(() => generateQRMatrix(value || EMERGENCY_PORTAL_BASE), [value]);
-  const matrixSize = matrix.length;
-  const cellSize = size / matrixSize;
+  const qrData = useMemo(() => {
+    const text = String(value || EMERGENCY_PORTAL_BASE || '').trim();
+    if (!text) {
+      return { valid: false };
+    }
+
+    try {
+      const qr = QRCode.create(text, {
+        errorCorrectionLevel: level,
+      });
+      const moduleCount = qr.modules.size;
+      const totalModules = moduleCount + margin * 2;
+
+      let pathData = '';
+      for (let r = 0; r < moduleCount; r++) {
+        for (let c = 0; c < moduleCount; c++) {
+          if (qr.modules.get(r, c)) {
+            pathData += `M${c + margin},${r + margin}h1v1h-1z `;
+          }
+        }
+      }
+
+      return {
+        valid: true,
+        totalModules,
+        pathData,
+      };
+    } catch (err) {
+      console.warn('QRCodeSVG generation error:', err);
+      return { valid: false };
+    }
+  }, [value, level, margin]);
+
+  if (!qrData.valid) {
+    return (
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 100 100"
+        className={className}
+        style={{ borderRadius: '6px', ...style }}
+      >
+        <rect width="100" height="100" fill={bgColor} />
+        <text x="50" y="52" textAnchor="middle" fontSize="11" fill={fgColor}>
+          QR Code
+        </text>
+      </svg>
+    );
+  }
+
+  const { totalModules, pathData } = qrData;
 
   return (
     <svg
       width={size}
       height={size}
-      viewBox={`0 0 ${size} ${size}`}
+      viewBox={`0 0 ${totalModules} ${totalModules}`}
       className={className}
-      style={{ shapeRendering: 'crispEdges' }}
+      style={{
+        shapeRendering: 'crispEdges',
+        display: 'block',
+        ...style,
+      }}
     >
-      {/* Background */}
-      <rect x="0" y="0" width={size} height={size} fill={bgColor} rx="4" />
+      {/* Background with essential quiet zone */}
+      <rect x="0" y="0" width={totalModules} height={totalModules} fill={bgColor} />
 
-      {/* QR Code Dots / Cells */}
-      {matrix.map((row, r) =>
-        row.map((isDark, c) =>
-          isDark ? (
-            <rect
-              key={`${r}-${c}`}
-              x={c * cellSize}
-              y={r * cellSize}
-              width={cellSize + 0.3}
-              height={cellSize + 0.3}
-              fill={fgColor}
-            />
-          ) : null
-        )
-      )}
+      {/* High-contrast single-path QR matrix */}
+      <path d={pathData} fill={fgColor} />
     </svg>
   );
 }

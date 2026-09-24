@@ -8,6 +8,7 @@ import TimelineProgressionGraph from './components/TimelineProgressionGraph';
 import ErrorBoundary from './components/ErrorBoundary';
 import { useTwinStore } from './store/twinStore';
 import { clinicalApi } from '../../api/clinical';
+import { authApi } from '../../api/auth';
 import {
   X, GitCompare, Clock, Download, Printer, ShieldCheck,
   CheckCircle2, AlertTriangle, Activity, User, FileText, ArrowRight, RefreshCw
@@ -22,6 +23,7 @@ export default function DigitalTwin3DPage({ patientId, result, onExportReport })
   const currentPatient = useTwinStore((s) => s.patient);
   const involvementMap = useTwinStore((s) => s.involvementMap);
   const setInvolvement = useTwinStore((s) => s.setInvolvement);
+  const setPatientAnalysis = useTwinStore((s) => s.setPatientAnalysis);
   const isComparisonOpen = useTwinStore((s) => s.isComparisonOpen);
   const setComparisonOpen = useTwinStore((s) => s.setComparisonOpen);
   const isTimelineOpen = useTwinStore((s) => s.isTimelineOpen);
@@ -33,7 +35,15 @@ export default function DigitalTwin3DPage({ patientId, result, onExportReport })
   const [timelineLoading, setTimelineLoading] = useState(false);
   const [selectedMilestone, setSelectedMilestone] = useState(null);
 
-  const activePid = patientId || currentPatient.patientId || 'USR-5EF52B';
+  const storedUser = authApi.getStoredUser();
+  const activePid = patientId || currentPatient.patientId || storedUser?.patient_id || storedUser?.user_id || storedUser?.id || '';
+
+  // Synchronize incoming diagnosis result into digital twin store
+  useEffect(() => {
+    if (result && activePid) {
+      setPatientAnalysis(result, activePid);
+    }
+  }, [result, activePid, setPatientAnalysis]);
 
   // Load timeline data when modal is open or patient changes
   useEffect(() => {

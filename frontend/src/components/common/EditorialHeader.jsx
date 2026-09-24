@@ -234,8 +234,8 @@ export default function EditorialHeader({
                     onNavigateFeature && onNavigateFeature(f.id);
                   }}
                 >
-                  <span style={{ fontWeight: 600 }}>{f.title.split("&")[0].trim()}</span>
-                  <span style={{ fontSize: "0.62rem", color: f.accentColor, background: f.accentBg, padding: "2px 6px", borderRadius: "4px", fontWeight: 700 }}>
+                  <span style={{ fontWeight: 600 }}>{(f?.title || f?.id || "Module").split("&")[0].trim()}</span>
+                  <span style={{ fontSize: "0.62rem", color: f.accentColor || "var(--primary)", background: f.accentBg || "var(--primary-soft)", padding: "2px 6px", borderRadius: "4px", fontWeight: 700 }}>
                     Intro
                   </span>
                 </button>

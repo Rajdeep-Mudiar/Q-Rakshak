@@ -525,7 +525,7 @@ def _build_triage_card_html(
     qr_code_base64: str,
     portal_url: str,
 ) -> str:
-    emergency_url = f"{portal_url}/#emergency/{patient_id}"
+    emergency_url = f"{portal_url}/#triage/{patient_id}"
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>

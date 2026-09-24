@@ -89,7 +89,7 @@ export const authApi = {
     }
     try {
       const me = await this.getCurrentUser();
-      if (me && me.user) {
+      if (me && me.user && me.user.username !== "api.gateway") {
         localStorage.setItem("qmed_user", JSON.stringify(me.user));
         return me.user;
       }

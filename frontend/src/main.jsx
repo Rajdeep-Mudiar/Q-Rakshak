@@ -11,17 +11,51 @@ function AppRouter() {
   const [route, setRoute] = useState(getRouteInfo());
 
   function getRouteInfo() {
-    const hash = window.location.hash;
-    const path = window.location.pathname;
+    const hash = window.location.hash || "";
+    const path = window.location.pathname || "";
+    const search = new URLSearchParams(window.location.search || "");
 
+    function sanitizeId(raw) {
+      if (!raw) return null;
+      const clean = decodeURIComponent(raw).split("?")[0].split("#")[0].replace(/\/+$/, "").trim();
+      return clean || null;
+    }
+
+    // 1. Hash-based triage and emergency routes (e.g. #triage/USR-5EF52B, #/triage/USR-5EF52B)
+    if (hash.startsWith("#triage/") || hash.startsWith("#/triage/")) {
+      const parts = hash.split("/");
+      return { isEmergency: true, patientId: sanitizeId(parts[parts.length - 1]) };
+    }
     if (hash.startsWith("#emergency/") || hash.startsWith("#/emergency/")) {
       const parts = hash.split("/");
-      return { isEmergency: true, patientId: parts[parts.length - 1] || "USR-5EF52B" };
+      return { isEmergency: true, patientId: sanitizeId(parts[parts.length - 1]) };
     }
-    if (path.startsWith("/emergency/")) {
-      const parts = path.split("/");
-      return { isEmergency: true, patientId: parts[parts.length - 1] || "USR-5EF52B" };
+
+    // 2. Path-based triage and emergency routes (e.g. /triage/USR-5EF52B, /triage)
+    if (path.startsWith("/triage/") || path === "/triage") {
+      const parts = path.split("/").filter(Boolean);
+      const pid = parts.length > 1 ? parts[parts.length - 1] : search.get("patient") || search.get("id");
+      return { isEmergency: true, patientId: sanitizeId(pid) };
     }
+    if (path.startsWith("/emergency/") || path === "/emergency") {
+      const parts = path.split("/").filter(Boolean);
+      const pid = parts.length > 1 ? parts[parts.length - 1] : search.get("patient") || search.get("id");
+      return { isEmergency: true, patientId: sanitizeId(pid) };
+    }
+
+    // 3. Query-parameter based triage routing (e.g. ?tab=triage&patient=USR-5EF52B)
+    const tabParam = (search.get("tab") || "").toLowerCase();
+    if (tabParam === "triage" || tabParam === "emergency") {
+      const pid = search.get("patient") || search.get("id") || search.get("patient_id");
+      return { isEmergency: true, patientId: sanitizeId(pid) };
+    }
+    if (search.get("triage")) {
+      return { isEmergency: true, patientId: sanitizeId(search.get("triage")) };
+    }
+    if (search.get("emergency")) {
+      return { isEmergency: true, patientId: sanitizeId(search.get("emergency")) };
+    }
+
     return { isEmergency: false, patientId: null, isNotFound: !["/", "/index.html"].includes(path) };
   }
 

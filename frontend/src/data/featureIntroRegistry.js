@@ -302,25 +302,54 @@ export const FEATURE_INTRO_REGISTRY = {
   },
 };
 
+export const FEATURE_ALIASES = {
+  doctor_booking: "doctor_consultation",
+  doctor: "doctor_consultation",
+  consultation: "doctor_consultation",
+  teleconsultation: "doctor_consultation",
+  ai_doctor_studio: "ai_doctor",
+  voice_doctor: "ai_doctor",
+  digital_twin: "twin",
+  "3d_twin": "twin",
+  health_twin: "twin",
+  profile_security: "profile",
+  security: "profile",
+  identity: "profile",
+  feature_intro: "doctor_consultation",
+};
+
 export function getFeatureIntroById(id) {
-  return FEATURE_INTRO_REGISTRY[id] || FEATURE_INTRO_REGISTRY.doctor_consultation;
+  if (!id) return FEATURE_INTRO_REGISTRY.doctor_consultation;
+  const normalized = String(id).toLowerCase().trim();
+  const aliased = FEATURE_ALIASES[normalized];
+  if (aliased && FEATURE_INTRO_REGISTRY[aliased]) {
+    return FEATURE_INTRO_REGISTRY[aliased];
+  }
+  return FEATURE_INTRO_REGISTRY[normalized] || FEATURE_INTRO_REGISTRY.doctor_consultation;
 }
 
 export function getLocalizedFeatureIntroById(id, t) {
   const base = getFeatureIntroById(id);
+  if (!base) return FEATURE_INTRO_REGISTRY.doctor_consultation;
   if (!t || typeof t !== "function") return base;
+
+  const translationKey =
+    base.id === "twin" ? "digital_twin" :
+    base.id === "profile" ? "profile_security" :
+    base.id;
+
   return {
     ...base,
-    title: t(`features.${base.id}.title`, base.title),
-    tagline: t(`features.${base.id}.tagline`, base.tagline),
-    category: t(`features.${base.id}.category`, base.category),
-    badge: t(`features.${base.id}.badge`, base.badge),
-    primaryCta: t(`features.${base.id}.primaryCta`, base.primaryCta),
-    secondaryCta: t(`features.${base.id}.secondaryCta`, base.secondaryCta),
+    title: t(`features.${translationKey}.title`, t(`features.${base.id}.title`, base.title)),
+    tagline: t(`features.${translationKey}.tagline`, t(`features.${base.id}.tagline`, base.tagline)),
+    category: t(`features.${translationKey}.category`, t(`features.${base.id}.category`, base.category)),
+    badge: t(`features.${translationKey}.badge`, t(`features.${base.id}.badge`, base.badge)),
+    primaryCta: t(`features.${translationKey}.primaryCta`, t(`features.${base.id}.primaryCta`, base.primaryCta)),
+    secondaryCta: t(`features.${translationKey}.secondaryCta`, t(`features.${base.id}.secondaryCta`, base.secondaryCta)),
     overview: {
       ...base.overview,
-      summary: t(`features.${base.id}.summary`, base.overview?.summary),
-      clinicalStandards: t(`features.${base.id}.clinicalStandards`, base.overview?.clinicalStandards),
+      summary: t(`features.${translationKey}.summary`, t(`features.${base.id}.summary`, base.overview?.summary)),
+      clinicalStandards: t(`features.${translationKey}.clinicalStandards`, t(`features.${base.id}.clinicalStandards`, base.overview?.clinicalStandards)),
     },
   };
 }

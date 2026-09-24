@@ -35,12 +35,13 @@ import { clinicalApi } from "../../../api/clinical";
 import { useLanguage } from "../../../context/LanguageContext.jsx";
 
 export default function PredictionTimeline({
-  patientId = "USR-5EF52B",
+  patientId = null,
   currentUser = null,
   lastPredictionResult = null,
   activeStudy = null,
 }) {
   const { t } = useLanguage();
+  const effectivePatientId = patientId || currentUser?.patient_id || currentUser?.user_id || currentUser?.id;
   const [timelineData, setTimelineData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -54,14 +55,18 @@ export default function PredictionTimeline({
 
   const fetchTimeline = useCallback(
     async (isManualRefresh = false) => {
-      if (!patientId) return;
+      if (!effectivePatientId) {
+        setTimelineData(null);
+        setLoading(false);
+        return;
+      }
       if (isManualRefresh) setRefreshing(true);
       else setLoading(true);
       setError(null);
 
       try {
         const res = await clinicalApi.getPatientTimeline(
-          patientId,
+          effectivePatientId,
           timeFilter,
           timeFilter === "Custom Range" ? customStart : null,
           timeFilter === "Custom Range" ? customEnd : null,
@@ -84,7 +89,7 @@ export default function PredictionTimeline({
         setRefreshing(false);
       }
     },
-    [patientId, timeFilter, customStart, customEnd, selectedDisease]
+    [effectivePatientId, timeFilter, customStart, customEnd, selectedDisease]
   );
 
   useEffect(() => {

@@ -14,8 +14,12 @@ import PrintableMedicalCardSheet from '../../components/clinical/PrintableMedica
 import { animateCard3DFlip } from '../../utils/motion.js';
 import { useLanguage } from '../../context/LanguageContext';
 
-export default function EmergencyCardView({ patientId = 'USR-5EF52B' }) {
+import { authApi } from '../../api/auth';
+
+export default function EmergencyCardView({ patientId = null }) {
   const { t } = useLanguage();
+  const storedUser = authApi.getStoredUser();
+  const effectivePatientId = patientId || storedUser?.patient_id || storedUser?.user_id || storedUser?.id || 'USR-5EF52B';
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -31,8 +35,8 @@ export default function EmergencyCardView({ patientId = 'USR-5EF52B' }) {
 
   async function handleEmailCard() {
     try {
-      await apiClient.post(`/api/v1/emergency/${patientId}/email-card`, {
-        recipient_email: data?.email || 'aryan.crores@gmail.com',
+      await apiClient.post(`/api/v1/emergency/${effectivePatientId}/email-card`, {
+        recipient_email: data?.email || storedUser?.email || '',
       });
       setEmailSent(true);
       setTimeout(() => setEmailSent(false), 3000);
@@ -50,15 +54,15 @@ export default function EmergencyCardView({ patientId = 'USR-5EF52B' }) {
   }
 
   const emergencyPortalUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/#emergency/${patientId}`
-    : `${window.location.origin}/#emergency/${patientId}`;
+    ? `${window.location.origin}/#triage/${effectivePatientId}`
+    : `https://q-rakshak.vercel.app/#triage/${effectivePatientId}`;
 
   useEffect(() => {
     async function loadData() {
       setLoading(true);
       setError(null);
       try {
-        const res = await apiClient.get(`/api/v1/emergency/${patientId}`);
+        const res = await apiClient.get(`/api/v1/emergency/${effectivePatientId}`);
         setData(res);
       } catch (err) {
         console.error('Failed to load emergency profile:', err);
@@ -1041,12 +1045,13 @@ export default function EmergencyCardView({ patientId = 'USR-5EF52B' }) {
                   size={150}
                   fgColor="#0F172A"
                   bgColor="#FFFFFF"
+                  margin={2}
                 />
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center' }}>
                 <span style={{ fontSize: '0.72rem', fontFamily: 'monospace', color: '#0F172A', background: '#F1F5F9', padding: '3px 10px', borderRadius: '6px', fontWeight: 700 }}>
-                  PERMANENT ID: {patientId}
+                  PERMANENT ID: {effectivePatientId}
                 </span>
                 <span style={{ fontSize: '0.64rem', color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <ShieldCheck size={12} color="#059669" />

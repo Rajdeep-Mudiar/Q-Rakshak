@@ -32,8 +32,9 @@ import SquareLoader from "../../components/common/SquareLoader.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import "../../styles.css";
 
-export default function AIDoctorConsultationPage({ patientId = "USR-5EF52B", currentUser }) {
+export default function AIDoctorConsultationPage({ patientId = null, currentUser }) {
   const { t } = useLanguage();
+  const effectivePatientId = patientId || currentUser?.patient_id || currentUser?.user_id || currentUser?.id;
   const [dossier, setDossier] = useState(null);
   const [systemPrompt, setSystemPrompt] = useState("");
   const [loadingContext, setLoadingContext] = useState(true);
@@ -363,7 +364,7 @@ export default function AIDoctorConsultationPage({ patientId = "USR-5EF52B", cur
       }));
 
       const res = await aiDoctorApi.sendChatMessage({
-        patientId: dossier?.patient_id || patientId || "USR-5EF52B",
+        patientId: dossier?.patient_id || effectivePatientId || "PATIENT",
         patientName: patientFullName,
         message: trimmedQuery,
         history: historyPayload,
@@ -492,7 +493,7 @@ export default function AIDoctorConsultationPage({ patientId = "USR-5EF52B", cur
             variableValues: {
               patient_name: patientFullName,
               first_name: patientFirstName,
-              patient_id: dossier?.patient_id || patientId || "USR-5EF52B",
+              patient_id: dossier?.patient_id || effectivePatientId || "PATIENT",
               vitals: `${dossier?.vitals?.blood_pressure || "120/78"}, Pulse: ${dossier?.vitals?.heart_rate_bpm || 72} bpm`,
               conditions: (dossier?.chronic_conditions || []).join(", "),
               medications: (dossier?.medications || []).join(", "),
@@ -615,7 +616,7 @@ export default function AIDoctorConsultationPage({ patientId = "USR-5EF52B", cur
               </span>
             </div>
             <p style={{ margin: "2px 0 0 0", fontSize: "0.74rem", color: "var(--text-secondary)" }}>
-              Name: <strong>{patientFullName}</strong> (ID: {dossier?.patient_id || patientId || "USR-5EF52B"}) • Dr. Quantum Voice Protocol
+              Name: <strong>{patientFullName}</strong> (ID: {dossier?.patient_id || effectivePatientId || "PATIENT"}) • Dr. Quantum Voice Protocol
             </p>
           </div>
         </div>

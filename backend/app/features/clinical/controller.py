@@ -406,14 +406,20 @@ async def persist_clinical_diagnostic_record(
 
 @router.get("/patient")
 @router.get("/patient/{patient_id}")
-async def get_patient_clinical_record(patient_id: str = "USR-5EF52B"):
+async def get_patient_clinical_record(patient_id: str | None = None, current_user: dict | None = Depends(get_optional_user)):
     """Retrieves real patient clinical telemetry, conditions, and vitals from the SQLite database."""
-    patient = await anyio.to_thread.run_sync(DatabaseRepository.get_patient, patient_id)
+    target_id = patient_id
+    if not target_id and current_user:
+        target_id = current_user.get("patient_id") or current_user.get("user_id") or current_user.get("id")
+    if not target_id:
+        target_id = "USR-5EF52B"
+
+    patient = await anyio.to_thread.run_sync(DatabaseRepository.get_patient, target_id)
     if not patient:
         patient = await anyio.to_thread.run_sync(
             lambda: DatabaseRepository.create_or_update_patient({
-                "id": patient_id,
-                "name": f"Patient {patient_id}",
+                "id": target_id,
+                "name": f"Patient {target_id}",
                 "age": 30,
                 "gender": "Unspecified",
                 "blood_group": "O+",
@@ -424,10 +430,19 @@ async def get_patient_clinical_record(patient_id: str = "USR-5EF52B"):
 
 @router.put("/patient/{patient_id}")
 @router.post("/patient")
-async def update_patient_clinical_record(patient_id: str = "USR-5EF52B", patient_data: dict[str, Any] = None):
+async def update_patient_clinical_record(
+    patient_id: str | None = None,
+    patient_data: dict[str, Any] = None,
+    current_user: dict | None = Depends(get_optional_user),
+):
     """Updates patient profile, emergency contacts, vitals, and medical history in SQLite database."""
     payload = patient_data or {}
-    payload["id"] = patient_id
+    target_id = patient_id or payload.get("id")
+    if not target_id and current_user:
+        target_id = current_user.get("patient_id") or current_user.get("user_id") or current_user.get("id")
+    if not target_id:
+        target_id = "USR-5EF52B"
+    payload["id"] = target_id
     updated = await anyio.to_thread.run_sync(DatabaseRepository.create_or_update_patient, payload)
     return {"status": "success", "message": "Patient profile successfully updated in database.", "patient": updated}
 
@@ -451,7 +466,7 @@ async def get_emergency_patient_card(patient_id: str):
         }
     
     # Target standalone card-frontend URL
-    emergency_url = f"{settings.FRONTEND_URL.rstrip('/')}/#emergency/{patient_id}"
+    emergency_url = f"{settings.FRONTEND_URL.rstrip('/')}/#triage/{patient_id}"
     record["qr_code_data_uri"] = generate_qr_base64_data_uri(emergency_url)
     record["emergency_url"] = emergency_url
     return record
@@ -461,7 +476,7 @@ async def get_emergency_patient_card(patient_id: str):
 @router.get("/emergency/{patient_id}/qr")
 async def get_emergency_qr_png(patient_id: str):
     """Streams high-contrast PNG QR code image bytes directly from Python."""
-    emergency_url = f"{settings.FRONTEND_URL.rstrip('/')}/#emergency/{patient_id}"
+    emergency_url = f"{settings.FRONTEND_URL.rstrip('/')}/#triage/{patient_id}"
     png_bytes = generate_qr_png_bytes(emergency_url, box_size=10, border=2)
     return Response(content=png_bytes, media_type="image/png")
 
@@ -469,7 +484,7 @@ async def get_emergency_qr_png(patient_id: str):
 @router.get("/emergency/{patient_id}/qr.svg")
 async def get_emergency_qr_svg(patient_id: str):
     """Streams vector SVG QR code string directly from Python."""
-    emergency_url = f"{settings.FRONTEND_URL.rstrip('/')}/#emergency/{patient_id}"
+    emergency_url = f"{settings.FRONTEND_URL.rstrip('/')}/#triage/{patient_id}"
     svg_str = generate_qr_svg_string(emergency_url)
     return Response(content=svg_str, media_type="image/svg+xml")
 

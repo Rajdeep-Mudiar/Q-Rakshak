@@ -7,6 +7,7 @@ import {
   Info,
   Crosshair,
   ShieldAlert,
+  ShieldCheck,
   ChevronRight,
   Layers,
   Activity
@@ -59,7 +60,7 @@ export default function RightSidebar() {
             fontWeight: 700,
           }}
         >
-          {selectedAnatomy || 'SELECT AN ORGAN'}
+          {selectedAnatomy || (affectedList.length === 0 ? 'HEALTHY BASELINE' : 'SELECT AN ORGAN')}
         </span>
       </div>
 
@@ -70,14 +71,24 @@ export default function RightSidebar() {
             <span style={{ fontSize: '0.74rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--dt-text-primary)' }}>
               Organs at Risk ({affectedList.length})
             </span>
-            <ShieldAlert size={14} color={affectedList.length > 0 ? '#DC2626' : '#10B981'} />
+            {affectedList.length > 0 ? (
+              <ShieldAlert size={14} color="#DC2626" />
+            ) : (
+              <ShieldCheck size={14} color="#10B981" />
+            )}
           </div>
 
           <div className="dt-affected-list">
             {affectedList.length === 0 ? (
-              <p style={{ fontSize: '0.74rem', color: 'var(--dt-text-muted)', margin: 0, padding: '4px 0' }}>
-                All organs in normal range.
-              </p>
+              <div style={{ padding: '12px 10px', textAlign: 'center', background: 'rgba(16, 185, 129, 0.06)', borderRadius: '6px', border: '1px dashed rgba(16, 185, 129, 0.3)' }}>
+                <ShieldCheck size={24} color="#10B981" style={{ margin: '0 auto 6px auto', display: 'block' }} />
+                <strong style={{ fontSize: '0.78rem', color: '#10B981', display: 'block', marginBottom: '4px' }}>
+                  Anatomical Baseline
+                </strong>
+                <p style={{ fontSize: '0.72rem', color: 'var(--dt-text-muted)', margin: 0, lineHeight: 1.4 }}>
+                  No active clinical disease risks detected. Complete a diagnostic assessment to project organ-specific involvement.
+                </p>
+              </div>
             ) : (
               affectedList.map((item) => (
                 <button
@@ -121,19 +132,23 @@ export default function RightSidebar() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.76rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: 'var(--dt-text-muted)' }}>Sex:</span>
-              <strong style={{ color: 'var(--dt-text-primary)', textTransform: 'capitalize' }}>{patient.sex || 'Female'}</strong>
+              <strong style={{ color: 'var(--dt-text-primary)', textTransform: 'capitalize' }}>{patient.sex || 'Not Specified'}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span style={{ color: 'var(--dt-text-muted)' }}>Age Group:</span>
-              <strong style={{ color: 'var(--dt-text-primary)' }}>{patient.ageGroup || '40-60 yrs'}</strong>
+              <strong style={{ color: 'var(--dt-text-primary)' }}>{patient.ageGroup || 'Adult'}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--dt-text-muted)' }}>Selected Disease:</span>
-              <strong style={{ color: 'var(--dt-accent-blue)' }}>{disease?.name || 'Breast Cancer'}</strong>
+              <span style={{ color: 'var(--dt-text-muted)' }}>Active Status:</span>
+              <strong style={{ color: affectedList.length > 0 ? '#DC2626' : '#10B981' }}>
+                {affectedList.length > 0 ? `${affectedList.length} Organs Monitored` : 'Baseline Healthy'}
+              </strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--dt-text-muted)' }}>Status:</span>
-              <strong style={{ color: '#059669' }}>Live</strong>
+              <span style={{ color: 'var(--dt-text-muted)' }}>Diagnostic State:</span>
+              <strong style={{ color: affectedList.length > 0 ? 'var(--dt-accent-blue)' : 'var(--dt-text-muted)' }}>
+                {affectedList.length > 0 ? (disease?.name || 'Assessed') : 'Pending Checkup'}
+              </strong>
             </div>
           </div>
         </div>

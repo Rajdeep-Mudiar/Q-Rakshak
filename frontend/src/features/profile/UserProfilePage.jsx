@@ -296,7 +296,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
 
   const effectiveRole = currentUser?.role || profile.role || "patient";
   const emergencyPortalUrl = typeof window !== "undefined"
-    ? `${window.location.origin}/#emergency/${profile.user_id || activeUserId || "USR-5EF52B"}`
+    ? `${window.location.origin}/#triage/${profile.user_id || activeUserId || "USR-5EF52B"}`
     : `${EMERGENCY_PORTAL_BASE}/${profile.user_id || activeUserId || "USR-5EF52B"}`;
   const emergencyQrUrl = ENDPOINTS.EMERGENCY_QR_PNG(profile.user_id || activeUserId);
 

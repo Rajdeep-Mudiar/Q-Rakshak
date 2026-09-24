@@ -13,6 +13,7 @@ import {
   X, Check, ShieldCheck, Heart, Wind, Thermometer,
   Sparkles, RefreshCw
 } from 'lucide-react';
+import { authApi } from '../../../api/auth';
 
 function SectionHeader({ icon: Icon, title, color = 'var(--dt-accent-blue)' }) {
   return (
@@ -539,12 +540,18 @@ export default function LeftSidebar() {
   const patientMode = useTwinStore((s) => s.patientMode);
   const isFetchingPatient = patientMode === 'loading';
 
-  const [inputPatientId, setInputPatientId] = useState(patient?.patientId || 'USR-5EF52B');
+  const storedUser = authApi.getStoredUser();
+  const initialPid = patient?.patientId || storedUser?.patient_id || storedUser?.user_id || storedUser?.id || '';
+  const [inputPatientId, setInputPatientId] = useState(initialPid);
 
   // Keep input aligned if patient ID changes
   useEffect(() => {
     if (patient?.patientId) {
       setInputPatientId(patient.patientId);
+    } else {
+      const u = authApi.getStoredUser();
+      const pid = u?.patient_id || u?.user_id || u?.id || '';
+      if (pid) setInputPatientId(pid);
     }
   }, [patient?.patientId]);
 

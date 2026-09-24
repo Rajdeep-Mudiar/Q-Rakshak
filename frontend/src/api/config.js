@@ -6,7 +6,7 @@ export const API_BASE_URL = rawBaseUrl.replace(/\/+$/, "");
 
 export const API_KEY = import.meta.env.VITE_API_KEY || "";
 export const EMERGENCY_PORTAL_BASE =
-  import.meta.env.VITE_EMERGENCY_PORTAL_BASE || "https://q-rakshak.health/#emergency";
+  import.meta.env.VITE_EMERGENCY_PORTAL_BASE || "https://q-rakshak.vercel.app/#triage";
 
 // On free-tier platforms like Render, cold starts can take 40-90+ seconds.
 // Set default timeout to 0 (no abort timer) unless explicitly configured via environment variable.

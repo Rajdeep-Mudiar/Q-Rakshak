@@ -2,6 +2,8 @@ import { API_KEY, API_TIMEOUT_MS } from "./config";
 
 let authExpiredDebounceTimer = null;
 function notifyAuthExpired(endpoint) {
+  const token = localStorage.getItem("qmed_token");
+  if (!token) return;
   localStorage.removeItem("qmed_token");
   localStorage.removeItem("qmed_user");
   if (!authExpiredDebounceTimer) {
@@ -21,7 +23,11 @@ async function executeFetchWithRetry(endpoint, fetchOptions, timeoutId, maxRetri
       const response = await fetch(endpoint, fetchOptions);
       if (timeoutId) clearTimeout(timeoutId);
 
-      const isAuthEndpoint = endpoint.includes("/auth/login") || endpoint.includes("/auth/register");
+      const isAuthEndpoint =
+        endpoint.includes("/auth/login") ||
+        endpoint.includes("/auth/register") ||
+        endpoint.includes("/auth/google") ||
+        endpoint.includes("/auth/me");
       if (response.status === 401 && !isAuthEndpoint) {
         notifyAuthExpired(endpoint);
       }
@@ -120,8 +126,7 @@ export async function request(endpoint, options = {}) {
 
   const headers = {
     Accept: "application/json",
-    ...(effectiveApiKey ? { "X-API-Key": effectiveApiKey } : {}),
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(token ? { Authorization: `Bearer ${token}` } : (effectiveApiKey ? { "X-API-Key": effectiveApiKey } : {})),
     ...(options.headers || {}),
   };
 

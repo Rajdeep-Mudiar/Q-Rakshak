@@ -55,32 +55,62 @@ export default function FeatureIntroPage({
   onSwitchFeature,
 }) {
   const { t } = useLanguage();
-  const feature = getLocalizedFeatureIntroById(featureId, t);
+  const rawFeature = getLocalizedFeatureIntroById(featureId, t);
+  const fallbackFeature = FEATURE_INTRO_REGISTRY.doctor_consultation;
+  const feature = {
+    ...fallbackFeature,
+    ...rawFeature,
+    overview: {
+      ...fallbackFeature.overview,
+      ...(rawFeature?.overview || {}),
+    },
+  };
 
   const heroRef = useRef(null);
   const statsRef = useRef(null);
   const cardsRef = useRef(null);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    try {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch {
+      window.scrollTo(0, 0);
+    }
 
-    if (heroRef.current) {
-      animateEditorialHero(heroRef.current);
+    try {
+      if (heroRef.current) {
+        animateEditorialHero(heroRef.current);
+      }
+    } catch (e) {
+      console.warn("[FeatureIntroPage] hero animation skipped:", e);
     }
-    if (statsRef.current) {
-      const statElements = statsRef.current.querySelectorAll(".feature-stat-val");
-      statElements.forEach((el) => {
-        const raw = el.getAttribute("data-value") || "";
-        const num = parseFloat(raw.replace(/[^0-9.]/g, ""));
-        if (!isNaN(num) && num > 0) {
-          const suffix = raw.includes("%") ? "%" : raw.includes("+") ? "+" : raw.includes("ms") ? " ms" : raw.includes("Mins") ? " Mins" : "";
-          const decimals = raw.includes(".") ? 1 : 0;
-          animateCounter(el, 0, num, decimals, suffix);
-        }
-      });
+
+    try {
+      if (statsRef.current) {
+        const statElements = statsRef.current.querySelectorAll(".feature-stat-val");
+        statElements.forEach((el) => {
+          const raw = (el.getAttribute("data-value") || "").trim();
+          const isSimpleMetric = /^<?\s*\d+(\.\d+)?\s*(%|\+|\s*ms|\s*Mins)?$/i.test(raw);
+          if (isSimpleMetric) {
+            const num = parseFloat(raw.replace(/[^0-9.]/g, ""));
+            if (!isNaN(num) && num > 0) {
+              const suffix = raw.includes("%") ? "%" : raw.includes("+") ? "+" : raw.includes("ms") ? " ms" : raw.includes("Mins") ? " Mins" : "";
+              const decimals = raw.includes(".") ? 1 : 0;
+              animateCounter(el, 0, num, decimals, suffix);
+            }
+          }
+        });
+      }
+    } catch (e) {
+      console.warn("[FeatureIntroPage] stats animation skipped:", e);
     }
-    if (cardsRef.current) {
-      animateCardStagger(cardsRef.current, ".feature-stagger-card");
+
+    try {
+      if (cardsRef.current) {
+        animateCardStagger(cardsRef.current, ".feature-stagger-card");
+      }
+    } catch (e) {
+      console.warn("[FeatureIntroPage] cards animation skipped:", e);
     }
   }, [featureId]);
 
@@ -140,7 +170,7 @@ export default function FeatureIntroPage({
                 transition: "all 0.18s ease",
               }}
             >
-              {f.title.split(" ")[0]}
+              {(f?.title || f?.id || "Module").split(" ")[0]}
             </button>
           ))}
         </div>
@@ -230,7 +260,7 @@ export default function FeatureIntroPage({
                 margin: 0,
               }}
             >
-              {feature.overview.summary}
+              {feature?.overview?.summary || ""}
             </p>
 
             {/* Primary Action Buttons */}
@@ -375,17 +405,17 @@ export default function FeatureIntroPage({
             gap: "16px",
           }}
         >
-          {Object.values(feature.stats).map((st, sIdx) => (
+          {(feature?.stats && typeof feature.stats === "object" ? Object.values(feature.stats) : []).map((st, sIdx) => (
             <div key={sIdx}>
               <div style={{ fontSize: "0.68rem", fontWeight: 700, textTransform: "uppercase", color: "var(--text-muted)", letterSpacing: "0.05em" }}>
-                {st.label}
+                {st?.label || ""}
               </div>
               <div
                 className="feature-stat-val"
-                data-value={st.value}
+                data-value={st?.value || ""}
                 style={{ fontSize: "1.4rem", fontWeight: 800, color: feature.accentColor, fontFamily: "var(--font-mono)", marginTop: "2px" }}
               >
-                {st.value}
+                {st?.value || ""}
               </div>
             </div>
           ))}
@@ -404,8 +434,8 @@ export default function FeatureIntroPage({
             gap: "16px",
           }}
         >
-          {feature.benefits.map((b, bIdx) => {
-            const IconComp = ICON_MAP[b.icon] || ShieldCheck;
+          {(Array.isArray(feature?.benefits) ? feature.benefits : []).map((b, bIdx) => {
+            const IconComp = (b?.icon && ICON_MAP[b.icon]) || ShieldCheck;
             return (
               <div
                 key={bIdx}
@@ -469,7 +499,7 @@ export default function FeatureIntroPage({
             gap: "20px",
           }}
         >
-          {feature.howItWorks.map((step, sIdx) => (
+          {(Array.isArray(feature?.howItWorks) ? feature.howItWorks : []).map((step, sIdx) => (
             <div
               key={sIdx}
               style={{
@@ -487,13 +517,13 @@ export default function FeatureIntroPage({
                   fontFamily: "var(--font-mono)",
                 }}
               >
-                {step.step}
+                {step?.step || `0${sIdx + 1}`}
               </div>
               <h4 style={{ fontSize: "0.90rem", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>
-                {step.title}
+                {step?.title || ""}
               </h4>
               <p style={{ fontSize: "0.80rem", color: "var(--text-secondary)", lineHeight: 1.5, margin: 0 }}>
-                {step.desc}
+                {step?.desc || ""}
               </p>
             </div>
           ))}
@@ -518,7 +548,7 @@ export default function FeatureIntroPage({
             Clinical Rigor & Zero-Trust Privacy Compliance
           </h4>
           <p style={{ fontSize: "0.80rem", color: "var(--text-secondary)", margin: 0 }}>
-            {feature.overview.clinicalStandards}
+            {feature?.overview?.clinicalStandards || "All interactions strictly adhere to HIPAA and DPDP Act zero-trust protocols."}
           </p>
         </div>
       </div>

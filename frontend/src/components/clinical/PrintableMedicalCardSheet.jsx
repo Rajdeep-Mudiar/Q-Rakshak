@@ -200,7 +200,7 @@ export default function PrintableMedicalCardSheet({
 
         <div className="print-legal-notice">
           <p>
-            <strong>NOTICE TO PARAMEDICS, ER ATTENDANTS & FIRST RESPONDERS:</strong> Scan the high-resolution dynamic QR code on the front face using any standard smartphone camera. It resolves directly to the immutable tamper-evident triage portal at <code>{emergencyPortalUrl || `https://qrakshak.in/#emergency/${patientId}`}</code> providing real-time vitals, baseline ECG telemetry, physician contacts, and trauma directives.
+            <strong>NOTICE TO PARAMEDICS, ER ATTENDANTS & FIRST RESPONDERS:</strong> Scan the high-resolution dynamic QR code on the front face using any standard smartphone camera. It resolves directly to the immutable tamper-evident triage portal at <code>{emergencyPortalUrl || `https://q-rakshak.vercel.app/#triage/${patientId}`}</code> providing real-time vitals, baseline ECG telemetry, physician contacts, and trauma directives.
           </p>
           <div className="print-ledger-seal-row">
             <span>Cryptographic Anchor: SHA-256 WORM Audit Log Verified</span>

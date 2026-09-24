@@ -55,7 +55,7 @@ async def get_emergency_card_data(patient_id: str):
             "emergency_contacts": [],
         }
 
-    emergency_url = f"{settings.FRONTEND_URL.rstrip('/')}/#emergency/{patient_id}"
+    emergency_url = f"{settings.FRONTEND_URL.rstrip('/')}/#triage/{patient_id}"
     qr_base64 = generate_qr_base64_data_uri(emergency_url)
 
     # Format allergies if stored as structured list
@@ -144,7 +144,7 @@ async def get_emergency_card_data(patient_id: str):
 @router.get("/{patient_id}/qr")
 async def get_emergency_qr_png(patient_id: str):
     """Streams high-contrast PNG QR code image bytes directly from Python."""
-    emergency_url = f"{settings.FRONTEND_URL.rstrip('/')}/#emergency/{patient_id}"
+    emergency_url = f"{settings.FRONTEND_URL.rstrip('/')}/#triage/{patient_id}"
     png_bytes = generate_qr_png_bytes(emergency_url, box_size=10, border=2)
     return Response(content=png_bytes, media_type="image/png")
 
@@ -152,7 +152,7 @@ async def get_emergency_qr_png(patient_id: str):
 @router.get("/{patient_id}/qr.svg")
 async def get_emergency_qr_svg(patient_id: str):
     """Streams vector SVG QR code string directly from Python."""
-    emergency_url = f"{settings.FRONTEND_URL.rstrip('/')}/#emergency/{patient_id}"
+    emergency_url = f"{settings.FRONTEND_URL.rstrip('/')}/#triage/{patient_id}"
     svg_str = generate_qr_svg_string(emergency_url)
     return Response(content=svg_str, media_type="image/svg+xml")
 

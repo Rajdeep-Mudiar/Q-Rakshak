@@ -176,6 +176,39 @@ export default function DiseaseEarlyDetectionTimeline({
             >
               Early Detection Pathway
             </span>
+            {patientRiskScore !== null && !isNaN(patientRiskScore) ? (
+              <span
+                style={{
+                  fontSize: "0.66rem",
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  color: "#059669",
+                  background: "#ECFDF5",
+                  border: "1px solid #A7F3D0",
+                  padding: "2px 7px",
+                  borderRadius: "4px",
+                }}
+              >
+                Personalized Assessment
+              </span>
+            ) : (
+              <span
+                style={{
+                  fontSize: "0.66rem",
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  color: "#475569",
+                  background: "#F1F5F9",
+                  border: "1px solid #CBD5E1",
+                  padding: "2px 7px",
+                  borderRadius: "4px",
+                }}
+              >
+                Reference Population Model
+              </span>
+            )}
             <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 500 }}>
               {currentEarlyDet.targetOrgan}
             </span>

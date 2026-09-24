@@ -30,6 +30,8 @@ class DatabaseRepository:
     def get_user_by_id(user_id: str) -> Optional[dict[str, Any]]:
         conn = get_db_connection()
         clean = (user_id or "").strip()
+        if clean in ("DOC-USR-ARYAN", "DOC_USR_ARYAN", "USR ARYAN"):
+            clean = "USR-ARYAN"
         row = conn.execute("SELECT * FROM users WHERE id = ? OR username = ?;", (clean, clean)).fetchone()
         conn.close()
         if not row:
@@ -1164,7 +1166,10 @@ class DatabaseRepository:
     @staticmethod
     def get_doctor_by_user_id(user_id: str) -> dict[str, Any] | None:
         conn = get_db_connection()
-        row = conn.execute("SELECT * FROM doctors WHERE user_id = ?;", (user_id,)).fetchone()
+        clean_uid = (user_id or "").strip()
+        if clean_uid in ("DOC-USR-ARYAN", "DOC_USR_ARYAN", "USR ARYAN"):
+            clean_uid = "USR-ARYAN"
+        row = conn.execute("SELECT * FROM doctors WHERE user_id = ? OR user_id = ?;", (clean_uid, user_id)).fetchone()
         conn.close()
         if not row:
             return None

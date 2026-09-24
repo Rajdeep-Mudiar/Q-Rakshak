@@ -30,12 +30,21 @@ elif (PROJECT_ROOT / ".env").exists():
 
 
 def _security_value(name: str) -> str:
-    """Require deployment secrets outside the isolated demo/test environment."""
+    """Require deployment secrets outside the isolated demo/test environment.
+    Falls back to SECRET_KEY for JWT_SECRET and provides stable demo defaults across restarts.
+    """
     value = os.getenv(name, "").strip()
+    if not value and name == "JWT_SECRET":
+        value = os.getenv("SECRET_KEY", "").strip()
     if value and not value.startswith(("replace-", "your-")):
         return value
     if os.getenv("QMED_DB_MODE", "production").strip().lower() == "demo":
-        return secrets.token_urlsafe(48)
+        defaults = {
+            "JWT_SECRET": "qmed-sih2026-super-secret-key-change-in-prod",
+            "API_KEY": "qmed-master-api-key-2026",
+            "MODEL_SERVICE_API_KEY": "qmed-internal-model-key-secure-prod-2026",
+        }
+        return defaults.get(name, "qmed-sih2026-fallback-secret-key")
     raise RuntimeError(f"{name} must be configured with a non-placeholder value in production.")
 
 

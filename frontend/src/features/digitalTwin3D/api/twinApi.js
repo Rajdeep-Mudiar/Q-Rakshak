@@ -5,28 +5,41 @@
 
 import apiClient from "../../../api/client";
 import { ENDPOINTS, API_BASE_URL } from "../../../api/config";
+import { authApi } from "../../../api/auth";
+
+function resolveTargetPatientId(patientId) {
+  if (patientId && typeof patientId === "string" && patientId.trim()) return patientId.trim();
+  const stored = authApi.getStoredUser();
+  return stored?.patient_id || stored?.user_id || stored?.id || null;
+}
 
 /**
  * Fetch the 3D digital twin state for a specific patient from the DB.
  * Returns module_risks, organ_heatmap, timeline_visits, top_biomarkers.
  */
-export async function fetchPatientTwinState(patientId = "USR-5EF52B") {
-  return apiClient.get(ENDPOINTS.TWIN_STATE(patientId));
+export async function fetchPatientTwinState(patientId) {
+  const pid = resolveTargetPatientId(patientId);
+  if (!pid) return null;
+  return apiClient.get(ENDPOINTS.TWIN_STATE(pid));
 }
 
 /**
  * Fetch clinical records for a patient.
  */
-export async function fetchClinicalPatient(patientId = "USR-5EF52B") {
-  return apiClient.get(ENDPOINTS.CLINICAL_PATIENT(patientId));
+export async function fetchClinicalPatient(patientId) {
+  const pid = resolveTargetPatientId(patientId);
+  if (!pid) return null;
+  return apiClient.get(ENDPOINTS.CLINICAL_PATIENT(pid));
 }
 
 /**
  * Fetch all clinical reports for a patient.
  */
-export async function fetchPatientReports(patientId = "USR-5EF52B") {
+export async function fetchPatientReports(patientId) {
+  const pid = resolveTargetPatientId(patientId);
+  if (!pid) return [];
   try {
-    return await apiClient.get(ENDPOINTS.REPORTS_LIST(patientId));
+    return await apiClient.get(ENDPOINTS.REPORTS_LIST(pid));
   } catch (err) {
     console.warn("Could not fetch reports for patient:", err);
     return [];

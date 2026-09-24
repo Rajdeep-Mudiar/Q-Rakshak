@@ -1,14 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import { Activity, Sparkles, Shield, Maximize2, Layers, CheckCircle2, AlertTriangle, Crosshair } from "lucide-react";
 import { clinicalApi } from "../../api/clinical";
+import { authApi } from "../../api/auth";
 import { animateEntrance } from "../../utils/motion";
 import { DigitalTwinViewer, useTwinStore, DISEASE_TO_ORGAN } from "../../features/digitalTwin3D";
 
-export default function DigitalTwin3D({ patientId = "USR-5EF52B", analysisResult = null, onOpenTwinTab = null }) {
+export default function DigitalTwin3D({ patientId, analysisResult = null, onOpenTwinTab = null }) {
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
   const [patientRecord, setPatientRecord] = useState(null);
   const [loadingRecord, setLoadingRecord] = useState(false);
+
+  const storedUser = authApi.getStoredUser();
+  const effectivePatientId = patientId || storedUser?.patient_id || storedUser?.user_id || storedUser?.id || "PATIENT";
 
   const setPatientAnalysis = useTwinStore((state) => state.setPatientAnalysis);
   const patientAnalysis = useTwinStore((state) => state.patientAnalysis);
@@ -19,74 +23,19 @@ export default function DigitalTwin3D({ patientId = "USR-5EF52B", analysisResult
   // Synchronize incoming analysisResult prop to twinStore
   useEffect(() => {
     if (analysisResult) {
-      setPatientAnalysis(analysisResult, patientId);
+      setPatientAnalysis(analysisResult, effectivePatientId);
     }
-  }, [analysisResult, patientId, setPatientAnalysis]);
+  }, [analysisResult, effectivePatientId, setPatientAnalysis]);
 
-  // Load patient baseline record if no active analysis has been run yet
+  // Load patient baseline record if present without fabricating positive disease findings
   useEffect(() => {
-    if (!analysisResult && !patientAnalysis) {
+    if (!analysisResult && !patientAnalysis && effectivePatientId && effectivePatientId !== "PATIENT") {
       let isMounted = true;
       setLoadingRecord(true);
-      clinicalApi.getPatientRecord(patientId)
+      clinicalApi.getPatientRecord(effectivePatientId)
         .then((res) => {
           if (!isMounted || !res?.patient) return;
-          const p = res.patient;
-          setPatientRecord(p);
-
-          // Infer primary target organ from patient diagnosed conditions
-          const conditions = (p.conditions || []).join(" ").toLowerCase();
-          let target = "HEART";
-          let diseaseName = "Cardiovascular Telemetry";
-          let riskClass = "Normal Baseline";
-          let topFeat = [];
-
-          if (conditions.includes("breast") || conditions.includes("cancer") || conditions.includes("oncology")) {
-            target = "BREAST_LEFT";
-            diseaseName = "Breast Oncology";
-            riskClass = "Monitored Mammography";
-            topFeat = [{ feature: "Tissue Symmetry", value: 1.0 }, { feature: "FNA Nuclear Margin", value: "Regular" }];
-          } else if (conditions.includes("diabetes") || conditions.includes("glycemia")) {
-            target = "PANCREAS";
-            diseaseName = "Endocrine / Diabetes";
-            riskClass = "Monitored Glucose";
-            topFeat = [{ feature: "HbA1c", value: "5.8%" }, { feature: "Fasting Glucose", value: "108 mg/dL" }];
-          } else if (conditions.includes("parkinson") || conditions.includes("neuro")) {
-            target = "BRAIN";
-            diseaseName = "Neurological Monitoring";
-            riskClass = "Voice Telemetry Monitored";
-            topFeat = [{ feature: "Jitter (local)", value: "0.003" }, { feature: "Shimmer", value: "0.02" }];
-          } else {
-            // Cardiovascular features only if recorded
-            const bp = p.baseline_vitals?.blood_pressure;
-            const hr = p.baseline_vitals?.heart_rate_bpm;
-            topFeat = [];
-            if (bp) topFeat.push({ feature: "Blood Pressure", value: bp });
-            if (hr) topFeat.push({ feature: "Resting Heart Rate", value: `${hr} BPM` });
-          }
-
-          const hasConditions = Array.isArray(p.conditions) && p.conditions.length > 0;
-          const narrative = hasConditions
-            ? `Active clinical conditions: ${p.conditions.join(", ")}.`
-            : (p.notes || "No acute anomalies recorded.");
-
-          setPatientAnalysis({
-            patient_id: patientId,
-            disease: diseaseName,
-            prediction: {
-              class: `${riskClass} (${p.conditions?.[0] || "Stable Baseline"})`,
-              confidence: 0.94,
-              severity: "normal",
-            },
-            explainability: {
-              top_features: topFeat,
-              clinical_narrative: narrative,
-            },
-            quantum_telemetry: {
-              qubits: 8,
-              entanglement: "Circular CNOT",
-            },
-          }, patientId);
+          setPatientRecord(res.patient);
         })
         .catch(() => {})
         .finally(() => {
@@ -97,7 +46,7 @@ export default function DigitalTwin3D({ patientId = "USR-5EF52B", analysisResult
         isMounted = false;
       };
     }
-  }, [patientId, analysisResult, patientAnalysis, setPatientAnalysis]);
+  }, [effectivePatientId, analysisResult, patientAnalysis]);
 
   useEffect(() => {
     if (containerRef.current) {
@@ -106,12 +55,12 @@ export default function DigitalTwin3D({ patientId = "USR-5EF52B", analysisResult
   }, []);
 
   const organList = [
-    { id: "HEART", label: "Heart", defaultRisk: 12 },
-    { id: "LUNG_LEFT", label: "Lungs", defaultRisk: 8 },
-    { id: "BRAIN", label: "Brain", defaultRisk: 5 },
-    { id: "PANCREAS", label: "Pancreas", defaultRisk: 15 },
-    { id: "LIVER", label: "Liver", defaultRisk: 6 },
-    { id: "BREAST_LEFT", label: "Breast", defaultRisk: analysisResult ? 68 : 10 },
+    { id: "HEART", label: "Heart" },
+    { id: "LUNG_LEFT", label: "Lungs" },
+    { id: "BRAIN", label: "Brain" },
+    { id: "PANCREAS", label: "Pancreas" },
+    { id: "LIVER", label: "Liver" },
+    { id: "BREAST_LEFT", label: "Breast" },
   ];
 
   return (
@@ -155,7 +104,7 @@ export default function DigitalTwin3D({ patientId = "USR-5EF52B", analysisResult
             }}
           />
           <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, letterSpacing: "0.04em", color: "var(--ink-primary)" }}>
-            PATIENT TWIN // {patientId}
+            PATIENT TWIN // {effectivePatientId}
           </span>
         </div>
 
@@ -229,14 +178,14 @@ export default function DigitalTwin3D({ patientId = "USR-5EF52B", analysisResult
           <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>
             Anatomical Telemetry
           </span>
-          <span style={{ fontSize: "0.62rem", color: "var(--emerald-couture)", fontWeight: 700 }}>
-            {patientAnalysis ? patientAnalysis.disease : "Baseline Synchronized"}
+          <span style={{ fontSize: "0.62rem", color: analysisResult ? "var(--accent-teal)" : "var(--emerald-couture)", fontWeight: 700 }}>
+            {analysisResult ? (patientAnalysis?.disease || "Diagnostic Assessed") : "Healthy Baseline (Pending Checkup)"}
           </span>
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
           {organList.map((org) => {
-            const riskVal = involvementMap[org.id] ?? org.defaultRisk;
+            const riskVal = involvementMap[org.id] || 0;
             const isSelected = selectedAnatomy === org.id;
             const isElevated = riskVal > 40;
             return (

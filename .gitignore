@@ -154,6 +154,7 @@ model_lab/artifacts/checkpoints/
 
 # Dynamic retraining job outputs
 models/quantum/JOB-QML-*.pt
+final_models/checkpoints/quantum/JOB-QML-*.pt
 
 # Intermediate training / ablation checkpoints and feature caches
 *last.pt

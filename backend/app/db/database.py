@@ -413,11 +413,14 @@ def init_database():
         ("DOC-USR-RAJESH", "dr.rajesh", hash_password("doctor123"), "Dr. Rajesh Mehta, MD, DM", "rajesh.mehta@tmh.org", "dr.rajesh@gmail.com", "+91 98222 55667", "doctor", "Tata Memorial Hospital", "MCI-2009-44120"),
         ("DOC-USR-ANANYA", "dr.ananya", hash_password("doctor123"), "Dr. Ananya Sen, MD", "ananya.sen@manipal.health", "dr.ananya@gmail.com", "+91 98333 77889", "doctor", "Manipal Hospital Pulmonology", "MCI-2018-77412"),
         ("DOC-VIKRAM", "dr.vikram", hash_password("doctor123"), "Dr. Vikram Malhotra, MBBS", "vikram.malhotra@gmail.com", "", "+91 98444 88990", "doctor", "Apollo Clinics", "MCI-2023-11045"),
-        ("DOC-USR-ARYAN", "dr.aryan", hash_password("clinician123"), "Dr. Aryan Choudhury, MD", "aryan.crores@gmail.com", "aryan@q-rakshak.health", "+91 98765 43210", "doctor", "AIIMS Clinical AI OPD", "MCI-2024-99881"),
+        ("USR-ARYAN", "dr.aryan", hash_password("clinician123"), "Dr. Aryan Choudhury, MD", "aryan.crores@gmail.com", "aryan@q-rakshak.health", "+91 98765 43210", "doctor", "AIIMS Clinical AI OPD", "MCI-2024-99881"),
         ("USR-5EF52B", "aryan", hash_password("patient123"), "Aryan Choudhury", "aryan.crores@gmail.com", "aryan.emergency@gmail.com", "+91 98765 43210", "patient", "AIIMS Cardiology & Oncology OPD", "PT-REC-99881"),
         ("PT-ALEX", "alex.patient", hash_password("patient123"), "Alex Mercer", "alex.patient@egreenquanta.health", "", "+91 98765 43210", "patient", "Community Hospital", "PT-REC-ALEX"),
         ("RES-PRIYA", "priya.qml", hash_password("quantum123"), "Dr. Priya Sharma, PhD", "priya.qml@egreenquanta.health", "", "+91 98555 66778", "researcher", "Centre for Quantum Technologies", "RES-QML-001"),
     ]
+    # Migrate legacy DOC-USR-ARYAN to USR-ARYAN
+    cursor.execute("UPDATE users SET id = 'USR-ARYAN' WHERE id IN ('DOC-USR-ARYAN', 'DOC_USR_ARYAN');")
+    cursor.execute("UPDATE doctors SET user_id = 'USR-ARYAN' WHERE user_id IN ('DOC-USR-ARYAN', 'DOC_USR_ARYAN');")
 
     for uid, uname, pwd_hash, name, email, sec_email, em_phone, role, aff, lic in seed_users:
         existing_user = cursor.execute("SELECT id FROM users WHERE LOWER(username) = LOWER(?) OR id = ?;", (uname, uid)).fetchone()
@@ -425,9 +428,9 @@ def init_database():
             actual_id = existing_user["id"] if isinstance(existing_user, dict) else existing_user[0]
             cursor.execute("""
             UPDATE users
-            SET username = ?, password_hash = ?, name = ?, email = ?, secondary_email = ?, emergency_phone = ?, role = ?, hospital_affiliation = ?, license_number = ?
+            SET id = ?, username = ?, password_hash = ?, name = ?, email = ?, secondary_email = ?, emergency_phone = ?, role = ?, hospital_affiliation = ?, license_number = ?
             WHERE id = ?;
-            """, (uname, pwd_hash, name, email, sec_email, em_phone, role, aff, lic, actual_id))
+            """, (uid, uname, pwd_hash, name, email, sec_email, em_phone, role, aff, lic, actual_id))
         else:
             cursor.execute("""
             INSERT INTO users (id, username, password_hash, name, email, secondary_email, emergency_phone, role, hospital_affiliation, license_number)
@@ -440,7 +443,7 @@ def init_database():
         ("DOC-RAJESH", "DOC-USR-RAJESH", "Dr. Rajesh Mehta, MD, DM", "Medical Oncology", "MCI-2009-44120", "Maharashtra Medical Council", 16, 1000.0, 4.8, json.dumps(["English", "Hindi", "Marathi"]), "Tata Memorial Hospital", json.dumps(["09:30 AM", "11:00 AM", "03:00 PM"]), "verified"),
         ("DOC-ANANYA", "DOC-USR-ANANYA", "Dr. Ananya Sen, MD", "Pulmonary & Respiratory Medicine", "MCI-2018-77412", "Karnataka Medical Council", 9, 700.0, 4.9, json.dumps(["English", "Hindi", "Bengali"]), "Manipal Hospital Pulmonology", json.dumps(["10:30 AM", "01:00 PM", "05:00 PM"]), "verified"),
         ("DOC-VIKRAM", "DOC-VIKRAM", "Dr. Vikram Malhotra, MBBS", "Dermatology & Skin Lesions", "MCI-2023-11045", "Delhi Medical Council", 3, 500.0, 4.5, json.dumps(["English", "Hindi"]), "Apollo Clinics", json.dumps(["11:00 AM", "02:30 PM"]), "pending"),
-        ("DOC-ARYAN", "DOC-USR-ARYAN", "Dr. Aryan Choudhury, MD", "General Medicine & Clinical AI", "MCI-2024-99881", "Delhi Medical Council", 8, 800.0, 5.0, json.dumps(["English", "Hindi"]), "AIIMS Clinical AI OPD", json.dumps(["09:00 AM", "11:30 AM", "03:00 PM", "05:00 PM"]), "verified"),
+        ("DOC-ARYAN", "USR-ARYAN", "Dr. Aryan Choudhury, MD", "General Medicine & Clinical AI", "MCI-2024-99881", "Delhi Medical Council", 8, 800.0, 5.0, json.dumps(["English", "Hindi"]), "AIIMS Clinical AI OPD", json.dumps(["09:00 AM", "11:30 AM", "03:00 PM", "05:00 PM"]), "verified"),
     ]
 
     for did, duid, dname, dspec, dreg, dcoun, dexp, dfee, drat, dlang, daff, dslots, dstat in seed_doctors:

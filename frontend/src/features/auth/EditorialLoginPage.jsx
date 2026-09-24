@@ -206,6 +206,26 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
     }
   }
 
+  async function handleQuickLogin(quickUsername, quickPassword, quickRole) {
+    setUsername(quickUsername);
+    setPassword(quickPassword);
+    setSelectedRole(quickRole);
+    setSubmitting(true);
+    setLocalError(null);
+    try {
+      const data = await authApi.login(quickUsername, quickPassword, quickRole);
+      if (data?.user) {
+        if (onLoginSuccess) onLoginSuccess(data.user);
+        else if (onGoogleVerifySuccess) onGoogleVerifySuccess(data.user);
+        else window.location.reload();
+      }
+    } catch (err) {
+      setLocalError(err?.message || "Quick demo login failed.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   async function handleRegisterSubmit(e) {
     if (e) e.preventDefault();
     if (!regName.trim() || !regEmail.trim() || !regUsername.trim() || !regPassword) {
@@ -746,7 +766,14 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                 <button
                   key={r.id}
                   type="button"
-                  onClick={() => setSelectedRole(r.id)}
+                  onClick={() => {
+                    setSelectedRole(r.id);
+                    if (!username || username === "aryan" || username === "alex.patient" || username === "dr.kavita" || username === "admin.audit") {
+                      if (r.id === "doctor") { setUsername("dr.kavita"); setPassword("doctor123"); }
+                      else if (r.id === "admin") { setUsername("admin.audit"); setPassword("admin123"); }
+                      else { setUsername("aryan"); setPassword("patient123"); }
+                    }
+                  }}
                   style={{
                     display: "flex",
                     flexDirection: "column",
@@ -932,6 +959,106 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                   {submitting ? t("login.signing_in", "Authenticating...") : `${t("login.sign_in_as", "Sign in as")} ${selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}`}
                 </span>
               </button>
+
+              {/* 1-Click Instant Demo Persona Access */}
+              <div style={{ marginTop: "10px", borderTop: "1px dashed #E2E8F0", paddingTop: "10px" }}>
+                <div style={{ fontSize: "0.66rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase", marginBottom: "6px", letterSpacing: "0.04em", textAlign: "left" }}>
+                  ⚡ {t("login.quick_demo_access", "1-Click Demo Sign In")}
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                  <button
+                    type="button"
+                    onClick={() => handleQuickLogin("aryan", "patient123", "patient")}
+                    disabled={submitting || loading}
+                    style={{
+                      padding: "6px 8px",
+                      borderRadius: "6px",
+                      border: "1px solid #A7F3D0",
+                      background: "#ECFDF5",
+                      color: "#065F46",
+                      fontSize: "0.72rem",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <span>👤 Aryan (Patient)</span>
+                    <span style={{ fontSize: "0.58rem", opacity: 0.7 }}>patient123</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleQuickLogin("alex.patient", "patient123", "patient")}
+                    disabled={submitting || loading}
+                    style={{
+                      padding: "6px 8px",
+                      borderRadius: "6px",
+                      border: "1px solid #A7F3D0",
+                      background: "#ECFDF5",
+                      color: "#065F46",
+                      fontSize: "0.72rem",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <span>👤 Alex (Patient)</span>
+                    <span style={{ fontSize: "0.58rem", opacity: 0.7 }}>patient123</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleQuickLogin("dr.kavita", "doctor123", "doctor")}
+                    disabled={submitting || loading}
+                    style={{
+                      padding: "6px 8px",
+                      borderRadius: "6px",
+                      border: "1px solid #BAE6FD",
+                      background: "#F0F9FF",
+                      color: "#0369A1",
+                      fontSize: "0.72rem",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <span>🩺 Dr. Kavita</span>
+                    <span style={{ fontSize: "0.58rem", opacity: 0.7 }}>doctor123</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleQuickLogin("admin.audit", "admin123", "admin")}
+                    disabled={submitting || loading}
+                    style={{
+                      padding: "6px 8px",
+                      borderRadius: "6px",
+                      border: "1px solid #E9D5FF",
+                      background: "#FAF5FF",
+                      color: "#6B21A8",
+                      fontSize: "0.72rem",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <span>🛡️ Admin Audit</span>
+                    <span style={{ fontSize: "0.58rem", opacity: 0.7 }}>admin123</span>
+                  </button>
+                </div>
+              </div>
             </form>
           ) : (
             <form onSubmit={handleRegisterSubmit} style={{ width: "100%", display: "flex", flexDirection: "column", gap: "10px" }}>

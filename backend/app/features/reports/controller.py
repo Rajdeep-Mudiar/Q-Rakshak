@@ -611,7 +611,7 @@ async def list_reports(patient_id: Optional[str] = Query(None)):
     if patient_id:
         records = DatabaseRepository.get_patient_diagnostic_records(patient_id)
     else:
-        records = DatabaseRepository.get_patient_diagnostic_records("USR-5EF52B")
+        records = []
 
     formatted = [
         {

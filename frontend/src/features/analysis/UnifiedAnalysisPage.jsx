@@ -66,7 +66,7 @@ import DiseaseEarlyDetectionTimeline from "./components/DiseaseEarlyDetectionTim
 import DiseaseIntroPage from "./DiseaseIntroPage.jsx";
 import FeatureIntroPage from "../common/FeatureIntroPage.jsx";
 import { DISEASE_LIST, DISEASE_REGISTRY } from "../../data/diseaseRegistry.js";
-import { FEATURE_INTRO_REGISTRY } from "../../data/featureIntroRegistry.js";
+import { FEATURE_INTRO_REGISTRY, getFeatureIntroById } from "../../data/featureIntroRegistry.js";
 
 
 import { clinicalApi } from "../../api/clinical";
@@ -537,13 +537,23 @@ const STUDIES = {
   },
 };
 
+function resolvePatientId(user) {
+  if (!user) return "";
+  if (user.role === "patient") {
+    return user.patient_id || user.user_id || user.id || "";
+  }
+  return user.user_id || user.id || "";
+}
+
 export default function UnifiedAnalysisPage() {
   const { language, t } = useLanguage();
   const [study, setStudy] = useState("breast_cancer");
   const [introDisease, setIntroDisease] = useState("breast_cancer");
   const [introFeature, setIntroFeature] = useState("doctor_consultation");
   const [diseaseDropdownOpen, setDiseaseDropdownOpen] = useState(true);
-  const [patientId, setPatientId] = useState("");
+  const [currentUser, setCurrentUser] = useState(() => authApi.getStoredUser());
+  const [patientId, setPatientId] = useState(() => resolvePatientId(authApi.getStoredUser()));
+  const effectivePatientId = patientId || resolvePatientId(currentUser) || "PATIENT";
   const [patientData, setPatientData] = useState(null);
   const [rawFeatures, setRawFeatures] = useState([]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -569,8 +579,26 @@ export default function UnifiedAnalysisPage() {
   const [activeGuide, setActiveGuide] = useState(null);
   const [selectedBookingForRoom, setSelectedBookingForRoom] = useState(null);
   const [myBookings, setMyBookings] = useState([]);
-  // Dynamic authenticated user state with session recovery
-  const [currentUser, setCurrentUser] = useState(() => authApi.getStoredUser());
+  // Dynamic authenticated user state with session recovery and cross-tab sync
+  useEffect(() => {
+    if (currentUser) {
+      setPatientId(resolvePatientId(currentUser));
+    } else {
+      setPatientId("");
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
+    function handleStorageChange(e) {
+      if (e.key === "qmed_user" || e.key === "qmed_token") {
+        const stored = authApi.getStoredUser();
+        setCurrentUser(stored);
+        setPatientId(resolvePatientId(stored));
+      }
+    }
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
   // Restore and validate session on mount
   useEffect(() => {
@@ -631,12 +659,25 @@ export default function UnifiedAnalysisPage() {
   const roleConfig = currentUser ? (ROLE_PERMISSIONS[currentUser.role] || ROLE_PERMISSIONS.patient) : ROLE_PERMISSIONS.patient;
   const [activeTab, setActiveTabState] = useState(roleConfig.defaultTab);
 
-  function navigateToTab(nextTab, { replace = false, studyParam = null, diseaseParam = null } = {}) {
+  function navigateToTab(nextTab, { replace = false, studyParam = null, diseaseParam = null, featureParam = null } = {}) {
     setActiveTabState(nextTab);
     const url = new URL(window.location.href);
     url.searchParams.set("tab", nextTab);
-    if (studyParam) url.searchParams.set("study", studyParam);
-    if (diseaseParam) url.searchParams.set("disease", diseaseParam);
+    if (studyParam) {
+      url.searchParams.set("study", studyParam);
+    } else if (nextTab !== "diagnostic") {
+      url.searchParams.delete("study");
+    }
+    if (diseaseParam) {
+      url.searchParams.set("disease", diseaseParam);
+    } else if (nextTab !== "disease_intro") {
+      url.searchParams.delete("disease");
+    }
+    if (featureParam) {
+      url.searchParams.set("feature", featureParam);
+    } else if (nextTab !== "feature_intro") {
+      url.searchParams.delete("feature");
+    }
     window.history[replace ? "replaceState" : "pushState"]({}, "", url);
   }
 
@@ -670,6 +711,14 @@ export default function UnifiedAnalysisPage() {
       const urlDisease = search.get("disease");
       if (urlDisease && (DISEASE_REGISTRY[urlDisease] || STUDIES[urlDisease])) {
         setIntroDisease(urlDisease);
+      }
+
+      const urlFeature = search.get("feature");
+      if (urlFeature) {
+        const resolved = getFeatureIntroById(urlFeature);
+        if (resolved?.id) {
+          setIntroFeature(resolved.id);
+        }
       }
     }
 
@@ -758,7 +807,7 @@ export default function UnifiedAnalysisPage() {
     }
 
     if (STUDIES[study]?.modality === "tabular") {
-      clinicalApi.getDiseaseFeatures(study, patientId || "USR-5EF52B")
+      clinicalApi.getDiseaseFeatures(study, effectivePatientId)
         .then((res) => {
           if (res.features && res.features.length > 0) {
             setRawFeatures(res.features);
@@ -1056,12 +1105,12 @@ export default function UnifiedAnalysisPage() {
           return;
         }
         if (activeFile && activeFile.type && activeFile.type.startsWith("image/")) {
-          const data = await clinicalApi.predictPneumonia(activeFile, patientId || "USR-5EF52B");
+          const data = await clinicalApi.predictPneumonia(activeFile, effectivePatientId);
           const predClass = typeof data.prediction === "object" ? (data.prediction.class || data.prediction.label) : data.prediction;
           const conf = typeof data.prediction === "object" ? (data.prediction.confidence || 0.95) : (data.confidence || 0.95);
           const isDanger = !String(predClass).toLowerCase().includes("normal");
           const payload = {
-            patient_id: patientId || "USR-5EF52B",
+            patient_id: effectivePatientId,
             disease: "Pulmonary Chest Radiography",
             model_architecture: "QuantumPneu (8-Qubit VQC + PneuVision Backbone)",
             prediction: {
@@ -1088,7 +1137,7 @@ export default function UnifiedAnalysisPage() {
         } else {
           const isNormal = activeFile?.name?.toLowerCase().includes("normal");
           const payload = {
-            patient_id: patientId || "USR-5EF52B",
+            patient_id: effectivePatientId,
             disease: "Pulmonary Chest Radiography",
             model_architecture: "QuantumPneu (8-Qubit VQC + PneuVision Backbone)",
             prediction: {
@@ -1120,12 +1169,12 @@ export default function UnifiedAnalysisPage() {
           return;
         }
         if (activeFile && activeFile.type && activeFile.type.startsWith("image/")) {
-          const data = await clinicalApi.predictSkinCancer(activeFile, "QuantumDerma", patientId || "USR-5EF52B");
+          const data = await clinicalApi.predictSkinCancer(activeFile, "QuantumDerma", effectivePatientId);
           const predClass = typeof data.prediction === "object" ? (data.prediction.class || data.prediction.label) : data.prediction;
           const conf = typeof data.prediction === "object" ? (data.prediction.confidence || 0.95) : (data.confidence || 0.95);
           const isDanger = String(predClass).toLowerCase().includes("melanoma") || String(predClass).toLowerCase().includes("malignant") || String(predClass).toLowerCase().includes("carcinoma");
           const payload = {
-            patient_id: patientId || "USR-5EF52B",
+            patient_id: effectivePatientId,
             disease: "Dermatoscopy (HAM10000)",
             model_architecture: "QuantumDerma (10-Qubit VQC + DermisNova Backbone)",
             prediction: {
@@ -1152,7 +1201,7 @@ export default function UnifiedAnalysisPage() {
         } else {
           const isMelanoma = activeFile?.name?.toLowerCase().includes("melanoma");
           const payload = {
-            patient_id: patientId || "USR-5EF52B",
+            patient_id: effectivePatientId,
             disease: "Dermatoscopy (HAM10000)",
             model_architecture: "QuantumDerma (10-Qubit VQC + DermisNova Backbone)",
             prediction: {
@@ -1217,7 +1266,7 @@ export default function UnifiedAnalysisPage() {
                   PPE: 0.12,
                 };
           }
-          const data = await clinicalApi.runDiagnosis("parkinsons", patientId || "USR-5EF52B", featureDict);
+          const data = await clinicalApi.runDiagnosis("parkinsons", effectivePatientId, featureDict);
           data.input_type = "Acoustic Phonation Waveform";
           data.audio_telemetry = {
             sampleRate: "44.1 kHz",
@@ -1229,14 +1278,14 @@ export default function UnifiedAnalysisPage() {
           };
           setResult(data);
         } else {
-          const data = await clinicalApi.runDiagnosis("parkinsons", patientId || "USR-5EF52B", Object.keys(featureDict).length > 0 ? featureDict : null);
+          const data = await clinicalApi.runDiagnosis("parkinsons", effectivePatientId, Object.keys(featureDict).length > 0 ? featureDict : null);
           setResult(data);
         }
       } else {
         if (activeFile && activeFile.type && activeFile.type.startsWith("image/")) {
           // Process clinical scan through medical image pipeline & VQC/QSVM engine
           // Note: /api/v1/clinical/diagnose-image persists the diagnostic record atomically in the database
-          const data = await clinicalApi.diagnoseImage(activeFile, study, patientId || "USR-5EF52B");
+          const data = await clinicalApi.diagnoseImage(activeFile, study, effectivePatientId);
           setResult(data);
         } else {
           const featureDict = {};
@@ -1246,7 +1295,7 @@ export default function UnifiedAnalysisPage() {
               if (!isNaN(num)) featureDict[f.name] = num;
             });
           }
-          const data = await clinicalApi.runDiagnosis(study, patientId || "USR-5EF52B", Object.keys(featureDict).length > 0 ? featureDict : null);
+          const data = await clinicalApi.runDiagnosis(study, effectivePatientId, Object.keys(featureDict).length > 0 ? featureDict : null);
           setResult(data);
         }
       }
@@ -1261,9 +1310,9 @@ export default function UnifiedAnalysisPage() {
     try {
       setLoading(true);
       const data = await reportsApi.generateReport({
-        patient_id: patientId || "USR-5EF52B",
-        patient_name: currentUser?.name || "Aryan Choudhury",
-        user_email: currentUser?.email || "aryan.crores@gmail.com",
+        patient_id: effectivePatientId,
+        patient_name: currentUser?.name || "Clinical Patient",
+        user_email: currentUser?.email || "",
         disease: result?.disease || currentStudy?.label || "Clinical Multi-Organ Biomarker Checkup",
         prediction_class: result?.prediction?.class || "Evaluated Risk Profile",
         confidence: result?.prediction?.confidence || 0.947,
@@ -1460,16 +1509,16 @@ export default function UnifiedAnalysisPage() {
                 const handleNavClick = () => {
                   if (item.id === "doctor_booking") {
                     setIntroFeature("doctor_consultation");
-                    setActiveTab("feature_intro");
+                    navigateToTab("feature_intro", { featureParam: "doctor_consultation" });
                   } else if (item.id === "ai_doctor") {
                     setIntroFeature("ai_doctor");
-                    setActiveTab("feature_intro");
+                    navigateToTab("feature_intro", { featureParam: "ai_doctor" });
                   } else if (item.id === "twin") {
                     setIntroFeature("twin");
-                    setActiveTab("feature_intro");
+                    navigateToTab("feature_intro", { featureParam: "twin" });
                   } else if (item.id === "profile") {
                     setIntroFeature("profile");
-                    setActiveTab("feature_intro");
+                    navigateToTab("feature_intro", { featureParam: "profile" });
                   } else {
                     setActiveTab(item.id);
                   }
@@ -1544,8 +1593,10 @@ export default function UnifiedAnalysisPage() {
             setActiveTab("disease_intro");
           }}
           onNavigateFeature={(featureKey) => {
-            setIntroFeature(featureKey);
-            setActiveTab("feature_intro");
+            const resolved = getFeatureIntroById(featureKey);
+            const targetId = resolved?.id || featureKey;
+            setIntroFeature(targetId);
+            navigateToTab("feature_intro", { featureParam: targetId });
           }}
         />
 
@@ -1572,8 +1623,10 @@ export default function UnifiedAnalysisPage() {
                   setActiveTab("disease_intro");
                 }}
                 onNavigateFeature={(featureKey) => {
-                  setIntroFeature(featureKey);
-                  setActiveTab("feature_intro");
+                  const resolved = getFeatureIntroById(featureKey);
+                  const targetId = resolved?.id || featureKey;
+                  setIntroFeature(targetId);
+                  navigateToTab("feature_intro", { featureParam: targetId });
                 }}
               />
             </div>
@@ -1596,12 +1649,51 @@ export default function UnifiedAnalysisPage() {
           {/* ── VIEW 0.6: PLATFORM FEATURE INTRO PAGE ───────────────────────── */}
           {activeTab === "feature_intro" && (
             <div style={{ height: "100%", overflowY: "auto" }}>
-              <FeatureIntroPage
-                featureId={introFeature}
-                onProceed={(targetTab) => setActiveTab(targetTab)}
-                onSecondaryAction={(secTab) => setActiveTab(secTab)}
-                onSwitchFeature={(fId) => setIntroFeature(fId)}
-              />
+              <ErrorBoundary
+                title="Platform Module Overview Notice"
+                message="We encountered an issue preparing the interactive overview for this module. You can return to the dashboard or jump directly to the tool."
+                fallback={({ reset }) => (
+                  <div style={{ padding: "48px 24px", maxWidth: "600px", margin: "40px auto", textAlign: "center", background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-lg)", boxShadow: "var(--shadow-card)" }}>
+                    <div style={{ width: "48px", height: "48px", borderRadius: "50%", background: "var(--primary-soft)", color: "var(--primary)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                      <Activity size={24} />
+                    </div>
+                    <h3 style={{ fontSize: "1.2rem", fontWeight: 700, color: "var(--text-primary)", margin: "0 0 8px" }}>
+                      Platform Module Overview
+                    </h3>
+                    <p style={{ color: "var(--text-secondary)", fontSize: "0.88rem", lineHeight: 1.5, margin: "0 0 24px" }}>
+                      This module overview is temporarily refreshing. You can proceed directly to the clinical dashboard or try loading the overview again.
+                    </p>
+                    <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
+                      <button
+                        type="button"
+                        className="btn-primary"
+                        onClick={() => setActiveTab("home")}
+                      >
+                        Return to Dashboard
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-secondary"
+                        onClick={() => reset()}
+                      >
+                        Try Again
+                      </button>
+                    </div>
+                  </div>
+                )}
+              >
+                <FeatureIntroPage
+                  featureId={introFeature}
+                  onProceed={(targetTab) => setActiveTab(targetTab)}
+                  onSecondaryAction={(secTab) => setActiveTab(secTab)}
+                  onSwitchFeature={(fId) => {
+                    const resolved = getFeatureIntroById(fId);
+                    const targetId = resolved?.id || fId;
+                    setIntroFeature(targetId);
+                    navigateToTab("feature_intro", { featureParam: targetId, replace: true });
+                  }}
+                />
+              </ErrorBoundary>
             </div>
           )}
 
@@ -1933,7 +2025,7 @@ export default function UnifiedAnalysisPage() {
                   {!twinCollapsed && (
                     <div className="cockpit-col-body" style={{ alignItems: "center", padding: "0" }}>
                       <DigitalTwin3D
-                        patientId={patientId}
+                        patientId={effectivePatientId}
                         analysisResult={result}
                         onOpenTwinTab={() => setActiveTab("twin")}
                       />
@@ -1962,18 +2054,19 @@ export default function UnifiedAnalysisPage() {
                 )}
               </div>
 
-              {/* Disease-Specific Early Detection Timeline Graph */}
+              {/* Early Detection & Longitudinal Trajectory Section */}
               <div style={{ marginTop: "16px" }}>
-                <ErrorBoundary
-                  compact
-                  title="Early Detection Timeline Notice"
-                  message="The timeline graph encountered a temporary calculation issue. Click Try Again to reload."
-                >
-                  <DiseaseEarlyDetectionTimeline
-                    diseaseId={study}
-                    patientRiskScore={
-                      result
-                        ? (result.prediction?.confidence
+                {result ? (
+                  <>
+                    <ErrorBoundary
+                      compact
+                      title="Early Detection Timeline Notice"
+                      message="The timeline graph encountered a temporary calculation issue. Click Try Again to reload."
+                    >
+                      <DiseaseEarlyDetectionTimeline
+                        diseaseId={study}
+                        patientRiskScore={
+                          result.prediction?.confidence
                             ? (result.prediction?.class?.toLowerCase().includes("malignant") ||
                                result.prediction?.class?.toLowerCase().includes("melanoma") ||
                                result.prediction?.class?.toLowerCase().includes("pneumonia") ||
@@ -1981,28 +2074,87 @@ export default function UnifiedAnalysisPage() {
                                result.prediction?.severity === "danger"
                                  ? result.prediction.confidence * 100
                                  : (1 - result.prediction.confidence) * 100)
-                            : 50)
-                        : null
-                    }
-                    patientPrediction={result?.prediction}
-                    onStartAnalysis={() => runDiagnosis()}
-                  />
-                </ErrorBoundary>
-              </div>
+                            : 50
+                        }
+                        patientPrediction={result?.prediction}
+                        onStartAnalysis={() => runDiagnosis()}
+                      />
+                    </ErrorBoundary>
 
-              {/* Longitudinal Health Prediction Timeline & OLS Trend Analysis */}
-              <ErrorBoundary
-                compact
-                title="Longitudinal Prediction Graph Notice"
-                message="The health trajectory trend encountered an update notice. Click Try Again to refresh."
-              >
-                <PredictionTimeline
-                  patientId={patientId}
-                  currentUser={currentUser}
-                  lastPredictionResult={result}
-                  activeStudy={study}
-                />
-              </ErrorBoundary>
+                    <ErrorBoundary
+                      compact
+                      title="Longitudinal Prediction Graph Notice"
+                      message="The health trajectory trend encountered an update notice. Click Try Again to refresh."
+                    >
+                      <PredictionTimeline
+                        patientId={effectivePatientId}
+                        currentUser={currentUser}
+                        lastPredictionResult={result}
+                        activeStudy={study}
+                      />
+                    </ErrorBoundary>
+                  </>
+                ) : (
+                  <div
+                    style={{
+                      background: "var(--bg-surface)",
+                      border: "1px dashed var(--border-default)",
+                      borderRadius: "var(--radius-md)",
+                      padding: "32px 24px",
+                      textAlign: "center",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: "12px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "48px",
+                        height: "48px",
+                        borderRadius: "50%",
+                        background: "rgba(2, 132, 199, 0.08)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "var(--primary)",
+                      }}
+                    >
+                      <TrendingUp size={24} />
+                    </div>
+                    <div>
+                      <h4 style={{ fontSize: "1.05rem", fontWeight: 700, margin: "0 0 6px", color: "var(--text-primary)" }}>
+                        {t("analysis.timeline_pending_title", "Personalized Trajectory Pending Analysis")}
+                      </h4>
+                      <p style={{ fontSize: "0.82rem", color: "var(--text-secondary)", maxWidth: "560px", margin: "0 auto", lineHeight: 1.5 }}>
+                        {t(
+                          "analysis.timeline_pending_desc",
+                          "You haven't run the clinical checkup for this disease yet. Upload a scan/sample or click 'Run Instant Quantum AI Checkup' above to analyze your indicators and view your personalized progression timeline for your account."
+                        )}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      className="btn-primary"
+                      onClick={() => runDiagnosis()}
+                      disabled={loading}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        padding: "9px 20px",
+                        borderRadius: "var(--radius-sm)",
+                        fontSize: "0.84rem",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                      }}
+                    >
+                      <Play size={14} />
+                      <span>{t("analysis.run_checkup_btn", "Run Instant Quantum AI Checkup")}</span>
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -2013,7 +2165,7 @@ export default function UnifiedAnalysisPage() {
                 title="3D Digital Health Twin Interruption"
                 message="The 3D anatomical viewer encountered a graphics interruption. Click Try Again to reinitialize the 3D twin canvas."
               >
-                <DigitalTwin3DPage patientId={patientId} result={result} onExportReport={exportReport} />
+                <DigitalTwin3DPage patientId={effectivePatientId} result={result} onExportReport={exportReport} />
               </ErrorBoundary>
             </div>
           )}
@@ -2273,7 +2425,7 @@ export default function UnifiedAnalysisPage() {
             <div style={{ height: "100%", overflow: "hidden" }}>
               <ErrorBoundary title="AI Doctor Consultation Notice" message="The AI doctor voice consultation encountered an interruption. Click Try Again to reconnect.">
                 <AIDoctorConsultationPage
-                  patientId={patientId || "USR-5EF52B"}
+                  patientId={effectivePatientId}
                   currentUser={currentUser}
                 />
               </ErrorBoundary>

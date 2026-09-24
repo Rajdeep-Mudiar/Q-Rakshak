@@ -352,19 +352,22 @@ export const useTwinStore = create((set, get) => ({
         throw new Error(twinRes.reason?.message || clinicalRes.reason?.message || 'Failed to fetch patient record from database');
       }
 
-      const moduleRisks = twinData?.selected_visit?.module_risks || twinData?.module_risks || {};
-      const involvementMap = mapRisksToInvolvement(moduleRisks);
-      const detectedDisease = detectPrimaryDisease(moduleRisks);
+      const hasRecords = twinData?.has_records === true || (Array.isArray(twinData?.timeline_visits) && twinData.timeline_visits.length > 0);
+      const moduleRisks = hasRecords ? (twinData?.selected_visit?.module_risks || twinData?.module_risks || {}) : {};
+      const involvementMap = hasRecords ? mapRisksToInvolvement(moduleRisks) : {};
+      const detectedDisease = hasRecords ? detectPrimaryDisease(moduleRisks) : null;
       const visitNotes = twinData?.selected_visit?.notes || '';
 
       // Build updated disease params from DB data
       const newDiseaseParams = { ...DEFAULT_DISEASE_PARAMS };
-      if (involvementMap.HEART)        newDiseaseParams.HEART_DISEASE.percentage = involvementMap.HEART;
-      if (involvementMap.LUNG_LEFT)    newDiseaseParams.PNEUMONIA.leftPercentage = involvementMap.LUNG_LEFT;
-      if (involvementMap.LUNG_RIGHT)   newDiseaseParams.PNEUMONIA.rightPercentage = involvementMap.LUNG_RIGHT;
-      if (involvementMap.BREAST_LEFT)  newDiseaseParams.BREAST_CANCER.leftPercentage = involvementMap.BREAST_LEFT;
-      if (involvementMap.BREAST_RIGHT) newDiseaseParams.BREAST_CANCER.rightPercentage = involvementMap.BREAST_RIGHT;
-      if (involvementMap.PANCREAS)     newDiseaseParams.DIABETES.pancreas = involvementMap.PANCREAS;
+      if (hasRecords) {
+        if (involvementMap.HEART)        newDiseaseParams.HEART_DISEASE.percentage = involvementMap.HEART;
+        if (involvementMap.LUNG_LEFT)    newDiseaseParams.PNEUMONIA.leftPercentage = involvementMap.LUNG_LEFT;
+        if (involvementMap.LUNG_RIGHT)   newDiseaseParams.PNEUMONIA.rightPercentage = involvementMap.LUNG_RIGHT;
+        if (involvementMap.BREAST_LEFT)  newDiseaseParams.BREAST_CANCER.leftPercentage = involvementMap.BREAST_LEFT;
+        if (involvementMap.BREAST_RIGHT) newDiseaseParams.BREAST_CANCER.rightPercentage = involvementMap.BREAST_RIGHT;
+        if (involvementMap.PANCREAS)     newDiseaseParams.DIABETES.pancreas = involvementMap.PANCREAS;
+      }
 
       // Extract details from clinical DB record if available
       let firstName = get().patient.firstName;
@@ -455,11 +458,11 @@ export const useTwinStore = create((set, get) => ({
       }
 
       set({
-        patientMode: 'active',
+        patientMode: hasRecords ? 'active' : 'idle',
         dbData: twinData || { status: 'success', patient: clinicalData },
-        involvementMap,
+        involvementMap: hasRecords ? involvementMap : {},
         selectedDisease: detectedDisease || get().selectedDisease,
-        diseaseParams: newDiseaseParams,
+        diseaseParams: hasRecords ? newDiseaseParams : { ...DEFAULT_DISEASE_PARAMS },
         selectedAnatomy: null,
         patient: {
           ...get().patient,
@@ -480,7 +483,7 @@ export const useTwinStore = create((set, get) => ({
           abhaId: clinicalData?.abha_id || '',
           emergencyContact: clinicalData?.emergency_contact || ''
         },
-        layers: { ...get().layers, diseaseOverlay: true }
+        layers: { ...get().layers, diseaseOverlay: hasRecords }
       });
     } catch (err) {
       set({ patientMode: 'error', patientError: err.message });

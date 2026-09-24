@@ -11,8 +11,9 @@ import { animateEntrance, animateCardStagger } from "../../utils/motion";
 import SquareLoader from "../../components/common/SquareLoader.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 
-export default function PatientPortal({ patientId = "USR-5EF52B", currentUser = null, onOpenBooking = null, onOpenCard = null }) {
+export default function PatientPortal({ patientId = null, currentUser = null, onOpenBooking = null, onOpenCard = null }) {
   const { t } = useLanguage();
+  const effectivePatientId = patientId || currentUser?.patient_id || currentUser?.user_id || currentUser?.id;
   const [activeSubTab, setActiveSubTab] = useState("overview");
   const [patient, setPatient] = useState(null);
   const [auditLogs, setAuditLogs] = useState([]);
@@ -51,7 +52,7 @@ export default function PatientPortal({ patientId = "USR-5EF52B", currentUser = 
         } else {
           // Patient View: Fetch patient's personal record and audit trail
           const [pRes, aRes] = await Promise.all([
-            clinicalApi.getPatientRecord(patientId).catch(() => null),
+            clinicalApi.getPatientRecord(effectivePatientId).catch(() => null),
             complianceApi.getAuditLogs().catch(() => ({ logs: [] })),
           ]);
           if (pRes?.patient) setPatient(pRes.patient);

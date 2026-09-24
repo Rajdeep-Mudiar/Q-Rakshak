@@ -124,7 +124,7 @@ async def check_inference_rate_limit(request: Request) -> None:
 
 # ── Token (HMAC-SHA256, payload.signature) ───────────────────────────────────
 
-def create_access_token(data: dict[str, Any], expires_delta_sec: int = 86400) -> str:
+def create_access_token(data: dict[str, Any], expires_delta_sec: int = 604800) -> str:
     payload = data.copy()
     payload["exp"] = time.time() + expires_delta_sec
     payload_json = json.dumps(payload, separators=(",", ":"))
@@ -162,14 +162,15 @@ async def get_current_user(
     x_api_key: str | None = Header(None),
 ) -> dict[str, Any]:
     """Requires a valid Bearer token or valid X-API-Key header. Raises HTTP 401 if missing or invalid.
-    Use get_optional_user for endpoints that allow unauthenticated guest access.
+    Bearer tokens always take priority over API keys to ensure individual user sessions are preserved.
     """
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.split(" ", 1)[1].strip()
+        if token:
+            return verify_access_token(token)
     if x_api_key and x_api_key in VALID_API_KEYS:
         return {"user_id": "API-GATEWAY", "username": "api.gateway", "role": "admin", "name": "API Gateway Client"}
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Authorization header or valid X-API-Key required. Please log in.")
-    token = authorization.split(" ", 1)[1]
-    return verify_access_token(token)
+    raise HTTPException(status_code=401, detail="Authorization header or valid X-API-Key required. Please log in.")
 
 
 async def get_optional_user(
@@ -177,17 +178,18 @@ async def get_optional_user(
     x_api_key: str | None = Header(None),
 ) -> dict[str, Any]:
     """Returns authenticated user dict OR a default guest patient dict.
-    Use this for endpoints where unauthenticated (guest) access is intentional.
+    Bearer tokens take precedence over API key and guest fallback.
     """
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.split(" ", 1)[1].strip()
+        if token:
+            try:
+                return verify_access_token(token)
+            except HTTPException:
+                pass
     if x_api_key and x_api_key in VALID_API_KEYS:
         return {"user_id": "API-GATEWAY", "username": "api.gateway", "role": "admin", "name": "API Gateway Client"}
-    if not authorization or not authorization.startswith("Bearer "):
-        return {"user_id": "GUEST-USER", "username": "guest", "role": "patient", "name": "Guest Patient"}
-    token = authorization.split(" ", 1)[1]
-    try:
-        return verify_access_token(token)
-    except HTTPException:
-        return {"user_id": "GUEST-USER", "username": "guest", "role": "patient", "name": "Guest Patient"}
+    return {"user_id": "GUEST-USER", "username": "guest", "role": "patient", "name": "Guest Patient"}
 
 
 def require_admin(user: dict[str, Any]) -> dict[str, Any]:
