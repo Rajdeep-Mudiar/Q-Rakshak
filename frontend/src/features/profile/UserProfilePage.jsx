@@ -25,7 +25,7 @@ import { profileApi } from "../../api/profile";
 import { clinicalApi } from "../../api/clinical";
 import { authApi } from "../../api/auth";
 import apiClient from "../../api/client";
-import { ENDPOINTS, EMERGENCY_PORTAL_BASE } from "../../api/config";
+import { ENDPOINTS, EMERGENCY_PORTAL_BASE, getEmergencyPortalUrl } from "../../api/config";
 import QRCodeSVG from "../../components/common/QRCodeSVG";
 import TriagePhysicalCard from "../../components/clinical/TriagePhysicalCard";
 import PrintableMedicalCardSheet from "../../components/clinical/PrintableMedicalCardSheet";
@@ -316,9 +316,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
   }
 
   const effectiveUserId = profile.user_id || profile.id || activeUserId || "";
-  const emergencyPortalUrl = typeof window !== "undefined"
-    ? `${window.location.origin}/#triage/${effectiveUserId}`
-    : `${EMERGENCY_PORTAL_BASE}/${effectiveUserId}`;
+  const emergencyPortalUrl = getEmergencyPortalUrl(effectiveUserId);
   const emergencyQrUrl = ENDPOINTS.EMERGENCY_QR_PNG(effectiveUserId);
 
   return (

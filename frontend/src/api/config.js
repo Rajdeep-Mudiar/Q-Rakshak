@@ -8,6 +8,28 @@ export const API_KEY = import.meta.env.VITE_API_KEY || "";
 export const EMERGENCY_PORTAL_BASE =
   import.meta.env.VITE_EMERGENCY_PORTAL_BASE || "https://q-rakshak.vercel.app/#triage";
 
+/**
+ * Returns a globally accessible URL for physical QR codes and emergency cards.
+ * When running locally on `localhost` or `127.0.0.1`, defaults to the live deployed
+ * cloud production domain (https://q-rakshak.vercel.app) so mobile devices scanning the QR
+ * code can reach the emergency passport without localhost connection refused errors.
+ */
+export function getEmergencyPortalUrl(patientId) {
+  const pid = String(patientId || "USR-ARYAN").trim();
+  const envBase = import.meta.env.VITE_EMERGENCY_PORTAL_BASE || import.meta.env.VITE_APP_URL;
+  if (envBase) {
+    const clean = envBase.replace(/\/+$/, "");
+    return clean.includes("#triage") ? `${clean}/${pid}` : `${clean}/#triage/${pid}`;
+  }
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname;
+    if (host !== "localhost" && host !== "127.0.0.1" && host !== "0.0.0.0") {
+      return `${window.location.origin}/#triage/${pid}`;
+    }
+  }
+  return `https://q-rakshak.vercel.app/#triage/${pid}`;
+}
+
 // On free-tier platforms like Render, cold starts can take 40-90+ seconds.
 // Set default timeout to 0 (no abort timer) unless explicitly configured via environment variable.
 export const API_TIMEOUT_MS = import.meta.env.VITE_API_TIMEOUT_MS !== undefined

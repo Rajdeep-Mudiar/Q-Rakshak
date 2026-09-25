@@ -14,6 +14,7 @@ import PrintableMedicalCardSheet from '../../components/clinical/PrintableMedica
 import { animateCard3DFlip } from '../../utils/motion.js';
 import { useLanguage } from '../../context/LanguageContext';
 import { useShakeDetection } from '../../utils/useShake.js';
+import { getEmergencyPortalUrl } from '../../api/config';
 
 import { authApi } from '../../api/auth';
 
@@ -59,9 +60,7 @@ export default function EmergencyCardView({ patientId = null }) {
     }
   }
 
-  const emergencyPortalUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/#triage/${effectivePatientId}`
-    : `https://q-rakshak.vercel.app/#triage/${effectivePatientId}`;
+  const emergencyPortalUrl = getEmergencyPortalUrl(effectivePatientId);
 
   useEffect(() => {
     async function loadData() {

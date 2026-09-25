@@ -6,6 +6,7 @@ import {
   Pill, AlertOctagon, User, Clock
 } from 'lucide-react';
 import QRCodeSVG from '../common/QRCodeSVG';
+import { getEmergencyPortalUrl } from '../../api/config';
 
 /**
  * TriagePhysicalCard Component
@@ -60,9 +61,7 @@ export default function TriagePhysicalCard({
     ? ((patient.medications || patient.active_medications).length > 0 ? (patient.medications || patient.active_medications).map(m => typeof m === 'string' ? m : (m.name || 'None')).join(', ') : 'None recorded')
     : (patient.medications || patient.active_medications || 'None recorded');
 
-  const targetTriageUrl = emergencyPortalUrl || (typeof window !== 'undefined'
-    ? `${window.location.origin}/#triage/${patientId}`
-    : `https://q-rakshak.vercel.app/#triage/${patientId}`);
+  const targetTriageUrl = emergencyPortalUrl || getEmergencyPortalUrl(patientId);
 
   return (
     <div className={`triage-card-shell metallic-sheen hardware-accelerated ${isDark ? 'triage-dark' : 'triage-light'} ${isBack ? 'triage-card-back-view' : ''}`}>
