@@ -31,9 +31,6 @@ import {
   UserRound,
   UsersRound,
   TrendingUp,
-  PhoneCall,
-  Siren,
-  Smartphone,
 } from "lucide-react";
 import { DigitalTwin3DPage } from "../../features/digitalTwin3D/index.js";
 import DigitalTwin3D from "../../components/visualizations/DigitalTwin3D.jsx";
@@ -92,7 +89,7 @@ const NavTelemetrySvg = Cpu;
 const NavComplianceSvg = ShieldCheck;
 const NavPortalSvg = UserRound;
 const NavUsersSvg = UsersRound;
-const NavProfileSvg = CircleUserRound;
+const NavProfileSvg = User;
 
 /* ── Interactive Plain-English Patient Guides Dictionary ─────────────────────── */
 const GUIDE_DATA = {
@@ -572,64 +569,6 @@ export default function UnifiedAnalysisPage() {
   const [activeGuide, setActiveGuide] = useState(null);
   const [selectedBookingForRoom, setSelectedBookingForRoom] = useState(null);
   const [myBookings, setMyBookings] = useState([]);
-  const [shakeSosOpen, setShakeSosOpen] = useState(false);
-
-  // Global Shake-to-Call Emergency Detection on mobile devices
-  useEffect(() => {
-    let lastX = 0, lastY = 0, lastZ = 0;
-    let lastTime = 0;
-    let shakeHits = 0;
-    let lastHitTime = 0;
-
-    function handleMotion(e) {
-      const acc = e.acceleration || e.accelerationIncludingGravity;
-      if (!acc) return;
-
-      const currentTime = Date.now();
-      if (currentTime - lastTime < 50) return;
-
-      const diffTime = currentTime - lastTime;
-      lastTime = currentTime;
-
-      const curX = acc.x ?? 0;
-      const curY = acc.y ?? 0;
-      const curZ = acc.z ?? 0;
-
-      const deltaX = Math.abs(curX - lastX);
-      const deltaY = Math.abs(curY - lastY);
-      const deltaZ = Math.abs(curZ - lastZ);
-
-      lastX = curX;
-      lastY = curY;
-      lastZ = curZ;
-
-      const speed = ((deltaX + deltaY + deltaZ) / diffTime) * 10000;
-
-      if (speed > 80) {
-        if (currentTime - lastHitTime < 1500) {
-          shakeHits += 1;
-        } else {
-          shakeHits = 1;
-        }
-        lastHitTime = currentTime;
-
-        if (shakeHits >= 2) {
-          if (navigator.vibrate) navigator.vibrate([250, 100, 250]);
-          setShakeSosOpen(true);
-          shakeHits = 0;
-        }
-      }
-    }
-
-    if (typeof window !== "undefined" && window.DeviceMotionEvent) {
-      window.addEventListener("devicemotion", handleMotion, { passive: true });
-    }
-    return () => {
-      if (typeof window !== "undefined" && window.DeviceMotionEvent) {
-        window.removeEventListener("devicemotion", handleMotion);
-      }
-    };
-  }, []);
   // Dynamic authenticated user state with session recovery and cross-tab sync
   useEffect(() => {
     if (currentUser) {
@@ -2536,124 +2475,6 @@ export default function UnifiedAnalysisPage() {
         onClose={() => setActiveGuide(null)}
         guideData={activeGuide}
       />
-
-      {/* ── Global Shake-to-Call Emergency Modal ── */}
-      {shakeSosOpen && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 99999,
-            background: "rgba(15, 23, 42, 0.7)",
-            backdropFilter: "blur(8px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "20px",
-          }}
-          onClick={() => setShakeSosOpen(false)}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              maxWidth: "420px",
-              width: "100%",
-              textAlign: "center",
-              padding: "28px 24px",
-              background: "#FFFFFF",
-              borderRadius: "20px",
-              boxShadow: "0 25px 60px -12px rgba(15, 23, 42, 0.3)",
-              border: "1px solid #E2E8F0",
-            }}
-          >
-            <div
-              style={{
-                width: "60px",
-                height: "60px",
-                background: "#FEF2F2",
-                borderRadius: "50%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                margin: "0 auto 12px",
-                color: "#DC2626",
-                border: "2px solid #FECACA",
-              }}
-            >
-              <PhoneCall size={26} />
-            </div>
-
-            <span style={{ fontSize: "0.66rem", fontWeight: 800, color: "#DC2626", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-              SHAKE-TO-CALL SOS ACTIVATED
-            </span>
-            <h2 style={{ fontSize: "1.25rem", fontWeight: 800, color: "#0F172A", margin: "4px 0 6px" }}>
-              Emergency Medical Assistance
-            </h2>
-            <p style={{ fontSize: "0.80rem", color: "#64748B", lineHeight: 1.45, marginBottom: "18px" }}>
-              Your device movement detected an urgent assistance request. Select an emergency line to connect immediately:
-            </p>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "14px" }}>
-              <a
-                href="tel:108"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "8px",
-                  background: "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
-                  color: "#FFFFFF",
-                  padding: "12px",
-                  borderRadius: "12px",
-                  fontSize: "0.88rem",
-                  fontWeight: 700,
-                  textDecoration: "none",
-                  boxShadow: "0 4px 14px rgba(220, 38, 38, 0.3)",
-                }}
-              >
-                <Siren size={18} />
-                <span>Call 108 (National Ambulance / EMS)</span>
-              </a>
-
-              <a
-                href="tel:112"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "8px",
-                  background: "#F8FAFC",
-                  color: "#0F172A",
-                  border: "1px solid #CBD5E1",
-                  padding: "10px",
-                  borderRadius: "12px",
-                  fontSize: "0.82rem",
-                  fontWeight: 700,
-                  textDecoration: "none",
-                }}
-              >
-                <PhoneCall size={15} color="#0284C7" />
-                <span>Call 112 (National Emergency Helpline)</span>
-              </a>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setShakeSosOpen(false)}
-              style={{
-                background: "none",
-                border: "none",
-                color: "#94A3B8",
-                fontSize: "0.74rem",
-                cursor: "pointer",
-                padding: "6px",
-              }}
-            >
-              Cancel / False Alarm
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
