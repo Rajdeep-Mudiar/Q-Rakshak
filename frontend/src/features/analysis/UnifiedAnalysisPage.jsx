@@ -31,6 +31,7 @@ import {
   UserRound,
   UsersRound,
   CircleUserRound,
+  TrendingUp,
 } from "lucide-react";
 import { DigitalTwin3DPage } from "../../features/digitalTwin3D/index.js";
 import DigitalTwin3D from "../../components/visualizations/DigitalTwin3D.jsx";
@@ -884,7 +885,7 @@ export default function UnifiedAnalysisPage() {
   }
 
   const inputRef = useRef(null);
-  const currentStudy = STUDIES[study] || STUDIES.breast_cancer;
+  const currentStudy = (study && STUDIES[study]) || (study && DISEASE_REGISTRY[study]) || STUDIES.breast_cancer || {};
 
   async function handleFile(nextFile) {
     if (!nextFile) return;
@@ -1689,50 +1690,54 @@ export default function UnifiedAnalysisPage() {
 
           {/* ── 3-COLUMN UNIFIED DIAGNOSTIC COCKPIT ────────────────────────── */}
           {activeTab === "diagnostic" && (
-            <div style={{ display: "flex", flexDirection: "column", height: "100%", overflowY: "auto", gap: "10px", paddingRight: "4px" }}>
-              {/* Step Workflow Guide */}
-              <div className="workflow-stepper">
-                <div className={`step-chip ${study ? "active" : ""}`}>
-                  <span className="step-badge">0.1</span>
-                  <span>Select & Run Checkup</span>
-                </div>
-                <ChevronRight size={12} color="var(--text-muted)" />
-                <div className={`step-chip ${result ? "active" : ""}`}>
-                  <span className="step-badge">0.2</span>
-                  <span>Health Assessment & 3D Twin</span>
-                </div>
-              </div>
-
-              <div
-                className="cockpit-grid"
-                style={{
-                  gridTemplateColumns: twinCollapsed ? "1fr 44px" : "1fr 420px",
-                  transition: "grid-template-columns 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
-                  minHeight: "580px",
-                  flexShrink: 0,
-                }}
-              >
-                {/* COLUMN 1: Clinical Checkup & Diagnostic Intelligence */}
-                <div className="cockpit-col">
-                  <div className="cockpit-col-header">
-                    <div>
-                      <span className="step-badge">0.1</span>
-                      <span>AI Health Checkups</span>
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                      <span style={{ fontSize: "0.68rem", color: "var(--primary)", fontFamily: "var(--font-mono)", fontWeight: 700 }}>
-                        {currentStudy.model}
-                      </span>
-                      <button
-                        type="button"
-                        className="section-guide-btn"
-                        onClick={() => setActiveGuide(GUIDE_DATA.checkup_selector)}
-                        title="How to use Health Checkups (Plain English Guide)"
-                      >
-                        <Info size={13} />
-                      </button>
-                    </div>
+            <ErrorBoundary
+              title="Diagnostic Studio Notice"
+              message="The diagnostic cockpit encountered a temporary display update. Click Try Again to reload."
+            >
+              <div style={{ display: "flex", flexDirection: "column", height: "100%", overflowY: "auto", gap: "10px", paddingRight: "4px" }}>
+                {/* Step Workflow Guide */}
+                <div className="workflow-stepper">
+                  <div className={`step-chip ${study ? "active" : ""}`}>
+                    <span className="step-badge">0.1</span>
+                    <span>Select & Run Checkup</span>
                   </div>
+                  <ChevronRight size={12} color="var(--text-muted)" />
+                  <div className={`step-chip ${result ? "active" : ""}`}>
+                    <span className="step-badge">0.2</span>
+                    <span>Health Assessment & 3D Twin</span>
+                  </div>
+                </div>
+
+                <div
+                  className="cockpit-grid"
+                  style={{
+                    gridTemplateColumns: twinCollapsed ? "1fr 44px" : "1fr 420px",
+                    transition: "grid-template-columns 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+                    minHeight: "580px",
+                    flexShrink: 0,
+                  }}
+                >
+                  {/* COLUMN 1: Clinical Checkup & Diagnostic Intelligence */}
+                  <div className="cockpit-col">
+                    <div className="cockpit-col-header">
+                      <div>
+                        <span className="step-badge">0.1</span>
+                        <span>AI Health Checkups</span>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                        <span style={{ fontSize: "0.68rem", color: "var(--primary)", fontFamily: "var(--font-mono)", fontWeight: 700 }}>
+                          {currentStudy?.model || "Quantum AI"}
+                        </span>
+                        <button
+                          type="button"
+                          className="section-guide-btn"
+                          onClick={() => setActiveGuide(GUIDE_DATA.checkup_selector)}
+                          title="How to use Health Checkups (Plain English Guide)"
+                        >
+                          <Info size={13} />
+                        </button>
+                      </div>
+                    </div>
                   <div className="cockpit-col-body">
                     <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                       {Object.entries(STUDIES).map(([k, cfg]) => (
@@ -2146,6 +2151,7 @@ export default function UnifiedAnalysisPage() {
                 )}
               </div>
             </div>
+            </ErrorBoundary>
           )}
 
           {/* ── VIEW 2: 3D DIGITAL TWIN EXPLORER — Full Screen ─────────────── */}
