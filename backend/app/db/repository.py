@@ -69,7 +69,7 @@ class DatabaseRepository:
         sec_email = user_data.get("secondary_email", "").strip()
         phone = user_data.get("emergency_phone", "+91 98765 43210").strip()
         role = user_data.get("role", "patient").strip().lower()
-        aff = user_data.get("hospital_affiliation", "AIIMS Clinical AI OPD" if role in ("doctor", "clinician") else "Q-RAKSHAK Network")
+        aff = user_data.get("hospital_affiliation", "Q-Rakshak" if role in ("doctor", "clinician") else "Q-RAKSHAK Network")
         lic = user_data.get("license_number", f"MCI-2026-{uuid.uuid4().hex[:4].upper()}" if role in ("doctor", "clinician") else f"LIC-{uuid.uuid4().hex[:4].upper()}")
 
         conn.execute("""
@@ -103,7 +103,7 @@ class DatabaseRepository:
                     "fee_inr": float(user_data.get("fee_inr", 600.0)),
                     "rating": float(user_data.get("rating", 4.9)),
                     "languages": user_data.get("languages") or ["English", "Hindi"],
-                    "hospital_affiliation": aff or "AIIMS Clinical AI OPD",
+                    "hospital_affiliation": aff or "Q-Rakshak",
                     "available_slots": user_data.get("available_slots") or ["09:30 AM", "11:00 AM", "02:30 PM", "04:30 PM"],
                     "verification_status": user_data.get("verification_status", "verified"),
                 })
@@ -376,7 +376,7 @@ class DatabaseRepository:
     def save_diagnostic_record(record: dict[str, Any]) -> str:
         conn = get_db_connection()
         rid = record.get("id") or record.get("request_id") or f"DX-{uuid.uuid4().hex[:8].upper()}"
-        patient_id = record.get("patient_id") or "USR-5EF52B"
+        patient_id = record.get("patient_id") or f"USR-ANON-{uuid.uuid4().hex[:4].upper()}"
         disease = record.get("disease", "Clinical Biomarker Checkup")
         model_arch = record.get("model_architecture", "Hybrid VQC Quantum Classifier")
         model_ver = record.get("model_version") or (record.get("model", {}).get("version") if isinstance(record.get("model"), dict) else "1.0.0") or "1.0.0"
@@ -1214,7 +1214,7 @@ class DatabaseRepository:
                 langs = [l.strip() for l in langs.split(",") if l.strip()]
         langs_json = json.dumps(langs)
 
-        aff = doc_data.get("hospital_affiliation") or "AIIMS Clinical AI OPD"
+        aff = doc_data.get("hospital_affiliation") or "Q-Rakshak"
 
         slots = doc_data.get("available_slots", ["09:30 AM", "11:00 AM", "02:30 PM", "04:30 PM"])
         if isinstance(slots, str):
@@ -1265,7 +1265,7 @@ class DatabaseRepository:
                     "fee_inr": 600.0,
                     "rating": 4.9,
                     "languages": ["English", "Hindi"],
-                    "hospital_affiliation": u.get("hospital_affiliation") or "AIIMS Clinical AI OPD",
+                    "hospital_affiliation": u.get("hospital_affiliation") or "Q-Rakshak",
                     "available_slots": ["09:30 AM", "11:00 AM", "02:30 PM", "04:30 PM"],
                     "verification_status": "verified",
                 })

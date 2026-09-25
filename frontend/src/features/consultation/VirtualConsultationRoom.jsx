@@ -653,17 +653,11 @@ export default function VirtualConsultationRoom({ booking, isDoctor = false, onL
                   zIndex: 20,
                 }}
               >
-                <span style={{ display: "flex", alignItems: "center", gap: "5px", color: "var(--electric-rose)" }}>
-                  <Heart size={12} fill="currentColor" /> HR: 74 BPM
-                </span>
-                <span style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                  BP: 118/76
-                </span>
                 <span style={{ display: "flex", alignItems: "center", gap: "5px", color: "var(--emerald-couture)" }}>
-                  SpO2: 99%
+                  <ShieldCheck size={12} /> SECURE WebRTC 1080p
                 </span>
                 <span style={{ display: "flex", alignItems: "center", gap: "5px", color: "var(--text-gold)" }}>
-                  <Sparkles size={12} /> ENTROPY: 0.94
+                  <Sparkles size={12} /> TELEMETRY: ACTIVE (0.94)
                 </span>
               </div>
             )}

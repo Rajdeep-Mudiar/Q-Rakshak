@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Q-RAKSHAK WebRTC & Media Engine
  * High-reliability clinical tele-consultation media utilities.
  * Handles real camera/mic access, synthetic holographic medical stream fallback,
@@ -149,7 +149,7 @@ export function createSyntheticMedicalStream({
     ctx.fillStyle = "#A1A1AA";
     ctx.font = "12px 'JetBrains Mono', monospace";
     ctx.fillText(`ENTROPY: 0.942 | FRAME: ${frame} | QPU TELEMETRY: ACTIVE`, 40, 95);
-    ctx.fillText("VITALS HUD: HR 74 BPM | SpO2 99% | BP 118/76 | T 36.8°C", 40, 115);
+    ctx.fillText("SESSION FIDELITY: 99.4% | QUANTUM NOISE RESILIENCE: OPTIMAL", 40, 115);
 
     ctx.fillStyle = "#10B981";
     ctx.fillText("DTLS-SRTP 256-BIT SECURE", width - 270, 50);

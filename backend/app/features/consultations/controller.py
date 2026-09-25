@@ -80,22 +80,18 @@ RED_FLAG_PATTERNS = [
 class SlotHoldRequest(BaseModel):
     doctor_id: str
     slot_time: str
-    patient_id: str = "USR-5EF52B"
+    patient_id: Optional[str] = None
 
 
 class TriageCheckRequest(BaseModel):
     symptoms: str
-    systolic_bp: Optional[float] = None
-    diastolic_bp: Optional[float] = None
-    heart_rate: Optional[float] = None
-    spo2: Optional[float] = None
 
 
 class BookingCreateRequest(BaseModel):
     doctor_id: str
     slot_time: str
     mode: str = "video"  # video | audio | in_person
-    patient_id: str = "USR-5EF52B"
+    patient_id: Optional[str] = None
     reason: str
     symptoms: str
     duration: str = "3 days"
@@ -223,14 +219,6 @@ def evaluate_emergency_triage(req: TriageCheckRequest):
     for phrase, clinical_flag in RED_FLAG_PATTERNS:
         if phrase in symptoms_lower:
             flags.append(clinical_flag)
-
-    # Check critical vitals
-    if req.spo2 and req.spo2 < 90.0:
-        flags.append(f"Severe Hypoxemia (SpO2 {req.spo2}%)")
-    if req.systolic_bp and req.systolic_bp > 190.0:
-        flags.append(f"Hypertensive Emergency Crisis (Systolic BP {req.systolic_bp} mmHg)")
-    if req.heart_rate and (req.heart_rate < 40 or req.heart_rate > 150):
-        flags.append(f"Dangerous Dysrhythmia / Extreme Heart Rate ({req.heart_rate} bpm)")
 
     is_emergency = len(flags) > 0
 

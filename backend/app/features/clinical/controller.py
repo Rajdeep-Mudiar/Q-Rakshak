@@ -33,7 +33,7 @@ router = APIRouter(prefix="/api/v1/clinical", tags=["Clinical Diagnosis"])
 class DiagnosticRequest(BaseModel):
     disease: str = "breast_cancer"  # breast_cancer | heart | diabetes | pneumonia | skin
     model_type: str = "VQC"  # VQC | QSVM | QNN | Classical
-    patient_id: str = "USR-5EF52B"
+    patient_id: str | None = None
     features: Any | None = None
 
 
@@ -394,7 +394,7 @@ async def persist_clinical_diagnostic_record(
     rid = await anyio.to_thread.run_sync(DatabaseRepository.save_diagnostic_record, record)
     await anyio.to_thread.run_sync(
         lambda: DatabaseRepository.add_audit_log(
-            actor=f"Patient ({record.get('patient_id', 'USR-5EF52B')})",
+            actor=f"Patient ({record.get('patient_id', 'ANONYMOUS')})",
             action="DIAGNOSTIC_RECORD_SAVED",
             resource=f"{record.get('patient_id')}:{record.get('disease', 'Clinical Analysis')}",
             ip_address="127.0.0.1",
@@ -408,11 +408,19 @@ async def persist_clinical_diagnostic_record(
 @router.get("/patient/{patient_id}")
 async def get_patient_clinical_record(patient_id: str | None = None, current_user: dict | None = Depends(get_optional_user)):
     """Retrieves real patient clinical telemetry, conditions, and vitals from the SQLite database."""
+    user_role = current_user.get("role", "patient") if current_user else "patient"
+    user_id = current_user.get("user_id", "") if current_user else ""
+    if user_role == "patient" and user_id not in ("GUEST-USER", "") and patient_id and user_id != patient_id:
+        raise HTTPException(
+            status_code=403,
+            detail="Forbidden: You are authorized to access only your own clinical record.",
+        )
+
     target_id = patient_id
     if not target_id and current_user:
         target_id = current_user.get("patient_id") or current_user.get("user_id") or current_user.get("id")
-    if not target_id:
-        target_id = "USR-5EF52B"
+    if not target_id or target_id in ("GUEST-USER", ""):
+        raise HTTPException(status_code=400, detail="Patient ID is required to retrieve clinical record.")
 
     patient = await anyio.to_thread.run_sync(DatabaseRepository.get_patient, target_id)
     if not patient:
@@ -440,8 +448,17 @@ async def update_patient_clinical_record(
     target_id = patient_id or payload.get("id")
     if not target_id and current_user:
         target_id = current_user.get("patient_id") or current_user.get("user_id") or current_user.get("id")
-    if not target_id:
-        target_id = "USR-5EF52B"
+    if not target_id or target_id in ("GUEST-USER", ""):
+        raise HTTPException(status_code=400, detail="Patient ID is required.")
+
+    user_role = current_user.get("role", "patient") if current_user else "patient"
+    user_id = current_user.get("user_id", "") if current_user else ""
+    if user_role == "patient" and user_id not in ("GUEST-USER", "") and user_id != target_id:
+        raise HTTPException(
+            status_code=403,
+            detail="Forbidden: You are authorized to modify only your own clinical record.",
+        )
+
     payload["id"] = target_id
     updated = await anyio.to_thread.run_sync(DatabaseRepository.create_or_update_patient, payload)
     return {"status": "success", "message": "Patient profile successfully updated in database.", "patient": updated}
@@ -600,7 +617,7 @@ def get_clinical_status():
 async def diagnose_medical_image(
     image: UploadFile = File(...),
     disease: str = Form("breast_cancer"),
-    patient_id: str = Form("USR-5EF52B"),
+    patient_id: str | None = Form(None),
     rate_limit: None = Depends(check_inference_rate_limit),
 ):
     """Processes clinical medical scan images (Radiographs, Dermatoscopy, Histopathology, ECG strips, Retinal scans)

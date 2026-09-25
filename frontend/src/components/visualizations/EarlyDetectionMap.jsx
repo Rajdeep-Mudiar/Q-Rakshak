@@ -7,7 +7,7 @@ import DiseaseEarlyDetectionTimeline from "../../features/analysis/components/Di
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { getLocalizedDiseaseById } from "../../data/diseaseRegistry.js";
 
-export default function EarlyDetectionMap({ patientId = "USR-5EF52B" }) {
+export default function EarlyDetectionMap({ patientId = null }) {
   const { t } = useLanguage();
   const containerRef = useRef(null);
   const [selectedDisease, setSelectedDisease] = useState("breast_cancer");

@@ -43,7 +43,7 @@ class ModelServiceClient:
         return {"online": False, "detail": "Model service offline or unreachable"}
 
     async def predict_clinical(
-        self, disease: str, patient_id: str = "USR-5EF52B", features: Optional[Dict[str, Any]] = None
+        self, disease: str, patient_id: Optional[str] = None, features: Optional[Dict[str, Any]] = None
     ) -> Optional[Dict[str, Any]]:
         """Sends clinical tabular biomarker request to the model service."""
         try:

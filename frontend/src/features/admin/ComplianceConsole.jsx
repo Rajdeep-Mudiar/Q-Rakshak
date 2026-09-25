@@ -4,7 +4,7 @@ import { complianceApi } from "../../api/compliance";
 import { animateEntrance, animateCardStagger } from "../../utils/motion";
 import { useLanguage } from "../../context/LanguageContext";
 
-export default function ComplianceConsole({ patientId = "USR-5EF52B" }) {
+export default function ComplianceConsole({ patientId = null }) {
   const { t } = useLanguage();
   const [auditLogs, setAuditLogs] = useState([]);
   const [registry, setRegistry] = useState([]);

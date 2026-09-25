@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Optional
+
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
 from backend.app.db.repository import DatabaseRepository
@@ -14,7 +16,7 @@ async def predict(
     image: UploadFile = File(...),
     model: str = Form("QuantumDerma"),
     explain: bool = Form(False),
-    patient_id: str = Form("USR-5EF52B"),
+    patient_id: Optional[str] = Form(None),
 ):
     data = await image.read()
     try:

@@ -67,11 +67,7 @@ const DEFAULT_PATIENT = {
 
   // Vital Signs (latest)
   vitals: {
-    bloodPressureSystolic: '',
-    bloodPressureDiastolic: '',
-    heartRate: '',
     temperature: '',
-    spo2: '',
     respiratoryRate: '',
     glucose: '',
     cholesterol: ''
@@ -397,21 +393,8 @@ export const useTwinStore = create((set, get) => ({
       // Parse baseline vitals from DB
       const dbVitals = clinicalData?.baseline_vitals || {};
       let systolic = get().patient.vitals.bloodPressureSystolic;
-      let diastolic = get().patient.vitals.bloodPressureDiastolic;
-      if (dbVitals.blood_pressure) {
-        const match = String(dbVitals.blood_pressure).match(/(\d+)\s*\/\s*(\d+)/);
-        if (match) {
-          systolic = match[1];
-          diastolic = match[2];
-        }
-      }
-
       const vitals = {
         ...get().patient.vitals,
-        bloodPressureSystolic: systolic || '',
-        bloodPressureDiastolic: diastolic || '',
-        heartRate: dbVitals.heart_rate_bpm || dbVitals.heart_rate || '',
-        spo2: dbVitals.spo2_percent || dbVitals.spo2 || '',
         temperature: dbVitals.temperature_f || dbVitals.temperature || '',
         respiratoryRate: dbVitals.respiratory_rate || '',
         glucose: dbVitals.glucose || '',

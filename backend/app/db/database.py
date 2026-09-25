@@ -404,16 +404,17 @@ def init_database():
     # Seed Default Users (Purged all dummy patient accounts)
     seed_users = [
         ("ADM-SYSTEM", "admin.audit", hash_password("admin123"), "Audit & Security Admin", "compliance.lead@egreenquanta.health", "admin.sec@gmail.com", "+91 98222 33445", "admin", "Q-RAKSHAK Governance Board", "SEC-DPDP-001"),
-        ("DOC-USR-KAVITA", "dr.kavita", hash_password("doctor123"), "Dr. Kavita Rao, MD", "kavita.rao@aiims.edu", "dr.kavita@gmail.com", "+91 98111 22334", "doctor", "AIIMS Cardiology OPD", "MCI-2014-89312"),
+        ("DOC-USR-KAVITA", "dr.kavita", hash_password("doctor123"), "Dr. Kavita Rao, MD", "kavita.rao@q-rakshak.health", "dr.kavita@gmail.com", "+91 98111 22334", "doctor", "Q-Rakshak Cardiology OPD", "MCI-2014-89312"),
         ("DOC-USR-RAJESH", "dr.rajesh", hash_password("doctor123"), "Dr. Rajesh Mehta, MD, DM", "rajesh.mehta@tmh.org", "dr.rajesh@gmail.com", "+91 98222 55667", "doctor", "Tata Memorial Hospital", "MCI-2009-44120"),
         ("DOC-USR-ANANYA", "dr.ananya", hash_password("doctor123"), "Dr. Ananya Sen, MD", "ananya.sen@manipal.health", "dr.ananya@gmail.com", "+91 98333 77889", "doctor", "Manipal Hospital Pulmonology", "MCI-2018-77412"),
         ("DOC-VIKRAM", "dr.vikram", hash_password("doctor123"), "Dr. Vikram Malhotra, MBBS", "vikram.malhotra@gmail.com", "", "+91 98444 88990", "doctor", "Apollo Clinics", "MCI-2023-11045"),
-        ("USR-ARYAN", "dr.aryan", hash_password("clinician123"), "Dr. Aryan Choudhury, MD", "aryan.crores@gmail.com", "aryan@q-rakshak.health", "+91 98765 43210", "doctor", "AIIMS Clinical AI OPD", "MCI-2024-99881"),
-        ("USR-5EF52B", "aryan", hash_password("patient123"), "Aryan Choudhury", "aryan.crores@gmail.com", "aryan.emergency@gmail.com", "+91 98765 43210", "patient", "AIIMS Cardiology & Oncology OPD", "PT-REC-99881"),
-        ("PT-ALEX", "alex.patient", hash_password("patient123"), "Alex Mercer", "alex.patient@egreenquanta.health", "", "+91 98765 43210", "patient", "Community Hospital", "PT-REC-ALEX"),
+        ("USR-ARYAN", "dr.aryan", hash_password("clinician123"), "Dr. Aryan Choudhury, MD", "aryan.crores@gmail.com", "aryan@q-rakshak.health", "+91 98765 43210", "doctor", "Q-Rakshak Clinical AI OPD", "MCI-2024-99881"),
+        ("USR-ALEX", "aryan", hash_password("patient123"), "Aryan Choudhury", "aryan.crores@gmail.com", "aryan.emergency@gmail.com", "+91 98765 43210", "patient", "Q-Rakshak Cardiology & Oncology OPD", "PT-REC-99881"),
+        ("USR-ALEX", "alex.patient", hash_password("patient123"), "Alex Mercer", "alex.patient@egreenquanta.health", "", "+91 98765 43210", "patient", "Community Hospital", "PT-REC-ALEX"),
         ("RES-PRIYA", "priya.qml", hash_password("quantum123"), "Dr. Priya Sharma, PhD", "priya.qml@egreenquanta.health", "", "+91 98555 66778", "researcher", "Centre for Quantum Technologies", "RES-QML-001"),
     ]
-    # Migrate legacy DOC-USR-ARYAN to USR-ARYAN
+
+    # Migrate legacy DOC-USR-ARYAN to USR-ARYAN
     cursor.execute("UPDATE users SET id = 'USR-ARYAN' WHERE id IN ('DOC-USR-ARYAN', 'DOC_USR_ARYAN');")
     cursor.execute("UPDATE doctors SET user_id = 'USR-ARYAN' WHERE user_id IN ('DOC-USR-ARYAN', 'DOC_USR_ARYAN');")
 
@@ -434,11 +435,11 @@ def init_database():
 
     # Seed Verified Doctors Directory
     seed_doctors = [
-        ("DOC-KAVITA", "DOC-USR-KAVITA", "Dr. Kavita Rao, MD", "Cardiology & Preventive Medicine", "MCI-2014-89312", "Delhi Medical Council", 14, 800.0, 4.9, json.dumps(["English", "Hindi"]), "AIIMS Cardiology OPD", json.dumps(["10:00 AM", "11:30 AM", "02:00 PM", "04:30 PM"]), "verified"),
+        ("DOC-KAVITA", "DOC-USR-KAVITA", "Dr. Kavita Rao, MD", "Cardiology & Preventive Medicine", "MCI-2014-89312", "Delhi Medical Council", 14, 800.0, 4.9, json.dumps(["English", "Hindi"]), "Q-Rakshak Cardiology OPD", json.dumps(["10:00 AM", "11:30 AM", "02:00 PM", "04:30 PM"]), "verified"),
         ("DOC-RAJESH", "DOC-USR-RAJESH", "Dr. Rajesh Mehta, MD, DM", "Medical Oncology", "MCI-2009-44120", "Maharashtra Medical Council", 16, 1000.0, 4.8, json.dumps(["English", "Hindi", "Marathi"]), "Tata Memorial Hospital", json.dumps(["09:30 AM", "11:00 AM", "03:00 PM"]), "verified"),
         ("DOC-ANANYA", "DOC-USR-ANANYA", "Dr. Ananya Sen, MD", "Pulmonary & Respiratory Medicine", "MCI-2018-77412", "Karnataka Medical Council", 9, 700.0, 4.9, json.dumps(["English", "Hindi", "Bengali"]), "Manipal Hospital Pulmonology", json.dumps(["10:30 AM", "01:00 PM", "05:00 PM"]), "verified"),
         ("DOC-VIKRAM", "DOC-VIKRAM", "Dr. Vikram Malhotra, MBBS", "Dermatology & Skin Lesions", "MCI-2023-11045", "Delhi Medical Council", 3, 500.0, 4.5, json.dumps(["English", "Hindi"]), "Apollo Clinics", json.dumps(["11:00 AM", "02:30 PM"]), "pending"),
-        ("DOC-ARYAN", "USR-ARYAN", "Dr. Aryan Choudhury, MD", "General Medicine & Clinical AI", "MCI-2024-99881", "Delhi Medical Council", 8, 800.0, 5.0, json.dumps(["English", "Hindi"]), "AIIMS Clinical AI OPD", json.dumps(["09:00 AM", "11:30 AM", "03:00 PM", "05:00 PM"]), "verified"),
+        ("DOC-ARYAN", "USR-ARYAN", "Dr. Aryan Choudhury, MD", "General Medicine & Clinical AI", "MCI-2024-99881", "Delhi Medical Council", 8, 800.0, 5.0, json.dumps(["English", "Hindi"]), "Q-Rakshak Clinical AI OPD", json.dumps(["09:00 AM", "11:30 AM", "03:00 PM", "05:00 PM"]), "verified"),
     ]
 
     for did, duid, dname, dspec, dreg, dcoun, dexp, dfee, drat, dlang, daff, dslots, dstat in seed_doctors:
@@ -447,13 +448,13 @@ def init_database():
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
         """, (did, duid, dname, dspec, dreg, dcoun, dexp, dfee, drat, dlang, daff, dslots, dstat))
 
-    # Seed Patient Record for USR-5EF52B (Aryan Choudhury)
+    # Seed Patient Record for USR-ALEX (Aryan Choudhury)
     cursor.execute("""
     INSERT OR IGNORE INTO patients (id, mrn, name, age, gender, blood_group, height_cm, weight_kg, conditions_json, baseline_vitals_json, emergency_contact, medical_history_json, allergies_json, medications_json, emergency_contacts_json)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
     """, (
-        "USR-5EF52B",
-        "MRN-5EF52B-QX",
+        "USR-ALEX",
+        "MRN-ALEX-QX",
         "Aryan Choudhury",
         28,
         "Male",
@@ -462,10 +463,9 @@ def init_database():
         74.0,
         json.dumps([]),
         json.dumps({
-            "heart_rate_bpm": 72,
-            "blood_pressure": "120/80 mmHg",
-            "spo2_percent": 99,
             "temperature_f": 98.6,
+            "respiratory_rate": 16,
+            "blood_glucose_mg_dl": 95,
         }),
         "+91 98765 43210",
         json.dumps([]),
@@ -474,20 +474,20 @@ def init_database():
         json.dumps([{"name": "Emergency Contact", "phone": "+91 98765 43210", "relation": "Family", "is_primary": True}])
     ))
 
-    # Seed Consent for USR-5EF52B
+    # Seed Consent for USR-ALEX
     cursor.execute("""
     INSERT OR IGNORE INTO consents (patient_id, dpdp_opt_in, telemetry_sharing, research_access)
     VALUES (?, 1, 1, 1);
-    """, ("USR-5EF52B",))
+    """, ("USR-ALEX",))
 
     # Seed Initial Audit Logs if empty
     res = cursor.execute("SELECT COUNT(*) as cnt FROM audit_logs;").fetchone()
     cnt = res["cnt"] if isinstance(res, dict) else res[0]
     if cnt == 0:
         seed_logs = [
-            ("AUD-1001", "2026-09-06T12:00:00Z", "Clinical System Engine", "PATIENT_RECORD_INIT", "USR-5EF52B", "127.0.0.1", "SUCCESS", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
+            ("AUD-1001", "2026-09-06T12:00:00Z", "Clinical System Engine", "PATIENT_RECORD_INIT", "USR-ALEX", "127.0.0.1", "SUCCESS", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
             ("AUD-1002", "2026-09-06T12:05:00Z", "Quantum Kernel Telemetry", "VQC_SYSTEM_CALIBRATE", "QPU-SIM-8Q", "127.0.0.1", "SUCCESS", "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb"),
-            ("AUD-1003", "2026-09-06T12:10:00Z", "Audit & Security Admin", "DPDP_CONSENT_VERIFY", "USR-5EF52B", "127.0.0.1", "SUCCESS", "3e23e8160039594a33894f6564e1b1348bbd7a0088d42c4acb73eeaed59c009d"),
+            ("AUD-1003", "2026-09-06T12:10:00Z", "Audit & Security Admin", "DPDP_CONSENT_VERIFY", "USR-ALEX", "127.0.0.1", "SUCCESS", "3e23e8160039594a33894f6564e1b1348bbd7a0088d42c4acb73eeaed59c009d"),
         ]
         for aid, ts, actor, action, rsc, ip, status, hsig in seed_logs:
             cursor.execute("""
@@ -495,14 +495,14 @@ def init_database():
             VALUES (?, ?, ?, ?, ?, ?, ?, ?);
             """, (aid, ts, actor, action, rsc, ip, status, hsig))
 
-    # Seed Initial Notifications for USR-5EF52B if empty
+    # Seed Initial Notifications for USR-ALEX if empty
     notif_check = cursor.execute("SELECT id FROM notifications LIMIT 1;").fetchone()
     if not notif_check:
         cursor.execute("""
         INSERT OR IGNORE INTO notifications (id, user_id, title, message, reference_code, category, is_read)
         VALUES
-        ('NOTIF-INIT-01', 'USR-5EF52B', 'Clinical Vault Synchronized', 'Your longitudinal medical records and quantum baseline have been initialized with DPDP compliance.', 'REF-EHR-1001', 'security', 0),
-        ('NOTIF-INIT-02', 'USR-5EF52B', 'Next Health Checkup Ready', 'Annual multi-organ quantum biomarker assessment is now available.', 'REF-CHK-2002', 'clinical', 0);
+        ('NOTIF-INIT-01', 'USR-ALEX', 'Clinical Vault Synchronized', 'Your longitudinal medical records and quantum baseline have been initialized with DPDP compliance.', 'REF-EHR-1001', 'security', 0),
+        ('NOTIF-INIT-02', 'USR-ALEX', 'Next Health Checkup Ready', 'Annual multi-organ quantum biomarker assessment is now available.', 'REF-CHK-2002', 'clinical', 0);
         """)
 
     # Auto-sync any unlinked doctor accounts to doctors directory
@@ -513,7 +513,7 @@ def init_database():
         if uid not in existing_docs:
             uname = u["name"] if isinstance(u, dict) else u[2]
             dname = uname if (uname.startswith("Dr.") or uname.startswith("Dr ")) else f"Dr. {uname}"
-            uaff = (u["hospital_affiliation"] if isinstance(u, dict) else u[3]) or "AIIMS Clinical AI OPD"
+            uaff = (u["hospital_affiliation"] if isinstance(u, dict) else u[3]) or "Q-Rakshak Clinical AI OPD"
             ulic = (u["license_number"] if isinstance(u, dict) else u[4]) or f"MCI-2026-{uuid.uuid4().hex[:5].upper()}"
             cursor.execute("""
             INSERT OR IGNORE INTO doctors (id, user_id, name, specialty, registration_number, council_name, experience_years, fee_inr, rating, languages_json, hospital_affiliation, available_slots_json, verification_status)

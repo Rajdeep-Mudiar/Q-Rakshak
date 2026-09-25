@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import time
 import uuid
@@ -22,7 +22,7 @@ class CreateUserRequest(BaseModel):
     secondary_email: str | None = ""
     emergency_phone: str | None = "+91 98765 43210"
     role: str = "patient"  # patient | admin
-    hospital_affiliation: str | None = "AIIMS New Delhi"
+    hospital_affiliation: str | None = "Q-Rakshak Health Network"
     license_number: str | None = None
 
 

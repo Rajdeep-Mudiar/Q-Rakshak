@@ -10,7 +10,7 @@ export const consultationsApi = {
     return apiClient.get(ENDPOINTS.CONSULTATIONS_DOCTOR_PROFILE(doctorId));
   },
 
-  async holdSlot(doctorId, slotTime, patientId = "USR-5EF52B") {
+  async holdSlot(doctorId, slotTime, patientId = null) {
     return apiClient.post(ENDPOINTS.CONSULTATIONS_SLOTS_HOLD, {
       doctor_id: doctorId,
       slot_time: slotTime,

@@ -26,15 +26,15 @@ def test_timeline_endpoint_empty_patient(client):
 
 
 def test_patient_isolation_forbidden_for_other_patient(client, patient_headers):
-    """Authenticated patient (alex.patient = PT-ALEX) cannot view another patient's timeline."""
+    """Authenticated patient (alex.patient = USR-ALEX) cannot view another patient's timeline."""
     res = client.get("/api/v1/clinical/timeline/PT-SOMEONE-ELSE", headers=patient_headers)
     assert res.status_code == 403
     assert "Forbidden" in res.json()["detail"]
 
 
 def test_patient_can_view_own_timeline(client, patient_headers):
-    """Authenticated patient (PT-ALEX) can view their own timeline."""
-    res = client.get("/api/v1/clinical/timeline/PT-ALEX", headers=patient_headers)
+    """Authenticated patient (USR-ALEX) can view their own timeline."""
+    res = client.get("/api/v1/clinical/timeline/USR-ALEX", headers=patient_headers)
     assert res.status_code == 200
     assert res.json()["status"] == "success"
 

@@ -4,7 +4,7 @@ import { profileApi } from "../../api/profile";
 import { animateModalOpen } from "../../utils/motion";
 import { useLanguage } from "../../context/LanguageContext";
 
-export default function ProfileSettingsModal({ isOpen, onClose, userId = "USR-5EF52B", userRole = "patient", onProfileUpdated }) {
+export default function ProfileSettingsModal({ isOpen, onClose, userId = null, userRole = "patient", onProfileUpdated }) {
   const { t } = useLanguage();
   const overlayRef = useRef(null);
   const modalRef = useRef(null);

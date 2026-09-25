@@ -82,28 +82,16 @@ export default function PatientClinicalDossier({ dossier }) {
         </div>
       </div>
 
-      {/* Baseline Vitals */}
+      {/* Clinical Metrics */}
       <div>
         <div style={{ fontSize: "0.68rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.04em", color: "var(--text-muted)", marginBottom: "6px" }}>
-          Baseline Vital Signs
+          Clinical Profile & Metrics
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
           <div style={{ background: "var(--bg-surface-alt)", padding: "8px 10px", borderRadius: "var(--radius-xs)", border: "1px solid var(--border-default)" }}>
-            <div style={{ fontSize: "0.58rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 700 }}>Blood Pressure</div>
+            <div style={{ fontSize: "0.58rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 700 }}>Blood Group</div>
             <div style={{ fontSize: "0.82rem", fontWeight: 800, color: "var(--ink-primary)", fontFamily: "var(--font-mono)" }}>
-              {vitals.blood_pressure || "120/78 mmHg"}
-            </div>
-          </div>
-          <div style={{ background: "var(--bg-surface-alt)", padding: "8px 10px", borderRadius: "var(--radius-xs)", border: "1px solid var(--border-default)" }}>
-            <div style={{ fontSize: "0.58rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 700 }}>Heart Rate</div>
-            <div style={{ fontSize: "0.82rem", fontWeight: 800, color: "var(--ink-primary)", fontFamily: "var(--font-mono)" }}>
-              {vitals.heart_rate_bpm ? `${vitals.heart_rate_bpm} BPM` : "72 BPM"}
-            </div>
-          </div>
-          <div style={{ background: "var(--bg-surface-alt)", padding: "8px 10px", borderRadius: "var(--radius-xs)", border: "1px solid var(--border-default)" }}>
-            <div style={{ fontSize: "0.58rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 700 }}>Blood Oxygen (SpO2)</div>
-            <div style={{ fontSize: "0.82rem", fontWeight: 800, color: "#059669", fontFamily: "var(--font-mono)" }}>
-              {vitals.spo2_percent ? `${vitals.spo2_percent}%` : "98%"}
+              {dossier.blood_group || "O+"}
             </div>
           </div>
           <div style={{ background: "var(--bg-surface-alt)", padding: "8px 10px", borderRadius: "var(--radius-xs)", border: "1px solid var(--border-default)" }}>

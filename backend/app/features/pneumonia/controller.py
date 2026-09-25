@@ -48,6 +48,8 @@ Image.MAX_IMAGE_PIXELS = 10_000_000
 MAX_FILE_BYTES = 10 * 1024 * 1024  # 10 MB limit
 
 
+from typing import Optional
+
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from backend.app.db.repository import DatabaseRepository
 
@@ -55,7 +57,7 @@ from backend.app.db.repository import DatabaseRepository
 @router.post("/predict")
 async def predict(
     image: UploadFile = File(...),
-    patient_id: str = Form("USR-5EF52B"),
+    patient_id: Optional[str] = Form(None),
 ):
     if not image.content_type or not image.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="Unsupported image type")

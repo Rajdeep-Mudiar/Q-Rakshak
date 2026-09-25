@@ -21,7 +21,7 @@ function AppRouter() {
       return clean || null;
     }
 
-    // 1. Hash-based triage and emergency routes (e.g. #triage/USR-5EF52B, #/triage/USR-5EF52B)
+    // 1. Hash-based triage and emergency routes (e.g. #triage/USR-ARYAN, #/emergency/USR-ALEX)
     if (hash.startsWith("#triage/") || hash.startsWith("#/triage/")) {
       const parts = hash.split("/");
       return { isEmergency: true, patientId: sanitizeId(parts[parts.length - 1]) };
@@ -31,7 +31,7 @@ function AppRouter() {
       return { isEmergency: true, patientId: sanitizeId(parts[parts.length - 1]) };
     }
 
-    // 2. Path-based triage and emergency routes (e.g. /triage/USR-5EF52B, /triage)
+    // 2. Path-based triage and emergency routes (e.g. /triage/USR-ARYAN, /emergency)
     if (path.startsWith("/triage/") || path === "/triage") {
       const parts = path.split("/").filter(Boolean);
       const pid = parts.length > 1 ? parts[parts.length - 1] : search.get("patient") || search.get("id");
@@ -43,7 +43,7 @@ function AppRouter() {
       return { isEmergency: true, patientId: sanitizeId(pid) };
     }
 
-    // 3. Query-parameter based triage routing (e.g. ?tab=triage&patient=USR-5EF52B)
+    // 3. Query-parameter based triage routing (e.g. ?tab=emergency&patient=USR-ALEX)
     const tabParam = (search.get("tab") || "").toLowerCase();
     if (tabParam === "triage" || tabParam === "emergency") {
       const pid = search.get("patient") || search.get("id") || search.get("patient_id");

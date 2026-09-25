@@ -53,16 +53,6 @@ export default function TriagePhysicalCard({
     ? ((patient.medications || patient.active_medications).length > 0 ? (patient.medications || patient.active_medications).map(m => typeof m === 'string' ? m : (m.name || 'None')).join(', ') : 'None recorded')
     : (patient.medications || patient.active_medications || 'None recorded');
 
-  const bpRaw = patient.baseline_vitals?.blood_pressure || patient.blood_pressure;
-  const hrRaw = patient.baseline_vitals?.heart_rate_bpm || patient.heart_rate;
-  const spo2Raw = patient.baseline_vitals?.spo2_percent || patient.spo2;
-
-  const hasVitalsRecorded = Boolean(bpRaw || hrRaw || spo2Raw);
-
-  const bp = bpRaw ? (String(bpRaw).includes('mmHg') ? bpRaw : `${bpRaw} mmHg`) : '—';
-  const hr = hrRaw || '—';
-  const spo2 = spo2Raw || '—';
-
   const targetTriageUrl = emergencyPortalUrl || (typeof window !== 'undefined'
     ? `${window.location.origin}/#triage/${patientId}`
     : `https://q-rakshak.vercel.app/#triage/${patientId}`);
@@ -92,7 +82,7 @@ export default function TriagePhysicalCard({
                 <div className="triage-left-content">
                   <div className="triage-role-pill">
                     <span className="triage-pulse-indicator" />
-                    <span className="triage-role-text">VERIFIED EHR</span>
+                    <span className="triage-role-text">MY MEDICAL RECORDS</span>
                   </div>
                   <div className="triage-blood-tag">
                     <span className="triage-blood-lbl">BLOOD</span>
@@ -224,31 +214,14 @@ export default function TriagePhysicalCard({
                   <div className="triage-back-val-danger">{allergiesList}</div>
                 </div>
 
-                {hasVitalsRecorded ? (
-                  <div className="triage-back-vitals-grid">
-                    <div className="triage-back-vital-item">
-                      <span className="triage-back-vital-lbl">BP</span>
-                      <strong className="triage-back-vital-val">{bp}</strong>
-                    </div>
-                    <div className="triage-back-vital-item">
-                      <span className="triage-back-vital-lbl">HR</span>
-                      <strong className="triage-back-vital-val">{hr} bpm</strong>
-                    </div>
-                    <div className="triage-back-vital-item">
-                      <span className="triage-back-vital-lbl">SpO2</span>
-                      <strong className="triage-back-vital-val">{spo2}%</strong>
-                    </div>
+                <div className="triage-back-instruction-box" style={{ margin: '4px 0', padding: '5px 8px' }}>
+                  <div style={{ fontSize: '0.48rem', fontWeight: 800, color: isDark ? '#9CA3AF' : '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    FIRST RESPONDER DIRECTIVE
                   </div>
-                ) : (
-                  <div className="triage-back-instruction-box" style={{ margin: '4px 0', padding: '5px 8px' }}>
-                    <div style={{ fontSize: '0.48rem', fontWeight: 800, color: isDark ? '#9CA3AF' : '#64748B', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                      TRIAGE DIRECTIVE
-                    </div>
-                    <div style={{ fontSize: '0.55rem', fontWeight: 600, marginTop: '2px', lineHeight: 1.25, color: isDark ? '#E2E8F0' : '#1E293B' }}>
-                      Scan front QR for live EHR telemetry & primary emergency contacts.
-                    </div>
+                  <div style={{ fontSize: '0.55rem', fontWeight: 600, marginTop: '2px', lineHeight: 1.25, color: isDark ? '#E2E8F0' : '#1E293B' }}>
+                    Scan front QR for verified digital health records & emergency contacts.
                   </div>
-                )}
+                </div>
 
                 <div className="triage-back-donor-badge">
                   <Heart size={11} color={isDark ? '#4ADE80' : '#16866A'} />

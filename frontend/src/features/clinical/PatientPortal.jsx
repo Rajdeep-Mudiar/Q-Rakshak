@@ -43,7 +43,7 @@ export default function PatientPortal({ patientId = null, currentUser = null, on
         } else if (isAdmin) {
           // Admin View: Fetch patient registry and audit trail
           const [p1, aRes] = await Promise.all([
-            clinicalApi.getPatientRecord(currentUser?.patient_id || "USR-5EF52B").catch(() => null),
+            clinicalApi.getPatientRecord(effectivePatientId).catch(() => null),
             complianceApi.getAuditLogs().catch(() => ({ logs: [] })),
           ]);
           const patientsList = [p1?.patient].filter(Boolean);
@@ -227,27 +227,9 @@ export default function PatientPortal({ patientId = null, currentUser = null, on
                   <div style={{ fontSize: "0.74rem", fontWeight: 800, fontFamily: "var(--font-mono)", color: "var(--text-muted)", textTransform: "uppercase", marginBottom: "6px" }}>
                     {t("portal.verified_baseline_telemetry", "Verified Baseline Telemetry (Text Format)")}
                   </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "8px" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "8px" }}>
                     <div style={{ background: "var(--bg-surface-alt)", padding: "8px 10px", border: "1px solid var(--border-subtle)" }}>
-                      <div style={{ fontSize: "0.62rem", color: "var(--text-secondary)", fontFamily: "var(--font-mono)" }}>{t("portal.bp_label", "BLOOD PRESSURE")}</div>
-                      <div style={{ fontSize: "0.88rem", fontWeight: 800, color: "var(--ink-primary)", fontFamily: "var(--font-mono)" }}>
-                        {b.baseline_vitals?.blood_pressure || "120/80"} <span style={{ fontSize: "0.65rem", fontWeight: 400, color: "var(--text-muted)" }}>mmHg</span>
-                      </div>
-                    </div>
-                    <div style={{ background: "var(--bg-surface-alt)", padding: "8px 10px", border: "1px solid var(--border-subtle)" }}>
-                      <div style={{ fontSize: "0.62rem", color: "var(--text-secondary)", fontFamily: "var(--font-mono)" }}>{t("portal.hr_label", "RESTING HEART RATE")}</div>
-                      <div style={{ fontSize: "0.88rem", fontWeight: 800, color: "var(--ink-primary)", fontFamily: "var(--font-mono)" }}>
-                        {b.baseline_vitals?.heart_rate_bpm || 72} <span style={{ fontSize: "0.65rem", fontWeight: 400, color: "var(--text-muted)" }}>BPM</span>
-                      </div>
-                    </div>
-                    <div style={{ background: "var(--bg-surface-alt)", padding: "8px 10px", border: "1px solid var(--border-subtle)" }}>
-                      <div style={{ fontSize: "0.62rem", color: "var(--text-secondary)", fontFamily: "var(--font-mono)" }}>{t("portal.spo2_label", "OXYGEN SATURATION")}</div>
-                      <div style={{ fontSize: "0.88rem", fontWeight: 800, color: "var(--ink-primary)", fontFamily: "var(--font-mono)" }}>
-                        {b.baseline_vitals?.spo2_percent || 98}% <span style={{ fontSize: "0.65rem", fontWeight: 400, color: "var(--text-muted)" }}>SpO₂</span>
-                      </div>
-                    </div>
-                    <div style={{ background: "var(--bg-surface-alt)", padding: "8px 10px", border: "1px solid var(--border-subtle)" }}>
-                      <div style={{ fontSize: "0.62rem", color: "var(--text-secondary)", fontFamily: "var(--font-mono)" }}>{t("portal.temp_bmi_label", "TEMPERATURE & BMI")}</div>
+                      <div style={{ fontSize: "0.62rem", color: "var(--text-secondary)", fontFamily: "var(--font-mono)" }}>{t("portal.body_temperature", "BODY TEMPERATURE")}</div>
                       <div style={{ fontSize: "0.88rem", fontWeight: 800, color: "var(--ink-primary)", fontFamily: "var(--font-mono)" }}>
                         {b.baseline_vitals?.temperature_f || 98.6}°F <span style={{ fontSize: "0.65rem", fontWeight: 400, color: "var(--text-muted)" }}>• {t("common.verified", "Verified")}</span>
                       </div>
@@ -472,24 +454,6 @@ export default function PatientPortal({ patientId = null, currentUser = null, on
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "10px" }}>
-              <div style={{ padding: "10px 12px", background: "var(--bg-canvas)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-sm)" }}>
-                <strong style={{ fontSize: "0.78rem", color: "var(--text-secondary)", display: "block" }}>{t("portal.bp_label", "Blood Pressure")}</strong>
-                <span style={{ fontSize: "1.1rem", fontWeight: 800, fontFamily: "var(--font-mono)" }}>
-                  {patient?.baseline_vitals?.blood_pressure || "120/78 mmHg"}
-                </span>
-              </div>
-              <div style={{ padding: "10px 12px", background: "var(--bg-canvas)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-sm)" }}>
-                <strong style={{ fontSize: "0.78rem", color: "var(--text-secondary)", display: "block" }}>{t("portal.hr_label", "Resting Heart Rate")}</strong>
-                <span style={{ fontSize: "1.1rem", fontWeight: 800, fontFamily: "var(--font-mono)" }}>
-                  {patient?.baseline_vitals?.heart_rate_bpm || 72} BPM
-                </span>
-              </div>
-              <div style={{ padding: "10px 12px", background: "var(--bg-canvas)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-sm)" }}>
-                <strong style={{ fontSize: "0.78rem", color: "var(--text-secondary)", display: "block" }}>{t("portal.spo2_label", "Oxygen Saturation (SpO₂)")}</strong>
-                <span style={{ fontSize: "1.1rem", fontWeight: 800, fontFamily: "var(--font-mono)" }}>
-                  {patient?.baseline_vitals?.spo2_percent || 98}%
-                </span>
-              </div>
               <div style={{ padding: "10px 12px", background: "var(--bg-canvas)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-sm)" }}>
                 <strong style={{ fontSize: "0.78rem", color: "var(--text-secondary)", display: "block" }}>{t("portal.body_temperature", "Body Temperature")}</strong>
                 <span style={{ fontSize: "1.1rem", fontWeight: 800, fontFamily: "var(--font-mono)" }}>

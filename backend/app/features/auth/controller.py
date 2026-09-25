@@ -27,7 +27,7 @@ class RegisterRequest(BaseModel):
     email: str
     role: str = "patient"  # patient | doctor | admin
     emergency_phone: str | None = "+91 98765 43210"
-    hospital_affiliation: str | None = "AIIMS Clinical AI OPD"
+    hospital_affiliation: str | None = "Q-Rakshak"
     license_number: str | None = None
     specialty: str | None = "General Medicine & Clinical AI"
     experience_years: int | None = 6
@@ -50,7 +50,7 @@ async def register(req: RegisterRequest):
         "email": req.email,
         "role": req.role,
         "emergency_phone": req.emergency_phone or "+91 98765 43210",
-        "hospital_affiliation": req.hospital_affiliation or ("AIIMS Clinical AI OPD" if req.role in ("doctor", "clinician") else "Community Hospital"),
+        "hospital_affiliation": req.hospital_affiliation or ("Q-Rakshak" if req.role in ("doctor", "clinician") else "Community Hospital"),
         "license_number": req.license_number,
         "specialty": req.specialty or "General Medicine & Clinical AI",
         "experience_years": req.experience_years or 6,

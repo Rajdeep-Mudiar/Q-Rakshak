@@ -33,7 +33,7 @@ def test_digital_twin_clean_baseline_for_new_patient():
 
 
 def test_digital_twin_demo_simulation_fallback():
-    login_res = client.post("/api/v1/auth/login", json={"username": "aryan", "password": "patient123", "role": "patient"})
+    login_res = client.post("/api/v1/auth/login", json={"username": "alex.patient", "password": "patient123", "role": "patient"})
     assert login_res.status_code == 200
     token = login_res.json()["access_token"]
     headers = {"Authorization": f"Bearer {token}"}
@@ -51,5 +51,5 @@ def test_reports_privacy_when_no_patient_id():
     res = client.get("/api/v1/reports")
     assert res.status_code == 200
     data = res.json()
-    # Unfiltered report list without patient_id must NOT return USR-5EF52B records by default
+    # Unfiltered report list without patient_id must NOT return USR-ALEX records by default
     assert data["reports"] == []

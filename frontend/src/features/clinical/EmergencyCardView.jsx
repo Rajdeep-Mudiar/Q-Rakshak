@@ -19,7 +19,7 @@ import { authApi } from '../../api/auth';
 export default function EmergencyCardView({ patientId = null }) {
   const { t } = useLanguage();
   const storedUser = authApi.getStoredUser();
-  const effectivePatientId = patientId || storedUser?.patient_id || storedUser?.user_id || storedUser?.id || 'USR-5EF52B';
+  const effectivePatientId = patientId || storedUser?.patient_id || storedUser?.user_id || storedUser?.id || '';
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -931,40 +931,28 @@ export default function EmergencyCardView({ patientId = null }) {
               </div>
             </div>
 
-            {/* Baseline Vitals & Conditions */}
+            {/* Clinical Center & Affiliation */}
             <div className="triage-sexy-card">
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid #F1F5F9', paddingBottom: '12px', marginBottom: '14px' }}>
                 <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#ECFDF5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#059669' }}>
                   <Activity size={15} />
                 </div>
                 <h3 style={{ fontSize: '0.88rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
-                  Baseline Vitals & Attending Center
+                  Clinical Center & Affiliation
                 </h3>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '14px' }}>
                 <div style={{ background: '#F8FAFC', padding: '12px', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
-                  <span style={{ fontSize: '0.68rem', color: '#64748B', fontWeight: 600, display: 'block' }}>Blood Pressure</span>
+                  <span style={{ fontSize: '0.68rem', color: '#64748B', fontWeight: 600, display: 'block' }}>Blood Group</span>
                   <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0F172A', marginTop: '2px', display: 'block' }}>
-                    {data?.baseline_vitals?.blood_pressure || '120/78 mmHg'}
-                  </span>
-                </div>
-                <div style={{ background: '#F8FAFC', padding: '12px', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
-                  <span style={{ fontSize: '0.68rem', color: '#64748B', fontWeight: 600, display: 'block' }}>Resting Heart Rate</span>
-                  <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0F172A', marginTop: '2px', display: 'block' }}>
-                    {data?.baseline_vitals?.heart_rate_bpm || 72} <span style={{ fontSize: '0.74rem', color: '#64748B' }}>BPM</span>
-                  </span>
-                </div>
-                <div style={{ background: '#F8FAFC', padding: '12px', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
-                  <span style={{ fontSize: '0.68rem', color: '#64748B', fontWeight: 600, display: 'block' }}>Blood Oxygen (SpO2)</span>
-                  <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#059669', marginTop: '2px', display: 'block' }}>
-                    {data?.baseline_vitals?.spo2_percent || 98}%
+                    {data?.blood_group || 'O+'}
                   </span>
                 </div>
                 <div style={{ background: '#F8FAFC', padding: '12px', borderRadius: '10px', border: '1px solid #E2E8F0' }}>
                   <span style={{ fontSize: '0.68rem', color: '#64748B', fontWeight: 600, display: 'block' }}>Attending Center</span>
                   <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0F172A', marginTop: '2px', display: 'block' }}>
-                    {data?.hospital || 'AIIMS Clinical AI OPD'}
+                    {data?.hospital || 'Q-Rakshak'}
                   </span>
                 </div>
               </div>
@@ -1026,7 +1014,7 @@ export default function EmergencyCardView({ patientId = null }) {
                   Permanent Scannable Triage QR
                 </h3>
                 <p style={{ fontSize: '0.74rem', color: '#64748B', margin: 0, maxWidth: '320px' }}>
-                  Scan with any smartphone camera or emergency medical scanner for live verified EHR telemetry.
+                  Scan with any smartphone camera or emergency medical scanner for live medical records telemetry.
                 </p>
               </div>
 

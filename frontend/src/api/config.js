@@ -42,10 +42,10 @@ export const ENDPOINTS = {
   CLINICAL_DIAGNOSE: `${API_BASE_URL}/clinical/diagnose`,
   CLINICAL_DIAGNOSE_IMAGE: `${API_BASE_URL}/clinical/diagnose-image`,
   CLINICAL_RECORD: `${API_BASE_URL}/clinical/record`,
-  CLINICAL_TIMELINE: (patientId = "USR-5EF52B") => `${API_BASE_URL}/clinical/timeline/${encodeURIComponent(patientId)}`,
-  CLINICAL_PATIENT: (patientId = "USR-5EF52B") => `${API_BASE_URL}/clinical/patient/${encodeURIComponent(patientId)}`,
-  CLINICAL_FEATURES: (patientId = "USR-5EF52B", disease = "breast_cancer") =>
-    `${API_BASE_URL}/clinical/patient/${encodeURIComponent(patientId)}/features/${encodeURIComponent(disease)}`,
+  CLINICAL_TIMELINE: (patientId) => `${API_BASE_URL}/clinical/timeline/${encodeURIComponent(patientId || "")}`,
+  CLINICAL_PATIENT: (patientId) => `${API_BASE_URL}/clinical/patient/${encodeURIComponent(patientId || "")}`,
+  CLINICAL_FEATURES: (patientId, disease = "breast_cancer") =>
+    `${API_BASE_URL}/clinical/patient/${encodeURIComponent(patientId || "")}/features/${encodeURIComponent(disease)}`,
   CLINICAL_STATUS: `${API_BASE_URL}/clinical/status`,
 
   // Vision & Disease Models
@@ -56,8 +56,8 @@ export const ENDPOINTS = {
   SKIN_CANCER_HEALTH: `${API_BASE_URL}/skin-cancer/health`,
 
   // Digital Twin & Early Detection
-  TWIN_STATE: (patientId = "USR-5EF52B", visitIndex = -1, view = "all") =>
-    `${API_BASE_URL}/digital-twin/state/${encodeURIComponent(patientId)}?visit_index=${visitIndex}&view=${encodeURIComponent(view)}`,
+  TWIN_STATE: (patientId, visitIndex = -1, view = "all") =>
+    `${API_BASE_URL}/digital-twin/state/${encodeURIComponent(patientId || "")}?visit_index=${visitIndex}&view=${encodeURIComponent(view)}`,
   EARLY_DETECTION_PATHWAY: (diseaseKey = "breast_cancer") =>
     `${API_BASE_URL}/early-detection/pathway/${encodeURIComponent(diseaseKey)}`,
   EARLY_DETECTION_INGEST_FHIR: `${API_BASE_URL}/early-detection/ingest-fhir`,
@@ -137,13 +137,13 @@ export const ENDPOINTS = {
   NOTIFICATIONS_SEND_ALERT: `${API_BASE_URL}/notifications/send-alert`,
 
   // Profile & Graphs
-  PROFILE: (userId = "USR-5EF52B") => `${API_BASE_URL}/profile/${encodeURIComponent(userId)}`,
+  PROFILE: (userId) => `${API_BASE_URL}/profile/${encodeURIComponent(userId || "")}`,
   GRAPHS: `${API_BASE_URL}/graphs`,
   GRAPHS_FILE: (disease, filename) => `${API_BASE_URL}/graphs/${encodeURIComponent(disease)}/${encodeURIComponent(filename)}`,
 
   // AI Doctor & Voice Consultation (Vapi)
   AI_DOCTOR_CONFIG: `${API_BASE_URL}/ai-doctor/config`,
-  AI_DOCTOR_CONTEXT: (patientId = "USR-5EF52B") => `${API_BASE_URL}/ai-doctor/context/${encodeURIComponent(patientId)}`,
+  AI_DOCTOR_CONTEXT: (patientId) => `${API_BASE_URL}/ai-doctor/context/${encodeURIComponent(patientId || "")}`,
   AI_DOCTOR_ASSISTANT_CONFIG: `${API_BASE_URL}/ai-doctor/assistant-config`,
   AI_DOCTOR_CHAT: `${API_BASE_URL}/ai-doctor/chat`,
 };

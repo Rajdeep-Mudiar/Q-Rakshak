@@ -24,10 +24,12 @@ def get_user_notifications(
     current_user: dict = Depends(get_optional_user),
 ):
     """Module L: Retrieves in-app notifications for authenticated user."""
-    username = current_user.get("username")
-    if not username or username == "guest":
-        username = "aryan"
-    notifs = DatabaseRepository.list_notifications(username, limit=limit)
+    user_id = current_user.get("id") or current_user.get("username")
+    if not user_id or user_id in ("guest", "aryan"):
+        user_id = "USR-ALEX"
+    notifs = DatabaseRepository.list_notifications(user_id, limit=limit)
+    if not notifs and current_user.get("username"):
+        notifs = DatabaseRepository.list_notifications(current_user["username"], limit=limit)
     unread_count = sum(1 for n in notifs if not n.get("is_read"))
     return {
         "status": "success",

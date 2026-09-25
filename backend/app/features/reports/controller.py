@@ -16,7 +16,7 @@ router = APIRouter(prefix="/api/v1/reports", tags=["Clinical Reports"])
 
 
 class ReportGenerationRequest(BaseModel):
-    patient_id: str = "USR-5EF52B"
+    patient_id: Optional[str] = None
     patient_name: Optional[str] = None
     user_email: Optional[str] = None
     disease: str = "Breast Oncology (WDBC)"

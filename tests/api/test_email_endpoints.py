@@ -7,7 +7,7 @@ client = TestClient(app)
 
 def test_report_generation_with_email():
     payload = {
-        "patient_id": "USR-5EF52B",
+        "patient_id": "USR-ALEX",
         "patient_name": "Aryan Choudhury",
         "user_email": "aryan.crores@gmail.com",
         "disease": "Breast Oncology (WDBC)",
@@ -20,14 +20,14 @@ def test_report_generation_with_email():
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "success"
-    assert data["patient_id"] == "USR-5EF52B"
+    assert data["patient_id"] == "USR-ALEX"
     assert "report_html" in data
     assert data["email_dispatched_to"] == "aryan.crores@gmail.com"
 
 
 def test_explicit_report_email_endpoint():
     payload = {
-        "patient_id": "USR-5EF52B",
+        "patient_id": "USR-ALEX",
         "recipient_email": "aryan.crores@gmail.com",
         "patient_name": "Aryan Choudhury",
         "disease": "Dermatology Lesion",
@@ -47,8 +47,8 @@ def test_emergency_card_email_endpoint():
     payload = {
         "recipient_email": "aryan.crores@gmail.com",
     }
-    response = client.post("/api/v1/emergency/USR-5EF52B/email-card", json=payload)
+    response = client.post("/api/v1/emergency/USR-ALEX/email-card", json=payload)
     assert response.status_code == 200
     data = response.json()
     assert data["status"] in ("success", "logged")
-    assert data["patient_id"] == "USR-5EF52B"
+    assert data["patient_id"] == "USR-ALEX"

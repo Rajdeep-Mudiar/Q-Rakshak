@@ -41,17 +41,9 @@ function TelemetryTab() {
   const patientMode       = useTwinStore((s) => s.patientMode);
 
   const v = patient.vitals || {};
-  const sys  = v.bloodPressureSystolic  ? Number(v.bloodPressureSystolic)  : null;
-  const dia  = v.bloodPressureDiastolic ? Number(v.bloodPressureDiastolic) : null;
-  const hr   = v.heartRate              ? Number(v.heartRate)              : null;
-  const spo2 = v.spo2                   ? Number(v.spo2)                   : null;
-  const temp = v.temperature            ? Number(v.temperature)            : null;
+  const temp = v.temperature ? Number(v.temperature) : null;
 
-  const hasVitals = sys !== null || hr !== null || spo2 !== null || temp !== null;
-
-  const bpElevated = sys !== null && dia !== null && (sys > 130 || dia > 85);
-  const hrElevated = hr !== null && (hr > 95 || hr < 55);
-  const spo2Low    = spo2 !== null && spo2 < 95;
+  const hasVitals = temp !== null;
 
   // Calculate BMI only if height and weight are present
   const hCm  = Number(patient.heightCm) || 0;
@@ -115,53 +107,17 @@ function TelemetryTab() {
       </div>
 
       {/* ── Heart and Breathing (only when vitals are recorded) ── */}
-      {hasVitals ? (
-        <div className="dt-card">
+      {/* Body Temperature & Clinical Biomarkers Panel */}
+      {hasVitals || hasBMI ? (
+        <div className="dt-card" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <SectionHeader icon={Activity} title="Heart & Vitals" color="var(--dt-accent-blue)" />
+            <SectionHeader icon={Activity} title="Vitals & Metrics" color="var(--dt-accent-blue)" />
             <span style={{ fontSize: '0.62rem', color: 'var(--dt-accent-blue)', fontWeight: 600 }}>
-              Live Readings
+              Verified Baseline
             </span>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-            {/* Blood Pressure */}
-            <div style={{ background: 'var(--dt-bg-surface)', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--dt-border-default)', display: 'flex', flexDirection: 'column', gap: '3px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.62rem', color: 'var(--dt-text-muted)', fontWeight: 700 }}>BLOOD PRESSURE</span>
-                {sys !== null && dia !== null && (
-                  <span style={{ fontSize: '0.56rem', fontWeight: 700, padding: '1px 5px', borderRadius: '3px', background: bpElevated ? '#fee2e2' : '#e0f2fe', color: bpElevated ? '#dc2626' : 'var(--dt-accent-blue)' }}>
-                    {bpElevated ? 'ELEVATED' : 'NORMAL'}
-                  </span>
-                )}
-              </div>
-              <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--dt-text-primary)', fontFamily: 'var(--dt-font-sans)' }}>
-                {sys !== null && dia !== null ? <>{sys} / {dia} <span style={{ fontSize: '0.64rem', color: 'var(--dt-text-muted)', fontWeight: 500 }}>mmHg</span></> : '—'}
-              </div>
-            </div>
-
-            {/* Resting Heart Rate */}
-            <div style={{ background: 'var(--dt-bg-surface)', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--dt-border-default)', display: 'flex', flexDirection: 'column', gap: '3px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.62rem', color: 'var(--dt-text-muted)', fontWeight: 700 }}>HEART RATE</span>
-                <Heart size={12} color="var(--dt-accent-blue)" />
-              </div>
-              <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--dt-text-primary)', fontFamily: 'var(--dt-font-sans)' }}>
-                {hr !== null ? <>{hr} <span style={{ fontSize: '0.64rem', color: 'var(--dt-text-muted)', fontWeight: 500 }}>BPM</span></> : '—'}
-              </div>
-            </div>
-
-            {/* SpO2 Saturation */}
-            <div style={{ background: 'var(--dt-bg-surface)', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--dt-border-default)', display: 'flex', flexDirection: 'column', gap: '3px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.62rem', color: 'var(--dt-text-muted)', fontWeight: 700 }}>OXYGEN LEVEL</span>
-                <Wind size={12} color="var(--dt-accent-blue)" />
-              </div>
-              <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--dt-text-primary)', fontFamily: 'var(--dt-font-sans)' }}>
-                {spo2 !== null ? <>{spo2}% <span style={{ fontSize: '0.64rem', color: 'var(--dt-text-muted)', fontWeight: 500 }}>SpO2</span></> : '—'}
-              </div>
-            </div>
-
             {/* Body Temperature */}
             <div style={{ background: 'var(--dt-bg-surface)', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--dt-border-default)', display: 'flex', flexDirection: 'column', gap: '3px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -170,6 +126,17 @@ function TelemetryTab() {
               </div>
               <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--dt-text-primary)', fontFamily: 'var(--dt-font-sans)' }}>
                 {temp !== null ? <>{temp}° <span style={{ fontSize: '0.64rem', color: 'var(--dt-text-muted)', fontWeight: 500 }}>F</span></> : '—'}
+              </div>
+            </div>
+
+            {/* Calculated BMI */}
+            <div style={{ background: 'var(--dt-bg-surface)', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--dt-border-default)', display: 'flex', flexDirection: 'column', gap: '3px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.62rem', color: 'var(--dt-text-muted)', fontWeight: 700 }}>BMI</span>
+                <Scale size={12} color="var(--dt-accent-blue)" />
+              </div>
+              <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--dt-text-primary)', fontFamily: 'var(--dt-font-sans)' }}>
+                {hasBMI ? <>{bmi} <span style={{ fontSize: '0.64rem', color: 'var(--dt-text-muted)', fontWeight: 500 }}>kg/m²</span></> : '—'}
               </div>
             </div>
           </div>

@@ -18,25 +18,25 @@ def test_get_ai_doctor_config():
 
 
 def test_get_patient_ai_doctor_context():
-    res = client.get("/api/v1/ai-doctor/context/USR-5EF52B")
+    res = client.get("/api/v1/ai-doctor/context/USR-ALEX")
     assert res.status_code == 200
     data = res.json()
     assert data["status"] == "success"
     assert "dossier" in data
     dossier = data["dossier"]
-    assert dossier["name"] == "Aryan Choudhury"
+    assert dossier["name"] == "Alex Mercer"
     assert "vitals" in dossier
-    assert "blood_pressure" in dossier["vitals"]
+    assert "temperature_f" in dossier["vitals"]
     assert "composite_risk_score" in dossier
     assert "recent_quantum_diagnoses" in dossier
     assert "system_prompt" in data
     assert "Dr. Quantum" in data["system_prompt"]
-    assert "Aryan Choudhury" in data["system_prompt"]
+    assert "Alex Mercer" in data["system_prompt"]
 
 
 def test_generate_vapi_assistant_config():
     payload = {
-        "patient_id": "USR-5EF52B",
+        "patient_id": "USR-ALEX",
         "assistant_name": "Dr. Quantum — SIH Clinical AI",
         "voice_provider": "11labs",
         "voice_id": "sarah",
@@ -53,12 +53,12 @@ def test_generate_vapi_assistant_config():
     assert "firstMessage" in cfg
     assert "model" in cfg
     assert cfg["model"]["messages"][0]["role"] == "system"
-    assert "Aryan Choudhury" in cfg["model"]["messages"][0]["content"]
+    assert "Alex Mercer" in cfg["model"]["messages"][0]["content"]
 
 
 def test_ai_doctor_chat_cardiology_query():
     payload = {
-        "patient_id": "USR-5EF52B",
+        "patient_id": "USR-ALEX",
         "message": "Can you explain my blood pressure and heart test results?",
         "history": [],
     }
@@ -74,7 +74,7 @@ def test_ai_doctor_chat_cardiology_query():
 
 def test_ai_doctor_chat_skin_lesion_query():
     payload = {
-        "patient_id": "USR-5EF52B",
+        "patient_id": "USR-ALEX",
         "message": "What did the skin cancer quantum scan say about my mole?",
         "history": [],
     }
@@ -87,7 +87,7 @@ def test_ai_doctor_chat_skin_lesion_query():
 
 def test_ai_doctor_chat_feeling_unwell_followup():
     payload = {
-        "patient_id": "USR-5EF52B",
+        "patient_id": "USR-ALEX",
         "patient_name": "Rajdeep",
         "message": "I think I'm not feeling well. Can you tell me what what issues do I have in my body?",
         "history": [
@@ -105,7 +105,7 @@ def test_ai_doctor_chat_feeling_unwell_followup():
 
 def test_ai_doctor_chat_exercise_followup():
     payload = {
-        "patient_id": "USR-5EF52B",
+        "patient_id": "USR-ALEX",
         "patient_name": "Rajdeep",
         "message": "You mean that I am overall fit and fine and I don't need to do any exercises?",
         "history": [
@@ -124,7 +124,7 @@ def test_ai_doctor_chat_exercise_followup():
 
 def test_ai_doctor_chat_health_score_followup():
     payload = {
-        "patient_id": "USR-5EF52B",
+        "patient_id": "USR-ALEX",
         "patient_name": "Rajdeep",
         "message": "What does my score 26.2 mean? Is it healthy or dangerous?",
         "history": [],
@@ -140,7 +140,7 @@ def test_ai_doctor_chat_health_score_followup():
 
 def test_ai_doctor_chat_overall_checkup_assessment():
     payload = {
-        "patient_id": "USR-5EF52B",
+        "patient_id": "USR-ALEX",
         "patient_name": "Rajdeep",
         "message": "Do you think that my health checkup is overall good?",
         "history": [],
@@ -158,7 +158,7 @@ def test_ai_doctor_chat_overall_checkup_assessment():
 
 def test_ai_doctor_chat_echo_filter():
     payload = {
-        "patient_id": "USR-5EF52B",
+        "patient_id": "USR-ALEX",
         "patient_name": "Rajdeep",
         "message": "I'm done quantum your AI doctor. I've taken a look at your health check UPS and everything looks good. How are you feeling today?",
         "history": [],

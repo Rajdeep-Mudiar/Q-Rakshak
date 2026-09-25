@@ -73,7 +73,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
         email: regEmail.trim(),
         role: regRole,
         emergency_phone: regPhone || "+91 98765 43210",
-        hospital_affiliation: regAffiliation || (regRole === "doctor" ? "AIIMS Clinical AI OPD" : "Community Hospital"),
+        hospital_affiliation: regAffiliation || (regRole === "doctor" ? "Q-Rakshak" : "Community Hospital"),
         license_number: defaultLicense,
         specialty: regRole === "doctor" ? (regSpecialty || "General Medicine & Clinical AI") : undefined,
         fee_inr: regRole === "doctor" ? (parseFloat(regFee) || 600.0) : undefined,
@@ -381,7 +381,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                       type="text"
                       value={regAffiliation}
                       onChange={(e) => setRegAffiliation(e.target.value)}
-                      placeholder="e.g. AIIMS Clinical AI OPD"
+                      placeholder="e.g. Q-Rakshak"
                       style={{ width: "100%", padding: "7px 8px", border: "1px solid var(--border-default)", fontSize: "0.74rem" }}
                     />
                   </div>

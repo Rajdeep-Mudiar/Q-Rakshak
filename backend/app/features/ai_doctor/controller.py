@@ -14,7 +14,7 @@ router = APIRouter(prefix="/api/v1/ai-doctor", tags=["AI Doctor 1-on-1 Voice Con
 
 
 class AssistantConfigRequest(BaseModel):
-    patient_id: str = "USR-5EF52B"
+    patient_id: str | None = None
     patient_name: Optional[str] = None
     assistant_name: str = "Dr. Quantum — AI Clinical Specialist"
     voice_provider: str = "11labs"
@@ -24,7 +24,7 @@ class AssistantConfigRequest(BaseModel):
 
 
 class ChatQueryRequest(BaseModel):
-    patient_id: str = "USR-5EF52B"
+    patient_id: str | None = None
     patient_name: Optional[str] = None
     message: str = Field(..., description="User query or question for the AI Doctor")
     history: list[dict[str, str]] = Field(default_factory=list, description="Recent conversation turns")
@@ -63,14 +63,11 @@ def build_patient_clinical_dossier(patient_id: str, override_name: Optional[str]
     and recent quantum machine learning diagnostic predictions.
     """
     clean_id = (patient_id or "").strip()
-    if not clean_id:
-        clean_id = "USR-5EF52B"
-
-    patient = DatabaseRepository.get_patient(clean_id)
+    patient = DatabaseRepository.get_patient(clean_id) if clean_id else None
 
     # Resolve real user name
     raw_name = (override_name or "").strip()
-    if not raw_name:
+    if not raw_name and clean_id:
         u = DatabaseRepository.get_user_by_id(clean_id)
         if u and (u.get("name") or u.get("username")):
             raw_name = u.get("name") or u.get("username")
@@ -78,7 +75,7 @@ def build_patient_clinical_dossier(patient_id: str, override_name: Optional[str]
             raw_name = patient.get("name")
 
     if not raw_name or raw_name.lower() in ("patient", "user"):
-        raw_name = "Aryan Choudhury" if ("5ef52b" in clean_id.lower() or "aryan" in clean_id.lower()) else "Patient"
+        raw_name = "Patient"
 
     first_name = raw_name.split()[0] if raw_name and raw_name != "Patient" else "Patient"
 
@@ -95,10 +92,9 @@ def build_patient_clinical_dossier(patient_id: str, override_name: Optional[str]
             "weight_kg": 74.0,
             "conditions": [],
             "baseline_vitals": {
-                "heart_rate_bpm": 72,
-                "blood_pressure": "120/80 mmHg",
-                "spo2_percent": 99,
                 "temperature_f": 98.6,
+                "respiratory_rate": 16,
+                "blood_glucose_mg_dl": 95,
             },
             "emergency_contact": "+91 98765 43210",
             "allergies": [],
@@ -166,9 +162,6 @@ def build_patient_clinical_dossier(patient_id: str, override_name: Optional[str]
         "height_cm": patient.get("height_cm", 182.0),
         "weight_kg": patient.get("weight_kg", 78.0),
         "vitals": {
-            "heart_rate_bpm": vitals.get("heart_rate_bpm", 72),
-            "blood_pressure": vitals.get("blood_pressure", "120/78 mmHg"),
-            "spo2_percent": vitals.get("spo2_percent", 98),
             "temperature_f": vitals.get("temperature_f", 98.6),
         },
         "chronic_conditions": _to_string_list(patient.get("conditions")),
@@ -176,7 +169,7 @@ def build_patient_clinical_dossier(patient_id: str, override_name: Optional[str]
         "medications": _to_string_list(patient.get("medications")),
         "medical_history": _to_string_list(patient.get("medical_history")),
         "attending_physician": patient.get("attending_physician", "Dr. Sarah Lin (Cardiologist)"),
-        "hospital": patient.get("hospital", "AIIMS Clinical AI OPD"),
+        "hospital": patient.get("hospital", "Q-Rakshak"),
         "composite_risk_score": twin_state.get("composite_risk_score", 23.6),
         "risk_level": twin_state.get("crs_level", "Optimal / Low Risk"),
         "organ_states": twin_state.get("organs", []),
@@ -209,12 +202,12 @@ def build_patient_clinical_dossier(patient_id: str, override_name: Optional[str]
     conds_str = ", ".join(dossier["chronic_conditions"]) if dossier["chronic_conditions"] else "None reported"
     allergies_str = ", ".join(dossier["allergies"]) if dossier["allergies"] else "None known"
     meds_str = ", ".join(dossier["medications"]) if dossier["medications"] else "None active"
-    vitals_str = (
-        f"Heart Rate: {dossier['vitals']['heart_rate_bpm']} bpm, "
-        f"BP: {dossier['vitals']['blood_pressure']}, "
-        f"SpO2: {dossier['vitals']['spo2_percent']}%, "
-        f"Temp: {dossier['vitals']['temperature_f']}°F"
-    )
+    vitals_parts = []
+    if dossier.get("vitals"):
+        for k, v in dossier["vitals"].items():
+            k_clean = k.replace("_", " ").title()
+            vitals_parts.append(f"{k_clean}: {v}")
+    vitals_str = ", ".join(vitals_parts) if vitals_parts else "Normal baseline"
 
     organ_risks_str = "; ".join([
         f"{org['name']}: {org['status'].upper()} risk ({org['risk_score']}%) — {org['top_biomarker']}"
@@ -245,7 +238,7 @@ You are having a casual 1-on-1 voice conversation with {dossier['name']}.
    - Do NOT talk about booking appointments with Dr. Sarah Lin unless {first_name} specifically asks to schedule a visit or see a doctor in person.
 5. USER CLINICAL PROFILE (FOR YOUR REFERENCE):
    - User Name: {dossier['name']} (First name: {first_name}, {dossier['age']} y/o {dossier['gender']}, Blood Group: {dossier['blood_group']})
-   - Blood Pressure: {dossier['vitals']['blood_pressure']} (Normal/Good) | Pulse: {dossier['vitals']['heart_rate_bpm']} bpm | Oxygen (SpO2): {dossier['vitals']['spo2_percent']}%
+   - Baseline Vitals: {vitals_str} (Stable)
    - Medications: {meds_str}
    - Allergies: {allergies_str} (Never recommend these!)
    - Recent Health Checkups: Heart is in great shape, skin scan showed a normal harmless mole, chest X-ray is completely clear.
@@ -483,11 +476,11 @@ def ai_doctor_chat_fallback(req: ChatQueryRequest):
         ]):
             ans = (
                 f"Yes, absolutely {first_name}! Overall, your health check-up is in very good shape. "
-                f"Your vital signs are steady with blood pressure at {vitals['blood_pressure']} and a resting pulse of {vitals['heart_rate_bpm']} bpm. "
+                f"Your vital signs are steady with normal temperature and metabolic markers. "
                 f"Your composite health risk score is {crs} out of 100, which is in the '{risk_level}' category, with clear lungs, healthy heart markers, and a normal skin check. "
                 f"Is there any specific test or organ you'd like to review?"
             )
-            key_factors = [f"Overall Assessment: Very Good / Stable", f"Health Score: {crs}/100 ({risk_level})", f"Vitals: {vitals['blood_pressure']}"]
+            key_factors = [f"Overall Assessment: Very Good / Stable", f"Health Score: {crs}/100 ({risk_level})", "Vitals: Steady Baseline"]
 
         # 3. Feeling Unwell / Symptoms / Discomfort / Body Issues / Diseases
         elif any(w in msg_lower for w in [
@@ -501,13 +494,13 @@ def ai_doctor_chat_fallback(req: ChatQueryRequest):
                     f"I'm sorry to hear your head hurts, {first_name}. Your blood pressure is steady at {vitals['blood_pressure']}, "
                     f"so this may be related to tension, eye strain, or mild dehydration. Try resting in a quiet room and drinking a glass of water. If it worsens, let's have it evaluated."
                 )
-                key_factors = ["Symptom: Headache / Tension", f"BP: {vitals['blood_pressure']} (Normal)", "Triage: Hydration & Rest"]
+                key_factors = ["Symptom: Headache / Tension", "Vitals: Steady Baseline", "Triage: Hydration & Rest"]
             elif any(w in msg_lower for w in ["dizzy", "dizziness"]):
                 ans = (
                     f"Dizziness can happen if you change positions too quickly or if you're slightly dehydrated, {first_name}. "
-                    f"Your resting pulse ({vitals['heart_rate_bpm']} bpm) and blood pressure ({vitals['blood_pressure']}) look stable. Please sit down comfortably and take slow, deep breaths."
+                    f"Your vital indicators look stable. Please sit down comfortably and take slow, deep breaths."
                 )
-                key_factors = ["Symptom: Dizziness", f"Pulse: {vitals['heart_rate_bpm']} bpm", "Action: Rest seated & Hydrate"]
+                key_factors = ["Symptom: Dizziness", "Vitals: Steady Baseline", "Action: Rest seated & Hydrate"]
             elif any(w in msg_lower for w in ["stomach", "nausea"]):
                 ans = (
                     f"For mild stomach upset or nausea, {first_name}, sipping warm water or ginger tea and having small bland meals can help. "
@@ -516,12 +509,12 @@ def ai_doctor_chat_fallback(req: ChatQueryRequest):
                 key_factors = ["Symptom: Nausea / Stomach", "Baseline: Stable", "Recommendation: Light diet & hydration"]
             else:
                 symptom_responses = [
-                    f"I'm sorry to hear you're not feeling at your best, {first_name}. Looking at your baseline files, your vital signs are stable with BP at {vitals['blood_pressure']} and oxygen at {vitals['spo2_percent']}%, and your heart and lung scans are clear. Could you tell me what specific symptoms you are experiencing, like headache, fever, or dizziness?",
+                    f"I'm sorry to hear you're not feeling at your best, {first_name}. Looking at your baseline files, your vital signs are stable, and your heart and lung scans are clear. Could you tell me what specific symptoms you are experiencing, like headache, fever, or dizziness?",
                     f"Thank you for sharing that with me, {first_name}. Your primary organ scans and tests show normal, low-risk markers, which is reassuring. To help you better, what exact issues or discomfort are you noticing in your body today?",
                     f"I understand, {first_name}. While your recent quantum scans for heart, lungs, and skin show no structural abnormalities, temporary fatigue, stress, or a mild bug could make you feel unwell. Tell me more about what you're feeling right now.",
                 ]
                 ans = symptom_responses[turn_mod % len(symptom_responses)]
-                key_factors = [f"Patient: {name}", f"Vitals: {vitals['blood_pressure']}, {vitals['heart_rate_bpm']} bpm", "Status: Triage in Progress"]
+                key_factors = [f"Patient: {name}", "Vitals: Steady Baseline", "Status: Triage in Progress"]
 
         # 4. Exercise & Fitness Doubts ("You mean I'm fit and don't need to do exercise?")
         elif any(w in msg_lower for w in [
@@ -531,7 +524,7 @@ def ai_doctor_chat_fallback(req: ChatQueryRequest):
             if any(w in msg_lower for w in ["don't need", "no need", "do i need", "should i", "fit and fine"]):
                 ans = (
                     f"Even though your scan results are healthy, {first_name}, staying physically active is still essential! "
-                    f"Doing 30 minutes of moderate exercise, like brisk walking or light cardio daily, helps maintain your blood pressure ({vitals['blood_pressure']}) and protects your heart for the long run."
+                    f"Doing 30 minutes of moderate exercise, like brisk walking or light cardio daily, helps maintain optimal vascular health and protects your heart for the long run."
                 )
                 key_factors = ["Recommendation: 30-min Daily Exercise", "Benefit: BP & Lipid Maintenance", "Routine: Walking / Light Cardio"]
             else:
@@ -556,16 +549,15 @@ def ai_doctor_chat_fallback(req: ChatQueryRequest):
         elif any(w in msg_lower for w in ["heart", "cardio", "bp", "blood pressure", "pulse", "bpm", "chest", "hypertension"]):
             if any(w in msg_lower for w in ["explain", "test", "result", "scan", "what", "how"]):
                 ans = (
-                    f"Your cardiovascular check looks very reassuring, {first_name}! Your blood pressure is steady at {vitals['blood_pressure']} "
-                    f"with a resting pulse of {vitals['heart_rate_bpm']} beats per minute. The CardioWave scan confirmed low cardiac risk. Are you feeling any chest discomfort?"
+                    f"Your cardiovascular check looks very reassuring, {first_name}! Your physiological markers are steady "
+                    f"and your CardioWave scan confirmed low cardiac risk. Are you feeling any chest discomfort?"
                 )
             else:
                 med_phrase = f"Your prescribed regimen ({meds_txt}) continues to support your cardiovascular stability." if meds else "Your baseline indicators show strong physiological cardiovascular resilience."
                 ans = (
-                    f"Your blood pressure is currently {vitals['blood_pressure']} and your resting pulse is {vitals['heart_rate_bpm']} bpm. "
-                    f"Both are in a healthy, safe range. {med_phrase}"
+                    f"Your cardiovascular indicators are in a healthy, safe range. {med_phrase}"
                 )
-            key_factors = [f"Blood Pressure: {vitals['blood_pressure']}", f"Pulse: {vitals['heart_rate_bpm']} bpm", "Cardiac Status: Healthy & Stable"]
+            key_factors = ["Cardiovascular Biomarkers: Normal", "Cardiac Status: Healthy & Stable"]
 
         # 7. Skin Scan & Mole Checks
         elif any(w in msg_lower for w in ["skin", "melanoma", "mole", "lesion", "derma", "spot", "quantumderma", "nevus"]):
@@ -621,21 +613,21 @@ def ai_doctor_chat_fallback(req: ChatQueryRequest):
             "opd timing", "specialist appointment", "appointment with", "book a visit", "see dr"
         ]):
             ans = (
-                f"Your attending physicians at AIIMS include Dr. Kavita Rao, MD (Cardiology) and Dr. Aryan Choudhury, MD. "
+                f"Your attending physicians at Q-Rakshak include Dr. Kavita Rao, MD (Cardiology) and Dr. Aryan Choudhury, MD. "
                 f"Your baseline records are up to date, but if you'd like to schedule an in-person follow-up or need a prescription review, we can arrange that for you."
             )
-            key_factors = ["Attending Physicians: Dr. Kavita Rao / Dr. Aryan Choudhury", "Location: AIIMS OPD", "Status: Appointments Available"]
+            key_factors = ["Attending Physicians: Dr. Kavita Rao / Dr. Aryan Choudhury", "Location: Q-Rakshak OPD", "Status: Appointments Available"]
 
         # 13. Clarifications / Follow-up continuations ("Why?", "Tell me more", "Explain further", "Are you sure?")
         elif any(w in msg_lower for w in ["why", "tell me more", "explain more", "are you sure", "what else", "what should i do", "elaborate"]):
-            if "heart" in last_assistant_msg or "blood pressure" in last_assistant_msg:
+            if "heart" in last_assistant_msg:
                 ans = (
-                    f"To elaborate on your heart health, {first_name}, your blood pressure at {vitals['blood_pressure']} is within the ideal target. "
+                    f"To elaborate on your heart health, {first_name}, your cardiac biomarkers remain in the optimal range. "
                     f"Maintaining balanced nutrition and active hydration helps keep arterial walls smooth and prevents plaque buildup."
                 )
             elif "exercise" in last_assistant_msg:
                 ans = (
-                    f"When you do moderate cardio, {first_name}, your heart muscle becomes more efficient at pumping blood, which naturally keeps your resting pulse ({vitals['heart_rate_bpm']} bpm) low and healthy."
+                    f"When you do moderate cardio, {first_name}, your heart muscle becomes more efficient at pumping oxygenated blood throughout your body."
                 )
             elif "skin" in last_assistant_msg or "mole" in last_assistant_msg:
                 ans = (
@@ -643,7 +635,7 @@ def ai_doctor_chat_fallback(req: ChatQueryRequest):
                 )
             else:
                 ans = (
-                    f"I'm happy to explain further, {first_name}. Your health profile shows strong stability across vitals (BP {vitals['blood_pressure']}, SpO2 {vitals['spo2_percent']}%) and diagnostic imaging. Maintaining your daily routine and balanced diet will keep you feeling your best."
+                    f"I'm happy to explain further, {first_name}. Your health profile shows strong stability across your biometric indicators and diagnostic imaging. Maintaining your daily routine and balanced diet will keep you feeling your best."
                 )
             key_factors = [f"Patient: {name}", "Consultation: In-Depth Follow-up", "Status: Clarified"]
 
@@ -670,7 +662,7 @@ def ai_doctor_chat_fallback(req: ChatQueryRequest):
         # 16. General Conversational Adaptive Responder
         else:
             conversational_pool = [
-                f"I've noted that, {first_name}. Based on your records, your vitals are steady with BP at {vitals['blood_pressure']} and pulse at {vitals['heart_rate_bpm']} bpm. What specific health question or symptom can I clarify for you?",
+                f"I've noted that, {first_name}. Based on your records, your vital indicators are steady. What specific health question or symptom can I clarify for you?",
                 f"That's a good point, {first_name}. Your latest quantum diagnostics and lab reports are all in a safe, healthy range. Is there an aspect of your medications, diet, or scan results you'd like to dive into?",
                 f"Understood, {first_name}. Your overall wellness score is {crs}/100 and your heart and lungs look strong. Feel free to ask about any symptoms, daily exercise, or upcoming check-ups!",
             ]

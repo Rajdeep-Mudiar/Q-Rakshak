@@ -248,7 +248,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
         password: regPassword,
         role: selectedRole,
         emergency_phone: regPhone || "+91 98765 43210",
-        hospital_affiliation: selectedRole === "doctor" ? "AIIMS Clinical AI OPD" : "Community Healthcare",
+        hospital_affiliation: selectedRole === "doctor" ? "Q-Rakshak" : "Community Healthcare",
         license_number: defaultLicense,
         specialty: selectedRole === "doctor" ? "General Medicine & Clinical AI" : undefined,
       });

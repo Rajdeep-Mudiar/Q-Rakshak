@@ -297,10 +297,11 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
   }
 
   const effectiveRole = currentUser?.role || profile.role || "patient";
+  const effectiveUserId = profile.user_id || profile.id || activeUserId || "";
   const emergencyPortalUrl = typeof window !== "undefined"
-    ? `${window.location.origin}/#triage/${profile.user_id || activeUserId || "USR-5EF52B"}`
-    : `${EMERGENCY_PORTAL_BASE}/${profile.user_id || activeUserId || "USR-5EF52B"}`;
-  const emergencyQrUrl = ENDPOINTS.EMERGENCY_QR_PNG(profile.user_id || activeUserId);
+    ? `${window.location.origin}/#triage/${effectiveUserId}`
+    : `${EMERGENCY_PORTAL_BASE}/${effectiveUserId}`;
+  const emergencyQrUrl = ENDPOINTS.EMERGENCY_QR_PNG(effectiveUserId);
 
   return (
     <>
@@ -1581,10 +1582,12 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                   type="button"
                   className="btn-primary"
                   onClick={() => {
-                    const pid = profile?.id || profile?.user_id || "USR-5EF52B";
-                    apiClient.post(`/api/v1/emergency/${pid}/email-card`, {
-                      recipient_email: profile?.email || "aryan.crores@gmail.com",
-                    }).catch(() => {});
+                    const pid = profile?.id || profile?.user_id || activeUserId;
+                    if (pid && profile?.email) {
+                      apiClient.post(`/api/v1/emergency/${pid}/email-card`, {
+                        recipient_email: profile.email,
+                      }).catch(() => {});
+                    }
                     window.print();
                   }}
                   style={{ fontSize: "0.76rem", display: "flex", alignItems: "center", gap: "6px" }}

@@ -2,15 +2,18 @@ import apiClient from "./client";
 import { ENDPOINTS } from "./config";
 
 export const profileApi = {
-  async getProfile(userId = "USR-5EF52B") {
+  async getProfile(userId) {
+    if (!userId) return null;
     return apiClient.get(ENDPOINTS.PROFILE(userId));
   },
 
-  async updateProfile(userId = "USR-5EF52B", profileData = {}) {
+  async updateProfile(userId, profileData = {}) {
+    if (!userId) return null;
     return apiClient.put(ENDPOINTS.PROFILE(userId), profileData);
   },
 
-  async deleteProfile(userId = "USR-5EF52B") {
+  async deleteProfile(userId) {
+    if (!userId) return null;
     return apiClient.delete(ENDPOINTS.PROFILE(userId));
   },
 };
