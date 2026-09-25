@@ -338,6 +338,54 @@ export function getLocalizedFeatureIntroById(id, t) {
     base.id === "profile" ? "profile_security" :
     base.id;
 
+  const localizedBenefits = t(`feature_intro.${translationKey}.benefits`);
+  const localizedHowItWorks = t(`feature_intro.${translationKey}.howItWorks`);
+
+  const mergedBenefits = (base.benefits || []).map((b, idx) => {
+    const locB = Array.isArray(localizedBenefits) ? localizedBenefits[idx] : null;
+    return {
+      ...b,
+      title: locB?.title || b.title,
+      desc: locB?.desc || b.desc,
+    };
+  });
+
+  const mergedHowItWorks = (base.howItWorks || []).map((h, idx) => {
+    const locH = Array.isArray(localizedHowItWorks) ? localizedHowItWorks[idx] : null;
+    return {
+      ...h,
+      title: locH?.title || h.title,
+      desc: locH?.desc || h.desc,
+    };
+  });
+
+  // Localized stats
+  const localizedStats = {};
+  if (base.stats) {
+    Object.entries(base.stats).forEach(([k, st]) => {
+      let locLabel = st.label;
+      let locValue = st.value;
+      if (st.label === "Verified Specialists") locLabel = t("feature_intro.stats.verified_specialists", st.label);
+      else if (st.label === "Avg Connection Time") {
+        locLabel = t("feature_intro.stats.avg_connection_time", st.label);
+        locValue = t("feature_intro.stats.mins_unit", st.value);
+      } else if (st.label === "Security Standard") locLabel = t("feature_intro.stats.security_standard", st.label);
+      else if (st.label === "Patient Satisfaction") locLabel = t("feature_intro.stats.patient_satisfaction", st.label);
+      else if (st.label === "Availability") {
+        locLabel = t("feature_intro.stats.availability", st.label);
+        locValue = t("feature_intro.stats.all_day", st.value);
+      } else if (st.label === "Response Latency") {
+        locLabel = t("feature_intro.stats.response_latency", st.label);
+        locValue = t("feature_intro.stats.ms_unit", st.value);
+      } else if (st.label === "Diagnostic Accord") locLabel = t("feature_intro.stats.diagnostic_accord", st.label);
+      else if (st.label === "Languages") {
+        locLabel = t("feature_intro.stats.languages", st.label);
+        locValue = t("feature_intro.stats.supported_count", st.value);
+      }
+      localizedStats[k] = { label: locLabel, value: locValue };
+    });
+  }
+
   return {
     ...base,
     title: t(`features.${translationKey}.title`, t(`features.${base.id}.title`, base.title)),
@@ -351,5 +399,8 @@ export function getLocalizedFeatureIntroById(id, t) {
       summary: t(`features.${translationKey}.summary`, t(`features.${base.id}.summary`, base.overview?.summary)),
       clinicalStandards: t(`features.${translationKey}.clinicalStandards`, t(`features.${base.id}.clinicalStandards`, base.overview?.clinicalStandards)),
     },
+    benefits: mergedBenefits,
+    howItWorks: mergedHowItWorks,
+    stats: Object.keys(localizedStats).length > 0 ? localizedStats : base.stats,
   };
 }

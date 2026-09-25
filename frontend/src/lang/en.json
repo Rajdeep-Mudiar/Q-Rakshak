@@ -937,7 +937,233 @@
   },
   "early_detection": {
     "no_analysis_title": "No Clinical Analysis Performed Yet",
-    "no_analysis_desc": "Personal longitudinal early detection curves and risk trajectories are only generated after completing a verified diagnostic screening. Run an instant checkup to establish your baseline."
+    "no_analysis_desc": "Personal longitudinal early detection curves and risk trajectories are only generated after completing a verified diagnostic screening. Run an instant checkup to establish your baseline.",
+    "page_title": "Early Prevention & Sub-Clinical Pathway Map",
+    "page_subtitle": "Multi-stage disease progression monitoring with preventative intervention windows.",
+    "pathway_badge": "Early Detection Pathway",
+    "personalized_assessment": "Personalized Assessment",
+    "population_model": "Reference Population Model",
+    "select_trajectory": "Select Disease Trajectory:",
+    "timeline_title_suffix": "— Early Detection Timeline",
+    "lead_time_window": "Early Detection Window",
+    "pre_clinical_lead_time": "Pre-clinical lead time",
+    "pre_clinical_lead": "Pre-clinical lead",
+    "stage_0_impact": "Stage 0 Impact",
+    "sensitivity_gain": "Quantum Sensitivity Gain",
+    "vs_standard": "vs Standard Screening",
+    "vs_classical": "vs Classical Screen",
+    "target_disease_organ": "Target Disease & Organ System",
+    "progression_trajectory_title": "Multi-Stage Progression Trajectory & Cellular Biomarkers",
+    "progression_trajectory_subtitle": "Asymptomatic Stage 0 to Stage II Clinical Intervention",
+    "cellular_biomarker": "Cellular Biomarker:",
+    "clinical_presentation": "Clinical Presentation:",
+    "detection_method": "Detection Method:",
+    "recommended_protocol": "Recommended Protocol:",
+    "preventative_strategy_title": "Research-Backed Clinical Interventions & Preventative Strategy",
+    "complete_badge": "Complete",
+    "risk_label": "{{risk}}% Risk",
+    "protocols": {
+      "breast_cancer": "Breast Oncology",
+      "cardiovascular": "Heart & Cardio Plaque",
+      "diabetes": "Diabetes & Metabolism",
+      "pneumonia": "Pulmonary Infection (Pneu)",
+      "skin": "Skin Spot & Melanoma",
+      "parkinsons": "Parkinson's Voice & Motor"
+    }
+  },
+  "feature_intro": {
+    "platform_modules": "Platform Modules",
+    "explore_module": "Explore Module:",
+    "verified_medical_interface": "Verified Medical Interface",
+    "core_capabilities_title": "Core Capabilities & Clinical Advantage",
+    "how_it_works_title": "How This Module Works (Step-by-Step)",
+    "clinical_rigor_title": "Clinical Rigor & Zero-Trust Privacy Compliance",
+    "ready_to_proceed": "READY TO PROCEED",
+    "launch_title": "Launch {{title}}",
+    "launch_desc": "Enter the active working environment with all verified privacy protections active.",
+    "launch_now": "Launch Module Now",
+    "stats": {
+      "verified_specialists": "Verified Specialists",
+      "avg_connection_time": "Avg Connection Time",
+      "security_standard": "Security Standard",
+      "patient_satisfaction": "Patient Satisfaction",
+      "availability": "Availability",
+      "response_latency": "Response Latency",
+      "diagnostic_accord": "Diagnostic Accord",
+      "languages": "Languages",
+      "supported_count": "14 Supported",
+      "mins_unit": "< 5 Mins",
+      "ms_unit": "< 250 ms",
+      "all_day": "24/7/365"
+    },
+    "doctor_consultation": {
+      "benefits": [
+        {
+          "title": "Immediate Specialist Access",
+          "desc": "Bypass months-long hospital queues. Connect with leading sub-specialists in minutes from anywhere in the world."
+        },
+        {
+          "title": "Integrated Diagnostic Sharing",
+          "desc": "One-click sharing of your quantum AI health scans, biomarker timelines, and organ vitality metrics directly into the doctor's clinical console."
+        },
+        {
+          "title": "Tamper-Proof e-Prescriptions",
+          "desc": "Receive digitally certified prescriptions recognized by pharmacies nationwide, complete with dosage instructions and diagnostic notes."
+        },
+        {
+          "title": "Virtual Consultation Room",
+          "desc": "Includes interactive screen-sharing, collaborative medical scan annotation, and direct clinical note taking in real time."
+        }
+      ],
+      "howItWorks": [
+        {
+          "step": "01",
+          "title": "Select Clinical Specialty",
+          "desc": "Filter doctors by specialty (Oncology, Cardiology, Pulmonology, Dermatology, Neurology), hospital affiliation, and consultation fees."
+        },
+        {
+          "step": "02",
+          "title": "Reserve Consultation Slot",
+          "desc": "Choose an immediate emergency consult or schedule an upcoming appointment. Attach your latest Q-Rakshak diagnostic report."
+        },
+        {
+          "step": "03",
+          "title": "Attend Virtual Session",
+          "desc": "Join the encrypted video room. Speak face-to-face with your physician while reviewing your 3D digital twin and lab records."
+        },
+        {
+          "step": "04",
+          "title": "Receive Verified Rx & Plan",
+          "desc": "Download your cryptographically sealed prescription and personalized lifestyle, medication, or follow-up imaging regimen."
+        }
+      ]
+    },
+    "ai_doctor": {
+      "benefits": [
+        {
+          "title": "Natural Voice & Text Dialogue",
+          "desc": "Converse freely in your native language. Speak your symptoms naturally or upload photos of rashes and lesions for instant visual triage."
+        },
+        {
+          "title": "Quantum Risk Synthesis",
+          "desc": "Unlike standard chatbots, the AI Doctor cross-references your active quantum model outputs (e.g. OncoPulse-VQC or CardioWave) for hyper-personalized advice."
+        },
+        {
+          "title": "Red-Flag Emergency Detection",
+          "desc": "Immediately isolates acute life-threatening indicators (e.g. crushing chest pain, anaphylaxis, stroke signs) and directs emergency protocols."
+        },
+        {
+          "title": "Zero Wait Time",
+          "desc": "Get answers to health concerns at 2 AM or during weekend travel without waiting for clinic opening hours."
+        }
+      ],
+      "howItWorks": [
+        {
+          "step": "01",
+          "title": "Describe Symptoms Naturally",
+          "desc": "Speak through your microphone or type your concerns. Share symptom onset, severity, and any associated pain or discomfort."
+        },
+        {
+          "step": "02",
+          "title": "Multimodal Analysis",
+          "desc": "Upload medical photos or past test values. The AI processes visual indicators and clinical parameters simultaneously."
+        },
+        {
+          "step": "03",
+          "title": "Differential Reasoning",
+          "desc": "The system generates probabilistic clinical considerations, cross-referenced with your historical health metrics and quantum scores."
+        },
+        {
+          "step": "04",
+          "title": "Actionable Next Steps",
+          "desc": "Receive plain-English lifestyle recommendations, OTC guidance, or direct routing to book a board-certified specialist."
+        }
+      ]
+    },
+    "digital_twin": {
+      "benefits": [
+        {
+          "title": "Real-Time 3D Organ Simulation",
+          "desc": "Explore high-fidelity 3D meshes of your heart, lungs, liver, skin, and vascular beds responding dynamically to clinical biomarkers."
+        },
+        {
+          "title": "Longitudinal Health Morphing",
+          "desc": "Simulate forward organ health projections based on current risk factors versus quantum-guided clinical interventions."
+        },
+        {
+          "title": "Multi-System Cross-Talk",
+          "desc": "Understand how metabolic, cardiovascular, and pulmonary markers interact systematically across your physiology."
+        },
+        {
+          "title": "Interactive Anatomical Slicing",
+          "desc": "Rotate, zoom, and cross-section specific organ chambers with sub-millimeter visual precision."
+        }
+      ],
+      "howItWorks": [
+        {
+          "step": "01",
+          "title": "Biomarker Telemetry Feed",
+          "desc": "Lab values, imaging metrics, and quantum classifier results are ingested into the 3D twin engine."
+        },
+        {
+          "step": "02",
+          "title": "Mesh & Volumetric Mapping",
+          "desc": "Physiological parameters dynamically alter anatomical textures, pulse rates, and organ inflammation heatmaps."
+        },
+        {
+          "step": "03",
+          "title": "Interactive Exploration",
+          "desc": "Navigate 3D organ structures, inspect localized anomalies, and review risk distribution tiers."
+        },
+        {
+          "step": "04",
+          "title": "Clinical Export & Annotation",
+          "desc": "Capture anatomical snapshots with cryptographic audit logs for medical consults and electronic health records."
+        }
+      ]
+    },
+    "profile_security": {
+      "benefits": [
+        {
+          "title": "ABHA Identity Integration",
+          "desc": "Seamlessly link and synchronize your official Ayushman Bharat Health Account across certified healthcare facilities."
+        },
+        {
+          "title": "Zero-Knowledge Encryption",
+          "desc": "Patient health telemetry is encrypted end-to-end with AES-256 and stored with zero unencrypted vendor access."
+        },
+        {
+          "title": "Tamper-Evident Audit Trails",
+          "desc": "Every diagnostic checkup, doctor consultation, and prescription export generates an immutable cryptographic SHA-256 log."
+        },
+        {
+          "title": "Complete Consent Governance",
+          "desc": "Grant, restrict, or revoke practitioner access to specific health records at any time with granular permission toggles."
+        }
+      ],
+      "howItWorks": [
+        {
+          "step": "01",
+          "title": "Authenticate ABHA Identity",
+          "desc": "Verify via OTP or biometric authentication to establish a cryptographically bound health identity."
+        },
+        {
+          "step": "02",
+          "title": "Consolidate Health Records",
+          "desc": "Aggregate past consultations, quantum diagnostic scans, and lab reports into a unified secure vault."
+        },
+        {
+          "step": "03",
+          "title": "Manage Data Sharing Consent",
+          "desc": "Control which clinicians and diagnostic centers can access your electronic health records (EHR)."
+        },
+        {
+          "step": "04",
+          "title": "Audit Security & Access Logs",
+          "desc": "Inspect real-time cryptographic access timestamps and verified practitioner credentials."
+        }
+      ]
+    }
   },
   "pharma": {
     "sa_md_badge": "Clinical Pharmacology & Safety SaMD",

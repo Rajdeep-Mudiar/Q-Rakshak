@@ -253,7 +253,7 @@ export default function DiseaseEarlyDetectionTimeline({
                   borderRadius: "4px",
                 }}
               >
-                Personalized Assessment
+                {t("early_detection.personalized_assessment", "Personalized Assessment")}
               </span>
             ) : (
               <span
@@ -269,7 +269,7 @@ export default function DiseaseEarlyDetectionTimeline({
                   borderRadius: "4px",
                 }}
               >
-                Reference Population Model
+                {t("early_detection.population_model", "Reference Population Model")}
               </span>
             )}
             <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 500 }}>

@@ -2167,10 +2167,10 @@ export default function UnifiedAnalysisPage() {
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--bg-surface)", border: "1px solid var(--border-default)", padding: "10px 14px" }}>
                 <div>
                   <h3 style={{ fontSize: "0.95rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em", margin: 0 }}>
-                    Early Prevention & Sub-Clinical Pathway Map
+                    {t("early_detection.page_title", "Early Prevention & Sub-Clinical Pathway Map")}
                   </h3>
                   <p style={{ fontSize: "0.72rem", color: "var(--text-secondary)", margin: 0 }}>
-                    Multi-stage disease progression monitoring with preventative intervention windows.
+                    {t("early_detection.page_subtitle", "Multi-stage disease progression monitoring with preventative intervention windows.")}
                   </p>
                 </div>
                 <button
