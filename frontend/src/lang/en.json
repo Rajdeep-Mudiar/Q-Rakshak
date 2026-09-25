@@ -581,7 +581,18 @@
     "tamper_proof_audit_desc": "End-to-end cryptographic logging with clinical protocol verification.",
     "verified_security": "Verified Security",
     "encrypted_data": "Encrypted Data",
-    "fast_triage": "Fast Triage"
+    "fast_triage": "Fast Triage",
+    "select_role": "User Role / Persona",
+    "role_patient": "Patient",
+    "role_doctor": "Doctor",
+    "role_admin": "Admin",
+    "role_patient_desc": "Health & 3D Twin",
+    "role_doctor_desc": "Clinical OPD & Rx",
+    "role_admin_desc": "Governance & Audit",
+    "select_language": "Language",
+    "subtitle_signin": "Enter your identifier and password to continue.",
+    "subtitle_register": "Register a new clinical account to get started.",
+    "account_type_label": "Account Type"
   },
   "portal": {
     "clinical_practice": "CLINICAL PRACTICE",

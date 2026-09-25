@@ -14,7 +14,11 @@ import {
   ExternalLink,
   Eye,
   EyeOff,
-  UserPlus
+  UserPlus,
+  Globe,
+  Languages,
+  Shield,
+  Stethoscope
 } from "lucide-react";
 import { animateErrorShake } from "../../utils/motion.js";
 import ModelEvaluationShowcase from "./components/ModelEvaluationShowcase.jsx";
@@ -26,11 +30,12 @@ if (typeof window !== "undefined") {
 }
 
 export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySuccess, onLoginSuccess, loading, error }) {
-  const { t } = useLanguage();
+  const { language, setLanguage, availableLanguages, t } = useLanguage();
   const [showGuideModal, setShowGuideModal] = useState(false);
   const [gisLoading, setGisLoading] = useState(false);
   const [localError, setLocalError] = useState(null);
   const [authMode, setAuthMode] = useState("login"); // 'login' | 'register'
+  const [selectedRole, setSelectedRole] = useState("patient"); // 'patient' | 'doctor' | 'admin'
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -43,6 +48,24 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
   const [regPassword, setRegPassword] = useState("");
   const [regPhone, setRegPhone] = useState("");
   const [regRole, setRegRole] = useState("patient"); // for new account registration only
+
+  function handleRoleSelect(role) {
+    setSelectedRole(role);
+    setRegRole(role);
+    setLocalError(null);
+    if (authMode === "login") {
+      if (role === "patient") {
+        setUsername("alex.patient");
+        setPassword("patient123");
+      } else if (role === "doctor") {
+        setUsername("dr.aryan");
+        setPassword("clinician123");
+      } else if (role === "admin") {
+        setUsername("admin");
+        setPassword("admin123");
+      }
+    }
+  }
 
   const modalContainerRef = useRef(null);
   const narrativeRef = useRef(null);
@@ -610,28 +633,74 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
             boxSizing: "border-box",
           }}
         >
-          {/* Header & Clean Clinical Branding */}
-          <div style={{ marginBottom: "22px", textAlign: "left" }}>
-            <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "3px 9px",
-                borderRadius: "5px",
-                background: "#ECFDF5",
-                border: "1px solid #A7F3D0",
-                color: "#059669",
-                fontSize: "0.72rem",
-                fontWeight: 700,
-                letterSpacing: "0.06em",
-                textTransform: "uppercase",
-                marginBottom: "12px",
-              }}
-            >
-              <Activity size={13} />
-              <span>Q-Rakshak Platform</span>
+          {/* Header & Clean Clinical Branding + Language Selector */}
+          <div style={{ marginBottom: "18px", textAlign: "left" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", flexWrap: "wrap", gap: "8px" }}>
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "3px 9px",
+                  borderRadius: "5px",
+                  background: "#ECFDF5",
+                  border: "1px solid #A7F3D0",
+                  color: "#059669",
+                  fontSize: "0.72rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                }}
+              >
+                <Activity size={13} />
+                <span>Q-Rakshak Platform</span>
+              </div>
+
+              {/* Language Switcher Option */}
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "3px",
+                  background: "#F8FAFC",
+                  border: "1px solid #E2E8F0",
+                  padding: "2px 4px",
+                  borderRadius: "7px",
+                }}
+              >
+                <Languages size={13} color="#64748B" style={{ marginLeft: "3px", marginRight: "2px" }} />
+                {(availableLanguages || [
+                  { code: "en", label: "English", nativeName: "English" },
+                  { code: "hi", label: "Hindi", nativeName: "हिंदी" },
+                  { code: "as", label: "Assamese", nativeName: "অসমীয়া" },
+                ]).map((lang) => {
+                  const isActive = language === lang.code;
+                  return (
+                    <button
+                      key={lang.code}
+                      type="button"
+                      onClick={() => setLanguage(lang.code)}
+                      title={lang.label}
+                      style={{
+                        padding: "3px 7px",
+                        fontSize: "0.70rem",
+                        fontWeight: isActive ? 700 : 500,
+                        borderRadius: "5px",
+                        border: "none",
+                        background: isActive ? "#059669" : "transparent",
+                        color: isActive ? "#FFFFFF" : "#64748B",
+                        boxShadow: isActive ? "0 1px 3px rgba(5,150,105,0.25)" : "none",
+                        cursor: "pointer",
+                        transition: "all 0.15s ease",
+                      }}
+                    >
+                      {lang.nativeName || lang.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
+
             <h2
               style={{
                 fontFamily: "var(--font-sans, inherit)",
@@ -642,12 +711,12 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                 margin: "0 0 6px 0",
               }}
             >
-              {authMode === "register" ? "Create Account" : "Sign In"}
+              {authMode === "register" ? t("login.create_account", "Create Account") : t("login.sign_in", "Sign In")}
             </h2>
             <p style={{ fontSize: "0.86rem", color: "#64748B", margin: 0, lineHeight: 1.45 }}>
               {authMode === "register"
-                ? "Register a new clinical account to get started."
-                : "Enter your identifier and password to continue."}
+                ? t("login.subtitle_register", "Register a new clinical account to get started.")
+                : t("login.subtitle_signin", "Enter your identifier and password to continue.")}
             </p>
           </div>
 
@@ -659,7 +728,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
               padding: "3px",
               borderRadius: "8px",
               width: "100%",
-              marginBottom: "18px",
+              marginBottom: "14px",
             }}
           >
             <button
@@ -679,7 +748,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                 transition: "all 0.2s ease",
               }}
             >
-              Sign In
+              {t("login.sign_in", "Sign In")}
             </button>
             <button
               type="button"
@@ -698,8 +767,78 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                 transition: "all 0.2s ease",
               }}
             >
-              Register New Account
+              {t("login.create_account", "Register New Account")}
             </button>
+          </div>
+
+          {/* User Role Option Selector (Patient, Doctor, Admin) */}
+          <div style={{ marginBottom: "16px", textAlign: "left" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+              <label
+                style={{
+                  fontSize: "0.70rem",
+                  fontWeight: 700,
+                  color: "#475569",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.04em",
+                }}
+              >
+                {t("login.select_role", "Select Persona / Role")}
+              </label>
+              <span style={{ fontSize: "0.68rem", color: "#059669", fontWeight: 600 }}>
+                {selectedRole === "patient"
+                  ? "Patient Portal"
+                  : selectedRole === "doctor"
+                  ? "Clinical OPD"
+                  : "Governance"}
+              </span>
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr 1fr",
+                gap: "6px",
+              }}
+            >
+              {[
+                { id: "patient", label: t("login.role_patient", "Patient"), icon: User, desc: t("login.role_patient_desc", "Health & 3D Twin") },
+                { id: "doctor", label: t("login.role_doctor", "Doctor"), icon: Stethoscope, desc: t("login.role_doctor_desc", "Clinical OPD & Rx") },
+                { id: "admin", label: t("login.role_admin", "Admin"), icon: Shield, desc: t("login.role_admin_desc", "Governance & Audit") },
+              ].map((roleItem) => {
+                const isSelected = selectedRole === roleItem.id;
+                const Icon = roleItem.icon;
+                return (
+                  <button
+                    key={roleItem.id}
+                    type="button"
+                    onClick={() => handleRoleSelect(roleItem.id)}
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "8px 4px",
+                      borderRadius: "8px",
+                      border: isSelected ? "1.5px solid #059669" : "1px solid #E2E8F0",
+                      background: isSelected ? "#F0FDF4" : "#F8FAFC",
+                      color: isSelected ? "#065F46" : "#475569",
+                      cursor: "pointer",
+                      transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+                      boxShadow: isSelected ? "0 2px 8px rgba(5, 150, 105, 0.12)" : "none",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                      <Icon size={14} color={isSelected ? "#059669" : "#64748B"} />
+                      <span style={{ fontSize: "0.78rem", fontWeight: 700 }}>{roleItem.label}</span>
+                    </div>
+                    <span style={{ fontSize: "0.64rem", color: isSelected ? "#047857" : "#94A3B8", marginTop: "2px" }}>
+                      {roleItem.desc}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Credentials Form */}

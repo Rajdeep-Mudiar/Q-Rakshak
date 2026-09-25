@@ -581,7 +581,18 @@
     "tamper_proof_audit_desc": "क्लिनिकल प्रोटोकॉल सत्यापन के साथ एंड-टू-एंड क्रिप्टोग्राफिक लॉगिंग।",
     "verified_security": "सत्यापित सुरक्षा",
     "encrypted_data": "एन्क्रिप्टेड डेटा",
-    "fast_triage": "त्वरित ट्राइएज"
+    "fast_triage": "त्वरित ट्राइएज",
+    "select_role": "उपयोगकर्ता भूमिका / प्रोफ़ाइल",
+    "role_patient": "रोगी (Patient)",
+    "role_doctor": "चिकित्सक (Doctor)",
+    "role_admin": "व्यवस्थापक (Admin)",
+    "role_patient_desc": "स्वास्थ्य और 3D ट्विन",
+    "role_doctor_desc": "क्लिनिकल ओपीडी और Rx",
+    "role_admin_desc": "शासन और ऑडिट",
+    "select_language": "भाषा",
+    "subtitle_signin": "जारी रखने के लिए अपना पहचानकर्ता और पासवर्ड दर्ज करें।",
+    "subtitle_register": "शुरू करने के लिए एक नया क्लिनिकल खाता पंजीकृत करें।",
+    "account_type_label": "खाता प्रकार"
   },
   "portal": {
     "clinical_practice": "क्लिनिकल अभ्यास",

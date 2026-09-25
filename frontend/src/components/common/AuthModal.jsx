@@ -1,14 +1,15 @@
 import { useState, useEffect, useRef } from "react";
-import { Lock, User, Shield, X, CheckCircle2, Eye, EyeOff, KeyRound, LogIn, Sparkles, UserPlus, Stethoscope } from "lucide-react";
+import { Lock, User, Shield, X, CheckCircle2, Eye, EyeOff, KeyRound, LogIn, Sparkles, UserPlus, Stethoscope, Languages } from "lucide-react";
 import { authApi } from "../../api/auth";
 import { animateModalOpen } from "../../utils/motion";
 import { useLanguage } from "../../context/LanguageContext";
 
 export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
-  const { t } = useLanguage();
+  const { language, setLanguage, availableLanguages, t } = useLanguage();
   const overlayRef = useRef(null);
   const modalRef = useRef(null);
   const [authMode, setAuthMode] = useState("login"); // 'login' | 'register'
+  const [selectedRole, setSelectedRole] = useState("patient"); // 'patient' | 'doctor' | 'admin'
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -26,6 +27,24 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
   const [regSpecialty, setRegSpecialty] = useState("General Medicine & Clinical AI");
   const [regFee, setRegFee] = useState("600");
   const [regExp, setRegExp] = useState("6");
+
+  function handleRoleSelect(role) {
+    setSelectedRole(role);
+    setRegRole(role);
+    setError(null);
+    if (authMode === "login") {
+      if (role === "patient") {
+        setUsername("alex.patient");
+        setPassword("patient123");
+      } else if (role === "doctor") {
+        setUsername("dr.aryan");
+        setPassword("clinician123");
+      } else if (role === "admin") {
+        setUsername("admin");
+        setPassword("admin123");
+      }
+    }
+  }
 
   useEffect(() => {
     if (isOpen) {
@@ -116,22 +135,55 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                 CLINICAL ACCESS
               </div>
               <h2 id="auth-modal-title" style={{ fontSize: "1.15rem", fontWeight: 700, color: "var(--text-primary)", margin: "2px 0 0 0", letterSpacing: "-0.01em" }}>
-                Sign In or Register Account
+                {authMode === "register" ? t("login.create_account", "Register Account") : t("login.sign_in", "Sign In")}
               </h2>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            style={{ background: "transparent", border: 0, cursor: "pointer", color: "var(--text-muted)", padding: "4px" }}
-            title="Close"
-          >
-            <X size={20} />
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            {/* Language Switcher */}
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "2px", background: "var(--bg-surface-alt)", padding: "2px 4px", borderRadius: "6px" }}>
+              <Languages size={13} color="var(--text-muted)" style={{ marginRight: "2px" }} />
+              {(availableLanguages || [
+                { code: "en", label: "English", nativeName: "EN" },
+                { code: "hi", label: "Hindi", nativeName: "हिं" },
+                { code: "as", label: "Assamese", nativeName: "অ" },
+              ]).map((lang) => {
+                const isActive = language === lang.code;
+                return (
+                  <button
+                    key={lang.code}
+                    type="button"
+                    onClick={() => setLanguage(lang.code)}
+                    style={{
+                      padding: "2px 6px",
+                      fontSize: "0.68rem",
+                      fontWeight: isActive ? 700 : 500,
+                      borderRadius: "4px",
+                      border: "none",
+                      background: isActive ? "var(--primary)" : "transparent",
+                      color: isActive ? "#FFFFFF" : "var(--text-secondary)",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {lang.nativeName || lang.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            <button
+              type="button"
+              onClick={onClose}
+              style={{ background: "transparent", border: 0, cursor: "pointer", color: "var(--text-muted)", padding: "4px" }}
+              title="Close"
+            >
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         {/* Mode Switcher Tabs */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px", marginBottom: "16px", background: "var(--bg-surface-alt)", padding: "4px", borderRadius: "9px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px", marginBottom: "12px", background: "var(--bg-surface-alt)", padding: "4px", borderRadius: "9px" }}>
           <button
             type="button"
             onClick={() => setAuthMode("login")}
@@ -148,7 +200,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
               transition: "all 0.16s ease",
             }}
           >
-            Sign In
+            {t("login.sign_in", "Sign In")}
           </button>
 
           <button
@@ -171,8 +223,47 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
               gap: "6px",
             }}
           >
-            <Sparkles size={12} /> Register
+            <Sparkles size={12} /> {t("login.create_account", "Register")}
           </button>
+        </div>
+
+        {/* Role Switcher Option (Patient, Doctor, Admin) */}
+        <div style={{ marginBottom: "14px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "6px" }}>
+            {[
+              { id: "patient", label: t("login.role_patient", "Patient"), icon: User, desc: "Health" },
+              { id: "doctor", label: t("login.role_doctor", "Doctor"), icon: Stethoscope, desc: "OPD" },
+              { id: "admin", label: t("login.role_admin", "Admin"), icon: Shield, desc: "Admin" },
+            ].map((roleItem) => {
+              const isSelected = selectedRole === roleItem.id;
+              const Icon = roleItem.icon;
+              return (
+                <button
+                  key={roleItem.id}
+                  type="button"
+                  onClick={() => handleRoleSelect(roleItem.id)}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "6px",
+                    padding: "7px 4px",
+                    borderRadius: "7px",
+                    border: isSelected ? "1.5px solid var(--primary)" : "1px solid var(--border-default)",
+                    background: isSelected ? "var(--primary-subtle, #F0FDF4)" : "var(--bg-surface-alt)",
+                    color: isSelected ? "var(--primary)" : "var(--text-secondary)",
+                    cursor: "pointer",
+                    fontSize: "0.75rem",
+                    fontWeight: 700,
+                    transition: "all 0.15s ease",
+                  }}
+                >
+                  <Icon size={13} />
+                  <span>{roleItem.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* MODE: Sign In Form */}

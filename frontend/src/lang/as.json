@@ -581,7 +581,18 @@
     "tamper_proof_audit_desc": "ক্লিনিকেল নীতি পৰীক্ষাৰ সৈতে ক্ৰিপ্টোগ্ৰাফিক সুৰক্ষা ব্যৱস্থা।",
     "verified_security": "প্ৰমাণিত নিৰাপত্তা",
     "encrypted_data": "এনক্ৰিপ্ট কৰা তথ্য",
-    "fast_triage": "দ্ৰুত ট্রায়েজর ব্যবস্থা"
+    "fast_triage": "দ্ৰুত ট্রায়েজর ব্যবস্থা",
+    "select_role": "ব্যৱহাৰকাৰী ভূমিকা / প্ৰফাইল",
+    "role_patient": "ৰোগী (Patient)",
+    "role_doctor": "চিকিৎসক (Doctor)",
+    "role_admin": "প্ৰশাসক (Admin)",
+    "role_patient_desc": "স্বাস্থ্য আৰু ৩ডি টুইন",
+    "role_doctor_desc": "ক্লিনিকেল অ'পিডি আৰু Rx",
+    "role_admin_desc": "প্ৰশাসন আৰু অডিট",
+    "select_language": "ভাষা",
+    "subtitle_signin": "অগ্ৰসৰ হ'বলৈ আপোনাৰ পৰিচয়ক আৰু পাছৱৰ্ড দিয়ক।",
+    "subtitle_register": "আৰম্ভ কৰিবলৈ এটা নতুন ক্লিনিকেল একাউণ্ট পঞ্জীয়ন কৰক।",
+    "account_type_label": "একাউণ্টৰ প্ৰকাৰ"
   },
   "portal": {
     "clinical_practice": "ক্লিনিকেল সেৱা",
