@@ -364,25 +364,35 @@ class DatabaseRepository:
                 u_dict = dict(u_row)
                 row = conn.execute("SELECT * FROM patients WHERE id = ? OR mrn = ? OR LOWER(name) = LOWER(?);", (u_dict["id"], u_dict.get("license_number"), u_dict.get("name"))).fetchone()
                 if not row:
-                    conn.close()
-                    # Construct valid emergency patient record from user metadata
-                    return {
-                        "id": u_dict["id"],
-                        "mrn": f"MRN-{u_dict['id']}-QX",
-                        "name": u_dict.get("name") or u_dict.get("username") or "Registered Patient",
-                        "age": u_dict.get("age", 28),
-                        "gender": u_dict.get("gender", "Unspecified"),
-                        "blood_group": u_dict.get("blood_group", "O+"),
-                        "emergency_contact": u_dict.get("emergency_contact") or "+91 98765 43210",
-                        "emergency_contacts": [{"name": u_dict.get("emergency_contact_name") or "Emergency Contact", "phone": u_dict.get("emergency_contact") or "+91 98765 43210", "relation": u_dict.get("emergency_contact_relation") or "Primary Next of Kin", "is_primary": True}],
-                        "allergies": [{"allergen": "Penicillin", "severity": "HIGH", "reaction": "Anaphylaxis"}] if u_dict.get("allergies") else [],
-                        "medications": [],
-                        "conditions": ["Active Quantum Health Monitoring"],
-                        "baseline_vitals": {"heart_rate_bpm": 72, "blood_pressure": "120/80 mmHg", "spo2_percent": 98, "temperature_f": 98.6},
-                        "organ_donor": True,
-                        "abha_id": u_dict.get("abha_id") or "91-1029-4821-3910",
-                        "address": "National Health Network",
-                    }
+                    new_pid = u_dict["id"]
+                    new_mrn = f"MRN-{new_pid}-QX"
+                    try:
+                        conn.execute("""
+                            INSERT INTO patients (id, mrn, name, age, gender, blood_group, height_cm, weight_kg, conditions_json, baseline_vitals_json, organ_donor, abha_id, emergency_contact, emergency_contacts_json, allergies_json, medications_json, medical_history_json, created_at, updated_at)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'));
+                        """, (
+                            new_pid,
+                            new_mrn,
+                            u_dict.get("name") or "Patient",
+                            int(u_dict.get("age", 28)),
+                            u_dict.get("gender") or "Unspecified",
+                            u_dict.get("blood_group") or "O+",
+                            float(u_dict.get("height_cm", 175.0)),
+                            float(u_dict.get("weight_kg", 70.0)),
+                            json.dumps(["Active Health Monitoring"]),
+                            json.dumps({"heart_rate_bpm": 72, "blood_pressure": "120/80 mmHg", "spo2_percent": 98, "temperature_f": 98.6}),
+                            1,
+                            u_dict.get("abha_id") or f"91-{new_pid.replace('USR-', '')}-4821",
+                            u_dict.get("phone") or "+91 98765 43210",
+                            json.dumps([{"name": "Emergency Contact", "relation": "Next of Kin", "phone": u_dict.get("phone") or "+91 98765 43210", "is_primary": True}]),
+                            json.dumps([]),
+                            json.dumps([]),
+                            json.dumps([]),
+                        ))
+                        conn.commit()
+                        row = conn.execute("SELECT * FROM patients WHERE id = ?;", (new_pid,)).fetchone()
+                    except Exception:
+                        pass
         conn.close()
         if not row:
             return None

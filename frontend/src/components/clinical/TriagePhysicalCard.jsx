@@ -26,31 +26,29 @@ export default function TriagePhysicalCard({
   const isDark = variant === 'dark';
   const isBack = face === 'back';
 
-  // Format Patient Values
-  const name = patient.name || 'Patient';
+  // Format Dynamic Patient Values from user data
+  const resolvedPatientId = patient.user_id || patient.patient_id || patient.id || (patient.mrn ? String(patient.mrn).replace(/^MRN-/, '').replace(/-QX$/, '') : '') || '';
+  const name = patient.name || patient.full_name || patient.username || (resolvedPatientId ? `Patient ${resolvedPatientId}` : 'Patient');
   const firstName = name.split(' ')[0] || 'Patient';
   const lastName = name.split(' ').slice(1).join(' ') || '';
-  const bloodGroup = patient.blood_group || '—';
-  const patientNameSlug = (patient.name || patient.username || 'PATIENT')
-    .replace(/^Dr\.?\s+/i, '')
-    .trim()
-    .toUpperCase()
-    .replace(/\s+/g, '_')
-    .replace(/[^A-Z0-9_]/g, '');
-  const cleanCardPatientId = `USR-${patientNameSlug}`;
-  const patientId = cleanCardPatientId;
-  const hospital = patient.hospital || 'Clinical Healthcare System';
-  const mrn = patient.mrn || patient.license_id || `MRN-${patientId}-QX`;
+  const bloodGroup = patient.blood_group || patient.bloodGroup || 'O+';
+
+  const patientId = resolvedPatientId || (name && name !== 'Patient'
+    ? `USR-${name.replace(/^Dr\.?\s+/i, '').trim().toUpperCase().replace(/\s+/g, '_').replace(/[^A-Z0-9_]/g, '')}`
+    : 'USR-PATIENT');
+
+  const hospital = patient.hospital || patient.attending_center || patient.attendingCenter || patient.facility || 'Q-Rakshak Clinical AI';
+  const mrn = patient.mrn || patient.license_id || (patientId ? `MRN-${patientId}-QX` : 'MRN-USR-PATIENT-QX');
 
   const primaryContact = patient.emergency_contacts?.find(c => c.is_primary) || patient.emergency_contacts?.[0] || {
-    name: patient.emergency_contact_name || '—',
+    name: patient.emergency_contact_name || patient.emergency_contact || '—',
     relation: patient.emergency_contact_relation || 'Next of Kin',
-    phone: patient.emergency_phone || '—'
+    phone: patient.emergency_phone || patient.phone || '—'
   };
-  const phoneFormatted = primaryContact.phone || patient.phone || '—';
-  const emailFormatted = patient.email || (patient.name ? `${firstName.toLowerCase()}.${lastName ? lastName.toLowerCase() : 'pt'}@qrakshak.org` : '—');
+  const phoneFormatted = primaryContact.phone || patient.emergency_phone || patient.phone || '—';
+  const emailFormatted = patient.primary_email || patient.email || (patient.name ? `${firstName.toLowerCase()}.${lastName ? lastName.toLowerCase() : 'pt'}@qrakshak.org` : '—');
   const locationFormatted = String(hospital).split(',')[0] || 'Emergency OPD';
-  const abhaId = patient.abha_id || patient.abhaId || patient.username || '91-1029-4821-3910';
+  const abhaId = patient.abha_id || patient.abhaId || (patient.username ? `ABHA-${patient.username.toUpperCase()}` : (patientId ? `91-${patientId.replace(/[^A-Z0-9]/gi, '')}-3910` : '91-1029-4821-3910'));
 
   // Clinical Details
   const allergiesList = Array.isArray(patient.allergies)
