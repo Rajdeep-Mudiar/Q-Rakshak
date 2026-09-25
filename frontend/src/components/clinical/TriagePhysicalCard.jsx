@@ -48,7 +48,8 @@ export default function TriagePhysicalCard({
   };
   const phoneFormatted = primaryContact.phone || patient.phone || '—';
   const emailFormatted = patient.email || (patient.name ? `${firstName.toLowerCase()}.${lastName ? lastName.toLowerCase() : 'pt'}@qrakshak.org` : '—');
-  const locationFormatted = hospital.split(',')[0] || 'Emergency OPD';
+  const locationFormatted = String(hospital).split(',')[0] || 'Emergency OPD';
+  const abhaId = patient.abha_id || patient.abhaId || patient.username || '91-1029-4821-3910';
 
   // Clinical Details
   const allergiesList = Array.isArray(patient.allergies)

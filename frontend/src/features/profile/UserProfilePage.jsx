@@ -173,30 +173,32 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
     setLoading(true);
     setError(null);
     try {
-      const res = await profileApi.getProfile(activeUserId);
-      if (res.profile) {
-        setProfile((prev) => ({
-          ...prev,
-          ...res.profile,
-          user_id: res.profile.user_id || activeUserId,
-          username: currentUser?.username || prev.username,
-        }));
-      }
-      if (!isDoctor) {
-        const clinical = await clinicalApi.getPatientRecord(activeUserId);
-        if (clinical.patient) {
-          const patient = clinical.patient;
-          setMedicalHistory(Array.isArray(patient.medical_history) ? patient.medical_history.map((item, index) => typeof item === "string" ? { id: `history-${index}`, condition: item, notes: "" } : item) : []);
-          setMedications(Array.isArray(patient.medications) ? patient.medications : []);
-          setEmergencyContacts(Array.isArray(patient.emergency_contacts) ? patient.emergency_contacts.map((item, index) => ({ id: `contact-${index}`, ...item })) : []);
+      if (activeUserId) {
+        const res = await profileApi.getProfile(activeUserId);
+        if (res?.profile) {
           setProfile((prev) => ({
             ...prev,
-            ...patient,
-            allergies: formatAllergies(patient.allergies || prev.allergies),
-            active_medications: formatMedications(patient.medications || patient.active_medications || prev.active_medications),
-            medical_history: formatMedicalHistory(patient.medical_history || prev.medical_history),
-            user_id: patient.id || prev.user_id
+            ...res.profile,
+            user_id: res.profile.user_id || activeUserId,
+            username: currentUser?.username || prev.username,
           }));
+        }
+        if (!isDoctor) {
+          const clinical = await clinicalApi.getPatientRecord(activeUserId);
+          if (clinical?.patient) {
+            const patient = clinical.patient;
+            setMedicalHistory(Array.isArray(patient.medical_history) ? patient.medical_history.map((item, index) => typeof item === "string" ? { id: `history-${index}`, condition: item, notes: "" } : item) : []);
+            setMedications(Array.isArray(patient.medications) ? patient.medications : []);
+            setEmergencyContacts(Array.isArray(patient.emergency_contacts) ? patient.emergency_contacts.map((item, index) => ({ id: `contact-${index}`, ...item })) : []);
+            setProfile((prev) => ({
+              ...prev,
+              ...patient,
+              allergies: formatAllergies(patient.allergies || prev.allergies),
+              active_medications: formatMedications(patient.medications || patient.active_medications || prev.active_medications),
+              medical_history: formatMedicalHistory(patient.medical_history || prev.medical_history),
+              user_id: patient.id || prev.user_id
+            }));
+          }
         }
       }
     } catch (err) {

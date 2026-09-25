@@ -2275,17 +2275,19 @@ export default function UnifiedAnalysisPage() {
           {/* ── VIEW 10: DEDICATED USER PROFILE & SECURITY PAGE ──────────── */}
           {activeTab === "profile" && (
             <div style={{ height: "100%", overflowY: "auto" }}>
-              <UserProfilePage
-                currentUser={currentUser}
-                openCard={profileCardRequested}
-                onCardOpened={() => setProfileCardRequested(false)}
-                onProfileUpdated={(updated) => setCurrentUser((prev) => ({ ...prev, ...updated }))}
-                onProfileDeleted={() => {
-                  authApi.logout();
-                  setCurrentUser(null);
-                  setError("Your profile and account have been permanently deleted from the database.");
-                }}
-              />
+              <ErrorBoundary title="User Profile Notice" message="The user profile encountered an interruption. Click Try Again to reload.">
+                <UserProfilePage
+                  currentUser={currentUser}
+                  openCard={profileCardRequested}
+                  onCardOpened={() => setProfileCardRequested(false)}
+                  onProfileUpdated={(updated) => setCurrentUser((prev) => ({ ...prev, ...updated }))}
+                  onProfileDeleted={() => {
+                    authApi.logout();
+                    setCurrentUser(null);
+                    setError("Your profile and account have been permanently deleted from the database.");
+                  }}
+                />
+              </ErrorBoundary>
             </div>
           )}
 
