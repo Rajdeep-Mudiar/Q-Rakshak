@@ -1604,37 +1604,47 @@ export default function UnifiedAnalysisPage() {
           {/* ── VIEW 0: EDITORIAL HOME & PROJECT OVERVIEW ─────────────────── */}
           {activeTab === "home" && (
             <div style={{ height: "100%", overflowY: "auto", padding: "12px 6px" }}>
-              <EditorialHomePage
-                currentUser={currentUser}
-                allowedTabs={roleConfig.allowedTabs}
-                onNavigate={(tab) => {
-                  if (roleConfig.allowedTabs.includes(tab)) setActiveTab(tab);
-                }}
-                onSelectDisease={(diseaseKey) => {
-                  setIntroDisease(diseaseKey);
-                  setActiveTab("disease_intro");
-                }}
-                onNavigateFeature={(featureKey) => {
-                  const resolved = getFeatureIntroById(featureKey);
-                  const targetId = resolved?.id || featureKey;
-                  setIntroFeature(targetId);
-                  navigateToTab("feature_intro", { featureParam: targetId });
-                }}
-              />
+              <ErrorBoundary
+                title="Care Overview Notice"
+                message="We encountered a temporary display issue loading the dashboard overview. Click Try Again to reload."
+              >
+                <EditorialHomePage
+                  currentUser={currentUser}
+                  allowedTabs={roleConfig.allowedTabs}
+                  onNavigate={(tab) => {
+                    if (roleConfig.allowedTabs.includes(tab)) setActiveTab(tab);
+                  }}
+                  onSelectDisease={(diseaseKey) => {
+                    setIntroDisease(diseaseKey);
+                    setActiveTab("disease_intro");
+                  }}
+                  onNavigateFeature={(featureKey) => {
+                    const resolved = getFeatureIntroById(featureKey);
+                    const targetId = resolved?.id || featureKey;
+                    setIntroFeature(targetId);
+                    navigateToTab("feature_intro", { featureParam: targetId });
+                  }}
+                />
+              </ErrorBoundary>
             </div>
           )}
 
           {/* ── VIEW 0.5: AESTHETIC DISEASE INTRO PAGE ─────────────────────── */}
           {activeTab === "disease_intro" && (
             <div style={{ height: "100%", overflowY: "auto" }}>
-              <DiseaseIntroPage
-                diseaseId={introDisease}
-                onStartAnalysis={(studyKey) => {
-                  setStudy(studyKey);
-                  setActiveTab("diagnostic");
-                }}
-                onSelectOtherDisease={(id) => setIntroDisease(id)}
-              />
+              <ErrorBoundary
+                title="Disease Protocol Overview Notice"
+                message="We encountered a temporary display issue loading this disease protocol. Click Try Again to reload."
+              >
+                <DiseaseIntroPage
+                  diseaseId={introDisease}
+                  onStartAnalysis={(studyKey) => {
+                    setStudy(studyKey);
+                    setActiveTab("diagnostic");
+                  }}
+                  onSelectOtherDisease={(id) => setIntroDisease(id)}
+                />
+              </ErrorBoundary>
             </div>
           )}
 

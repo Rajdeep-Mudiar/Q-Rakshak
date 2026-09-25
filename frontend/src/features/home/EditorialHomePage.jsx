@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { DISEASE_LIST, getLocalizedDiseaseById } from "../../data/diseaseRegistry.js";
+import { animateEntrance } from "../../utils/motion.js";
 
 /* ── Scientific Benchmark Ablation Matrix ──────────────────────────────────── */
 const SCIENTIFIC_ABLATIONS = [
