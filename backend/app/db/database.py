@@ -157,7 +157,7 @@ def init_database():
     if not is_postgres:
         cursor.execute("PRAGMA journal_mode = WAL;")
         cursor.execute("PRAGMA synchronous = NORMAL;")
-        cursor.execute("PRAGMA foreign_keys = ON;")
+        cursor.execute("PRAGMA foreign_keys = OFF;")
 
     # Users Table
     cursor.execute("""
@@ -409,14 +409,17 @@ def init_database():
         ("DOC-USR-ANANYA", "dr.ananya", hash_password("doctor123"), "Dr. Ananya Sen, MD", "ananya.sen@manipal.health", "dr.ananya@gmail.com", "+91 98333 77889", "doctor", "Manipal Hospital Pulmonology", "MCI-2018-77412"),
         ("DOC-VIKRAM", "dr.vikram", hash_password("doctor123"), "Dr. Vikram Malhotra, MBBS", "vikram.malhotra@gmail.com", "", "+91 98444 88990", "doctor", "Apollo Clinics", "MCI-2023-11045"),
         ("USR-ARYAN", "dr.aryan", hash_password("clinician123"), "Dr. Aryan Choudhury, MD", "aryan.crores@gmail.com", "aryan@q-rakshak.health", "+91 98765 43210", "doctor", "Q-Rakshak Clinical AI OPD", "MCI-2024-99881"),
-        ("USR-ALEX", "aryan", hash_password("patient123"), "Aryan Choudhury", "aryan.crores@gmail.com", "aryan.emergency@gmail.com", "+91 98765 43210", "patient", "Q-Rakshak Cardiology & Oncology OPD", "PT-REC-99881"),
         ("USR-ALEX", "alex.patient", hash_password("patient123"), "Alex Mercer", "alex.patient@egreenquanta.health", "", "+91 98765 43210", "patient", "Community Hospital", "PT-REC-ALEX"),
         ("RES-PRIYA", "priya.qml", hash_password("quantum123"), "Dr. Priya Sharma, PhD", "priya.qml@egreenquanta.health", "", "+91 98555 66778", "researcher", "Centre for Quantum Technologies", "RES-QML-001"),
     ]
 
     # Migrate legacy DOC-USR-ARYAN to USR-ARYAN
-    cursor.execute("UPDATE users SET id = 'USR-ARYAN' WHERE id IN ('DOC-USR-ARYAN', 'DOC_USR_ARYAN');")
-    cursor.execute("UPDATE doctors SET user_id = 'USR-ARYAN' WHERE user_id IN ('DOC-USR-ARYAN', 'DOC_USR_ARYAN');")
+    try:
+        cursor.execute("UPDATE doctors SET user_id = 'USR-ARYAN' WHERE user_id IN ('DOC-USR-ARYAN', 'DOC_USR_ARYAN');")
+        cursor.execute("UPDATE users SET id = 'USR-ARYAN' WHERE id IN ('DOC-USR-ARYAN', 'DOC_USR_ARYAN');")
+        cursor.execute("UPDATE users SET id = 'USR-ALEX' WHERE id = 'PT-ALEX';")
+    except Exception:
+        pass
 
     for uid, uname, pwd_hash, name, email, sec_email, em_phone, role, aff, lic in seed_users:
         existing_user = cursor.execute("SELECT id FROM users WHERE LOWER(username) = LOWER(?) OR id = ?;", (uname, uid)).fetchone()
@@ -534,6 +537,11 @@ def init_database():
                 "verified"
             ))
 
+    if not is_postgres:
+        try:
+            cursor.execute("PRAGMA foreign_keys = ON;")
+        except Exception:
+            pass
     conn.commit()
     conn.close()
     logger.info(f"Database initialized successfully (Engine: {'PostgreSQL' if is_postgres else 'SQLite'})")
