@@ -14,6 +14,7 @@ import PrintableMedicalCardSheet from '../../components/clinical/PrintableMedica
 import { animateCard3DFlip } from '../../utils/motion.js';
 import { useLanguage } from '../../context/LanguageContext';
 import { useShakeDetection } from '../../utils/useShake.js';
+import ShakeFeatureGuide from '../../components/clinical/ShakeFeatureGuide';
 import { getEmergencyPortalUrl } from '../../api/config';
 
 import { authApi } from '../../api/auth';
@@ -841,6 +842,14 @@ export default function EmergencyCardView({ patientId = null }) {
             )}
           </div>
         </div>
+
+        {/* 2.5 Shake-to-Call Motion Sensor Interactive Intro Guide (with Vector SVG) */}
+        <ShakeFeatureGuide
+          onTriggerShake={triggerShake}
+          onRequestPermission={requestMotionPermission}
+          permissionState={permissionState}
+          isSupported={isShakeSupported}
+        />
 
         {/* 3. Clinical Direct Intelligence 2-Column Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px', alignItems: 'start' }}>

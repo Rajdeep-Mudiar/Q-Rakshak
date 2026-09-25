@@ -29,6 +29,7 @@ import { ENDPOINTS, EMERGENCY_PORTAL_BASE, getEmergencyPortalUrl } from "../../a
 import QRCodeSVG from "../../components/common/QRCodeSVG";
 import TriagePhysicalCard from "../../components/clinical/TriagePhysicalCard";
 import PrintableMedicalCardSheet from "../../components/clinical/PrintableMedicalCardSheet";
+import ShakeFeatureGuide from "../../components/clinical/ShakeFeatureGuide";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 
 function formatAllergies(allergies) {
@@ -1875,6 +1876,15 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                   </div>
                 )}
               </div>
+            </div>
+
+            {/* Shake Feature Intro Guide in Profile Modal */}
+            <div style={{ margin: "14px 0" }}>
+              <ShakeFeatureGuide
+                onTriggerShake={() => {
+                  window.open(emergencyPortalUrl, "_blank");
+                }}
+              />
             </div>
 
             {/* ── Modal Footer Action Toolbar ── */}
