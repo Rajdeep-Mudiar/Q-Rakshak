@@ -13,6 +13,7 @@ import TriagePhysicalCard from '../../components/clinical/TriagePhysicalCard';
 import PrintableMedicalCardSheet from '../../components/clinical/PrintableMedicalCardSheet';
 import { animateCard3DFlip } from '../../utils/motion.js';
 import { useLanguage } from '../../context/LanguageContext';
+import { useShakeDetection } from '../../utils/useShake.js';
 
 import { authApi } from '../../api/auth';
 
@@ -32,6 +33,11 @@ export default function EmergencyCardView({ patientId = null }) {
   const [emailSent, setEmailSent] = useState(false);
 
   const card3DInnerRef = useRef(null);
+
+  // High-reliability mobile Shake-to-Call hook
+  const { isSupported: isShakeSupported, permissionState, requestMotionPermission, triggerShake } = useShakeDetection(() => {
+    setShakeTriggered(true);
+  }, { threshold: 12, timeout: 1500 });
 
   async function handleEmailCard() {
     try {
@@ -63,120 +69,17 @@ export default function EmergencyCardView({ patientId = null }) {
       setError(null);
       try {
         const res = await apiClient.get(`/api/v1/emergency/${effectivePatientId}`);
-        if (res) {
-          setData(res);
-        } else {
-          throw new Error('Empty response');
-        }
+        setData(res);
       } catch (err) {
-        console.warn('Failed to load emergency profile, using local patient vault:', err);
-        setData({
-          id: effectivePatientId,
-          patient_id: effectivePatientId,
-          mrn: `MRN-${effectivePatientId}-QX`,
-          name: storedUser?.name || 'Registered Patient',
-          age: storedUser?.age || 28,
-          gender: storedUser?.gender || 'Unspecified',
-          blood_group: storedUser?.blood_group || 'O+',
-          emergency_contacts: [
-            {
-              name: storedUser?.emergency_contact_name || 'Emergency Next of Kin',
-              phone: storedUser?.emergency_phone || storedUser?.emergency_contact || '+91 98765 43210',
-              relation: storedUser?.emergency_contact_relation || 'Primary Contact',
-              is_primary: true,
-            }
-          ],
-          allergies: [],
-          medications: [],
-          conditions: ['Active Health Monitoring'],
-          baseline_vitals: { heart_rate_bpm: 72, blood_pressure: '120/80 mmHg', spo2_percent: 98, temperature_f: 98.6 },
-          organ_donor: true,
-          abha_id: storedUser?.abha_id || '91-1029-4821-3910',
-        });
+        console.error('Failed to load emergency profile:', err);
+        setError(err.message || 'Unable to retrieve emergency record from clinical vault.');
+        setData(null);
       } finally {
         setLoading(false);
       }
     }
     loadData();
-  }, [effectivePatientId]);
-
-  const [motionPermissionGranted, setMotionPermissionGranted] = useState(false);
-
-  async function requestMotionPermission() {
-    if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
-      try {
-        const res = await DeviceMotionEvent.requestPermission();
-        if (res === 'granted') {
-          setMotionPermissionGranted(true);
-          if (navigator.vibrate) navigator.vibrate(100);
-        }
-      } catch (err) {
-        console.warn('DeviceMotion permission request error:', err);
-      }
-    } else {
-      setMotionPermissionGranted(true);
-    }
-  }
-
-  useEffect(() => {
-    let lastX = 0, lastY = 0, lastZ = 0;
-    let lastTime = 0;
-    let shakeHits = 0;
-    let lastHitTime = 0;
-
-    function handleMotion(e) {
-      const acc = e.acceleration || e.accelerationIncludingGravity;
-      if (!acc) return;
-
-      const currentTime = Date.now();
-      if (currentTime - lastTime < 50) return; // Sample rate limiter
-
-      const diffTime = currentTime - lastTime;
-      lastTime = currentTime;
-
-      const curX = acc.x ?? 0;
-      const curY = acc.y ?? 0;
-      const curZ = acc.z ?? 0;
-
-      const deltaX = Math.abs(curX - lastX);
-      const deltaY = Math.abs(curY - lastY);
-      const deltaZ = Math.abs(curZ - lastZ);
-
-      lastX = curX;
-      lastY = curY;
-      lastZ = curZ;
-
-      const speed = ((deltaX + deltaY + deltaZ) / diffTime) * 10000;
-
-      // Realistic shake threshold for mobile phones
-      if (speed > 75) {
-        if (currentTime - lastHitTime < 1500) {
-          shakeHits += 1;
-        } else {
-          shakeHits = 1;
-        }
-        lastHitTime = currentTime;
-
-        if (shakeHits >= 2) {
-          if (navigator.vibrate) {
-            navigator.vibrate([250, 100, 250]);
-          }
-          setShakeTriggered(true);
-          shakeHits = 0;
-        }
-      }
-    }
-
-    if (typeof window !== 'undefined' && window.DeviceMotionEvent) {
-      window.addEventListener('devicemotion', handleMotion, { passive: true });
-    }
-
-    return () => {
-      if (typeof window !== 'undefined' && window.DeviceMotionEvent) {
-        window.removeEventListener('devicemotion', handleMotion);
-      }
-    };
-  }, []);
+  }, [patientId, effectivePatientId]);
 
   const primaryContact = data?.emergency_contacts?.find((c) => c.is_primary) || data?.emergency_contacts?.[0] || {
     name: '—',
@@ -271,13 +174,13 @@ export default function EmergencyCardView({ patientId = null }) {
           background: #FFFFFF;
           border: 1px solid #E2E8F0;
           border-radius: 20px;
-          padding: clamp(20px, 3vw, 32px);
+          padding: clamp(16px, 3vw, 32px);
           box-shadow: 0 10px 35px -5px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.02);
           display: flex;
           justify-content: space-between;
           align-items: center;
           flex-wrap: wrap;
-          gap: 24px;
+          gap: 20px;
           position: relative;
           overflow: hidden;
         }
@@ -285,13 +188,15 @@ export default function EmergencyCardView({ patientId = null }) {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          padding: 7px 14px;
+          padding: 8px 14px;
           border-radius: 10px;
           font-size: 0.76rem;
           font-weight: 700;
           cursor: pointer;
           transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
           text-decoration: none;
+          min-height: 40px;
+          box-sizing: border-box;
         }
         .triage-call-cta {
           background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
@@ -328,6 +233,7 @@ export default function EmergencyCardView({ patientId = null }) {
           text-decoration: none;
           color: inherit;
           transition: all 0.18s ease;
+          min-height: 44px;
         }
         .triage-speed-card:hover {
           border-color: #0284C7;
@@ -336,44 +242,49 @@ export default function EmergencyCardView({ patientId = null }) {
           box-shadow: 0 4px 12px rgba(2, 132, 199, 0.08);
         }
 
-        /* ── Mobile Viewport Optimizations ── */
+        /* Responsive Mobile Adjustments */
         @media (max-width: 768px) {
           .triage-hero-banner {
             flex-direction: column !important;
             align-items: stretch !important;
-            padding: 16px 18px !important;
             gap: 16px !important;
           }
-          .triage-hero-banner > div:first-child {
+          .triage-hero-left-wrap {
             flex-direction: row !important;
-            align-items: center !important;
+            align-items: flex-start !important;
+            gap: 14px !important;
             width: 100% !important;
           }
-          .triage-hero-banner > div:last-child {
+          .triage-nok-box {
             width: 100% !important;
             min-width: 100% !important;
             box-sizing: border-box !important;
           }
-          .triage-sexy-card {
-            padding: 16px !important;
-            border-radius: 14px !important;
+          .triage-header-actions {
+            width: 100% !important;
+            display: grid !important;
+            grid-template-columns: 1fr 1fr auto !important;
+            gap: 8px !important;
           }
-          .triage-card-viewport-wrapper {
-            max-width: 100% !important;
-            overflow-x: auto !important;
-            padding: 4px 0 !important;
+          .triage-header-actions .triage-pill-btn {
+            justify-content: center !important;
+            padding: 8px 10px !important;
+            font-size: 0.72rem !important;
           }
         }
 
         @media (max-width: 480px) {
-          .triage-hero-banner > div:first-child {
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            gap: 12px !important;
+          .triage-header-actions {
+            grid-template-columns: 1fr !important;
           }
-          .triage-pill-btn {
-            padding: 6px 10px !important;
-            font-size: 0.70rem !important;
+          .triage-header-actions .triage-pill-btn {
+            width: 100% !important;
+          }
+          .triage-hero-left-wrap {
+            flex-direction: column !important;
+          }
+          .triage-sexy-card {
+            padding: 14px !important;
           }
         }
       `}</style>
@@ -441,7 +352,7 @@ export default function EmergencyCardView({ patientId = null }) {
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }} className="no-print">
+        <div className="triage-header-actions no-print" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
           <button
             type="button"
             onClick={copyTriageLink}
@@ -464,8 +375,12 @@ export default function EmergencyCardView({ patientId = null }) {
 
           <button
             type="button"
-            onClick={() => setShakeTriggered(true)}
+            onClick={async () => {
+              await requestMotionPermission();
+              setShakeTriggered(true);
+            }}
             className="triage-pill-btn triage-call-cta"
+            title="Shake phone or click to activate SOS emergency dialer"
           >
             <Smartphone size={14} />
             <span>SOS Direct Call</span>
@@ -609,7 +524,7 @@ export default function EmergencyCardView({ patientId = null }) {
       >
         {/* 1. Executive Hero Patient Banner */}
         <div className="triage-hero-banner">
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '20px', flex: 1, minWidth: 0 }}>
+          <div className="triage-hero-left-wrap" style={{ display: 'flex', alignItems: 'flex-start', gap: '20px', flex: 1, minWidth: 0 }}>
             {/* Blood Group Pillar Badge */}
             <div
               style={{
@@ -636,7 +551,7 @@ export default function EmergencyCardView({ patientId = null }) {
             </div>
 
             {/* Patient Meta Details */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <span
                   style={{
@@ -691,11 +606,11 @@ export default function EmergencyCardView({ patientId = null }) {
                 )}
               </div>
 
-              <h1 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', margin: 0 }}>
+              <h1 style={{ fontSize: 'clamp(1.4rem, 4vw, 2.2rem)', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', margin: 0, wordBreak: 'break-word' }}>
                 {data?.name || 'Patient'}
               </h1>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#64748B', fontSize: '0.82rem', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748B', fontSize: '0.80rem', flexWrap: 'wrap' }}>
                 <span>{data?.age ? `${data.age} Yrs` : 'Age Unspecified'}</span>
                 <span>•</span>
                 <span>{data?.gender || 'Gender Unspecified'}</span>
@@ -713,6 +628,7 @@ export default function EmergencyCardView({ patientId = null }) {
 
           {/* Quick Primary Contact Action */}
           <div
+            className="triage-nok-box"
             style={{
               display: 'flex',
               flexDirection: 'column',
@@ -1127,22 +1043,13 @@ export default function EmergencyCardView({ patientId = null }) {
               </div>
 
               {/* Clean White QR Box */}
-              {/* Clean White QR Box */}
-              <a
-                href={emergencyPortalUrl}
-                target="_blank"
-                rel="noreferrer"
-                title="Click or tap to open live Emergency Triage view in new tab"
+              <div
                 style={{
                   padding: '16px',
                   background: '#FFFFFF',
                   borderRadius: '16px',
                   border: '1px solid #E2E8F0',
                   boxShadow: '0 4px 16px rgba(15, 23, 42, 0.06)',
-                  display: 'block',
-                  cursor: 'pointer',
-                  transition: 'transform 0.15s ease',
-                  textDecoration: 'none',
                 }}
               >
                 <QRCodeSVG
@@ -1152,7 +1059,7 @@ export default function EmergencyCardView({ patientId = null }) {
                   bgColor="#FFFFFF"
                   margin={2}
                 />
-              </a>
+              </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center' }}>
                 <span style={{ fontSize: '0.72rem', fontFamily: 'monospace', color: '#0F172A', background: '#F1F5F9', padding: '3px 10px', borderRadius: '6px', fontWeight: 700 }}>
@@ -1164,32 +1071,21 @@ export default function EmergencyCardView({ patientId = null }) {
                 </span>
               </div>
 
-              <div style={{ display: 'flex', gap: '8px', width: '100%', maxWidth: '340px', flexWrap: 'wrap' }} className="no-print">
+              <div style={{ display: 'flex', gap: '8px', width: '100%', maxWidth: '300px' }} className="no-print">
                 <button
                   type="button"
                   onClick={copyTriageLink}
                   className="triage-pill-btn triage-outline-btn"
-                  style={{ flex: 1, minWidth: '95px', justifyContent: 'center' }}
+                  style={{ flex: 1, justifyContent: 'center' }}
                 >
                   {copiedLink ? <Check size={14} color="#059669" /> : <Copy size={14} />}
                   <span>{copiedLink ? 'Copied!' : 'Copy Link'}</span>
                 </button>
-                <a
-                  href={emergencyPortalUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="triage-pill-btn triage-outline-btn"
-                  style={{ flex: 1, minWidth: '95px', justifyContent: 'center' }}
-                  title="Open live emergency triage passport in new tab"
-                >
-                  <ExternalLink size={14} />
-                  <span>Open URL</span>
-                </a>
                 <button
                   type="button"
                   onClick={handlePrint}
                   className="triage-pill-btn triage-outline-btn"
-                  style={{ flex: 1, minWidth: '95px', justifyContent: 'center' }}
+                  style={{ flex: 1, justifyContent: 'center' }}
                 >
                   <Printer size={14} />
                   <span>Print Pass</span>
@@ -1481,48 +1377,6 @@ export default function EmergencyCardView({ patientId = null }) {
           </div>
         </div>
       )}
-
-      {/* ── Floating Mobile Shake / SOS Sensor Indicator ── */}
-      <div
-        className="no-print"
-        style={{
-          position: 'fixed',
-          bottom: '18px',
-          right: '18px',
-          zIndex: 90,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-end',
-          gap: '8px',
-        }}
-      >
-        <button
-          type="button"
-          onClick={() => {
-            requestMotionPermission();
-            setShakeTriggered(true);
-          }}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
-            color: '#FFFFFF',
-            border: '2px solid rgba(255, 255, 255, 0.4)',
-            borderRadius: '999px',
-            padding: '10px 18px',
-            boxShadow: '0 8px 24px rgba(220, 38, 38, 0.38)',
-            cursor: 'pointer',
-            fontWeight: 800,
-            fontSize: '0.78rem',
-            letterSpacing: '0.02em',
-          }}
-          title="Shake phone or click to activate emergency SOS dialer"
-        >
-          <Smartphone size={16} />
-          <span>Shake Phone for SOS</span>
-        </button>
-      </div>
     </div>
   );
 }

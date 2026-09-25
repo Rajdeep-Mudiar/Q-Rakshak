@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { ChevronDown, Stethoscope, Sparkles, Languages } from "lucide-react";
+import { ChevronDown, Stethoscope, Sparkles, Languages, Menu, X } from "lucide-react";
 import { DISEASE_LIST, getLocalizedDiseaseById } from "../../data/diseaseRegistry.js";
 import { FEATURE_INTRO_REGISTRY } from "../../data/featureIntroRegistry.js";
 import { useLanguage } from "../../context/LanguageContext.jsx";
@@ -79,9 +79,22 @@ export default function EditorialHeader({
           className="mobile-hamburger-btn"
           onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
           aria-label="Toggle Navigation Drawer"
-          style={{ background: "none", border: "1px solid var(--border-default)", borderRadius: "var(--radius-xs)", padding: "8px 12px", minWidth: "44px", minHeight: "44px", cursor: "pointer", color: "var(--ink-primary)", display: "none", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-mono)", fontSize: "0.76rem", fontWeight: 700 }}
+          style={{
+            background: "var(--bg-surface-alt)",
+            border: "1px solid var(--border-default)",
+            borderRadius: "8px",
+            padding: "8px",
+            minWidth: "40px",
+            minHeight: "40px",
+            cursor: "pointer",
+            color: "var(--ink-primary)",
+            display: "none",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+          }}
         >
-          {mobileSidebarOpen ? "Close" : "Menu"}
+          {mobileSidebarOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
 
         <button

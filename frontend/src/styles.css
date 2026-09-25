@@ -3585,7 +3585,8 @@ body.high-contrast {
 
 @media (max-width: 520px) {
   .triage-card-top-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1.25fr;
+    gap: 6px;
   }
 }
 
@@ -4909,38 +4910,6 @@ html, body {
     -webkit-text-size-adjust: 100%;
   }
 
-  /* Mobile Sidebar Navigation Drawer */
-  .sidebar {
-    position: fixed !important;
-    top: 0 !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    height: 100vh !important;
-    max-height: 100vh !important;
-    z-index: 1000 !important;
-    transform: translateX(-100%) !important;
-    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    box-shadow: 4px 0 24px rgba(15, 23, 42, 0.2) !important;
-  }
-  .sidebar.mobile-open {
-    transform: translateX(0) !important;
-  }
-  .sidebar-backdrop {
-    position: fixed !important;
-    inset: 0 !important;
-    background: rgba(15, 23, 42, 0.55) !important;
-    backdrop-filter: blur(4px) !important;
-    -webkit-backdrop-filter: blur(4px) !important;
-    z-index: 999 !important;
-  }
-  .mobile-hamburger-btn {
-    display: inline-flex !important;
-  }
-  .header-telemetry-desktop,
-  .header-divider-desktop {
-    display: none !important;
-  }
-
   h1 {
     font-size: clamp(1.75rem, 6.5vw, 2.4rem) !important;
     line-height: 1.12 !important;
@@ -5057,9 +5026,39 @@ html, body {
 
   .triage-card-shell {
     max-width: 100% !important;
-    height: auto !important;
-    min-height: 250px !important;
+    min-height: 240px !important;
     padding: 8px !important;
+    border-radius: 16px !important;
+  }
+  .triage-inner-frame {
+    padding: 7px 9px !important;
+    border-radius: 10px !important;
+  }
+  .triage-headline-name {
+    font-size: 1.05rem !important;
+  }
+  .triage-headline-last {
+    font-size: 0.72rem !important;
+  }
+  .triage-qr-wrap {
+    width: 52px !important;
+    height: 52px !important;
+  }
+  .triage-card-title-text {
+    font-size: 0.78rem !important;
+  }
+  .triage-affiliation-text {
+    font-size: 0.60rem !important;
+  }
+  .triage-contact-line {
+    font-size: 0.58rem !important;
+    gap: 4px !important;
+  }
+  .triage-bottom-frame {
+    padding: 4px 10px !important;
+  }
+  .triage-handle-text {
+    font-size: 0.76rem !important;
   }
 }
 
