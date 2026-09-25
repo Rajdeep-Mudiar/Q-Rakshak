@@ -115,19 +115,19 @@ export default function ClinicianDashboard({ doctorId = "DOC-KAVITA", currentUse
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
               <span className="step-badge" style={{ background: "var(--primary-soft)", color: "var(--primary-dark)", borderColor: "var(--border-default)" }}>
-                ATTENDING ROSTER
+                {t("triage.attending_roster", "ATTENDING ROSTER")}
               </span>
               <h2 style={{ fontFamily: "var(--font-display)", fontSize: "1.35rem", color: "var(--text-primary)", fontWeight: 700, margin: 0, letterSpacing: "-0.01em" }}>
-                Patient Care & Ambulatory Triage
+                {t("triage.patient_care_title", "Patient Care & Ambulatory Triage")}
               </h2>
             </div>
             <p style={{ color: "var(--text-secondary)", fontSize: "0.82rem", margin: 0 }}>
-              Attending: <strong style={{ color: "var(--text-primary)" }}>{currentUser?.name || "Dr. Kavita Rao, MD"}</strong> • License / Provider ID: <strong style={{ fontFamily: "var(--font-mono)" }}>{resolvedDoctorId}</strong> • Ward: <strong>Emergency & Ambulatory OPD</strong>
+              {t("triage.attending_label", "Attending")}: <strong style={{ color: "var(--text-primary)" }}>{currentUser?.name || "Dr. Kavita Rao, MD"}</strong> • {t("triage.license_provider_id", "License / Provider ID")}: <strong style={{ fontFamily: "var(--font-mono)" }}>{resolvedDoctorId}</strong> • {t("triage.ward_label", "Ward")}: <strong>{t("triage.ward_val", "Emergency & Ambulatory OPD")}</strong>
             </p>
           </div>
           <div style={{ display: "flex", gap: "10px" }}>
             <span className="step-badge" style={{ padding: "6px 12px", fontSize: "0.72rem", background: "var(--risk-low-bg)", color: "var(--risk-low)", borderColor: "var(--risk-low-border)", display: "flex", alignItems: "center", gap: "6px" }}>
-              <CheckCircle2 size={13} /> Attending Verified
+              <CheckCircle2 size={13} /> {t("triage.attending_verified", "Attending Verified")}
             </span>
           </div>
         </div>
@@ -136,29 +136,29 @@ export default function ClinicianDashboard({ doctorId = "DOC-KAVITA", currentUse
       {/* Care team overview */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "12px" }}>
         <div className="card-panel" style={{ padding: "16px 18px", borderRadius: "12px", border: "1px solid var(--border-default)", background: "var(--bg-surface)" }}>
-          <div style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase" }}>Patients waiting</div>
+          <div style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase" }}>{t("triage.patients_waiting_card", "Patients waiting")}</div>
           <div style={{ fontSize: "1.6rem", fontWeight: 700, color: "var(--text-primary)", margin: "2px 0", fontFamily: "var(--font-display)" }}>{bookings.length}</div>
-          <div style={{ fontSize: "0.74rem", color: "var(--text-secondary)" }}>Ready for consultation</div>
+          <div style={{ fontSize: "0.74rem", color: "var(--text-secondary)" }}>{t("triage.ready_for_consultation", "Ready for consultation")}</div>
         </div>
 
         <div className="card-panel" style={{ padding: "16px 18px", borderRadius: "12px", border: "1px solid var(--risk-high-border)", background: emergencyCount > 0 ? "var(--risk-high-bg)" : "var(--bg-surface)" }}>
           <div style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--risk-high)", textTransform: "uppercase", display: "flex", alignItems: "center", gap: "6px" }}>
-            Urgent reviews
+            {t("triage.urgent_reviews", "Urgent reviews")}
           </div>
           <div style={{ fontSize: "1.6rem", fontWeight: 700, color: "var(--risk-high)", margin: "2px 0", fontFamily: "var(--font-display)" }}>{emergencyCount}</div>
-          <div style={{ fontSize: "0.74rem", color: "var(--risk-high)", fontWeight: 600 }}>Needs prompt attention</div>
+          <div style={{ fontSize: "0.74rem", color: "var(--risk-high)", fontWeight: 600 }}>{t("triage.needs_prompt_attention", "Needs prompt attention")}</div>
         </div>
 
         <div className="card-panel" style={{ padding: "16px 18px", borderRadius: "12px", border: "1px solid var(--border-default)", background: "var(--bg-surface)" }}>
-          <div style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase" }}>Regular visits</div>
+          <div style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase" }}>{t("triage.regular_visits", "Regular visits")}</div>
           <div style={{ fontSize: "1.6rem", fontWeight: 700, color: "var(--text-primary)", margin: "2px 0", fontFamily: "var(--font-display)" }}>{routineCount}</div>
-          <div style={{ fontSize: "0.74rem", color: "var(--text-secondary)" }}>Scheduled appointments</div>
+          <div style={{ fontSize: "0.74rem", color: "var(--text-secondary)" }}>{t("triage.scheduled_appointments", "Scheduled appointments")}</div>
         </div>
 
         <div className="card-panel" style={{ padding: "16px 18px", borderRadius: "12px", border: "1px solid var(--border-default)", background: "var(--bg-surface)" }}>
-          <div style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase" }}>Median Wait Time</div>
+          <div style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase" }}>{t("triage.median_wait_time", "Median Wait Time")}</div>
           <div style={{ fontSize: "1.6rem", fontWeight: 700, color: "var(--primary)", margin: "2px 0", fontFamily: "var(--font-display)" }}>&lt; 6 Min</div>
-          <div style={{ fontSize: "0.74rem", color: "var(--text-secondary)" }}>Prompt clinical triage</div>
+          <div style={{ fontSize: "0.74rem", color: "var(--text-secondary)" }}>{t("triage.prompt_clinical_triage", "Prompt clinical triage")}</div>
         </div>
       </div>
 
@@ -170,16 +170,16 @@ export default function ClinicianDashboard({ doctorId = "DOC-KAVITA", currentUse
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <Calendar size={16} color="var(--accent-blue)" />
               <h3 style={{ margin: 0, fontSize: "0.95rem", fontWeight: 700, color: "var(--ink-primary)" }}>
-                Scheduled Appointments ({bookings.length})
+                {t("triage.scheduled_appointments_title", "Scheduled Appointments")} ({bookings.length})
               </h3>
             </div>
-            <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>Appointments</span>
+            <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>{t("triage.appointments_badge", "Appointments")}</span>
           </div>
 
           {loading ? (
             <div style={{ textAlign: "center", padding: "30px", color: "var(--text-muted)", fontSize: "0.82rem" }}>Loading patient roster...</div>
           ) : bookings.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "30px", color: "var(--text-muted)", fontSize: "0.82rem" }}>No consultations scheduled for today.</div>
+            <div style={{ textAlign: "center", padding: "30px", color: "var(--text-muted)", fontSize: "0.82rem" }}>{t("triage.no_consultations_today", "No consultations scheduled for today.")}</div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               {bookings.map((b) => (
@@ -214,7 +214,7 @@ export default function ClinicianDashboard({ doctorId = "DOC-KAVITA", currentUse
                     onClick={() => setActiveBookingForRoom(b)}
                     style={{ padding: "6px 12px", fontSize: "0.75rem", borderRadius: "var(--radius-sm)" }}
                   >
-                    <Video size={13} /> Open Consult Room
+                    <Video size={13} /> {t("triage.open_consult_room", "Open Consult Room")}
                   </button>
                 </div>
               ))}
@@ -228,16 +228,16 @@ export default function ClinicianDashboard({ doctorId = "DOC-KAVITA", currentUse
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <Activity size={16} color="var(--risk-high)" />
               <h3 style={{ margin: 0, fontSize: "0.95rem", fontWeight: 700, color: "var(--ink-primary)" }}>
-                Patients needing attention
+                {t("triage.patients_needing_attention", "Patients needing attention")}
               </h3>
             </div>
-            <span style={{ fontSize: "0.72rem", color: "var(--risk-high)", fontWeight: 700 }}>Priority review</span>
+            <span style={{ fontSize: "0.72rem", color: "var(--risk-high)", fontWeight: 700 }}>{t("triage.priority_review", "Priority review")}</span>
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             {triageCohort.length === 0 ? (
               <div style={{ padding: "30px 12px", textAlign: "center", color: "var(--text-muted)", fontSize: "0.82rem" }}>
-                No patients currently need attention.
+                {t("triage.no_patients_attention", "No patients currently need attention.")}
               </div>
             ) : triageCohort.map((pat) => (
               <div
@@ -299,7 +299,7 @@ export default function ClinicianDashboard({ doctorId = "DOC-KAVITA", currentUse
                     }}
                     title="Clinician Annotation / Override"
                   >
-                    <Edit3 size={13} /> Override
+                    <Edit3 size={13} /> {t("triage.override_btn", "Override")}
                   </button>
                 </div>
               </div>
