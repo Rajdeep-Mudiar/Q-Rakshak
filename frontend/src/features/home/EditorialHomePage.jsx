@@ -30,9 +30,8 @@ import {
   Brain,
   Wind
 } from "lucide-react";
-import { animateEntrance } from "../../utils/motion.js";
 import { useLanguage } from "../../context/LanguageContext.jsx";
-import { DISEASE_LIST } from "../../data/diseaseRegistry.js";
+import { DISEASE_LIST, getLocalizedDiseaseById } from "../../data/diseaseRegistry.js";
 
 /* ── Scientific Benchmark Ablation Matrix ──────────────────────────────────── */
 const SCIENTIFIC_ABLATIONS = [
@@ -630,10 +629,10 @@ export default function EditorialHomePage({
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
           <div>
             <h2 style={{ fontSize: "1.2rem", fontWeight: 800, color: "#0F172A", margin: "0 0 4px 0", letterSpacing: "-0.02em" }}>
-              {t("home.diseases_preview_title", "Supported Disease Screening Modules")}
+              {t("home_benchmarks.diseases_preview_title", "Supported Disease Screening Modules")}
             </h2>
             <p style={{ fontSize: "0.85rem", color: "#64748B", margin: 0 }}>
-              Calibrated machine learning and quantum circuits optimized for distinct clinical modalities.
+              {t("home_benchmarks.diseases_preview_subtitle", "Calibrated machine learning and quantum circuits optimized for distinct clinical modalities.")}
             </p>
           </div>
           <button
@@ -653,7 +652,7 @@ export default function EditorialHomePage({
               cursor: "pointer",
             }}
           >
-            <span>View All Checkups</span>
+            <span>{t("home_benchmarks.view_all_checkups", "View All Checkups")}</span>
             <ArrowRight size={13} />
           </button>
         </div>
@@ -665,48 +664,51 @@ export default function EditorialHomePage({
             gap: "12px",
           }}
         >
-          {DISEASE_LIST.map((d) => (
-            <div
-              key={d.id}
-              onClick={() => {
-                if (onSelectDisease) onSelectDisease(d.id);
-                else handleAction("disease_intro");
-              }}
-              style={{
-                background: "#FFFFFF",
-                border: "1px solid #E2E8F0",
-                borderRadius: "8px",
-                padding: "14px 16px",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
-                cursor: "pointer",
-                display: "flex",
-                flexDirection: "column",
-                gap: "8px",
-                transition: "all 0.15s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "#0284C7";
-                e.currentTarget.style.transform = "translateY(-1px)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "#E2E8F0";
-                e.currentTarget.style.transform = "translateY(0)";
-              }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>
-                  {d.category}
-                </span>
-                <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "#0284C7", background: "#F0F9FF", border: "1px solid #BAE6FD", padding: "1px 6px", borderRadius: "4px" }}>
-                  {d.accuracy} Acc
-                </span>
+          {DISEASE_LIST.map((d) => {
+            const locD = getLocalizedDiseaseById(d.id, t);
+            return (
+              <div
+                key={d.id}
+                onClick={() => {
+                  if (onSelectDisease) onSelectDisease(d.id);
+                  else handleAction("disease_intro");
+                }}
+                style={{
+                  background: "#FFFFFF",
+                  border: "1px solid #E2E8F0",
+                  borderRadius: "8px",
+                  padding: "14px 16px",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
+                  cursor: "pointer",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "8px",
+                  transition: "all 0.15s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = "#0284C7";
+                  e.currentTarget.style.transform = "translateY(-1px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "#E2E8F0";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>
+                    {locD.category}
+                  </span>
+                  <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "#0284C7", background: "#F0F9FF", border: "1px solid #BAE6FD", padding: "1px 6px", borderRadius: "4px" }}>
+                    {locD.accuracy || d.accuracy} {t("disease_intro.acc_label", "Acc")}
+                  </span>
+                </div>
+                <div>
+                  <strong style={{ fontSize: "0.92rem", color: "#0F172A", display: "block" }}>{locD.name}</strong>
+                  <span style={{ fontSize: "0.74rem", color: "#64748B", marginTop: "2px", display: "block" }}>{locD.modelArchitecture || d.model}</span>
+                </div>
               </div>
-              <div>
-                <strong style={{ fontSize: "0.92rem", color: "#0F172A", display: "block" }}>{d.name}</strong>
-                <span style={{ fontSize: "0.74rem", color: "#64748B", marginTop: "2px", display: "block" }}>{d.model}</span>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -715,10 +717,10 @@ export default function EditorialHomePage({
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", background: "#FFFFFF", padding: "14px 18px", borderRadius: "10px", border: "1px solid #E2E8F0" }}>
           <div>
             <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "#0F172A", margin: "0 0 2px 0" }}>
-              Mathematical Accuracy & Benchmark Matrix
+              {t("home_benchmarks.benchmark_matrix_title", "Mathematical Accuracy & Benchmark Matrix")}
             </h3>
             <p style={{ fontSize: "0.78rem", color: "#64748B", margin: 0 }}>
-              Rigorous 5-seed patient-stratified comparison of Quantum AI against Classical Machine Learning controls.
+              {t("home_benchmarks.benchmark_matrix_subtitle", "Rigorous 5-seed patient-stratified comparison of Quantum AI against Classical Machine Learning controls.")}
             </p>
           </div>
 
@@ -737,7 +739,7 @@ export default function EditorialHomePage({
                 color: activeBenchmarkTab === "ablations" ? "#0284C7" : "#475569",
               }}
             >
-              Architectures (A–E)
+              {t("home_benchmarks.tab_architectures", "Architectures (A–E)")}
             </button>
             <button
               type="button"
@@ -753,7 +755,7 @@ export default function EditorialHomePage({
                 color: activeBenchmarkTab === "diseases" ? "#0284C7" : "#475569",
               }}
             >
-              Cross-Disease Cohorts
+              {t("home_benchmarks.tab_cohorts", "Cross-Disease Cohorts")}
             </button>
           </div>
         </div>
@@ -764,14 +766,14 @@ export default function EditorialHomePage({
               <thead>
                 <tr style={{ background: "#F8FAFC", borderBottom: "1px solid #E2E8F0", color: "#64748B" }}>
                   <th style={{ padding: "10px 14px", width: "40px" }}>ID</th>
-                  <th style={{ padding: "10px 14px" }}>Architecture</th>
-                  <th style={{ padding: "10px 14px" }}>Type</th>
+                  <th style={{ padding: "10px 14px" }}>{t("disease_intro.table_architecture", "Architecture")}</th>
+                  <th style={{ padding: "10px 14px" }}>{t("common.type", "Type")}</th>
                   <th style={{ padding: "10px 14px" }}>AUROC</th>
-                  <th style={{ padding: "10px 14px" }}>Accuracy</th>
-                  <th style={{ padding: "10px 14px" }}>Sensitivity</th>
-                  <th style={{ padding: "10px 14px" }}>Specificity</th>
-                  <th style={{ padding: "10px 14px" }}>Latency</th>
-                  <th style={{ padding: "10px 14px", textAlign: "right" }}>Deployment Role</th>
+                  <th style={{ padding: "10px 14px" }}>{t("disease_intro.table_accuracy", "Accuracy")}</th>
+                  <th style={{ padding: "10px 14px" }}>{t("disease_intro.table_sensitivity", "Sensitivity")}</th>
+                  <th style={{ padding: "10px 14px" }}>{t("disease_intro.table_specificity", "Specificity")}</th>
+                  <th style={{ padding: "10px 14px" }}>{t("disease_intro.avg_latency", "Latency")}</th>
+                  <th style={{ padding: "10px 14px", textAlign: "right" }}>{t("disease_intro.table_status", "Deployment Role")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -809,41 +811,44 @@ export default function EditorialHomePage({
             <table style={{ width: "100%", minWidth: "700px", borderCollapse: "collapse", fontSize: "0.80rem", textAlign: "left" }}>
               <thead>
                 <tr style={{ background: "#F8FAFC", borderBottom: "1px solid #E2E8F0", color: "#64748B" }}>
-                  <th style={{ padding: "10px 14px" }}>Condition</th>
-                  <th style={{ padding: "10px 14px" }}>Dataset</th>
-                  <th style={{ padding: "10px 14px" }}>Quantum Model</th>
-                  <th style={{ padding: "10px 14px" }}>Classical Rival</th>
-                  <th style={{ padding: "10px 14px" }}>Quantum Acc</th>
-                  <th style={{ padding: "10px 14px" }}>Classical Acc</th>
+                  <th style={{ padding: "10px 14px" }}>{t("disease_intro.table_model", "Condition")}</th>
+                  <th style={{ padding: "10px 14px" }}>{t("disease_intro.dataset_cohort", "Dataset")}</th>
+                  <th style={{ padding: "10px 14px" }}>{t("disease_intro.table_architecture", "Quantum Model")}</th>
+                  <th style={{ padding: "10px 14px" }}>{t("disease_intro.classical_control", "Classical Rival")}</th>
+                  <th style={{ padding: "10px 14px" }}>Quantum {t("disease_intro.table_accuracy", "Acc")}</th>
+                  <th style={{ padding: "10px 14px" }}>Classical {t("disease_intro.table_accuracy", "Acc")}</th>
                   <th style={{ padding: "10px 14px" }}>Delta</th>
-                  <th style={{ padding: "10px 14px", textAlign: "right" }}>Arbitration Policy</th>
+                  <th style={{ padding: "10px 14px", textAlign: "right" }}>{t("disease_intro.table_status", "Arbitration Policy")}</th>
                 </tr>
               </thead>
               <tbody>
-                {DISEASE_BENCHMARKS.map((d, idx) => (
-                  <tr
-                    key={d.diseaseKey}
-                    style={{
-                      borderBottom: "1px solid #F1F5F9",
-                      background: idx % 2 === 0 ? "#FFFFFF" : "#F8FAFC",
-                    }}
-                  >
-                    <td style={{ padding: "10px 14px", fontWeight: 700, color: "#0F172A" }}>{d.disease}</td>
-                    <td style={{ padding: "10px 14px", color: "#64748B" }}>{d.dataset}</td>
-                    <td style={{ padding: "10px 14px", color: "#0284C7", fontWeight: 600 }}>{d.quantumModel}</td>
-                    <td style={{ padding: "10px 14px", color: "#64748B" }}>{d.classicalRival}</td>
-                    <td style={{ padding: "10px 14px", fontWeight: 700 }}>{d.qAcc}</td>
-                    <td style={{ padding: "10px 14px", color: "#64748B" }}>{d.cAcc}</td>
-                    <td style={{ padding: "10px 14px", fontWeight: 700, color: d.delta.startsWith("+") ? "#059669" : "#D97706" }}>
-                      {d.delta}
-                    </td>
-                    <td style={{ padding: "10px 14px", textAlign: "right" }}>
-                      <span style={{ fontSize: "0.68rem", fontWeight: 700, padding: "2px 7px", borderRadius: "4px", background: d.routing.includes("Quantum") ? "#ECFDF5" : "#FFFBEB", color: d.color }}>
-                        {d.routing}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                {DISEASE_BENCHMARKS.map((d, idx) => {
+                  const locD = getLocalizedDiseaseById(d.diseaseKey, t);
+                  return (
+                    <tr
+                      key={d.diseaseKey}
+                      style={{
+                        borderBottom: "1px solid #F1F5F9",
+                        background: idx % 2 === 0 ? "#FFFFFF" : "#F8FAFC",
+                      }}
+                    >
+                      <td style={{ padding: "10px 14px", fontWeight: 700, color: "#0F172A" }}>{locD.name}</td>
+                      <td style={{ padding: "10px 14px", color: "#64748B" }}>{locD.dataset || d.dataset}</td>
+                      <td style={{ padding: "10px 14px", color: "#0284C7", fontWeight: 600 }}>{locD.modelArchitecture || d.quantumModel}</td>
+                      <td style={{ padding: "10px 14px", color: "#64748B" }}>{d.classicalRival}</td>
+                      <td style={{ padding: "10px 14px", fontWeight: 700 }}>{d.qAcc}</td>
+                      <td style={{ padding: "10px 14px", color: "#64748B" }}>{d.cAcc}</td>
+                      <td style={{ padding: "10px 14px", fontWeight: 700, color: d.delta.startsWith("+") ? "#059669" : "#D97706" }}>
+                        {d.delta}
+                      </td>
+                      <td style={{ padding: "10px 14px", textAlign: "right" }}>
+                        <span style={{ fontSize: "0.68rem", fontWeight: 700, padding: "2px 7px", borderRadius: "4px", background: d.routing.includes("Quantum") ? "#ECFDF5" : "#FFFBEB", color: d.color }}>
+                          {d.routing}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           )}
@@ -865,18 +870,14 @@ export default function EditorialHomePage({
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <span style={{ fontWeight: 700, color: "#0F172A" }}>QRakshak Clinical Intelligence</span>
-          <span>•</span>
-          <span>SaMD Decision Support Architecture</span>
-          <span>•</span>
-          <span>ABDM & DPDP 2023 Compliant</span>
+          <span style={{ fontWeight: 700, color: "#0F172A" }}>{t("home_benchmarks.samd_footer", "QRakshak Clinical Intelligence • SaMD Decision Support Architecture • ABDM & DPDP 2023 Compliant")}</span>
         </div>
         <div style={{ display: "flex", gap: "16px" }}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-            <Lock size={12} color="#059669" /> AES-256 / SHA-256 Vault
+            <Lock size={12} color="#059669" /> {t("home_benchmarks.aes_vault", "AES-256 / SHA-256 Vault")}
           </span>
           <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
-            <ShieldCheck size={12} color="#0284C7" /> Human-in-the-Loop Triage
+            <ShieldCheck size={12} color="#0284C7" /> {t("home_benchmarks.human_triage", "Human-in-the-Loop Triage")}
           </span>
         </div>
       </footer>

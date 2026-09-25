@@ -1387,9 +1387,97 @@ export function getDiseaseById(id) {
   return DISEASE_REGISTRY[id] || DISEASE_REGISTRY.breast_cancer;
 }
 
+const DISEASE_META = {
+  breast_cancer: {
+    modelArchitecture: "OncoPulse-VQC",
+    accuracy: "96.51%",
+    dataset: "Wisconsin WDBC (N = 569)",
+    cohortSizeNum: "569",
+    inferenceTime: "< 15 ms",
+    sensitivity: "94.44%",
+    specificity: "96.25%",
+    triageTier: "15",
+    keyBiomarkers: ["Cell Radius", "Texture Variance", "Perimeter Area", "Concave Points", "Symmetry", "Fractal Dimension"],
+    modalityLabel: "Biopsy Cytology & Cell Morphometry"
+  },
+  skin: {
+    modelArchitecture: "Q-Skin-Vortex",
+    accuracy: "89.40%",
+    dataset: "HAM10000 / ISIC (N = 10,015)",
+    cohortSizeNum: "10,015",
+    inferenceTime: "18.5 ms",
+    sensitivity: "89.00%",
+    specificity: "94.00%",
+    triageTier: "12",
+    keyBiomarkers: ["Asymmetry Index", "Border Irregularity", "Color Variegation", "Dermoscopic Diameter", "Pigment Network", "Atypical Globules"],
+    modalityLabel: "Dermoscopic Multi-Spectral Imaging"
+  },
+  pneumonia: {
+    modelArchitecture: "QuantumPneu-VQC",
+    accuracy: "91.20%",
+    dataset: "Kermany Pediatric Scans (N = 5,863)",
+    cohortSizeNum: "5,863",
+    inferenceTime: "14.2 ms",
+    sensitivity: "93.00%",
+    specificity: "89.00%",
+    triageTier: "18",
+    keyBiomarkers: ["Pulmonary Opacity", "Focal Consolidation", "Air Bronchograms", "Interstitial Infiltrates", "Pleural Thickening", "Costophrenic Blunting"],
+    modalityLabel: "Chest Radiography (CXR Digital Scans)"
+  },
+  heart: {
+    modelArchitecture: "CardioWave-VQC",
+    accuracy: "88.40%",
+    dataset: "Cleveland (N = 303) + Framingham",
+    cohortSizeNum: "303",
+    inferenceTime: "11.8 ms",
+    sensitivity: "88.50%",
+    specificity: "91.20%",
+    triageTier: "20",
+    keyBiomarkers: ["ST-T Wave Depression", "Thallium-201 Scintigraphy", "Max Heart Rate Achieved", "Serum Cholesterol", "Resting Blood Pressure", "Fluoroscopy Vessels"],
+    modalityLabel: "Cardiovascular Telemetry & Biomarkers"
+  },
+  diabetes: {
+    modelArchitecture: "DiaQuantum-VQC",
+    accuracy: "89.60%",
+    dataset: "PIMA Indian Diabetes (N = 768)",
+    cohortSizeNum: "768",
+    inferenceTime: "9.5 ms",
+    sensitivity: "87.50%",
+    specificity: "92.10%",
+    triageTier: "10",
+    keyBiomarkers: ["Fasting Plasma Glucose", "2-Hour Oral Glucose", "HbA1c Glycated Hemoglobin", "BMI Adiposity Index", "Insulin Secretion Response", "Diabetes Pedigree Function"],
+    modalityLabel: "Metabolic Panel & Glycemic Telemetry"
+  },
+  parkinsons: {
+    modelArchitecture: "NeuroPulse-VQC",
+    accuracy: "93.80%",
+    dataset: "Oxford Telemonitoring (N = 195)",
+    cohortSizeNum: "195",
+    inferenceTime: "12.0 ms",
+    sensitivity: "93.20%",
+    specificity: "94.80%",
+    triageTier: "14",
+    keyBiomarkers: ["MDVP Jitter (Local)", "MDVP Shimmer (dB)", "Harmonics-to-Noise Ratio (HNR)", "Recurrence Period Density (RPDE)", "Detrended Fluctuation (DFA)", "Pitch Period Entropy (PPE)"],
+    modalityLabel: "Acoustic Vocal Telemetry & Tremor Metrics"
+  }
+};
+
 export function getLocalizedDiseaseById(id, t) {
   const base = getDiseaseById(id);
-  if (!t || typeof t !== "function") return base;
+  const rawKey = base.id || "breast_cancer";
+  const meta = DISEASE_META[rawKey] || DISEASE_META.breast_cancer;
+  if (!t || typeof t !== "function") {
+    return {
+      ...base,
+      ...meta,
+      clinicalBackground: base.overview?.clinicalDefinition || base.overview?.patientSummary || base.description || base.tagline,
+      description: base.overview?.patientSummary || base.description || base.tagline,
+      symptoms: base.overview?.warningSigns || [
+        "Unexplained localized tissue density or painless nodules",
+        "Morphological cellular boundary irregularities on imaging"
+      ],
+    };
+  }
   const key = base.id === "skin" ? "skin_cancer" : base.id === "heart" ? "heart_disease" : base.id;
   const localizedSigns = t(`diseases.${key}.warning_signs`);
   const localizedChecklist = t(`diseases.${key}.checklist`);
@@ -1415,15 +1503,23 @@ export function getLocalizedDiseaseById(id, t) {
 
   return {
     ...base,
+    ...meta,
     name: t(`diseases.${key}.name`, base.name),
     shortName: t(`diseases.${key}.short_name`, base.shortName || base.name),
     tagline: t(`diseases.${key}.tagline`, base.tagline),
     category: t(`categories.${catKey}`, base.category),
     badge: t(`diseases.${key}.badge`, base.badge),
     desc: t(`diseases.${key}.desc`, base.desc),
+    description: t(`diseases.${key}.patient_summary`, base.overview?.patientSummary || base.description || base.tagline),
+    clinicalBackground: t(`diseases.${key}.clinical_definition`, base.overview?.clinicalDefinition || base.overview?.patientSummary || base.description || base.tagline),
+    symptoms: Array.isArray(localizedSigns) && localizedSigns.length > 0 ? localizedSigns : (base.overview?.warningSigns || [
+      "Unexplained localized tissue density or painless nodules",
+      "Morphological cellular boundary irregularities on imaging"
+    ]),
     stats: {
       ...base.stats,
-      qubits: `${base.stats.qubits?.split(" ")[0] || "8"} ${t("disease_intro.qubits_unit", "Qubits")}`,
+      accuracy: meta.accuracy || base.stats?.accuracy,
+      qubits: `${base.stats?.qubits?.split(" ")[0] || "8"} ${t("disease_intro.qubits_unit", "Qubits")}`,
       earlyDetectionSurvival: t(`diseases.${key}.early_detection.survival_lift`, base.stats?.earlyDetectionSurvival),
     },
     facts: Array.isArray(localizedFacts) ? localizedFacts : base.facts,

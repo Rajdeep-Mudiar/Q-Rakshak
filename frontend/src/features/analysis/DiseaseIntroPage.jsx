@@ -96,7 +96,7 @@ export default function DiseaseIntroPage({
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "0.82rem", color: "#64748B" }}>
-          <span style={{ fontWeight: 600, color: "#0284C7" }}>{t("diseases.clinical_screening", "Clinical Screening")}</span>
+          <span style={{ fontWeight: 600, color: "#0284C7" }}>{t("disease_intro.clinical_screening", "Clinical Screening")}</span>
           <ChevronRight size={14} color="#94A3B8" />
           <span style={{ fontWeight: 500 }}>{disease.category}</span>
           <ChevronRight size={14} color="#94A3B8" />
@@ -106,9 +106,10 @@ export default function DiseaseIntroPage({
         {/* Quick Disease Pill Switcher */}
         <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
           <span style={{ fontSize: "0.70rem", color: "#64748B", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", marginRight: "4px" }}>
-            {t("diseases.switch_protocol", "Switch Protocol:")}
+            {t("disease_intro.switch_protocol", "Switch Protocol:")}
           </span>
           {DISEASE_LIST.map((d) => {
+            const locD = getLocalizedDiseaseById(d.id, t);
             const isCurrent = d.id === disease.id || (disease.id === "skin_cancer" && d.id === "skin") || (disease.id === "heart_disease" && d.id === "heart") || (disease.id === "parkinson" && d.id === "parkinsons");
             return (
               <button
@@ -127,7 +128,7 @@ export default function DiseaseIntroPage({
                   transition: "all 0.15s ease",
                 }}
               >
-                {d.name.split(" ")[0]}
+                {locD.name.split(" ")[0]}
               </button>
             );
           })}
@@ -156,10 +157,10 @@ export default function DiseaseIntroPage({
                 {disease.category}
               </span>
               <span style={{ fontSize: "0.68rem", fontWeight: 600, padding: "2px 8px", background: "#F8FAFC", color: "#475569", border: "1px solid #E2E8F0", borderRadius: "4px" }}>
-                Modality: {disease.modalityLabel || "Clinical Biomarkers / Scans"}
+                {t("disease_intro.modality_label", "Modality: {{type}}", { type: disease.modalityLabel || "Clinical Biomarkers / Scans" })}
               </span>
               <span style={{ fontSize: "0.68rem", fontWeight: 600, padding: "2px 8px", background: "#ECFDF5", color: "#059669", border: "1px solid #A7F3D0", borderRadius: "4px" }}>
-                {disease.modelArchitecture || "Variational Quantum Classifier"}
+                {disease.modelArchitecture || t("disease_intro.quantum_classifier_badge", "Variational Quantum Classifier")}
               </span>
             </div>
 
@@ -192,7 +193,7 @@ export default function DiseaseIntroPage({
                 }}
               >
                 <Activity size={16} />
-                <span>{t("diseases.start_evaluation", "Start Diagnostic Checkup")}</span>
+                <span>{t("disease_intro.start_evaluation", "Start Diagnostic Checkup")}</span>
                 <ArrowRight size={15} />
               </button>
 
@@ -214,7 +215,7 @@ export default function DiseaseIntroPage({
                 }}
               >
                 <BarChart3 size={15} color="#0284C7" />
-                <span>{t("diseases.view_benchmarks", "View Audited Benchmarks")}</span>
+                <span>{t("disease_intro.view_benchmarks", "View Audited Benchmarks")}</span>
               </button>
             </div>
           </div>
@@ -230,22 +231,22 @@ export default function DiseaseIntroPage({
             }}
           >
             <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.06em", display: "block" }}>
-              Model Specification
+              {t("disease_intro.model_specification", "Model Specification")}
             </span>
             <strong style={{ fontSize: "0.95rem", color: "#0F172A", display: "block", fontWeight: 800, marginTop: "4px" }}>
               {disease.modelArchitecture || "OncoPulse-VQC"}
             </strong>
             <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginTop: "10px", fontSize: "0.78rem" }}>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ color: "#64748B" }}>Accuracy:</span>
+                <span style={{ color: "#64748B" }}>{t("disease_intro.accuracy", "Accuracy:")}</span>
                 <strong style={{ color: "#059669" }}>{disease.accuracy}</strong>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ color: "#64748B" }}>Dataset Cohort:</span>
+                <span style={{ color: "#64748B" }}>{t("disease_intro.dataset_cohort", "Dataset Cohort:")}</span>
                 <span style={{ fontWeight: 600, color: "#0F172A" }}>{disease.dataset}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ color: "#64748B" }}>Avg. Latency:</span>
+                <span style={{ color: "#64748B" }}>{t("disease_intro.avg_latency", "Avg. Latency:")}</span>
                 <span style={{ fontWeight: 600, color: "#0F172A" }}>{disease.inferenceTime || "< 15 ms"}</span>
               </div>
             </div>
@@ -263,10 +264,10 @@ export default function DiseaseIntroPage({
         }}
       >
         {[
-          { label: "Clinical Sensitivity", val: disease.sensitivity || "94.0%", sub: "True Positive Detection Rate", color: "#059669" },
-          { label: "Specificity Score", val: disease.specificity || "96.2%", sub: "Low False-Positive Margin", color: "#0284C7" },
-          { label: "Dataset Cohort Size", val: disease.cohortSize || "N = 569", sub: "Patient-Stratified Samples", color: "#0F172A" },
-          { label: "Triage Classification", val: disease.triageTier || "ESI 1-5", sub: "Standard Clinical Priority", color: "#7C3AED" },
+          { label: t("disease_intro.clinical_sensitivity", "Clinical Sensitivity"), val: disease.sensitivity || "94.0%", sub: t("disease_intro.true_positive_rate", "True Positive Detection Rate"), color: "#059669" },
+          { label: t("disease_intro.specificity_score", "Specificity Score"), val: disease.specificity || "96.2%", sub: t("disease_intro.low_false_positive", "Low False-Positive Margin"), color: "#0284C7" },
+          { label: t("disease_intro.dataset_cohort_size", "Dataset Cohort Size"), val: disease.cohortSizeNum || "569", sub: t("disease_intro.patient_stratified_samples", "Patient-Stratified Samples"), color: "#0F172A" },
+          { label: t("disease_intro.triage_classification", "Triage Classification"), val: disease.triageTier || "15", sub: t("disease_intro.standard_clinical_priority", "Standard Clinical Priority"), color: "#7C3AED" },
         ].map((s, idx) => (
           <div
             key={idx}
@@ -296,9 +297,9 @@ export default function DiseaseIntroPage({
       {/* ── 4. Sub-Navigation Tabs ── */}
       <div style={{ display: "flex", gap: "6px", borderBottom: "2px solid #E2E8F0", paddingBottom: "2px" }}>
         {[
-          { id: "overview", label: t("diseases.tab_overview", "Overview & Symptoms"), icon: Info },
-          { id: "quantum", label: t("diseases.tab_quantum", "Quantum Circuit Architecture"), icon: Binary },
-          { id: "benchmarks", label: t("diseases.tab_benchmarks", "Audited Benchmarks"), icon: BarChart3 },
+          { id: "overview", label: t("disease_intro.tab_overview", "Overview & Symptoms"), icon: Info },
+          { id: "quantum", label: t("disease_intro.tab_quantum", "Quantum Circuit Architecture"), icon: Binary },
+          { id: "benchmarks", label: t("disease_intro.tab_benchmarks", "Audited Benchmarks"), icon: BarChart3 },
         ].map((tItem) => {
           const Icon = tItem.icon;
           const isActive = activeTab === tItem.id;
@@ -347,7 +348,7 @@ export default function DiseaseIntroPage({
               }}
             >
               <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0F172A", margin: 0 }}>
-                Clinical Background & Pathology
+                {t("disease_intro.clinical_background_title", "Clinical Background & Pathology")}
               </h3>
               <p style={{ fontSize: "0.88rem", color: "#475569", lineHeight: 1.65, margin: 0 }}>
                 {disease.clinicalBackground || disease.description}
@@ -355,7 +356,7 @@ export default function DiseaseIntroPage({
 
               <div style={{ borderTop: "1px solid #F1F5F9", paddingTop: "14px" }}>
                 <strong style={{ fontSize: "0.85rem", color: "#0F172A", display: "block", marginBottom: "8px" }}>
-                  Key Physiological Biomarkers Evaluated:
+                  {t("disease_intro.key_biomarkers_title", "Key Physiological Biomarkers Evaluated:")}
                 </strong>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
                   {(disease.keyBiomarkers || ["Cell Radius", "Texture Variance", "Perimeter Area", "Concave Points", "Symmetry", "Fractal Dimension"]).map((b, idx) => (
@@ -391,7 +392,7 @@ export default function DiseaseIntroPage({
               }}
             >
               <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0F172A", margin: 0 }}>
-                Primary Symptoms & Warning Signs
+                {t("disease_intro.symptoms_title", "Primary Symptoms & Warning Signs")}
               </h3>
               <ul style={{ margin: 0, paddingLeft: "18px", fontSize: "0.85rem", color: "#475569", lineHeight: 1.6 }}>
                 {(disease.symptoms || [
@@ -406,18 +407,17 @@ export default function DiseaseIntroPage({
 
               <div style={{ marginTop: "auto", background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: "6px", padding: "10px 14px" }}>
                 <span style={{ fontSize: "0.72rem", color: "#059669", fontWeight: 700, display: "flex", alignItems: "center", gap: "6px" }}>
-                  <CheckCircle2 size={14} /> Early Intervention Benefit
+                  <CheckCircle2 size={14} /> {t("disease_intro.early_intervention_benefit", "Early Intervention Benefit")}
                 </span>
                 <p style={{ fontSize: "0.78rem", color: "#166534", margin: "4px 0 0 0", lineHeight: 1.4 }}>
-                  Detecting cellular shifts at Stage 0-1 provides a 99% 5-year favorable clinical outcome.
+                  {t("disease_intro.early_intervention_desc", "Detecting cellular shifts at Stage 0-1 provides a 99% 5-year favorable clinical outcome.")}
                 </p>
               </div>
             </div>
           </div>
         )}
 
-
-        {/* TAB 3: Quantum Circuit Architecture */}
+        {/* TAB 2: Quantum Circuit Architecture */}
         {activeTab === "quantum" && (
           <div
             className="fade-stagger-card"
@@ -432,35 +432,41 @@ export default function DiseaseIntroPage({
             }}
           >
             <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0F172A", margin: 0 }}>
-              Variational Quantum Classifier (VQC) Mechanics
+              {t("disease_intro.vqc_mechanics_title", "Variational Quantum Classifier (VQC) Mechanics")}
             </h3>
             <p style={{ fontSize: "0.88rem", color: "#475569", lineHeight: 1.65, margin: 0 }}>
-              The <strong>{disease.modelArchitecture || "OncoPulse-VQC"}</strong> uses PennyLane statevector transformations to map biomedical biomarker vectors into a 2ⁿ-dimensional Hilbert space, evaluating non-linear multi-biomarker correlations without classical kernel overfitting.
+              {t("disease_intro.vqc_mechanics_desc", "The {{model}} uses PennyLane statevector transformations to map biomedical biomarker vectors into a 2ⁿ-dimensional Hilbert space, evaluating non-linear multi-biomarker correlations without classical kernel overfitting.", { model: disease.modelArchitecture || "OncoPulse-VQC" })}
             </p>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "12px", borderTop: "1px solid #F1F5F9", paddingTop: "14px" }}>
+            <div style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", display: "grid", gap: "12px", borderTop: "1px solid #F1F5F9", paddingTop: "14px" }}>
               <div style={{ background: "#F8FAFC", padding: "12px 14px", borderRadius: "6px", border: "1px solid #E2E8F0" }}>
-                <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Qubit Count</span>
-                <strong style={{ fontSize: "1.1rem", color: "#0284C7", display: "block", marginTop: "2px" }}>8 Qubits</strong>
-                <span style={{ fontSize: "0.72rem", color: "#64748B" }}>256-dimensional Hilbert space</span>
+                <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>
+                  {t("disease_intro.qubit_count", "Qubit Count")}
+                </span>
+                <strong style={{ fontSize: "1.1rem", color: "#0284C7", display: "block", marginTop: "2px" }}>8 {t("disease_intro.qubits_unit", "Qubits")}</strong>
+                <span style={{ fontSize: "0.72rem", color: "#64748B" }}>{t("disease_intro.hilbert_space_desc", "256-dimensional Hilbert space")}</span>
               </div>
 
               <div style={{ background: "#F8FAFC", padding: "12px 14px", borderRadius: "6px", border: "1px solid #E2E8F0" }}>
-                <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Entangling Topology</span>
+                <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>
+                  {t("disease_intro.entangling_topology", "Entangling Topology")}
+                </span>
                 <strong style={{ fontSize: "1.1rem", color: "#0F172A", display: "block", marginTop: "2px" }}>Circular CNOT</strong>
-                <span style={{ fontSize: "0.72rem", color: "#64748B" }}>Maximal inter-marker entanglement</span>
+                <span style={{ fontSize: "0.72rem", color: "#64748B" }}>{t("disease_intro.entangling_desc", "Maximal inter-marker entanglement")}</span>
               </div>
 
               <div style={{ background: "#F8FAFC", padding: "12px 14px", borderRadius: "6px", border: "1px solid #E2E8F0" }}>
-                <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>Parameter Efficiency</span>
+                <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>
+                  {t("disease_intro.parameter_efficiency", "Parameter Efficiency")}
+                </span>
                 <strong style={{ fontSize: "1.1rem", color: "#059669", display: "block", marginTop: "2px" }}>48 Parameters</strong>
-                <span style={{ fontSize: "0.72rem", color: "#64748B" }}>727× fewer weights than dense MLP</span>
+                <span style={{ fontSize: "0.72rem", color: "#64748B" }}>{t("disease_intro.parameters_desc", "727× fewer weights than dense MLP")}</span>
               </div>
             </div>
           </div>
         )}
 
-        {/* TAB 4: Audited Benchmarks */}
+        {/* TAB 3: Audited Benchmarks */}
         {activeTab === "benchmarks" && (
           <div
             className="fade-stagger-card"
@@ -475,18 +481,18 @@ export default function DiseaseIntroPage({
             }}
           >
             <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0F172A", margin: 0 }}>
-              Audited Performance: {disease.name}
+              {t("disease_intro.audited_performance_title", "Audited Performance: {{name}}", { name: disease.name })}
             </h3>
             <div style={{ overflowX: "auto" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.82rem", textAlign: "left" }}>
                 <thead>
                   <tr style={{ background: "#F8FAFC", borderBottom: "1px solid #E2E8F0", color: "#64748B" }}>
-                    <th style={{ padding: "10px 14px" }}>Model</th>
-                    <th style={{ padding: "10px 14px" }}>Architecture</th>
-                    <th style={{ padding: "10px 14px" }}>Accuracy</th>
-                    <th style={{ padding: "10px 14px" }}>Sensitivity</th>
-                    <th style={{ padding: "10px 14px" }}>Specificity</th>
-                    <th style={{ padding: "10px 14px" }}>Status</th>
+                    <th style={{ padding: "10px 14px" }}>{t("disease_intro.table_model", "Model")}</th>
+                    <th style={{ padding: "10px 14px" }}>{t("disease_intro.table_architecture", "Architecture")}</th>
+                    <th style={{ padding: "10px 14px" }}>{t("disease_intro.table_accuracy", "Accuracy")}</th>
+                    <th style={{ padding: "10px 14px" }}>{t("disease_intro.table_sensitivity", "Sensitivity")}</th>
+                    <th style={{ padding: "10px 14px" }}>{t("disease_intro.table_specificity", "Specificity")}</th>
+                    <th style={{ padding: "10px 14px" }}>{t("disease_intro.table_status", "Status")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -496,7 +502,7 @@ export default function DiseaseIntroPage({
                     <td style={{ padding: "10px 14px", fontWeight: 700, color: "#059669" }}>{disease.accuracy}</td>
                     <td style={{ padding: "10px 14px" }}>{disease.sensitivity || "94.0%"}</td>
                     <td style={{ padding: "10px 14px" }}>{disease.specificity || "96.2%"}</td>
-                    <td style={{ padding: "10px 14px", color: "#059669", fontWeight: 700 }}>Primary Active</td>
+                    <td style={{ padding: "10px 14px", color: "#059669", fontWeight: 700 }}>{t("disease_intro.primary_active", "Primary Active")}</td>
                   </tr>
                   <tr style={{ borderBottom: "1px solid #F1F5F9" }}>
                     <td style={{ padding: "10px 14px", fontWeight: 600 }}>Sentinel-RF</td>
@@ -504,7 +510,7 @@ export default function DiseaseIntroPage({
                     <td style={{ padding: "10px 14px", fontWeight: 600 }}>84.0%</td>
                     <td style={{ padding: "10px 14px" }}>82.5%</td>
                     <td style={{ padding: "10px 14px" }}>85.0%</td>
-                    <td style={{ padding: "10px 14px", color: "#64748B" }}>Classical Control</td>
+                    <td style={{ padding: "10px 14px", color: "#64748B" }}>{t("disease_intro.classical_control", "Classical Control")}</td>
                   </tr>
                 </tbody>
               </table>
