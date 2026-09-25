@@ -4,7 +4,6 @@ import {
   ShieldAlert,
   AlertTriangle,
   CheckCircle2,
-  Apple,
   Plus,
   Trash2,
   RefreshCw,
@@ -20,7 +19,22 @@ import {
   ChevronRight,
   ShieldCheck,
   Stethoscope,
-  X
+  X,
+  Share2,
+  SlidersHorizontal,
+  Clock,
+  ArrowRightLeft,
+  Filter,
+  Check,
+  Leaf,
+  Milk,
+  Wine,
+  Coffee,
+  Sun,
+  Flame,
+  Activity,
+  Heart,
+  Network
 } from "lucide-react";
 import { consultationsApi } from "../../api/consultations";
 import { useLanguage } from "../../context/LanguageContext";
@@ -57,15 +71,56 @@ const PRESET_REGIMENS = [
 ];
 
 const DIETARY_TAGS = [
-  { key: "grapefruit", label: "Grapefruit / Citrus", icon: "🍊", desc: "Potent CYP3A4 inhibitor" },
-  { key: "leafy_greens", label: "Spinach / Vitamin K", icon: "🥬", desc: "Warfarin clotting antagonist" },
-  { key: "dairy_calcium", label: "Milk & Dairy (Calcium)", icon: "🥛", desc: "Chelates fluoroquinolones & T4" },
-  { key: "high_potassium", label: "Bananas / K+ Substitutes", icon: "🍌", desc: "Compounded hyperkalemia risk" },
-  { key: "tyramine_foods", label: "Aged Cheese / Fermented", icon: "🧀", desc: "MAO inhibitor hypertensive crisis" },
-  { key: "alcohol", label: "Alcohol / Ethanol", icon: "🍷", desc: "Severe hepatotoxicity & CNS depression" },
-  { key: "caffeine", label: "Coffee / Energy Drinks", icon: "☕", desc: "Exaggerated stimulant toxicity" },
-  { key: "st_johns_wort", label: "St. John's Wort Herbal", icon: "🌿", desc: "CYP3A4 inducer & serotonin risk" },
+  { key: "grapefruit", label: "Grapefruit / Citrus", iconName: "citrus", desc: "Potent CYP3A4 inhibitor" },
+  { key: "leafy_greens", label: "Spinach / Vitamin K", iconName: "leaf", desc: "Warfarin clotting antagonist" },
+  { key: "dairy_calcium", label: "Milk & Dairy (Calcium)", iconName: "milk", desc: "Chelates fluoroquinolones & T4" },
+  { key: "high_potassium", label: "Bananas / K+ Substitutes", iconName: "potassium", desc: "Compounded hyperkalemia risk" },
+  { key: "tyramine_foods", label: "Aged Cheese / Fermented", iconName: "tyramine", desc: "MAO inhibitor hypertensive crisis" },
+  { key: "alcohol", label: "Alcohol / Ethanol", iconName: "alcohol", desc: "Severe hepatotoxicity & CNS depression" },
+  { key: "caffeine", label: "Coffee / Energy Drinks", iconName: "coffee", desc: "Exaggerated stimulant toxicity" },
+  { key: "st_johns_wort", label: "St. John's Wort Herbal", iconName: "herbal", desc: "CYP3A4 inducer & serotonin risk" },
 ];
+
+const DRUG_CATEGORIES = [
+  { id: "all", label: "All Classes" },
+  { id: "cardiac", label: "Cardiovascular & Blood" },
+  { id: "gi", label: "Gastrointestinal" },
+  { id: "anti_infective", label: "Antibiotics & Anti-Infective" },
+  { id: "cns", label: "CNS & Psychotropic" },
+  { id: "endocrine", label: "Endocrine & Diabetes" },
+  { id: "pain", label: "Analgesic & Anti-Inflammatory" },
+];
+
+const ALTERNATIVE_SUGGESTIONS = {
+  "omeprazole": { alternative: "Pantoprazole", reason: "Minimal CYP2C19 inhibition, preserving antiplatelet efficacy of Clopidogrel." },
+  "clarithromycin": { alternative: "Azithromycin", reason: "Does not inhibit CYP3A4, avoiding toxic statin accumulation and rhabdomyolysis." },
+  "ibuprofen": { alternative: "Paracetamol", reason: "Avoids renal tubular competition and bone marrow toxicity with Methotrexate." },
+  "tramadol": { alternative: "Paracetamol", reason: "Non-serotonergic analgesic that eliminates serotonin syndrome risk with SSRIs." },
+  "simvastatin": { alternative: "Rosuvastatin", reason: "Hydrophilic statin largely independent of CYP3A4 hepatic metabolism." },
+};
+
+function renderDietIcon(iconName, size = 16) {
+  switch (iconName) {
+    case "citrus":
+      return <Sun size={size} color="#EA580C" />;
+    case "leaf":
+      return <Leaf size={size} color="#16A34A" />;
+    case "milk":
+      return <Milk size={size} color="#0284C7" />;
+    case "potassium":
+      return <Flame size={size} color="#D97706" />;
+    case "tyramine":
+      return <ShieldAlert size={size} color="#CA8A04" />;
+    case "alcohol":
+      return <Wine size={size} color="#DC2626" />;
+    case "coffee":
+      return <Coffee size={size} color="#78350F" />;
+    case "herbal":
+      return <Leaf size={size} color="#059669" />;
+    default:
+      return <Activity size={size} color="#0284C7" />;
+  }
+}
 
 export default function DrugInteractionMatrix({ patientId = null, initialMeds = [] }) {
   const { t } = useLanguage();
@@ -78,8 +133,12 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
   const [catalogSearch, setCatalogSearch] = useState("");
-  const [activeTab, setActiveTab] = useState("workbench"); // 'workbench' | 'matrix' | 'food' | 'library'
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [activeTab, setActiveTab] = useState("workbench"); // 'workbench' | 'matrix' | 'network' | 'food' | 'library'
   const [selectedCollisionDetail, setSelectedCollisionDetail] = useState(null);
+  const [hoveredMatrixCell, setHoveredMatrixCell] = useState(null);
+  const [selectedNetworkNode, setSelectedNetworkNode] = useState(null);
+  const [timingMode, setTimingMode] = useState("concomitant"); // 'concomitant' | 'staggered'
 
   // Load Reference Catalog
   useEffect(() => {
@@ -90,7 +149,7 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
           setCatalog(res);
         }
       } catch {
-        // Graceful fallback
+        // Fallback handled gracefully
       }
     }
     loadCatalog();
@@ -153,7 +212,32 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
     setSelectedMeds([]);
     setSelectedDiet([]);
     setAnalysis(null);
+    setSelectedCollisionDetail(null);
   }
+
+  function handleSwapMedication(oldMedName, newMedName) {
+    setSelectedMeds((prev) =>
+      prev.map((m) => (m.toLowerCase() === oldMedName.toLowerCase() ? newMedName : m))
+    );
+    setSelectedCollisionDetail(null);
+  }
+
+  // Filter Formulary by Search and Category
+  const filteredFormulary = useMemo(() => {
+    const list = catalog?.common_medications || [];
+    return list.filter((item) => {
+      const matchesSearch = !catalogSearch.trim() || item.name.toLowerCase().includes(catalogSearch.toLowerCase().trim()) || item.class.toLowerCase().includes(catalogSearch.toLowerCase().trim());
+      if (!matchesSearch) return false;
+      if (selectedCategory === "all") return true;
+      if (selectedCategory === "cardiac") return /cardio|anticoagulant|antiplatelet|statin|ace|arb|beta|nitrate/i.test(item.class);
+      if (selectedCategory === "gi") return /ppi|antacid|gastro|ulcer|h2/i.test(item.class);
+      if (selectedCategory === "anti_infective") return /antibiotic|macrolide|fluoroquinolone|penicillin/i.test(item.class);
+      if (selectedCategory === "cns") return /ssri|antidepressant|sedative|analgesic|opioid|mood/i.test(item.class);
+      if (selectedCategory === "endocrine") return /diabetes|thyroid|metformin|hormone/i.test(item.class);
+      if (selectedCategory === "pain") return /nsaid|analgesic|anti-inflammatory/i.test(item.class);
+      return true;
+    });
+  }, [catalog, catalogSearch, selectedCategory]);
 
   // Filtered Reference Library
   const filteredRules = useMemo(() => {
@@ -176,6 +260,65 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
     riskTier === "CRITICAL_HAZARD" ? "#FEF2F2" : riskTier === "MODERATE_RISK" ? "#FFFBEB" : "#ECFDF5";
   const riskBorder =
     riskTier === "CRITICAL_HAZARD" ? "#FECDD3" : riskTier === "MODERATE_RISK" ? "#FDE68A" : "#A7F3D0";
+
+  // Calculate coordinates for Interactive Molecular Network Diagram
+  const networkNodes = useMemo(() => {
+    const allItems = [
+      ...selectedMeds.map((m) => ({ id: m, label: m, type: "med" })),
+      ...selectedDiet.map((d) => {
+        const tag = DIETARY_TAGS.find((t) => t.key === d);
+        return { id: d, label: tag?.label || d, type: "food", iconName: tag?.iconName };
+      }),
+    ];
+    if (allItems.length === 0) return [];
+    const radius = Math.min(180, Math.max(120, allItems.length * 28));
+    const centerX = 260;
+    const centerY = 200;
+    return allItems.map((item, idx) => {
+      const angle = (idx / allItems.length) * 2 * Math.PI - Math.PI / 2;
+      return {
+        ...item,
+        x: centerX + radius * Math.cos(angle),
+        y: centerY + radius * Math.sin(angle),
+      };
+    });
+  }, [selectedMeds, selectedDiet]);
+
+  const networkLinks = useMemo(() => {
+    if (!analysis) return [];
+    const links = [];
+    // Drug-Drug Links
+    (analysis.matrix_pairs || []).forEach((pair) => {
+      const sourceNode = networkNodes.find((n) => n.id.toLowerCase() === pair.drug_a.toLowerCase());
+      const targetNode = networkNodes.find((n) => n.id.toLowerCase() === pair.drug_b.toLowerCase());
+      if (sourceNode && targetNode) {
+        links.push({
+          source: sourceNode,
+          target: targetNode,
+          severity: pair.severity,
+          warning: pair.warning,
+          pairData: pair,
+        });
+      }
+    });
+    // Drug-Food Links
+    (analysis.food_interactions || []).forEach((food) => {
+      const foodNode = networkNodes.find((n) => n.id.toLowerCase() === food.food_key.toLowerCase());
+      (food.matched_drugs || []).forEach((dName) => {
+        const drugNode = networkNodes.find((n) => n.id.toLowerCase() === dName.toLowerCase());
+        if (foodNode && drugNode) {
+          links.push({
+            source: foodNode,
+            target: drugNode,
+            severity: food.severity,
+            warning: food.warning,
+            foodData: food,
+          });
+        }
+      });
+    });
+    return links;
+  }, [analysis, networkNodes]);
 
   return (
     <div
@@ -203,7 +346,7 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
           gap: "18px",
         }}
       >
-        <div style={{ maxWidth: "600px" }}>
+        <div style={{ maxWidth: "620px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
             <div
               style={{
@@ -263,7 +406,7 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
               background: riskBg,
               border: `1.5px solid ${riskBorder}`,
               borderRadius: "10px",
-              minWidth: "160px",
+              minWidth: "165px",
             }}
           >
             <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>
@@ -307,7 +450,7 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
             }}
           >
             <Printer size={14} />
-            <span>{t("pharma.print_report", "Export Rx Safety Sheet")}</span>
+            <span>{t("pharma.print_report", "Export Rx Audit")}</span>
           </button>
         </div>
       </div>
@@ -385,13 +528,16 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
           borderRadius: "10px",
           width: "fit-content",
           marginBottom: "20px",
+          flexWrap: "wrap",
+          gap: "2px",
         }}
       >
         {[
-          { id: "workbench", label: t("pharma.tab_workbench", "Regimen Workbench & Alerts"), icon: Layers },
-          { id: "matrix", label: t("pharma.tab_matrix", "2D Drug Collision Matrix"), icon: FileSpreadsheet },
-          { id: "food", label: t("pharma.tab_food", "Dietary & Food Contraindications"), icon: Apple },
-          { id: "library", label: t("pharma.tab_library", "Reference Pharmacology Library"), icon: BookOpen },
+          { id: "workbench", label: t("pharma.tab_workbench", "Regimen Workbench"), icon: Layers },
+          { id: "matrix", label: t("pharma.tab_matrix", "2D Collision Matrix"), icon: FileSpreadsheet },
+          { id: "network", label: "Interactive Pathway Map", icon: Network },
+          { id: "food", label: t("pharma.tab_food", "Food & Dietary Hazards"), icon: Leaf },
+          { id: "library", label: t("pharma.tab_library", "Pharmacology Database"), icon: BookOpen },
         ].map((tab) => {
           const isActive = activeTab === tab.id;
           const Icon = tab.icon;
@@ -448,22 +594,26 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
               </span>
             </div>
 
-            {/* Input for custom medication */}
+            {/* Custom Drug Input Field */}
             <form onSubmit={handleAddCustomMed} style={{ display: "flex", gap: "8px", marginBottom: "16px" }}>
-              <input
-                type="text"
-                value={customMedInput}
-                onChange={(e) => setCustomMedInput(e.target.value)}
-                placeholder={t("pharma.type_med_placeholder", "Type drug name (e.g. Clopidogrel, Omeprazole)...")}
-                style={{
-                  flex: 1,
-                  padding: "9px 12px",
-                  borderRadius: "7px",
-                  border: "1px solid #CBD5E1",
-                  fontSize: "0.85rem",
-                  outline: "none",
-                }}
-              />
+              <div style={{ position: "relative", flex: 1 }}>
+                <Search size={14} color="#94A3B8" style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)" }} />
+                <input
+                  type="text"
+                  value={customMedInput}
+                  onChange={(e) => setCustomMedInput(e.target.value)}
+                  placeholder={t("pharma.type_med_placeholder", "Type custom drug name (e.g. Aspirin, Warfarin, Metformin)...")}
+                  style={{
+                    width: "100%",
+                    padding: "9px 12px 9px 34px",
+                    borderRadius: "8px",
+                    border: "1px solid #CBD5E1",
+                    fontSize: "0.82rem",
+                    outline: "none",
+                    boxSizing: "border-box",
+                  }}
+                />
+              </div>
               <button
                 type="submit"
                 style={{
@@ -471,9 +621,9 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
                   background: "#059669",
                   color: "#FFFFFF",
                   border: "none",
-                  borderRadius: "7px",
+                  borderRadius: "8px",
+                  fontSize: "0.80rem",
                   fontWeight: 700,
-                  fontSize: "0.82rem",
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
@@ -485,15 +635,15 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
               </button>
             </form>
 
-            {/* Active Medication Tags */}
+            {/* Currently Active Medication Chips */}
             <div style={{ marginBottom: "18px" }}>
               <label style={{ display: "block", fontSize: "0.70rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase", marginBottom: "8px" }}>
                 {t("pharma.current_regimen_label", "Current Active Regimen:")}
               </label>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", minHeight: "38px", padding: "8px", background: "#F8FAFC", borderRadius: "8px", border: "1px dashed #CBD5E1" }}>
                 {selectedMeds.length === 0 ? (
-                  <span style={{ fontSize: "0.82rem", color: "#94A3B8", fontStyle: "italic" }}>
-                    {t("pharma.no_meds_selected", "No medications added yet. Click from common catalog below or type custom drug.")}
+                  <span style={{ fontSize: "0.76rem", color: "#94A3B8", fontStyle: "italic", margin: "auto 0" }}>
+                    {t("pharma.no_meds_selected", "No medications selected. Click items from catalog below.")}
                   </span>
                 ) : (
                   selectedMeds.map((med) => (
@@ -504,12 +654,13 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
                         alignItems: "center",
                         gap: "6px",
                         padding: "5px 10px",
-                        background: "#F1F5F9",
+                        background: "#FFFFFF",
                         border: "1px solid #CBD5E1",
                         borderRadius: "6px",
                         fontSize: "0.80rem",
                         fontWeight: 700,
                         color: "#0F172A",
+                        boxShadow: "0 1px 2px rgba(0,0,0,0.03)",
                       }}
                     >
                       <Pill size={12} color="#059669" />
@@ -527,13 +678,39 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
               </div>
             </div>
 
+            {/* Category Filter for Formulary */}
+            <div style={{ marginBottom: "10px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", overflowX: "auto", paddingBottom: "4px" }}>
+                {DRUG_CATEGORIES.map((cat) => (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setSelectedCategory(cat.id)}
+                    style={{
+                      padding: "3px 8px",
+                      borderRadius: "12px",
+                      fontSize: "0.68rem",
+                      fontWeight: selectedCategory === cat.id ? 700 : 500,
+                      background: selectedCategory === cat.id ? "#0F172A" : "#F1F5F9",
+                      color: selectedCategory === cat.id ? "#FFFFFF" : "#475569",
+                      border: "none",
+                      cursor: "pointer",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Quick Catalog Click Chips */}
             <div>
               <label style={{ display: "block", fontSize: "0.70rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase", marginBottom: "8px" }}>
-                {t("pharma.quick_add_catalog", "Quick Add from Common Catalog:")}
+                {t("pharma.quick_add_catalog", "Quick Add from Formulary Catalog:")}
               </label>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", maxHeight: "180px", overflowY: "auto" }}>
-                {(catalog?.common_medications || []).map((item) => {
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", maxHeight: "150px", overflowY: "auto" }}>
+                {filteredFormulary.map((item) => {
                   const isSelected = selectedMeds.some((m) => m.toLowerCase() === item.name.toLowerCase());
                   return (
                     <button
@@ -549,10 +726,13 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
                         fontSize: "0.75rem",
                         fontWeight: isSelected ? 700 : 500,
                         cursor: "pointer",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "4px",
                         transition: "all 0.12s ease",
                       }}
                     >
-                      {isSelected ? "✓ " : "+ "}
+                      {isSelected ? <Check size={12} color="#059669" /> : <Plus size={12} color="#94A3B8" />}
                       {item.name}
                     </button>
                   );
@@ -563,7 +743,7 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
             {/* Dietary Selection in Workbench */}
             <div style={{ marginTop: "20px", borderTop: "1px solid #F1F5F9", paddingTop: "14px" }}>
               <label style={{ display: "block", fontSize: "0.70rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase", marginBottom: "8px" }}>
-                {t("pharma.patient_dietary_habits", "Patient Dietary Factors & Beverages:")}
+                {t("pharma.patient_dietary_habits", "Patient Dietary Factors & Nutritional Intake:")}
               </label>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
                 {DIETARY_TAGS.map((diet) => {
@@ -586,7 +766,21 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
                         cursor: "pointer",
                       }}
                     >
-                      <span style={{ fontSize: "1rem" }}>{diet.icon}</span>
+                      <div
+                        style={{
+                          width: "24px",
+                          height: "24px",
+                          borderRadius: "6px",
+                          background: isSelected ? "#DCFCE7" : "#FFFFFF",
+                          border: "1px solid #E2E8F0",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {renderDietIcon(diet.iconName, 14)}
+                      </div>
                       <div style={{ overflow: "hidden" }}>
                         <strong style={{ display: "block", fontSize: "0.76rem" }}>{diet.label}</strong>
                         <span style={{ fontSize: "0.64rem", color: "#64748B", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>
@@ -642,8 +836,9 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-                <h4 style={{ fontSize: "0.88rem", fontWeight: 700, color: "#0F172A", margin: 0 }}>
-                  {t("pharma.drug_drug_collisions", "Drug-to-Drug Collisions")} ({analysis?.drug_interactions?.length || 0})
+                <h4 style={{ fontSize: "0.88rem", fontWeight: 700, color: "#0F172A", margin: 0, display: "flex", alignItems: "center", gap: "6px" }}>
+                  <Activity size={16} color="#059669" />
+                  {t("pharma.drug_drug_collisions", "Drug-to-Drug Collisions Detected")} ({analysis?.drug_interactions?.length || 0})
                 </h4>
               </div>
 
@@ -662,6 +857,12 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
                     const badgeColor = isCritical ? "#DC2626" : isHigh ? "#EA580C" : "#D97706";
                     const badgeBg = isCritical ? "#FEF2F2" : isHigh ? "#FFF7ED" : "#FFFBEB";
 
+                    // Check for safe alternative suggestion
+                    const targetDrugA = (item.matched_pair?.[0] || item.drug_a).toLowerCase();
+                    const targetDrugB = (item.matched_pair?.[1] || item.drug_b).toLowerCase();
+                    const altA = ALTERNATIVE_SUGGESTIONS[targetDrugA];
+                    const altB = ALTERNATIVE_SUGGESTIONS[targetDrugB];
+
                     return (
                       <div
                         key={idx}
@@ -675,6 +876,7 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
                       >
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
                           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                            <Pill size={14} color={badgeColor} />
                             <strong style={{ fontSize: "0.85rem", color: "#0F172A" }}>
                               {item.matched_pair?.[0] || item.drug_a} ↔ {item.matched_pair?.[1] || item.drug_b}
                             </strong>
@@ -703,11 +905,43 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
                           {item.warning}
                         </p>
 
-                        <div style={{ padding: "6px 10px", background: "#F8FAFC", borderRadius: "6px", borderLeft: `3px solid ${badgeColor}` }}>
+                        <div style={{ padding: "6px 10px", background: "#F8FAFC", borderRadius: "6px", borderLeft: `3px solid ${badgeColor}`, marginBottom: altA || altB ? "8px" : "0" }}>
                           <span style={{ fontSize: "0.72rem", color: "#0F172A", fontWeight: 600 }}>
                             Clinical Action: {item.recommendation || "Consult prescribing physician to adjust dosing interval or select substitute."}
                           </span>
                         </div>
+
+                        {/* Interactive Safe Alternative Swapper */}
+                        {(altA || altB) && (
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#ECFDF5", border: "1px dashed #A7F3D0", padding: "6px 10px", borderRadius: "6px" }}>
+                            <div style={{ fontSize: "0.70rem", color: "#065F46" }}>
+                              <strong>Safe Alternative:</strong> {altA ? `${item.matched_pair?.[0]} → ${altA.alternative}` : `${item.matched_pair?.[1]} → ${altB.alternative}`}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (altA) handleSwapMedication(item.matched_pair?.[0] || item.drug_a, altA.alternative);
+                                else if (altB) handleSwapMedication(item.matched_pair?.[1] || item.drug_b, altB.alternative);
+                              }}
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "4px",
+                                padding: "4px 8px",
+                                background: "#059669",
+                                color: "#FFFFFF",
+                                border: "none",
+                                borderRadius: "4px",
+                                fontSize: "0.68rem",
+                                fontWeight: 700,
+                                cursor: "pointer",
+                              }}
+                            >
+                              <ArrowRightLeft size={11} />
+                              <span>1-Click Swap</span>
+                            </button>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -726,8 +960,9 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-                <h4 style={{ fontSize: "0.88rem", fontWeight: 700, color: "#0F172A", margin: 0 }}>
-                  {t("pharma.food_contraindications", "Drug-Food Contraindications")} ({analysis?.food_interactions?.length || 0})
+                <h4 style={{ fontSize: "0.88rem", fontWeight: 700, color: "#0F172A", margin: 0, display: "flex", alignItems: "center", gap: "6px" }}>
+                  <Leaf size={16} color="#D97706" />
+                  {t("pharma.food_contraindications", "Drug-Food Dietary Contraindications")} ({analysis?.food_interactions?.length || 0})
                 </h4>
               </div>
 
@@ -751,9 +986,12 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
                       }}
                     >
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
-                        <strong style={{ fontSize: "0.84rem", color: "#92400E" }}>
-                          🍎 {food.food_name} ↔ {food.matched_drugs?.join(", ") || "Active Drugs"}
-                        </strong>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          {renderDietIcon(food.food_key, 14)}
+                          <strong style={{ fontSize: "0.84rem", color: "#92400E" }}>
+                            {food.food_name} ↔ {food.matched_drugs?.join(", ") || "Active Drugs"}
+                          </strong>
+                        </div>
                         <span style={{ fontSize: "0.64rem", fontWeight: 800, padding: "2px 6px", background: "#FEF3C7", color: "#B45309", borderRadius: "4px" }}>
                           {food.severity?.toUpperCase()} CAUTION
                         </span>
@@ -785,13 +1023,27 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
             overflowX: "auto",
           }}
         >
-          <div style={{ marginBottom: "16px" }}>
-            <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "#0F172A", margin: "0 0 4px 0" }}>
-              {t("pharma.matrix_title", "2D Pharmacological Collision Cross-Table")}
-            </h3>
-            <p style={{ fontSize: "0.80rem", color: "#64748B", margin: 0 }}>
-              {t("pharma.matrix_desc", "Visual cross-table comparing every selected medication against every other drug in the regimen. Click any intersection cell to inspect clinical pharmacology.")}
-            </p>
+          <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+            <div>
+              <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "#0F172A", margin: "0 0 4px 0" }}>
+                {t("pharma.matrix_title", "2D Pharmacological Collision Cross-Table")}
+              </h3>
+              <p style={{ fontSize: "0.80rem", color: "#64748B", margin: 0 }}>
+                {t("pharma.matrix_desc", "Visual cross-table comparing every selected medication against every other drug in the regimen. Hover over cells to see crosshairs; click any cell to inspect and swap.")}
+              </p>
+            </div>
+
+            <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "0.72rem", color: "#DC2626", fontWeight: 700 }}>
+                <ShieldAlert size={12} /> Critical Hazard
+              </span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "0.72rem", color: "#D97706", fontWeight: 700 }}>
+                <AlertTriangle size={12} /> Caution
+              </span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "0.72rem", color: "#059669", fontWeight: 700 }}>
+                <CheckCircle2 size={12} /> Safe Pair
+              </span>
+            </div>
           </div>
 
           {selectedMeds.length < 2 ? (
@@ -808,75 +1060,239 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
                   <th style={{ padding: "10px", border: "1px solid #E2E8F0", background: "#F8FAFC", fontSize: "0.76rem", color: "#64748B", textAlign: "left" }}>
                     DRUG / CROSS
                   </th>
-                  {selectedMeds.map((med) => (
-                    <th key={med} style={{ padding: "10px", border: "1px solid #E2E8F0", background: "#F8FAFC", fontSize: "0.76rem", color: "#0F172A", fontWeight: 700, textAlign: "center" }}>
-                      {med}
-                    </th>
-                  ))}
+                  {selectedMeds.map((med) => {
+                    const isColHovered = hoveredMatrixCell && hoveredMatrixCell.col === med;
+                    return (
+                      <th
+                        key={med}
+                        style={{
+                          padding: "10px",
+                          border: "1px solid #E2E8F0",
+                          background: isColHovered ? "#E0F2FE" : "#F8FAFC",
+                          fontSize: "0.76rem",
+                          color: isColHovered ? "#0369A1" : "#0F172A",
+                          fontWeight: 700,
+                          textAlign: "center",
+                          transition: "background 0.15s ease",
+                        }}
+                      >
+                        {med}
+                      </th>
+                    );
+                  })}
                 </tr>
               </thead>
               <tbody>
-                {selectedMeds.map((medRow) => (
-                  <tr key={medRow}>
-                    <td style={{ padding: "10px", border: "1px solid #E2E8F0", background: "#F8FAFC", fontSize: "0.78rem", fontWeight: 700, color: "#0F172A" }}>
-                      {medRow}
-                    </td>
-                    {selectedMeds.map((medCol) => {
-                      if (medRow === medCol) {
-                        return (
-                          <td key={medCol} style={{ padding: "10px", border: "1px solid #E2E8F0", background: "#F1F5F9", textAlign: "center", color: "#94A3B8", fontSize: "0.72rem" }}>
-                            —
-                          </td>
+                {selectedMeds.map((medRow) => {
+                  const isRowHovered = hoveredMatrixCell && hoveredMatrixCell.row === medRow;
+                  return (
+                    <tr key={medRow}>
+                      <td
+                        style={{
+                          padding: "10px",
+                          border: "1px solid #E2E8F0",
+                          background: isRowHovered ? "#E0F2FE" : "#F8FAFC",
+                          fontSize: "0.78rem",
+                          fontWeight: 700,
+                          color: isRowHovered ? "#0369A1" : "#0F172A",
+                          transition: "background 0.15s ease",
+                        }}
+                      >
+                        {medRow}
+                      </td>
+                      {selectedMeds.map((medCol) => {
+                        if (medRow === medCol) {
+                          return (
+                            <td key={medCol} style={{ padding: "10px", border: "1px solid #E2E8F0", background: "#F1F5F9", textAlign: "center", color: "#94A3B8", fontSize: "0.72rem" }}>
+                              —
+                            </td>
+                          );
+                        }
+
+                        // Check if collision exists
+                        const match = analysis?.matrix_pairs?.find(
+                          (p) =>
+                            (p.drug_a.toLowerCase() === medRow.toLowerCase() && p.drug_b.toLowerCase() === medCol.toLowerCase()) ||
+                            (p.drug_a.toLowerCase() === medCol.toLowerCase() && p.drug_b.toLowerCase() === medRow.toLowerCase())
                         );
-                      }
 
-                      // Check if collision exists
-                      const match = analysis?.matrix_pairs?.find(
-                        (p) =>
-                          (p.drug_a.toLowerCase() === medRow.toLowerCase() && p.drug_b.toLowerCase() === medCol.toLowerCase()) ||
-                          (p.drug_a.toLowerCase() === medCol.toLowerCase() && p.drug_b.toLowerCase() === medRow.toLowerCase())
-                      );
+                        if (match) {
+                          const isCrit = match.severity === "critical";
+                          return (
+                            <td
+                              key={medCol}
+                              onClick={() => setSelectedCollisionDetail(match)}
+                              onMouseEnter={() => setHoveredMatrixCell({ row: medRow, col: medCol })}
+                              onMouseLeave={() => setHoveredMatrixCell(null)}
+                              style={{
+                                padding: "10px",
+                                border: "1px solid #E2E8F0",
+                                background: isCrit ? "#FEE2E2" : "#FEF3C7",
+                                textAlign: "center",
+                                cursor: "pointer",
+                                transition: "all 0.15s ease",
+                                outline: (hoveredMatrixCell?.row === medRow && hoveredMatrixCell?.col === medCol) ? "2px solid #0F172A" : "none",
+                              }}
+                              title={match.warning}
+                            >
+                              <div style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "0.74rem", fontWeight: 800, color: isCrit ? "#DC2626" : "#D97706" }}>
+                                {isCrit ? <ShieldAlert size={13} /> : <AlertTriangle size={13} />}
+                                <span>{match.severity.toUpperCase()}</span>
+                              </div>
+                            </td>
+                          );
+                        }
 
-                      if (match) {
-                        const isCrit = match.severity === "critical";
                         return (
                           <td
                             key={medCol}
-                            onClick={() => setSelectedCollisionDetail(match)}
+                            onMouseEnter={() => setHoveredMatrixCell({ row: medRow, col: medCol })}
+                            onMouseLeave={() => setHoveredMatrixCell(null)}
                             style={{
                               padding: "10px",
                               border: "1px solid #E2E8F0",
-                              background: isCrit ? "#FEE2E2" : "#FEF3C7",
+                              background: "#F0FDF4",
                               textAlign: "center",
-                              cursor: "pointer",
-                              transition: "transform 0.1s ease",
+                              transition: "all 0.15s ease",
+                              outline: (hoveredMatrixCell?.row === medRow && hoveredMatrixCell?.col === medCol) ? "2px solid #059669" : "none",
                             }}
-                            title={match.warning}
                           >
-                            <span style={{ fontSize: "0.74rem", fontWeight: 800, color: isCrit ? "#DC2626" : "#D97706" }}>
-                              ⚠ {match.severity.toUpperCase()}
-                            </span>
+                            <div style={{ display: "inline-flex", alignItems: "center", gap: "4px", fontSize: "0.72rem", fontWeight: 700, color: "#059669" }}>
+                              <CheckCircle2 size={12} />
+                              <span>SAFE</span>
+                            </div>
                           </td>
                         );
-                      }
-
-                      return (
-                        <td key={medCol} style={{ padding: "10px", border: "1px solid #E2E8F0", background: "#F0FDF4", textAlign: "center" }}>
-                          <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "#059669" }}>
-                            ✓ SAFE
-                          </span>
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
+                      })}
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           )}
         </div>
       )}
 
-      {/* ── TAB 3: DIETARY & FOOD CONTRAINDICATIONS ── */}
+      {/* ── TAB 3: INTERACTIVE PATHWAY & NETWORK MAP ── */}
+      {activeTab === "network" && (
+        <div
+          style={{
+            background: "#FFFFFF",
+            border: "1px solid #E2E8F0",
+            borderRadius: "12px",
+            padding: "24px",
+            boxShadow: "0 2px 12px rgba(15, 23, 42, 0.04)",
+          }}
+        >
+          <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+            <div>
+              <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "#0F172A", margin: "0 0 4px 0", display: "flex", alignItems: "center", gap: "6px" }}>
+                <Network size={16} color="#059669" />
+                Interactive Pharmacology Network & Pathway Graph
+              </h3>
+              <p style={{ fontSize: "0.80rem", color: "#64748B", margin: 0 }}>
+                Visual biochemical interaction map connecting active medications and dietary agents. Red/Amber lines indicate metabolic enzyme interference.
+              </p>
+            </div>
+            {selectedNetworkNode && (
+              <button
+                type="button"
+                onClick={() => setSelectedNetworkNode(null)}
+                style={{ fontSize: "0.74rem", padding: "4px 8px", background: "#F1F5F9", border: "1px solid #CBD5E1", borderRadius: "6px", cursor: "pointer" }}
+              >
+                Reset Node Filter
+              </button>
+            )}
+          </div>
+
+          {networkNodes.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "40px 0", color: "#94A3B8" }}>
+              <Network size={36} style={{ margin: "0 auto 10px auto", opacity: 0.5 }} />
+              <p style={{ fontSize: "0.88rem", margin: 0 }}>Select medications or dietary items in the Workbench tab to render the interactive pathway network.</p>
+            </div>
+          ) : (
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "420px", position: "relative" }}>
+              <svg width="520" height="400" viewBox="0 0 520 400" style={{ overflow: "visible" }}>
+                {/* Connecting Links */}
+                {networkLinks.map((link, lIdx) => {
+                  const isCritical = link.severity === "critical";
+                  const isHigh = link.severity === "high";
+                  const strokeColor = isCritical ? "#DC2626" : isHigh ? "#EA580C" : "#D97706";
+                  const isHighlighted =
+                    !selectedNetworkNode ||
+                    selectedNetworkNode.id === link.source.id ||
+                    selectedNetworkNode.id === link.target.id;
+
+                  return (
+                    <g key={lIdx} opacity={isHighlighted ? 1 : 0.15}>
+                      <line
+                        x1={link.source.x}
+                        y1={link.source.y}
+                        x2={link.target.x}
+                        y2={link.target.y}
+                        stroke={strokeColor}
+                        strokeWidth={isCritical ? 3 : 2}
+                        strokeDasharray={isCritical ? "6,4" : "none"}
+                      />
+                    </g>
+                  );
+                })}
+
+                {/* Nodes */}
+                {networkNodes.map((node) => {
+                  const isSelected = selectedNetworkNode?.id === node.id;
+                  const isMed = node.type === "med";
+                  const nodeBg = isMed ? "#059669" : "#D97706";
+
+                  return (
+                    <g
+                      key={node.id}
+                      onClick={() => setSelectedNetworkNode(isSelected ? null : node)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <circle
+                        cx={node.x}
+                        cy={node.y}
+                        r={isSelected ? 26 : 22}
+                        fill={nodeBg}
+                        stroke="#FFFFFF"
+                        strokeWidth="3"
+                        style={{
+                          filter: isSelected ? "drop-shadow(0 0 8px rgba(5,150,105,0.6))" : "drop-shadow(0 2px 4px rgba(0,0,0,0.1))",
+                          transition: "all 0.15s ease",
+                        }}
+                      />
+                      <text
+                        x={node.x}
+                        y={node.y + 4}
+                        textAnchor="middle"
+                        fill="#FFFFFF"
+                        fontSize={isMed ? "9px" : "8px"}
+                        fontWeight="800"
+                        pointerEvents="none"
+                      >
+                        {isMed ? "Rx" : "Diet"}
+                      </text>
+                      <text
+                        x={node.x}
+                        y={node.y + 36}
+                        textAnchor="middle"
+                        fill="#0F172A"
+                        fontSize="11px"
+                        fontWeight="700"
+                      >
+                        {node.label}
+                      </text>
+                    </g>
+                  );
+                })}
+              </svg>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── TAB 4: DIETARY & FOOD CONTRAINDICATIONS ── */}
       {activeTab === "food" && (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "16px" }}>
           {(catalog?.food_interactions_db || []).map((rule, idx) => (
@@ -895,9 +1311,14 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
             >
               <div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-                  <h4 style={{ fontSize: "0.90rem", fontWeight: 800, color: "#0F172A", margin: 0 }}>
-                    {rule.food_name}
-                  </h4>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <div style={{ width: "24px", height: "24px", borderRadius: "6px", background: "#FEF3C7", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      {renderDietIcon(rule.food_key, 14)}
+                    </div>
+                    <h4 style={{ fontSize: "0.90rem", fontWeight: 800, color: "#0F172A", margin: 0 }}>
+                      {rule.food_name}
+                    </h4>
+                  </div>
                   <span
                     style={{
                       fontSize: "0.62rem",
@@ -931,7 +1352,7 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
         </div>
       )}
 
-      {/* ── TAB 4: PHARMACOLOGY REFERENCE LIBRARY ── */}
+      {/* ── TAB 5: PHARMACOLOGY REFERENCE LIBRARY ── */}
       {activeTab === "library" && (
         <div
           style={{
@@ -1021,7 +1442,7 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
         </div>
       )}
 
-      {/* ── Modal: Collision Detail Inspector ── */}
+      {/* ── Modal: Collision Detail Inspector with 1-Click Alternative Swapper ── */}
       {selectedCollisionDetail && (
         <div
           className="modal-overlay"
@@ -1044,7 +1465,7 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
               background: "#FFFFFF",
               borderRadius: "14px",
               padding: "24px",
-              maxWidth: "520px",
+              maxWidth: "540px",
               width: "100%",
               boxShadow: "0 20px 40px rgba(0,0,0,0.2)",
             }}
@@ -1074,7 +1495,7 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
               </p>
             </div>
 
-            <div style={{ padding: "12px", background: "#F8FAFC", borderRadius: "8px", border: "1px solid #E2E8F0", marginBottom: "18px" }}>
+            <div style={{ padding: "12px", background: "#F8FAFC", borderRadius: "8px", border: "1px solid #E2E8F0", marginBottom: "16px" }}>
               <strong style={{ fontSize: "0.78rem", color: "#0F172A", display: "block", marginBottom: "4px" }}>
                 Recommended Clinical Action:
               </strong>
@@ -1083,13 +1504,62 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
               </p>
             </div>
 
+            {/* Check for 1-Click Swap Recommendation */}
+            {(() => {
+              const drugA = (selectedCollisionDetail.drug_a || "").toLowerCase();
+              const drugB = (selectedCollisionDetail.drug_b || "").toLowerCase();
+              const altA = ALTERNATIVE_SUGGESTIONS[drugA];
+              const altB = ALTERNATIVE_SUGGESTIONS[drugB];
+              if (altA || altB) {
+                const target = altA ? selectedCollisionDetail.drug_a : selectedCollisionDetail.drug_b;
+                const repl = altA ? altA.alternative : altB.alternative;
+                const reason = altA ? altA.reason : altB.reason;
+                return (
+                  <div style={{ padding: "12px", background: "#ECFDF5", borderRadius: "8px", border: "1px solid #A7F3D0", marginBottom: "16px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                      <strong style={{ fontSize: "0.80rem", color: "#065F46" }}>
+                        1-Click Clinical Substitution:
+                      </strong>
+                      <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#059669" }}>Recommended</span>
+                    </div>
+                    <p style={{ fontSize: "0.76rem", color: "#047857", margin: "0 0 10px 0", lineHeight: 1.4 }}>
+                      Replace <strong>{target}</strong> with <strong>{repl}</strong>: {reason}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => handleSwapMedication(target, repl)}
+                      style={{
+                        width: "100%",
+                        padding: "8px",
+                        background: "#059669",
+                        color: "#FFFFFF",
+                        fontWeight: 700,
+                        fontSize: "0.80rem",
+                        borderRadius: "6px",
+                        border: "none",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "6px",
+                      }}
+                    >
+                      <ArrowRightLeft size={14} />
+                      <span>Apply 1-Click Medication Swap ({target} → {repl})</span>
+                    </button>
+                  </div>
+                );
+              }
+              return null;
+            })()}
+
             <button
               type="button"
               onClick={() => setSelectedCollisionDetail(null)}
               style={{
                 width: "100%",
                 padding: "10px",
-                background: "#059669",
+                background: "#0F172A",
                 color: "#FFFFFF",
                 fontWeight: 700,
                 fontSize: "0.84rem",
