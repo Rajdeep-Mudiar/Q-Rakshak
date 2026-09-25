@@ -1343,9 +1343,10 @@ export default function UnifiedAnalysisPage() {
   if (!currentUser) {
     return (
       <EditorialLoginPage
-        onGoogleLogin={() => {
+        onGoogleLogin={(role) => {
           const returnUrl = encodeURIComponent(window.location.origin + window.location.pathname);
-          window.location.href = `${ENDPOINTS.AUTH_GOOGLE}?redirect_url=${returnUrl}`;
+          const targetRole = role || "patient";
+          window.location.href = `${ENDPOINTS.AUTH_GOOGLE}?redirect_url=${returnUrl}&role=${targetRole}`;
         }}
         onGoogleVerifySuccess={(user) => {
           setCurrentUser(user);

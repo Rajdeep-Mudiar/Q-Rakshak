@@ -2,8 +2,10 @@ import apiClient from "./client";
 import { ENDPOINTS } from "./config";
 
 export const authApi = {
-  async login(username, password) {
-    const data = await apiClient.post(ENDPOINTS.AUTH_LOGIN, { username, password });
+  async login(username, password, role = null) {
+    const payload = { username, password };
+    if (role) payload.role = role;
+    const data = await apiClient.post(ENDPOINTS.AUTH_LOGIN, payload);
     if (data.access_token) {
       localStorage.setItem("qmed_token", data.access_token);
       localStorage.setItem("qmed_user", JSON.stringify(data.user));
@@ -20,9 +22,9 @@ export const authApi = {
     return data;
   },
 
-  async verifyGoogleCredential(credential) {
+  async verifyGoogleCredential(credential, role = "patient") {
     if (!credential) return null;
-    const data = await apiClient.post(ENDPOINTS.AUTH_GOOGLE_VERIFY, { credential });
+    const data = await apiClient.post(ENDPOINTS.AUTH_GOOGLE_VERIFY, { credential, role: role || "patient" });
     if (data && data.access_token) {
       localStorage.setItem("qmed_token", data.access_token);
       localStorage.setItem("qmed_user", JSON.stringify(data.user));

@@ -136,7 +136,13 @@ async def login(req: LoginRequest):
 
     is_test_account = settings.DB_MODE == "demo"
 
-    # Backend is the strict source of truth for authorization; user role comes from database record
+    # If role explicitly selected by user during login, ensure user role aligns
+    if req.role and req.role in ("doctor", "clinician", "patient", "admin"):
+        if user.get("username") != "admin" or req.role == "admin":
+            if user.get("role") != req.role:
+                DatabaseRepository.update_user_admin(user.get("id") or user.get("user_id"), {"role": req.role})
+                user["role"] = req.role
+
     user["role"] = user.get("role", "patient")
 
     doctor_id = None
@@ -294,7 +300,11 @@ async def google_verify(req: GoogleVerifyRequest, request: Request):
             )
         )
     else:
-        user["role"] = user.get("role", "patient")
+        if target_role and user.get("role") != target_role and user.get("username") != "admin":
+            DatabaseRepository.update_user_admin(user.get("id") or user.get("user_id"), {"role": target_role})
+            user["role"] = target_role
+        else:
+            user["role"] = user.get("role", "patient")
 
     doctor_id = None
     if user.get("role") in ("doctor", "clinician"):
@@ -357,6 +367,7 @@ async def google_login(
     prompt: str | None = "select_account",
     redirect_url: str | None = None,
     callback_url: str | None = None,
+    role: str | None = "patient",
 ):
     """Redirects user to Google OAuth 2.0 consent authorization screen."""
     client_id = settings.GOOGLE_CLIENT_ID
@@ -369,8 +380,10 @@ async def google_login(
         # Graceful notice if Google Client ID not yet set in .env
         return RedirectResponse(url=f"{frontend_url}/?error=google_oauth_credentials_required")
 
-    # Encode target frontend and expected redirect URI in OAuth state param
-    state_payload = json.dumps({"f": frontend_url, "r": redirect_uri})
+    target_role = role if role in ("patient", "doctor", "clinician", "admin", "researcher") else "patient"
+
+    # Encode target frontend, expected redirect URI, and desired role in OAuth state param
+    state_payload = json.dumps({"f": frontend_url, "r": redirect_uri, "role": target_role})
     state_b64 = base64.urlsafe_b64encode(state_payload.encode()).decode()
 
     params = {
@@ -400,6 +413,7 @@ async def google_callback(
     # 1. Recover state
     frontend_url = settings.FRONTEND_URL.rstrip("/")
     expected_redirect_uri = _determine_redirect_uri(request)
+    target_role = "patient"
     if state:
         try:
             decoded = json.loads(base64.urlsafe_b64decode(state.encode()).decode())
@@ -408,6 +422,8 @@ async def google_callback(
                     frontend_url = decoded["f"].rstrip("/")
                 if decoded.get("r"):
                     expected_redirect_uri = decoded["r"]
+                if decoded.get("role"):
+                    target_role = decoded["role"]
         except Exception as e:
             logger.warning("Could not decode OAuth state: %s", e)
 
@@ -500,7 +516,7 @@ async def google_callback(
             "password_hash": "GOOGLE_OAUTH_TOKEN",
             "name": google_name,
             "email": google_email,
-            "role": "patient",
+            "role": target_role,
             "hospital_affiliation": "Google Clinical SSO",
             "emergency_phone": "+91 98765 43210",
         })
@@ -508,9 +524,15 @@ async def google_callback(
             send_welcome_email(
                 user_email=google_email,
                 user_name=google_name,
-                user_role="patient",
+                user_role=target_role,
             )
         )
+    else:
+        if target_role and user.get("role") != target_role and user.get("username") != "admin":
+            DatabaseRepository.update_user_admin(user.get("id") or user.get("user_id"), {"role": target_role})
+            user["role"] = target_role
+        else:
+            user["role"] = user.get("role", "patient")
 
     doctor_id = None
     if user.get("role") in ("doctor", "clinician"):

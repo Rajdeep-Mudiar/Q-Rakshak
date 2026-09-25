@@ -59,7 +59,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
     setLoading(true);
     setError(null);
     try {
-      const data = await authApi.login(username, password);
+      const data = await authApi.login(username, password, selectedRole);
       if (onLoginSuccess) onLoginSuccess(data.user);
       onClose();
     } catch (err) {

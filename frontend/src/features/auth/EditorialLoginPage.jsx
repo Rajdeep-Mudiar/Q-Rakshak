@@ -128,7 +128,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                 try {
                   setGisLoading(true);
                   setLocalError(null);
-                  const verifiedUser = await authApi.verifyGoogleCredential(response.credential);
+                  const verifiedUser = await authApi.verifyGoogleCredential(response.credential, selectedRole);
                   if (verifiedUser) {
                     if (onLoginSuccess) {
                       onLoginSuccess(verifiedUser);
@@ -174,11 +174,11 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
     return () => {
       isMounted = false;
     };
-  }, [onGoogleVerifySuccess, onLoginSuccess]);
+  }, [onGoogleVerifySuccess, onLoginSuccess, selectedRole]);
 
   const handleGoogleClick = () => {
     if (onGoogleLogin) {
-      onGoogleLogin();
+      onGoogleLogin(selectedRole);
     }
   };
 
@@ -191,7 +191,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
     setSubmitting(true);
     setLocalError(null);
     try {
-      const data = await authApi.login(username.trim(), password);
+      const data = await authApi.login(username.trim(), password, selectedRole);
       if (data?.user) {
         if (onLoginSuccess) onLoginSuccess(data.user);
         else if (onGoogleVerifySuccess) onGoogleVerifySuccess(data.user);
