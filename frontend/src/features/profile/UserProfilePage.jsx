@@ -893,38 +893,38 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px", borderBottom: "1px solid var(--border-default)", paddingBottom: "10px" }}>
               <User size={18} color="var(--accent-blue)" />
               <h3 style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--ink-primary)", margin: 0 }}>
-                Patient Legal Identity & Contacts
+                {t("profile.patient_legal_identity", "Patient Legal Identity & Contacts")}
               </h3>
             </div>
 
             <div className="responsive-grid-two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "14px" }}>
               <div className="form-group">
-                <label className="form-label">Full Legal Name</label>
+                <label className="form-label">{t("profile.full_legal_name", "Full Legal Name")}</label>
                 <input
                   type="text"
                   className="input-control"
                   value={profile.name || ""}
                   onChange={(e) => handleFieldChange("name", e.target.value)}
                   onBlur={handleFieldBlur}
-                  placeholder="Enter full legal name"
+                  placeholder={t("profile.enter_full_name", "Enter full legal name")}
                   required
                 />
               </div>
 
               <div className="form-group">
-                <label className="form-label">Username / System ID</label>
+                <label className="form-label">{t("profile.username_system_id", "Username / System ID")}</label>
                 <input
                   type="text"
                   className="input-control"
                   value={profile.username || currentUser?.username || ""}
                   readOnly
-                  placeholder="System ID"
+                  placeholder={t("profile.system_id", "System ID")}
                   style={{ background: "var(--bg-surface-alt)", color: "var(--text-muted)", cursor: "not-allowed" }}
                 />
               </div>
 
               <div className="form-group">
-                <label className="form-label">Age</label>
+                <label className="form-label">{t("profile.age_label", "Age")}</label>
                 <input
                   type="number"
                   min="0"
@@ -933,43 +933,43 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                   value={profile.age ?? ""}
                   onChange={(e) => handleFieldChange("age", e.target.value === "" ? "" : Number(e.target.value))}
                   onBlur={handleFieldBlur}
-                  placeholder="Enter age"
+                  placeholder={t("profile.enter_age", "Enter age")}
                 />
               </div>
 
               <div className="form-group">
-                <label className="form-label">Biological Sex</label>
+                <label className="form-label">{t("profile.biological_sex", "Biological Sex")}</label>
                 <select
                   className="select-control"
                   value={profile.gender || ""}
                   onChange={(e) => handleFieldChange("gender", e.target.value)}
                   onBlur={handleFieldBlur}
                 >
-                  <option value="">Select Biological Sex</option>
-                  <option value="Prefer not to say">Prefer not to say</option>
-                  <option value="Female">Female</option>
-                  <option value="Male">Male</option>
-                  <option value="Intersex">Intersex</option>
+                  <option value="">{t("profile.select_biological_sex", "Select Biological Sex")}</option>
+                  <option value="Prefer not to say">{t("profile.sex_prefer_not_to_say", "Prefer not to say")}</option>
+                  <option value="Female">{t("profile.sex_female", "Female")}</option>
+                  <option value="Male">{t("profile.sex_male", "Male")}</option>
+                  <option value="Intersex">{t("profile.sex_intersex", "Intersex")}</option>
                 </select>
               </div>
             </div>
 
             <div className="responsive-grid-two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "14px" }}>
               <div className="form-group">
-                <label className="form-label">Primary Email</label>
+                <label className="form-label">{t("profile.primary_email_label", "Primary Email")}</label>
                 <input
                   type="email"
                   className="input-control"
                   value={profile.primary_email || ""}
                   onChange={(e) => handleFieldChange("primary_email", e.target.value)}
                   onBlur={handleFieldBlur}
-                  placeholder="Enter email address"
+                  placeholder={t("profile.enter_email", "Enter email address")}
                   required
                 />
               </div>
 
               <div className="form-group">
-                <label className="form-label">Direct Phone</label>
+                <label className="form-label">{t("profile.direct_phone", "Direct Phone")}</label>
                 <input
                   type="text"
                   className="input-control"
@@ -983,7 +983,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
 
             <div className="responsive-grid-two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
               <div className="form-group">
-                <label className="form-label">Blood Group</label>
+                <label className="form-label">{t("profile.blood_group_label", "Blood Group")}</label>
                 <select
                   className="select-control"
                   value={profile.blood_group || ""}
@@ -993,15 +993,15 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                   }}
                   style={{ fontWeight: 800, color: profile.blood_group ? "var(--risk-high)" : "var(--text-muted)" }}
                 >
-                  <option value="">Select Blood Group</option>
-                  <option value="A+">A+ (A Positive)</option>
-                  <option value="A-">A- (A Negative)</option>
-                  <option value="B+">B+ (B Positive)</option>
-                  <option value="B-">B- (B Negative)</option>
-                  <option value="AB+">AB+ (AB Positive)</option>
-                  <option value="AB-">AB- (AB Negative)</option>
-                  <option value="O+">O+ (O Positive)</option>
-                  <option value="O-">O- (O Negative)</option>
+                  <option value="">{t("profile.select_blood_group", "Select Blood Group")}</option>
+                  <option value="A+">{t("profile.blood_a_pos", "A+ (A Positive)")}</option>
+                  <option value="A-">{t("profile.blood_a_neg", "A- (A Negative)")}</option>
+                  <option value="B+">{t("profile.blood_b_pos", "B+ (B Positive)")}</option>
+                  <option value="B-">{t("profile.blood_b_neg", "B- (B Negative)")}</option>
+                  <option value="AB+">{t("profile.blood_ab_pos", "AB+ (AB Positive)")}</option>
+                  <option value="AB-">{t("profile.blood_ab_neg", "AB- (AB Negative)")}</option>
+                  <option value="O+">{t("profile.blood_o_pos", "O+ (O Positive)")}</option>
+                  <option value="O-">{t("profile.blood_o_neg", "O- (O Negative)")}</option>
                 </select>
               </div>
 
@@ -1014,7 +1014,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                     style={{ width: "16px", height: "16px", cursor: "pointer" }}
                   />
                   <span style={{ fontWeight: 700, color: "var(--ink-primary)" }}>
-                    Consented Organ Donor
+                    {t("profile.consented_organ_donor", "Consented Organ Donor")}
                   </span>
                 </label>
               </div>
@@ -1026,12 +1026,12 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px", borderBottom: "1px solid var(--border-default)", paddingBottom: "10px" }}>
               <Shield size={18} color="var(--accent-teal)" />
               <h3 style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--ink-primary)", margin: 0 }}>
-                Healthcare Identifiers & Primary Facility
+                {t("profile.healthcare_identifiers", "Healthcare Identifiers & Primary Facility")}
               </h3>
             </div>
 
             <div className="form-group" style={{ marginBottom: "14px" }}>
-              <label className="form-label">ABHA Health ID (Ayushman Bharat)</label>
+              <label className="form-label">{t("profile.abha_health_id", "ABHA Health ID (Ayushman Bharat)")}</label>
               <input
                 type="text"
                 className="input-control"
@@ -1044,7 +1044,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
             </div>
 
             <div className="form-group" style={{ marginBottom: "14px" }}>
-              <label className="form-label">Medical Record Number (MRN)</label>
+              <label className="form-label">{t("profile.medical_record_number", "Medical Record Number (MRN)")}</label>
               <input
                 type="text"
                 className="input-control"
@@ -1057,38 +1057,38 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
             </div>
 
             <div className="form-group" style={{ marginBottom: "14px" }}>
-              <label className="form-label">Hospital / Tertiary Center</label>
+              <label className="form-label">{t("profile.hospital_tertiary", "Hospital / Tertiary Center")}</label>
               <input
                 type="text"
                 className="input-control"
                 value={profile.hospital || ""}
                 onChange={(e) => handleFieldChange("hospital", e.target.value)}
                 onBlur={handleFieldBlur}
-                placeholder="Hospital / Tertiary Center"
+                placeholder={t("profile.placeholder_hospital", "Hospital / Tertiary Center")}
               />
             </div>
 
             <div className="form-group" style={{ marginBottom: "14px" }}>
-              <label className="form-label">Department / Ward</label>
+              <label className="form-label">{t("profile.department_ward", "Department / Ward")}</label>
               <input
                 type="text"
                 className="input-control"
                 value={profile.department || ""}
                 onChange={(e) => handleFieldChange("department", e.target.value)}
                 onBlur={handleFieldBlur}
-                placeholder="Department / Ward"
+                placeholder={t("profile.placeholder_department", "Department / Ward")}
               />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Attending Physician</label>
+              <label className="form-label">{t("profile.attending_physician", "Attending Physician")}</label>
               <input
                 type="text"
                 className="input-control"
                 value={profile.attending_physician || ""}
                 onChange={(e) => handleFieldChange("attending_physician", e.target.value)}
                 onBlur={handleFieldBlur}
-                placeholder="Dr. Physician Name (Department)"
+                placeholder={t("profile.placeholder_physician", "Dr. Physician Name (Department)")}
               />
             </div>
           </div>
@@ -1103,7 +1103,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px", borderBottom: "1px solid var(--border-default)", paddingBottom: "10px" }}>
               <AlertTriangle size={18} color="#DC2626" />
               <h3 style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--ink-primary)", margin: 0 }}>
-                Known Allergies & Contraindications
+                {t("profile.known_allergies_title", "Known Allergies & Contraindications")}
               </h3>
             </div>
 
@@ -1137,7 +1137,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                           color: "#FFFFFF",
                         }}
                       >
-                        {alg.severity} RISK
+                        {alg.severity} {t("profile.risk_badge", "RISK")}
                       </span>
                     </div>
                     <div style={{ fontSize: "0.72rem", color: "var(--text-secondary)", marginTop: "2px" }}>
@@ -1164,7 +1164,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
 
               {allergiesList.length === 0 && (
                 <p style={{ fontSize: "0.78rem", color: "var(--text-muted)", fontStyle: "italic" }}>
-                  No known allergies documented.
+                  {t("profile.no_allergies_doc", "No known allergies documented.")}
                 </p>
               )}
             </div>
@@ -1172,13 +1172,13 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
             {/* Add New Allergy Form */}
             <div style={{ background: "var(--bg-surface-alt)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", padding: "12px" }}>
               <div style={{ fontSize: "0.74rem", fontWeight: 700, color: "var(--ink-primary)", marginBottom: "8px" }}>
-                Add New Allergy / Drug Sensitivity
+                {t("profile.add_allergy_title", "Add New Allergy / Drug Sensitivity")}
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 100px", gap: "8px", marginBottom: "8px" }}>
                 <input
                   type="text"
                   className="input-control"
-                  placeholder="Allergen (e.g. Sulfa, Peanuts)"
+                  placeholder={t("profile.placeholder_allergen", "Allergen (e.g. Sulfa, Peanuts)")}
                   value={newAllergen}
                   onChange={(e) => setNewAllergen(e.target.value)}
                 />
@@ -1187,16 +1187,16 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                   value={newAllergySev}
                   onChange={(e) => setNewAllergySev(e.target.value)}
                 >
-                  <option value="HIGH">HIGH</option>
-                  <option value="MODERATE">MODERATE</option>
-                  <option value="LOW">LOW</option>
+                  <option value="HIGH">{t("profile.sev_high", "HIGH")}</option>
+                  <option value="MODERATE">{t("profile.sev_moderate", "MODERATE")}</option>
+                  <option value="LOW">{t("profile.sev_low", "LOW")}</option>
                 </select>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 90px", gap: "8px" }}>
                 <input
                   type="text"
                   className="input-control"
-                  placeholder="Expected reaction (e.g. Anaphylaxis)"
+                  placeholder={t("profile.placeholder_reaction", "Expected reaction (e.g. Anaphylaxis)")}
                   value={newAllergyRxn}
                   onChange={(e) => setNewAllergyRxn(e.target.value)}
                 />
@@ -1206,7 +1206,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                   onClick={addAllergy}
                   style={{ padding: "6px 12px", fontSize: "0.74rem", display: "flex", alignItems: "center", justifyContent: "center", gap: "4px" }}
                 >
-                  <Plus size={13} /> Add
+                  <Plus size={13} /> {t("actions.add", "Add")}
                 </button>
               </div>
             </div>
@@ -1214,14 +1214,14 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
             {/* Medical History Conditions */}
             <div style={{ marginTop: "20px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-                <label style={{ fontSize: "0.78rem", fontWeight: 700, color: "var(--ink-primary)" }}>Medical Diagnoses & History</label>
-                <button type="button" className="btn-secondary" onClick={addMedicalHistory} style={{ padding: "4px 8px", fontSize: "0.70rem" }}><Plus size={12} /> Add Condition</button>
+                <label style={{ fontSize: "0.78rem", fontWeight: 700, color: "var(--ink-primary)" }}>{t("profile.medical_history_title", "Medical Diagnoses & History")}</label>
+                <button type="button" className="btn-secondary" onClick={addMedicalHistory} style={{ padding: "4px 8px", fontSize: "0.70rem" }}><Plus size={12} /> {t("profile.add_condition", "Add Condition")}</button>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 {medicalHistory.map((item) => (
                   <div key={item.id} style={{ display: "grid", gridTemplateColumns: "1fr 1fr 32px", gap: "8px", alignItems: "center" }}>
-                    <input type="text" className="input-control" value={item.condition || ""} onChange={(e) => updateMedicalHistory(item.id, "condition", e.target.value)} placeholder="Condition / Diagnosis" />
-                    <input type="text" className="input-control" value={item.notes || ""} onChange={(e) => updateMedicalHistory(item.id, "notes", e.target.value)} placeholder="Year or notes" />
+                    <input type="text" className="input-control" value={item.condition || ""} onChange={(e) => updateMedicalHistory(item.id, "condition", e.target.value)} placeholder={t("profile.placeholder_condition", "Condition / Diagnosis")} />
+                    <input type="text" className="input-control" value={item.notes || ""} onChange={(e) => updateMedicalHistory(item.id, "notes", e.target.value)} placeholder={t("profile.placeholder_condition_notes", "Year or notes")} />
                     <button type="button" onClick={() => setMedicalHistory((items) => items.filter((entry) => entry.id !== item.id))} style={{ background: "none", border: "none", color: "#94A3B8", cursor: "pointer" }}><Trash2 size={14} /></button>
                   </div>
                 ))}
@@ -1234,16 +1234,16 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px", borderBottom: "1px solid var(--border-default)", paddingBottom: "10px" }}>
               <Stethoscope size={18} color="var(--accent-blue)" />
               <h3 style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--ink-primary)", margin: 0 }}>
-                Active Pharmacotherapy & Prescriptions
+                {t("profile.active_meds_title", "Active Pharmacotherapy & Prescriptions")}
               </h3>
             </div>
 
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
               <span style={{ fontSize: "0.78rem", color: "var(--text-secondary)" }}>
-                Current ongoing medications, dosage, and intake frequency:
+                {t("profile.meds_subtitle", "Current ongoing medications, dosage, and intake frequency:")}
               </span>
               <button type="button" className="btn-secondary" onClick={addMedication} style={{ padding: "5px 10px", fontSize: "0.72rem" }}>
-                <Plus size={13} /> Add Med
+                <Plus size={13} /> {t("profile.add_med_btn", "Add Med")}
               </button>
             </div>
 
@@ -1267,21 +1267,21 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                     className="input-control"
                     value={item.name || ""}
                     onChange={(e) => updateMedication(item.id, "name", e.target.value)}
-                    placeholder="Medication name"
+                    placeholder={t("profile.placeholder_med_name", "Medication name")}
                   />
                   <input
                     type="text"
                     className="input-control"
                     value={item.dose || ""}
                     onChange={(e) => updateMedication(item.id, "dose", e.target.value)}
-                    placeholder="Dose (e.g. 20mg)"
+                    placeholder={t("profile.placeholder_med_dose", "Dose (e.g. 20mg)")}
                   />
                   <input
                     type="text"
                     className="input-control"
                     value={item.frequency || ""}
                     onChange={(e) => updateMedication(item.id, "frequency", e.target.value)}
-                    placeholder="Frequency (OD/BD)"
+                    placeholder={t("profile.placeholder_med_freq", "Frequency (OD/BD)")}
                   />
                   <button
                     type="button"
@@ -1300,19 +1300,19 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                   <Phone size={15} color="#DC2626" />
-                  <strong style={{ fontSize: "0.80rem", color: "var(--ink-primary)" }}>Emergency Contacts & Next of Kin</strong>
+                  <strong style={{ fontSize: "0.80rem", color: "var(--ink-primary)" }}>{t("profile.emergency_contacts_title", "Emergency Contacts & Next of Kin")}</strong>
                 </div>
                 <button type="button" className="btn-secondary" onClick={addEmergencyContact} style={{ padding: "4px 8px", fontSize: "0.70rem" }}>
-                  <Plus size={12} /> Add Contact
+                  <Plus size={12} /> {t("profile.add_contact_btn", "Add Contact")}
                 </button>
               </div>
 
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 {emergencyContacts.map((contact) => (
                   <div key={contact.id} style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 32px", gap: "8px", alignItems: "center" }}>
-                    <input type="text" className="input-control" value={contact.name || ""} onChange={(e) => updateEmergencyContact(contact.id, "name", e.target.value)} placeholder="Full Name" />
-                    <input type="text" className="input-control" value={contact.relation || ""} onChange={(e) => updateEmergencyContact(contact.id, "relation", e.target.value)} placeholder="Relation (Brother/Spouse)" />
-                    <input type="text" className="input-control" value={contact.phone || ""} onChange={(e) => updateEmergencyContact(contact.id, "phone", e.target.value)} placeholder="Phone number" />
+                    <input type="text" className="input-control" value={contact.name || ""} onChange={(e) => updateEmergencyContact(contact.id, "name", e.target.value)} placeholder={t("profile.placeholder_contact_name", "Full Name")} />
+                    <input type="text" className="input-control" value={contact.relation || ""} onChange={(e) => updateEmergencyContact(contact.id, "relation", e.target.value)} placeholder={t("profile.placeholder_contact_rel", "Relation (Brother/Spouse)")} />
+                    <input type="text" className="input-control" value={contact.phone || ""} onChange={(e) => updateEmergencyContact(contact.id, "phone", e.target.value)} placeholder={t("profile.placeholder_contact_phone", "Phone number")} />
                     <button type="button" onClick={() => setEmergencyContacts((items) => items.filter((entry) => entry.id !== contact.id))} style={{ background: "none", border: "none", color: "#94A3B8", cursor: "pointer" }}><Trash2 size={14} /></button>
                   </div>
                 ))}
@@ -1328,10 +1328,10 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", borderBottom: "1px solid var(--border-default)", paddingBottom: "12px", flexWrap: "wrap", gap: "12px" }}>
             <div>
               <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "var(--ink-primary)", margin: 0 }}>
-                Digital Health Identity Pass (ISO/IEC 7810 ID-1 Standard)
+                {t("profile.pass_title", "Digital Health Identity Pass (ISO/IEC 7810 ID-1 Standard)")}
               </h3>
               <span style={{ fontSize: "0.74rem", color: "var(--text-secondary)" }}>
-                Permanent patient pass with scannable dynamic QR resolving directly to live emergency telemetry.
+                {t("profile.pass_subtitle", "Permanent patient pass with scannable dynamic QR resolving directly to live emergency telemetry.")}
               </span>
             </div>
 
@@ -1353,7 +1353,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                     boxShadow: cardTheme === "both" ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
                   }}
                 >
-                  Both Editions
+                  {t("profile.card_both", "Both Editions")}
                 </button>
                 <button
                   type="button"
@@ -1370,7 +1370,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                     boxShadow: cardTheme === "light" ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
                   }}
                 >
-                  Day White
+                  {t("profile.card_day_white", "Day White")}
                 </button>
                 <button
                   type="button"
@@ -1387,7 +1387,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                     boxShadow: cardTheme === "dark" ? "0 1px 3px rgba(0,0,0,0.2)" : "none",
                   }}
                 >
-                  Matte Black
+                  {t("profile.card_matte_black", "Matte Black")}
                 </button>
               </div>
 
@@ -1408,7 +1408,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                     boxShadow: cardFace === "dual" ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
                   }}
                 >
-                  Dual View (Front + Back)
+                  {t("profile.card_dual_view", "Dual View (Front + Back)")}
                 </button>
                 <button
                   type="button"
@@ -1425,7 +1425,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                     boxShadow: cardFace === "front" ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
                   }}
                 >
-                  Front Face
+                  {t("profile.card_front_face", "Front Face")}
                 </button>
                 <button
                   type="button"
@@ -1442,7 +1442,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                     boxShadow: cardFace === "back" ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
                   }}
                 >
-                  Back Face
+                  {t("profile.card_back_face", "Back Face")}
                 </button>
               </div>
 
@@ -1455,14 +1455,14 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                   setTimeout(() => setCopiedPass(false), 2000);
                 }}
               >
-                <Copy size={13} /> {copiedPass ? "Copied Link!" : "Copy Triage Link"}
+                <Copy size={13} /> {copiedPass ? t("profile.copied_link", "Copied Link!") : t("profile.copy_triage_link", "Copy Triage Link")}
               </button>
               <button
                 type="button"
                 className="btn-primary"
                 onClick={() => window.print()}
               >
-                <Printer size={13} /> Print Medical ID
+                <Printer size={13} /> {t("profile.print_medical_id", "Print Medical ID")}
               </button>
             </div>
           </div>
@@ -1474,11 +1474,11 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", width: "100%", maxWidth: cardFace === "dual" ? "920px" : "480px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <span style={{ fontSize: "0.68rem", fontWeight: 800, color: "var(--ink-primary)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-                    Clinical Day White Edition
+                    {t("profile.clinical_day_white", "Clinical Day White Edition")}
                   </span>
                   {cardFace === "dual" && (
                     <span style={{ fontSize: "0.58rem", fontWeight: 700, color: "var(--accent-blue)", background: "var(--accent-blue-light)", padding: "1px 6px", borderRadius: "4px" }}>
-                      FRONT + BACK DUAL VIEW
+                      {t("profile.front_back_dual_view", "FRONT + BACK DUAL VIEW")}
                     </span>
                   )}
                 </div>
@@ -1486,7 +1486,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                 <div style={{ display: "flex", gap: "20px", flexWrap: "wrap", justifyContent: "center", width: "100%" }}>
                   {(cardFace === "dual" || cardFace === "front") && (
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", width: "100%", maxWidth: "440px" }}>
-                      <span style={{ fontSize: "0.58rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em" }}>Front View (QR & ID)</span>
+                      <span style={{ fontSize: "0.58rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{t("profile.front_view_qr", "Front View (QR & ID)")}</span>
                       <TriagePhysicalCard
                         patient={profile}
                         variant="light"
@@ -1504,7 +1504,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
 
                   {(cardFace === "dual" || cardFace === "back") && (
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", width: "100%", maxWidth: "440px" }}>
-                      <span style={{ fontSize: "0.58rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em" }}>Back View (Allergies, Rx & Vitals)</span>
+                      <span style={{ fontSize: "0.58rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{t("profile.back_view_allergies", "Back View (Allergies, Rx & Vitals)")}</span>
                       <TriagePhysicalCard
                         patient={profile}
                         variant="light"
@@ -1528,11 +1528,11 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", width: "100%", maxWidth: cardFace === "dual" ? "920px" : "480px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <span style={{ fontSize: "0.68rem", fontWeight: 800, color: "var(--ink-primary)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-                    Matte Black Edition (First Responder)
+                    {t("profile.matte_black_edition", "Matte Black Edition (First Responder)")}
                   </span>
                   {cardFace === "dual" && (
                     <span style={{ fontSize: "0.58rem", fontWeight: 700, color: "var(--accent-blue)", background: "var(--accent-blue-light)", padding: "1px 6px", borderRadius: "4px" }}>
-                      FRONT + BACK DUAL VIEW
+                      {t("profile.front_back_dual_view", "FRONT + BACK DUAL VIEW")}
                     </span>
                   )}
                 </div>
@@ -1540,7 +1540,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                 <div style={{ display: "flex", gap: "20px", flexWrap: "wrap", justifyContent: "center", width: "100%" }}>
                   {(cardFace === "dual" || cardFace === "front") && (
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", width: "100%", maxWidth: "440px" }}>
-                      <span style={{ fontSize: "0.58rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em" }}>Front View (QR & ID)</span>
+                      <span style={{ fontSize: "0.58rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{t("profile.front_view_qr", "Front View (QR & ID)")}</span>
                       <TriagePhysicalCard
                         patient={profile}
                         variant="dark"
@@ -1558,7 +1558,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
 
                   {(cardFace === "dual" || cardFace === "back") && (
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", width: "100%", maxWidth: "440px" }}>
-                      <span style={{ fontSize: "0.58rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em" }}>Back View (Allergies, Rx & Vitals)</span>
+                      <span style={{ fontSize: "0.58rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{t("profile.back_view_allergies", "Back View (Allergies, Rx & Vitals)")}</span>
                       <TriagePhysicalCard
                         patient={profile}
                         variant="dark"
@@ -1587,29 +1587,29 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px", borderBottom: "1px solid var(--border-default)", paddingBottom: "10px" }}>
               <Shield size={18} color="var(--accent-blue)" />
               <h3 style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--ink-primary)", margin: 0 }}>
-                Data Security & Audit Controls
+                {t("profile.data_security_title", "Data Security & Audit Controls")}
               </h3>
             </div>
 
             <p style={{ fontSize: "0.80rem", color: "var(--text-secondary)", lineHeight: 1.5, marginBottom: "14px" }}>
-              Your electronic health records and biometric measurements are protected under immutable audit logging (WORM) and AES-256 encryption at rest.
+              {t("profile.data_security_desc", "Your electronic health records and biometric measurements are protected under immutable audit logging (WORM) and AES-256 encryption at rest.")}
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px", background: "var(--bg-surface-alt)", borderRadius: "var(--radius-sm)", border: "1px solid var(--border-default)" }}>
                 <div>
-                  <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--ink-primary)" }}>Two-Factor Authentication</div>
-                  <div style={{ fontSize: "0.72rem", color: "var(--text-secondary)" }}>Secures medical data using hardware or app-based OTP</div>
+                  <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--ink-primary)" }}>{t("profile.two_factor_title", "Two-Factor Authentication")}</div>
+                  <div style={{ fontSize: "0.72rem", color: "var(--text-secondary)" }}>{t("profile.two_factor_desc", "Secures medical data using hardware or app-based OTP")}</div>
                 </div>
-                <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "#059669", background: "#ECFDF5", padding: "3px 8px", borderRadius: "4px" }}>ACTIVE</span>
+                <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "#059669", background: "#ECFDF5", padding: "3px 8px", borderRadius: "4px" }}>{t("profile.active_badge", "ACTIVE")}</span>
               </div>
 
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px", background: "var(--bg-surface-alt)", borderRadius: "var(--radius-sm)", border: "1px solid var(--border-default)" }}>
                 <div>
-                  <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--ink-primary)" }}>Public Emergency Pass Access</div>
-                  <div style={{ fontSize: "0.72rem", color: "var(--text-secondary)" }}>Permits authorized first responders to scan your triage pass</div>
+                  <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--ink-primary)" }}>{t("profile.emergency_pass_access", "Public Emergency Pass Access")}</div>
+                  <div style={{ fontSize: "0.72rem", color: "var(--text-secondary)" }}>{t("profile.emergency_pass_desc", "Permits authorized first responders to scan your triage pass")}</div>
                 </div>
-                <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "var(--accent-blue)", background: "var(--accent-blue-soft)", padding: "3px 8px", borderRadius: "4px" }}>ENABLED</span>
+                <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "var(--accent-blue)", background: "var(--accent-blue-soft)", padding: "3px 8px", borderRadius: "4px" }}>{t("profile.enabled_badge", "ENABLED")}</span>
               </div>
             </div>
           </div>
@@ -1662,7 +1662,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <CreditCard size={18} color="var(--accent-blue)" />
                   <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "var(--ink-primary)", margin: 0 }}>
-                    Emergency Medical Identity Card
+                    {t("profile.emergency_card_modal_title", "Emergency Medical Identity Card")}
                   </h3>
                 </div>
                 <span style={{ fontSize: "0.68rem", color: "var(--text-muted)", marginTop: "2px", display: "block" }}>
@@ -1673,7 +1673,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 {/* Theme Selector — one at a time */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontSize: '0.62rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Edition:</span>
+                  <span style={{ fontSize: '0.62rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t("profile.edition_label", "Edition:")}</span>
                   <div
                     style={{
                       display: 'flex',
@@ -1699,7 +1699,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                         boxShadow: cardTheme === 'light' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
                       }}
                     >
-                      ☀ Day White
+                      ☀ {t("profile.day_white", "Day White")}
                     </button>
                     <button
                       type="button"
@@ -1716,7 +1716,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                         boxShadow: cardTheme === 'dark' ? '0 1px 3px rgba(0,0,0,0.2)' : 'none',
                       }}
                     >
-                      ◼ Matte Slate
+                      ◼ {t("profile.matte_slate", "Matte Slate")}
                     </button>
                   </div>
                 </div>
@@ -1747,7 +1747,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                       boxShadow: cardFace === "dual" ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
                     }}
                   >
-                    Dual View (Front + Back)
+                    {t("profile.card_dual_view", "Dual View (Front + Back)")}
                   </button>
                   <button
                     type="button"
@@ -1764,7 +1764,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                       boxShadow: cardFace === "front" ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
                     }}
                   >
-                    Front Face
+                    {t("profile.card_front_face", "Front Face")}
                   </button>
                   <button
                     type="button"
@@ -1781,7 +1781,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                       boxShadow: cardFace === "back" ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
                     }}
                   >
-                    Back Face
+                    {t("profile.card_back_face", "Back Face")}
                   </button>
                 </div>
 
@@ -1830,11 +1830,11 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
               {/* Edition label */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ fontSize: '0.66rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: cardTheme === 'dark' ? '#94A3B8' : 'var(--ink-primary)' }}>
-                  {cardTheme === 'light' ? '☀ Clinical White Edition (Day / Print)' : '◼ Matte Slate Gray Edition (First Responder)'}
+                  {cardTheme === 'light' ? `☀ ${t("profile.clinical_day_white", "Clinical Day White Edition")}` : `◼ ${t("profile.matte_black_edition", "Matte Black Edition (First Responder)")}`}
                 </span>
                 {cardFace === 'dual' && (
                   <span style={{ fontSize: '0.58rem', fontWeight: 700, color: 'var(--accent-blue)', background: 'var(--accent-blue-light)', padding: '1px 6px', borderRadius: '4px' }}>
-                    FRONT + BACK
+                    {t("profile.front_back_dual_view", "FRONT + BACK")}
                   </span>
                 )}
               </div>
@@ -1843,7 +1843,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
               <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
                 {(cardFace === 'dual' || cardFace === 'front') && (
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ fontSize: '0.58rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Front Face · QR &amp; ID</span>
+                    <span style={{ fontSize: '0.58rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{t("profile.front_view_qr", "Front Face · QR & ID")}</span>
                     <TriagePhysicalCard
                       patient={profile}
                       variant={cardTheme}
@@ -1861,7 +1861,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
 
                 {(cardFace === 'dual' || cardFace === 'back') && (
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ fontSize: '0.58rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Back Face · Allergies, Rx &amp; Vitals</span>
+                    <span style={{ fontSize: '0.58rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{t("profile.back_view_allergies", "Back Face · Allergies, Rx & Vitals")}</span>
                     <TriagePhysicalCard
                       patient={profile}
                       variant={cardTheme}
@@ -1903,7 +1903,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                   }}
                   style={{ fontSize: "0.76rem" }}
                 >
-                  <Copy size={13} /> {copiedPass ? "Copied URL!" : "Copy Triage URL"}
+                  <Copy size={13} /> {copiedPass ? t("profile.copied_url", "Copied URL!") : t("profile.copy_triage_url", "Copy Triage URL")}
                 </button>
 
                 <button
@@ -1912,7 +1912,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                   onClick={() => window.open(emergencyPortalUrl, "_blank")}
                   style={{ fontSize: "0.76rem" }}
                 >
-                  <ExternalLink size={13} /> Open Triage App
+                  <ExternalLink size={13} /> {t("profile.open_triage_app", "Open Triage App")}
                 </button>
               </div>
 
@@ -1931,7 +1931,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                   }}
                   style={{ fontSize: "0.76rem", display: "flex", alignItems: "center", gap: "6px" }}
                 >
-                  <Printer size={13} /> Print / Save PDF
+                  <Printer size={13} /> {t("profile.print_save_pdf", "Print / Save PDF")}
                 </button>
                 <button
                   type="button"
@@ -1939,7 +1939,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                   onClick={() => setViewCardOpen(false)}
                   style={{ fontSize: "0.76rem" }}
                 >
-                  Done
+                  {t("profile.done", "Done")}
                 </button>
               </div>
             </div>
@@ -1955,7 +1955,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px", color: "var(--risk-high)" }}>
               <AlertTriangle size={20} />
               <h3 style={{ fontSize: "1rem", fontWeight: 800, margin: 0 }}>
-                Confirm Account Deletion
+                {t("profile.confirm_account_deletion", "Confirm Account Deletion")}
               </h3>
             </div>
 
@@ -1983,7 +1983,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                 onClick={() => setDeleteConfirmOpen(false)}
                 style={{ fontSize: "0.76rem" }}
               >
-                Cancel
+                {t("profile.cancel", "Cancel")}
               </button>
               <button
                 type="button"
@@ -2000,7 +2000,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                   cursor: isDeleteAuthorized ? "pointer" : "not-allowed",
                 }}
               >
-                {deleting ? "Deleting..." : "Permanently Delete"}
+                {deleting ? t("profile.deleting", "Deleting...") : t("profile.permanently_delete", "Permanently Delete")}
               </button>
             </div>
           </div>

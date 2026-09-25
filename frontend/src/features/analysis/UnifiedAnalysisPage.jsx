@@ -2328,9 +2328,9 @@ export default function UnifiedAnalysisPage() {
                   <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--bg-surface)", border: "1px solid var(--border-default)", padding: "14px" }}>
                       <div>
-                        <h3 style={{ margin: "0 0 4px 0", fontSize: "1.05rem", fontWeight: 800 }}>My Consultations & Tele-Health Appointments</h3>
+                        <h3 style={{ margin: "0 0 4px 0", fontSize: "1.05rem", fontWeight: 800 }}>{t("consultations.my_consultations_title", "My Consultations & Tele-Health Appointments")}</h3>
                         <p style={{ margin: 0, fontSize: "0.78rem", color: "var(--text-secondary)" }}>
-                          Verified medical appointments, active video rooms, and issued E-Prescriptions.
+                          {t("consultations.my_consultations_subtitle", "Verified medical appointments, active video rooms, and issued E-Prescriptions.")}
                         </p>
                       </div>
                       <button
@@ -2339,7 +2339,7 @@ export default function UnifiedAnalysisPage() {
                         onClick={() => setActiveTab("doctor_booking")}
                         style={{ padding: "8px 14px", fontSize: "0.8rem" }}
                       >
-                        + Book New Consultation
+                        {t("consultations.book_new_consultation", "+ Book New Consultation")}
                       </button>
                     </div>
 
@@ -2347,9 +2347,9 @@ export default function UnifiedAnalysisPage() {
                       <div className="skeleton-list" aria-label="Loading consultations"><div className="skeleton" /><div className="skeleton" /></div>
                     ) : myBookings.length === 0 ? (
                       <EmptyState
-                        title="No consultations scheduled"
-                        description="When you book an appointment, its details and any prescribed care will appear here."
-                        actionLabel="Find a clinician"
+                        title={t("consultations.no_consultations", "No consultations scheduled")}
+                        description={t("consultations.no_consultations_desc", "When you book an appointment, its details and any prescribed care will appear here.")}
+                        actionLabel={t("consultations.find_clinician", "Find a clinician")}
                         onAction={() => setActiveTab("doctor_booking")}
                       />
                     ) : (
@@ -2376,8 +2376,8 @@ export default function UnifiedAnalysisPage() {
                             </div>
 
                             <div style={{ fontSize: "0.78rem", background: "var(--bg-surface-alt)", padding: "8px", lineHeight: 1.5 }}>
-                              <div><strong>Slot:</strong> {b.slot_time} ({b.mode?.toUpperCase()})</div>
-                              <div><strong>Reason:</strong> {b.intake?.reason || "Follow-up checkup"}</div>
+                              <div><strong>{t("consultations.slot_label", "Slot:")}</strong> {b.slot_time} ({b.mode?.toUpperCase()})</div>
+                              <div><strong>{t("consultations.reason_label", "Reason:")}</strong> {b.intake?.reason || t("consultations.followup_default", "Follow-up checkup")}</div>
                             </div>
 
                             <div style={{ display: "flex", gap: "8px", borderTop: "1px solid var(--border-default)", paddingTop: "8px" }}>
@@ -2387,7 +2387,7 @@ export default function UnifiedAnalysisPage() {
                                 onClick={() => setSelectedBookingForRoom(b)}
                                 style={{ flex: 1, padding: "8px", fontSize: "0.8rem", textAlign: "center" }}
                               >
-                                Join Video Consultation Room
+                                {t("consultations.join_video_room", "Join Video Consultation Room")}
                               </button>
                             </div>
                           </div>
