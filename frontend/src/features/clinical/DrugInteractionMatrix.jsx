@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   Pill,
   ShieldAlert,
@@ -34,7 +34,16 @@ import {
   Flame,
   Activity,
   Heart,
-  Network
+  Network,
+  Play,
+  Pause,
+  RotateCcw,
+  Gauge,
+  TrendingUp,
+  TrendingDown,
+  User,
+  Sliders,
+  Timer
 } from "lucide-react";
 import { consultationsApi } from "../../api/consultations";
 import { useLanguage } from "../../context/LanguageContext";
@@ -67,6 +76,37 @@ const PRESET_REGIMENS = [
     subtitle: "Metformin + Pantoprazole",
     meds: ["Metformin", "Pantoprazole"],
     diet: [],
+  },
+];
+
+const SIMULATION_SCENARIOS = [
+  {
+    id: "statin_grapefruit",
+    name: "Statin + Grapefruit CYP3A4 Surge",
+    meds: ["Atorvastatin"],
+    diet: ["grapefruit"],
+    desc: "Simulates intestinal CYP3A4 inhibition causing a 300% surge in systemic statin concentration and hepatic/muscular overload.",
+  },
+  {
+    id: "hyperkalemia_synergy",
+    name: "ACEi + Spironolactone + K+ Diet",
+    meds: ["Lisinopril", "Spironolactone"],
+    diet: ["high_potassium"],
+    desc: "Simulates dual distal tubule potassium retention pushing serum K+ past 6.0 mEq/L cardiac arrhythmia threshold.",
+  },
+  {
+    id: "antiplatelet_cyp_block",
+    name: "Clopidogrel + Omeprazole Bio-Blockade",
+    meds: ["Clopidogrel", "Omeprazole"],
+    diet: [],
+    desc: "Simulates CYP2C19 competitive inhibition dropping antiplatelet active thiol metabolite below therapeutic threshold.",
+  },
+  {
+    id: "warfarin_vitk_crash",
+    name: "Warfarin + High Vitamin K Antagonism",
+    meds: ["Warfarin"],
+    diet: ["leafy_greens"],
+    desc: "Simulates exogenous Vitamin K1 overriding VKORC1 blockade, causing target INR to plunge from 2.5 to 1.2.",
   },
 ];
 
@@ -134,11 +174,19 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
   const [loading, setLoading] = useState(false);
   const [catalogSearch, setCatalogSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [activeTab, setActiveTab] = useState("workbench"); // 'workbench' | 'matrix' | 'network' | 'food' | 'library'
+  const [activeTab, setActiveTab] = useState("simulation"); // default to simulation for high engagement
   const [selectedCollisionDetail, setSelectedCollisionDetail] = useState(null);
   const [hoveredMatrixCell, setHoveredMatrixCell] = useState(null);
   const [selectedNetworkNode, setSelectedNetworkNode] = useState(null);
-  const [timingMode, setTimingMode] = useState("concomitant"); // 'concomitant' | 'staggered'
+
+  // ── Simulation Engine State ──
+  const [simTimeHours, setSimTimeHours] = useState(8.0); // 0.0 to 24.0 hours
+  const [simIsPlaying, setSimIsPlaying] = useState(false);
+  const [simSpeed, setSimSpeed] = useState(1); // 1x, 2x, 4x
+  const [simPatientAge, setSimPatientAge] = useState(62); // years
+  const [simEgfr, setSimEgfr] = useState(75); // mL/min (Kidney function)
+  const [simStaggeredHours, setSimStaggeredHours] = useState(0); // 0 = same time, 4 = +4 hours gap
+  const animFrameRef = useRef(null);
 
   // Load Reference Catalog
   useEffect(() => {
@@ -177,6 +225,19 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
       setLoading(false);
     }
   }
+
+  // ── Simulation Animation Loop ──
+  useEffect(() => {
+    if (!simIsPlaying) return;
+    const interval = setInterval(() => {
+      setSimTimeHours((prev) => {
+        const next = prev + 0.25 * simSpeed;
+        if (next >= 24) return 0;
+        return Number(next.toFixed(2));
+      });
+    }, 150);
+    return () => clearInterval(interval);
+  }, [simIsPlaying, simSpeed]);
 
   function handleAddCustomMed(e) {
     if (e) e.preventDefault();
@@ -261,7 +322,90 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
   const riskBorder =
     riskTier === "CRITICAL_HAZARD" ? "#FECDD3" : riskTier === "MODERATE_RISK" ? "#FDE68A" : "#A7F3D0";
 
-  // Calculate coordinates for Interactive Molecular Network Diagram
+  // ── Dynamic Real-Time Pharmacokinetic (PK) Math Calculations ──
+  const simCalculations = useMemo(() => {
+    const t = simTimeHours;
+    const hasGrapefruit = selectedDiet.includes("grapefruit");
+    const hasLeafyGreens = selectedDiet.includes("leafy_greens");
+    const hasHighK = selectedDiet.includes("high_potassium");
+    const hasDairy = selectedDiet.includes("dairy_calcium");
+
+    const hasStatin = selectedMeds.some((m) => /statin/i.test(m));
+    const hasWarfarin = selectedMeds.some((m) => /warfarin/i.test(m));
+    const hasAspirin = selectedMeds.some((m) => /aspirin/i.test(m));
+    const hasLisinopril = selectedMeds.some((m) => /lisinopril/i.test(m));
+    const hasSpironolactone = selectedMeds.some((m) => /spironolactone/i.test(m));
+    const hasClopidogrel = selectedMeds.some((m) => /clopidogrel/i.test(m));
+    const hasOmeprazole = selectedMeds.some((m) => /omeprazole/i.test(m));
+
+    // Statin PK Curve (One-compartment model)
+    const statinKa = 1.2;
+    const statinKe = 0.12 * (simEgfr / 90);
+    const statinMultiplier = hasGrapefruit ? 3.2 : 1.0;
+    const statinT = Math.max(0, t - 8.0);
+    const statinConcentration = hasStatin
+      ? Math.max(0, statinMultiplier * 28 * (Math.exp(-statinKe * statinT) - Math.exp(-statinKa * statinT)))
+      : 0;
+
+    // Serum Potassium Level (Baseline 4.2 mEq/L)
+    let kLevel = 4.2;
+    if (hasLisinopril) kLevel += 0.5 * (1 + (90 - simEgfr) / 100);
+    if (hasSpironolactone) kLevel += 0.8;
+    if (hasHighK) kLevel += 0.7;
+    // Time course modulation
+    const kModulation = Math.sin((t / 24) * Math.PI) * 0.4;
+    kLevel = Math.min(7.2, Math.max(3.5, kLevel + kModulation));
+
+    // INR Level (Baseline 2.2 for Warfarin)
+    let inrLevel = hasWarfarin ? 2.4 : 1.0;
+    if (hasWarfarin && hasAspirin) inrLevel += 0.8;
+    if (hasWarfarin && hasLeafyGreens) inrLevel -= 1.1; // Vitamin K antagonism
+    const inrModulation = Math.sin(((t - 4) / 24) * Math.PI) * 0.3;
+    inrLevel = Math.max(0.9, inrLevel + (hasWarfarin ? inrModulation : 0));
+
+    // Antiplatelet Efficacy (%)
+    let plateletInhibition = 0;
+    if (hasClopidogrel) {
+      plateletInhibition = hasOmeprazole ? 24 : 84; // CYP2C19 blockade
+    }
+
+    // Organ Stress Indicators (0 - 100%)
+    const hepaticStress = Math.min(100, Math.round(
+      (hasStatin && hasGrapefruit ? 82 : hasStatin ? 28 : 10) +
+      (selectedMeds.length * 6) +
+      (selectedDiet.includes("alcohol") ? 35 : 0)
+    ));
+
+    const renalStress = Math.min(100, Math.round(
+      ((90 - simEgfr) * 0.8) +
+      (hasLisinopril && hasSpironolactone ? 42 : hasLisinopril ? 18 : 8) +
+      (hasHighK ? 15 : 0)
+    ));
+
+    const cardiacStress = Math.min(100, Math.round(
+      (kLevel > 5.5 ? (kLevel - 5.5) * 45 : 12) +
+      (hasAspirin && hasWarfarin ? 30 : 0)
+    ));
+
+    const bleedingRiskIndex = Math.min(100, Math.round(
+      (inrLevel > 3.0 ? (inrLevel - 3.0) * 35 + 25 : (hasWarfarin ? 20 : 5)) +
+      (hasAspirin ? 30 : 0)
+    ));
+
+    return {
+      statinConcentration: Number(statinConcentration.toFixed(1)),
+      kLevel: Number(kLevel.toFixed(2)),
+      inrLevel: Number(inrLevel.toFixed(2)),
+      plateletInhibition: Math.round(plateletInhibition),
+      hepaticStress,
+      renalStress,
+      cardiacStress,
+      bleedingRiskIndex,
+      isToxicitySpike: statinConcentration > 45 || kLevel > 5.5 || inrLevel > 4.0,
+    };
+  }, [simTimeHours, selectedMeds, selectedDiet, simEgfr]);
+
+  // Coordinates for Molecular Network Map
   const networkNodes = useMemo(() => {
     const allItems = [
       ...selectedMeds.map((m) => ({ id: m, label: m, type: "med" })),
@@ -271,9 +415,9 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
       }),
     ];
     if (allItems.length === 0) return [];
-    const radius = Math.min(180, Math.max(120, allItems.length * 28));
+    const radius = Math.min(170, Math.max(120, allItems.length * 28));
     const centerX = 260;
-    const centerY = 200;
+    const centerY = 190;
     return allItems.map((item, idx) => {
       const angle = (idx / allItems.length) * 2 * Math.PI - Math.PI / 2;
       return {
@@ -287,7 +431,6 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
   const networkLinks = useMemo(() => {
     if (!analysis) return [];
     const links = [];
-    // Drug-Drug Links
     (analysis.matrix_pairs || []).forEach((pair) => {
       const sourceNode = networkNodes.find((n) => n.id.toLowerCase() === pair.drug_a.toLowerCase());
       const targetNode = networkNodes.find((n) => n.id.toLowerCase() === pair.drug_b.toLowerCase());
@@ -301,7 +444,6 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
         });
       }
     });
-    // Drug-Food Links
     (analysis.food_interactions || []).forEach((food) => {
       const foodNode = networkNodes.find((n) => n.id.toLowerCase() === food.food_key.toLowerCase());
       (food.matched_drugs || []).forEach((dName) => {
@@ -390,7 +532,7 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
           <p style={{ fontSize: "0.84rem", color: "#64748B", margin: 0, lineHeight: 1.5 }}>
             {t(
               "pharma.subtitle",
-              "Proactive clinical pharmacology safety analyzer. Cross-references active medications, newly prescribed candidates, and dietary contraindications in real-time."
+              "Proactive clinical pharmacology safety analyzer and dynamic pharmacokinetic bio-simulation suite."
             )}
           </p>
         </div>
@@ -455,70 +597,6 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
         </div>
       </div>
 
-      {/* ── Preset Regimens Quick Bar ── */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "10px",
-          marginBottom: "18px",
-          overflowX: "auto",
-          paddingBottom: "4px",
-        }}
-      >
-        <span style={{ fontSize: "0.74rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase", whiteSpace: "nowrap" }}>
-          <Sparkles size={13} style={{ display: "inline", marginRight: "4px" }} />
-          {t("pharma.quick_scenarios", "Clinical Scenarios:")}
-        </span>
-        {PRESET_REGIMENS.map((p) => (
-          <button
-            key={p.id}
-            type="button"
-            onClick={() => handleLoadPreset(p)}
-            style={{
-              padding: "6px 12px",
-              background: "#FFFFFF",
-              border: "1px solid #E2E8F0",
-              borderRadius: "20px",
-              fontSize: "0.76rem",
-              fontWeight: 600,
-              color: "#334155",
-              cursor: "pointer",
-              whiteSpace: "nowrap",
-              boxShadow: "0 1px 2px rgba(0,0,0,0.03)",
-              transition: "all 0.15s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "#059669";
-              e.currentTarget.style.color = "#059669";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "#E2E8F0";
-              e.currentTarget.style.color = "#334155";
-            }}
-          >
-            {p.name}
-          </button>
-        ))}
-
-        <button
-          type="button"
-          onClick={handleClearAll}
-          style={{
-            padding: "6px 12px",
-            background: "transparent",
-            border: "1px dashed #CBD5E1",
-            borderRadius: "20px",
-            fontSize: "0.74rem",
-            color: "#64748B",
-            cursor: "pointer",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {t("pharma.clear_all", "Clear All")}
-        </button>
-      </div>
-
       {/* ── Sub-Navigation Tabs ── */}
       <div
         style={{
@@ -533,10 +611,11 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
         }}
       >
         {[
+          { id: "simulation", label: "Dynamic Bio-Simulation Engine", icon: Play },
           { id: "workbench", label: t("pharma.tab_workbench", "Regimen Workbench"), icon: Layers },
           { id: "matrix", label: t("pharma.tab_matrix", "2D Collision Matrix"), icon: FileSpreadsheet },
-          { id: "network", label: "Interactive Pathway Map", icon: Network },
-          { id: "food", label: t("pharma.tab_food", "Food & Dietary Hazards"), icon: Leaf },
+          { id: "network", label: "Pathway Map", icon: Network },
+          { id: "food", label: t("pharma.tab_food", "Dietary Hazards"), icon: Leaf },
           { id: "library", label: t("pharma.tab_library", "Pharmacology Database"), icon: BookOpen },
         ].map((tab) => {
           const isActive = activeTab === tab.id;
@@ -568,6 +647,399 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
           );
         })}
       </div>
+
+      {/* ── TAB: DYNAMIC PHARMACOKINETIC BIO-SIMULATION ENGINE ── */}
+      {activeTab === "simulation" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          {/* Simulation Header & Quick Scenarios */}
+          <div
+            style={{
+              background: "#FFFFFF",
+              border: "1px solid #E2E8F0",
+              borderRadius: "12px",
+              padding: "18px 22px",
+              boxShadow: "0 2px 8px rgba(15, 23, 42, 0.03)",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", flexWrap: "wrap", gap: "10px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <Activity size={18} color="#059669" />
+                <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "#0F172A", margin: 0 }}>
+                  Pharmacokinetic Time-Course & Physiological Collision Simulator
+                </h3>
+              </div>
+              <span style={{ fontSize: "0.72rem", color: "#64748B", fontWeight: 600 }}>
+                Simulating: {selectedMeds.join(", ") || "No Active Drugs"} + {selectedDiet.join(", ") || "Normal Diet"}
+              </span>
+            </div>
+
+            {/* Scenario Buttons */}
+            <div style={{ display: "flex", gap: "8px", overflowX: "auto", paddingBottom: "4px" }}>
+              <span style={{ fontSize: "0.74rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase", whiteSpace: "nowrap", display: "flex", alignItems: "center" }}>
+                Preset Case Studies:
+              </span>
+              {SIMULATION_SCENARIOS.map((scen) => (
+                <button
+                  key={scen.id}
+                  type="button"
+                  onClick={() => {
+                    setSelectedMeds(scen.meds);
+                    setSelectedDiet(scen.diet);
+                    setSimTimeHours(8.0);
+                  }}
+                  style={{
+                    padding: "5px 11px",
+                    background: "#F8FAFC",
+                    border: "1px solid #CBD5E1",
+                    borderRadius: "6px",
+                    fontSize: "0.74rem",
+                    fontWeight: 600,
+                    color: "#334155",
+                    cursor: "pointer",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {scen.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Simulation Cockpit: Graph + Live Telemetry */}
+          <div style={{ display: "grid", gridTemplateColumns: "1.3fr 0.7fr", gap: "20px", alignItems: "start" }}>
+            {/* Left: 24-Hour Time-Course Curve Graph */}
+            <div
+              style={{
+                background: "#FFFFFF",
+                border: "1px solid #E2E8F0",
+                borderRadius: "12px",
+                padding: "20px 24px",
+                boxShadow: "0 2px 10px rgba(15, 23, 42, 0.03)",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+                <div>
+                  <h4 style={{ fontSize: "0.92rem", fontWeight: 800, color: "#0F172A", margin: "0 0 2px 0" }}>
+                    24-Hour Dynamic Plasma Concentration & Biomarker Trajectory
+                  </h4>
+                  <span style={{ fontSize: "0.74rem", color: "#64748B" }}>
+                    Real-time simulation of absorption, metabolic enzyme competition, and toxicity threshold breaches.
+                  </span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", background: "#F1F5F9", padding: "4px 8px", borderRadius: "6px" }}>
+                  <Timer size={14} color="#059669" />
+                  <strong style={{ fontSize: "0.82rem", color: "#0F172A", fontFamily: "var(--font-mono, monospace)" }}>
+                    {String(Math.floor(simTimeHours)).padStart(2, "0")}:{String(Math.round((simTimeHours % 1) * 60)).padStart(2, "0")} HRS
+                  </strong>
+                </div>
+              </div>
+
+              {/* SVG Curve Plotter */}
+              <div style={{ position: "relative", width: "100%", height: "240px", background: "#0F172A", borderRadius: "8px", overflow: "hidden", padding: "10px", boxSizing: "border-box" }}>
+                <svg width="100%" height="100%" viewBox="0 0 500 200" preserveAspectRatio="none">
+                  {/* Grid Lines */}
+                  {[40, 80, 120, 160].map((y) => (
+                    <line key={y} x1="0" y1={y} x2="500" y2={y} stroke="#1E293B" strokeWidth="1" />
+                  ))}
+                  {[100, 200, 300, 400].map((x) => (
+                    <line key={x} x1={x} y1="0" x2={x} y2="200" stroke="#1E293B" strokeWidth="1" />
+                  ))}
+
+                  {/* Red Shaded Danger Zone (Toxicity Threshold) */}
+                  <rect x="0" y="0" width="500" height="50" fill="rgba(220, 38, 38, 0.18)" />
+                  <line x1="0" y1="50" x2="500" y2="50" stroke="#DC2626" strokeDasharray="4,4" strokeWidth="1.5" />
+                  <text x="8" y="42" fill="#F87171" fontSize="10px" fontWeight="700">TOXICITY DANGER THRESHOLD</text>
+
+                  {/* Green Safe Therapeutic Corridor */}
+                  <rect x="0" y="50" width="500" height="80" fill="rgba(5, 150, 105, 0.08)" />
+                  <text x="8" y="110" fill="#34D399" fontSize="10px" fontWeight="700">OPTIMAL THERAPEUTIC WINDOW</text>
+
+                  {/* Sub-therapeutic Zone */}
+                  <text x="8" y="180" fill="#94A3B8" fontSize="10px" fontWeight="700">SUB-THERAPEUTIC / INEFFECTIVE</text>
+
+                  {/* Simulated Statin / Drug Curve (Cyan line) */}
+                  <path
+                    d={(() => {
+                      const points = [];
+                      const statinMultiplier = selectedDiet.includes("grapefruit") ? 3.2 : 1.0;
+                      for (let hr = 0; hr <= 24; hr += 0.5) {
+                        const px = (hr / 24) * 500;
+                        const tOffset = Math.max(0, hr - 8.0);
+                        const conc = selectedMeds.some((m) => /statin/i.test(m))
+                          ? Math.max(0, statinMultiplier * 28 * (Math.exp(-0.1 * tOffset) - Math.exp(-1.2 * tOffset)))
+                          : 12 + Math.sin(hr * 0.4) * 8;
+                        const py = 200 - (conc / 80) * 180;
+                        points.push(`${px},${Math.max(10, Math.min(190, py))}`);
+                      }
+                      return `M ${points.join(" L ")}`;
+                    })()}
+                    fill="none"
+                    stroke="#38BDF8"
+                    strokeWidth="3"
+                  />
+
+                  {/* Simulated Potassium / Second Marker Curve (Amber line) */}
+                  <path
+                    d={(() => {
+                      const points = [];
+                      for (let hr = 0; hr <= 24; hr += 0.5) {
+                        const px = (hr / 24) * 500;
+                        const hasLisin = selectedMeds.some((m) => /lisinopril/i.test(m));
+                        const hasSpir = selectedMeds.some((m) => /spironolactone/i.test(m));
+                        let k = 4.2;
+                        if (hasLisin) k += 0.5;
+                        if (hasSpir) k += 0.8;
+                        if (selectedDiet.includes("high_potassium")) k += 0.7;
+                        k += Math.sin((hr / 24) * Math.PI) * 0.4;
+                        const py = 200 - ((k - 3.0) / 4.5) * 180;
+                        points.push(`${px},${Math.max(10, Math.min(190, py))}`);
+                      }
+                      return `M ${points.join(" L ")}`;
+                    })()}
+                    fill="none"
+                    stroke="#FBBF24"
+                    strokeWidth="2.5"
+                    strokeDasharray="5,3"
+                  />
+
+                  {/* Current Simulation Time Vertical Scrubber Bar */}
+                  <line
+                    x1={(simTimeHours / 24) * 500}
+                    y1="0"
+                    x2={(simTimeHours / 24) * 500}
+                    y2="200"
+                    stroke="#FFFFFF"
+                    strokeWidth="2.5"
+                  />
+                  <circle
+                    cx={(simTimeHours / 24) * 500}
+                    cy="40"
+                    r="5"
+                    fill="#EF4444"
+                    stroke="#FFFFFF"
+                    strokeWidth="2"
+                  />
+                </svg>
+              </div>
+
+              {/* Interactive Player Controls */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "16px", flexWrap: "wrap", gap: "12px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <button
+                    type="button"
+                    onClick={() => setSimIsPlaying(!simIsPlaying)}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      padding: "7px 14px",
+                      background: simIsPlaying ? "#DC2626" : "#059669",
+                      color: "#FFFFFF",
+                      border: "none",
+                      borderRadius: "6px",
+                      fontSize: "0.78rem",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {simIsPlaying ? <Pause size={14} /> : <Play size={14} />}
+                    <span>{simIsPlaying ? "Pause Simulation" : "Run Dynamic Simulation"}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSimIsPlaying(false);
+                      setSimTimeHours(8.0);
+                    }}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "4px",
+                      padding: "7px 10px",
+                      background: "#F1F5F9",
+                      border: "1px solid #CBD5E1",
+                      borderRadius: "6px",
+                      fontSize: "0.76rem",
+                      color: "#334155",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <RotateCcw size={13} />
+                    <span>Reset</span>
+                  </button>
+                </div>
+
+                {/* Scrubber Slider */}
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, maxWidth: "260px" }}>
+                  <Clock size={14} color="#64748B" />
+                  <input
+                    type="range"
+                    min="0"
+                    max="24"
+                    step="0.25"
+                    value={simTimeHours}
+                    onChange={(e) => setSimTimeHours(parseFloat(e.target.value))}
+                    style={{ width: "100%", accentColor: "#059669", cursor: "pointer" }}
+                  />
+                </div>
+
+                {/* Speed Toggles */}
+                <div style={{ display: "flex", gap: "4px" }}>
+                  {[1, 2, 4].map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => setSimSpeed(s)}
+                      style={{
+                        padding: "4px 8px",
+                        borderRadius: "4px",
+                        border: "1px solid #CBD5E1",
+                        background: simSpeed === s ? "#0F172A" : "#FFFFFF",
+                        color: simSpeed === s ? "#FFFFFF" : "#334155",
+                        fontSize: "0.70rem",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                      }}
+                    >
+                      {s}x
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Patient Physiology Modifiers */}
+              <div style={{ marginTop: "18px", borderTop: "1px solid #F1F5F9", paddingTop: "14px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.72rem", marginBottom: "4px" }}>
+                    <span style={{ fontWeight: 700, color: "#64748B" }}>Renal Function (eGFR):</span>
+                    <strong style={{ color: simEgfr < 60 ? "#DC2626" : "#059669" }}>{simEgfr} mL/min ({simEgfr < 60 ? "Impaired" : "Normal"})</strong>
+                  </div>
+                  <input
+                    type="range"
+                    min="20"
+                    max="120"
+                    value={simEgfr}
+                    onChange={(e) => setSimEgfr(parseInt(e.target.value))}
+                    style={{ width: "100%", accentColor: "#0284C7", cursor: "pointer" }}
+                  />
+                </div>
+
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.72rem", marginBottom: "4px" }}>
+                    <span style={{ fontWeight: 700, color: "#64748B" }}>Patient Age Factor:</span>
+                    <strong style={{ color: "#0F172A" }}>{simPatientAge} Years</strong>
+                  </div>
+                  <input
+                    type="range"
+                    min="25"
+                    max="90"
+                    value={simPatientAge}
+                    onChange={(e) => setSimPatientAge(parseInt(e.target.value))}
+                    style={{ width: "100%", accentColor: "#0284C7", cursor: "pointer" }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Live Simulated Vitals & Organ Stress Gauges */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+              {/* Vitals Telemetry Card */}
+              <div
+                style={{
+                  background: "#FFFFFF",
+                  border: "1px solid #E2E8F0",
+                  borderRadius: "12px",
+                  padding: "18px 20px",
+                  boxShadow: "0 2px 8px rgba(15, 23, 42, 0.03)",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "12px" }}>
+                  <Heart size={16} color="#DC2626" />
+                  <h4 style={{ fontSize: "0.88rem", fontWeight: 800, color: "#0F172A", margin: 0 }}>
+                    Live Virtual Patient Biomarkers
+                  </h4>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                  <div style={{ padding: "10px", background: simCalculations.kLevel > 5.5 ? "#FEF2F2" : "#F8FAFC", border: `1px solid ${simCalculations.kLevel > 5.5 ? "#FECDD3" : "#E2E8F0"}`, borderRadius: "8px" }}>
+                    <span style={{ fontSize: "0.68rem", color: "#64748B", fontWeight: 700, display: "block" }}>Serum K+ Level</span>
+                    <strong style={{ fontSize: "1.1rem", color: simCalculations.kLevel > 5.5 ? "#DC2626" : "#0F172A" }}>
+                      {simCalculations.kLevel} <span style={{ fontSize: "0.68rem" }}>mEq/L</span>
+                    </strong>
+                    <span style={{ fontSize: "0.62rem", color: simCalculations.kLevel > 5.5 ? "#DC2626" : "#059669", display: "block" }}>
+                      {simCalculations.kLevel > 5.5 ? "Hyperkalemia Alert" : "Normal: 3.5 - 5.0"}
+                    </span>
+                  </div>
+
+                  <div style={{ padding: "10px", background: simCalculations.inrLevel > 3.5 || simCalculations.inrLevel < 1.5 ? "#FEF2F2" : "#F8FAFC", border: `1px solid ${simCalculations.inrLevel > 3.5 || simCalculations.inrLevel < 1.5 ? "#FECDD3" : "#E2E8F0"}`, borderRadius: "8px" }}>
+                    <span style={{ fontSize: "0.68rem", color: "#64748B", fontWeight: 700, display: "block" }}>INR Coagulation</span>
+                    <strong style={{ fontSize: "1.1rem", color: simCalculations.inrLevel > 3.5 || simCalculations.inrLevel < 1.5 ? "#DC2626" : "#0F172A" }}>
+                      {simCalculations.inrLevel} <span style={{ fontSize: "0.68rem" }}>INR</span>
+                    </strong>
+                    <span style={{ fontSize: "0.62rem", color: simCalculations.inrLevel > 3.5 ? "#DC2626" : "#059669", display: "block" }}>
+                      {simCalculations.inrLevel > 3.5 ? "High Bleed Risk" : simCalculations.inrLevel < 1.5 && selectedMeds.includes("Warfarin") ? "Clot Hazard" : "Target: 2.0 - 3.0"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Organ Load Stress Gauges */}
+              <div
+                style={{
+                  background: "#FFFFFF",
+                  border: "1px solid #E2E8F0",
+                  borderRadius: "12px",
+                  padding: "18px 20px",
+                  boxShadow: "0 2px 8px rgba(15, 23, 42, 0.03)",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "12px" }}>
+                  <Gauge size={16} color="#059669" />
+                  <h4 style={{ fontSize: "0.88rem", fontWeight: 800, color: "#0F172A", margin: 0 }}>
+                    Simulated Organ Stress & Clearance Load
+                  </h4>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {/* Hepatic CYP Load */}
+                  <div>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.72rem", marginBottom: "2px" }}>
+                      <span style={{ color: "#334155", fontWeight: 600 }}>Hepatic CYP3A4 / Metabolic Load</span>
+                      <strong style={{ color: simCalculations.hepaticStress > 60 ? "#DC2626" : "#059669" }}>{simCalculations.hepaticStress}%</strong>
+                    </div>
+                    <div style={{ width: "100%", height: "6px", background: "#E2E8F0", borderRadius: "3px", overflow: "hidden" }}>
+                      <div style={{ width: `${simCalculations.hepaticStress}%`, height: "100%", background: simCalculations.hepaticStress > 60 ? "#DC2626" : "#059669", transition: "width 0.2s ease" }} />
+                    </div>
+                  </div>
+
+                  {/* Renal Clearance Burden */}
+                  <div>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.72rem", marginBottom: "2px" }}>
+                      <span style={{ color: "#334155", fontWeight: 600 }}>Renal Tubular Secretion Burden</span>
+                      <strong style={{ color: simCalculations.renalStress > 60 ? "#DC2626" : "#059669" }}>{simCalculations.renalStress}%</strong>
+                    </div>
+                    <div style={{ width: "100%", height: "6px", background: "#E2E8F0", borderRadius: "3px", overflow: "hidden" }}>
+                      <div style={{ width: `${simCalculations.renalStress}%`, height: "100%", background: simCalculations.renalStress > 60 ? "#DC2626" : "#0284C7", transition: "width 0.2s ease" }} />
+                    </div>
+                  </div>
+
+                  {/* Cardiovascular Risk Index */}
+                  <div>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.72rem", marginBottom: "2px" }}>
+                      <span style={{ color: "#334155", fontWeight: 600 }}>Cardiovascular Arrhythmia Risk</span>
+                      <strong style={{ color: simCalculations.cardiacStress > 50 ? "#DC2626" : "#059669" }}>{simCalculations.cardiacStress}%</strong>
+                    </div>
+                    <div style={{ width: "100%", height: "6px", background: "#E2E8F0", borderRadius: "3px", overflow: "hidden" }}>
+                      <div style={{ width: `${simCalculations.cardiacStress}%`, height: "100%", background: simCalculations.cardiacStress > 50 ? "#DC2626" : "#10B981", transition: "width 0.2s ease" }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── TAB 1: WORKBENCH & ACTIVE REGIMEN ALERTS ── */}
       {activeTab === "workbench" && (
@@ -857,7 +1329,6 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
                     const badgeColor = isCritical ? "#DC2626" : isHigh ? "#EA580C" : "#D97706";
                     const badgeBg = isCritical ? "#FEF2F2" : isHigh ? "#FFF7ED" : "#FFFBEB";
 
-                    // Check for safe alternative suggestion
                     const targetDrugA = (item.matched_pair?.[0] || item.drug_a).toLowerCase();
                     const targetDrugB = (item.matched_pair?.[1] || item.drug_b).toLowerCase();
                     const altA = ALTERNATIVE_SUGGESTIONS[targetDrugA];
@@ -1211,8 +1682,8 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
               <p style={{ fontSize: "0.88rem", margin: 0 }}>Select medications or dietary items in the Workbench tab to render the interactive pathway network.</p>
             </div>
           ) : (
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "420px", position: "relative" }}>
-              <svg width="520" height="400" viewBox="0 0 520 400" style={{ overflow: "visible" }}>
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "400px", position: "relative" }}>
+              <svg width="520" height="380" viewBox="0 0 520 380" style={{ overflow: "visible" }}>
                 {/* Connecting Links */}
                 {networkLinks.map((link, lIdx) => {
                   const isCritical = link.severity === "critical";
@@ -1504,7 +1975,7 @@ export default function DrugInteractionMatrix({ patientId = null, initialMeds = 
               </p>
             </div>
 
-            {/* Check for 1-Click Swap Recommendation */}
+            {/* 1-Click Swap Recommendation */}
             {(() => {
               const drugA = (selectedCollisionDetail.drug_a || "").toLowerCase();
               const drugB = (selectedCollisionDetail.drug_b || "").toLowerCase();
