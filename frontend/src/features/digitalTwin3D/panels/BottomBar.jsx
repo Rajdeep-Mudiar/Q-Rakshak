@@ -1,9 +1,11 @@
 import React from 'react';
 import { SEVERITY_TIERS } from '../data/visualizationRules';
 import { useTwinStore } from '../store/twinStore';
+import { useLanguage } from '../../../context/LanguageContext';
 import { Activity, ShieldAlert, Cpu } from 'lucide-react';
 
 export default function BottomBar() {
+  const { t } = useLanguage();
   const involvementMap = useTwinStore((state) => state.involvementMap);
   const patient = useTwinStore((state) => state.patient);
   const patientMode = useTwinStore((state) => state.patientMode);
@@ -17,7 +19,7 @@ export default function BottomBar() {
       {/* Visual Severity Legend */}
       <div className="dt-legend-group">
         <span style={{ color: 'var(--dt-text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-          Risk Level:
+          {t('twin_panels.risk_level', 'Risk Level')}:
         </span>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {SEVERITY_TIERS.map((tier) => (
@@ -42,21 +44,21 @@ export default function BottomBar() {
         <div className="dt-legend-item" style={{ background: 'var(--dt-accent-blue-soft)', borderColor: 'rgba(37, 99, 235, 0.2)' }}>
           <Activity size={12} color="var(--dt-accent-blue)" />
           <span style={{ color: 'var(--dt-accent-blue)', fontWeight: 700 }}>
-            Max Risk: {maxInvolvement}%
+            {t('twin_panels.max_risk', 'Max Risk')}: {maxInvolvement}%
           </span>
         </div>
 
         <div className="dt-legend-item">
           <ShieldAlert size={12} color="var(--dt-accent-blue)" />
           <span style={{ color: 'var(--dt-text-primary)', fontWeight: 600 }}>
-            {organCount} Affected Organ{organCount !== 1 ? 's' : ''}
+            {organCount} {organCount === 1 ? t('twin_panels.affected_organs', 'Affected Organ') : t('twin_panels.affected_organs_plural', 'Affected Organs')}
           </span>
         </div>
 
         <div className="dt-legend-item" style={{ background: 'var(--dt-bg-card-hover)', borderColor: 'var(--dt-border-default)' }}>
           <Cpu size={12} color="var(--dt-accent-blue)" />
           <span style={{ color: 'var(--dt-accent-blue)', fontWeight: 700 }}>
-            {patientMode === 'active' ? `Live: ${patient.patientId || patient.id || ''}` : 'Ready'}
+            {patientMode === 'active' ? `${t('twin_panels.live', 'Live')}: ${patient.patientId || patient.id || ''}` : t('twin_panels.ready', 'Ready')}
           </span>
         </div>
       </div>

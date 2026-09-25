@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTwinStore } from '../store/twinStore';
+import { useLanguage } from '../../../context/LanguageContext';
 import { DISEASE_REGISTRY } from '../data/diseaseRegistry';
 import BreastCancerControls from '../diseases/BreastCancerControls';
 import HeartDiseaseControls from '../diseases/HeartDiseaseControls';
@@ -11,7 +12,7 @@ import {
   ChevronDown, ChevronRight, Plus, Trash2, Search,
   Loader2, UserCheck, Stethoscope, Dna, FlaskConical,
   X, Check, ShieldCheck, Heart, Wind, Thermometer,
-  Sparkles, RefreshCw
+  Sparkles, RefreshCw, Scale
 } from 'lucide-react';
 import { authApi } from '../../../api/auth';
 
@@ -25,15 +26,16 @@ function SectionHeader({ icon: Icon, title, color = 'var(--dt-accent-blue)' }) {
 }
 
 // ── Tab Definitions ────────────────────────────────────────────────────────────
-const TABS = [
-  { id: 'overview',   label: 'Vitals',        icon: Activity },
-  { id: 'disease',    label: 'Simulation',    icon: Stethoscope },
-  { id: 'history',    label: 'History',       icon: Clock },
-  { id: 'meds',       label: 'Medications',   icon: Pill },
+const TAB_KEYS = [
+  { id: 'overview',   labelKey: 'twin_panels.tabs_vitals',        fallback: 'Vitals',        icon: Activity },
+  { id: 'disease',    labelKey: 'twin_panels.tabs_simulation',    fallback: 'Simulation',    icon: Stethoscope },
+  { id: 'history',    labelKey: 'twin_panels.tabs_history',       fallback: 'History',       icon: Clock },
+  { id: 'meds',       labelKey: 'twin_panels.tabs_medications',   fallback: 'Medications',   icon: Pill },
 ];
 
 // ── Health data and overview tab ─────────────────────────────────────────────
 function TelemetryTab() {
+  const { t } = useLanguage();
   const patient           = useTwinStore((s) => s.patient);
   const toggleSymptom     = useTwinStore((s) => s.toggleSymptom);
   const setPatientField   = useTwinStore((s) => s.setPatientField);
@@ -58,10 +60,10 @@ function TelemetryTab() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
             <div style={{ fontFamily: 'var(--dt-font-sans)', fontSize: '0.64rem', color: 'var(--dt-accent-blue)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Patient Profile
+              {t('twin_panels.patient_profile', 'Patient Profile')}
             </div>
             <div style={{ fontSize: '0.94rem', fontWeight: 800, color: 'var(--dt-text-primary)', marginTop: '2px' }}>
-              {patient.firstName ? `${patient.firstName} ${patient.lastName || ''}`.trim() : (patient.patientId ? `Patient #${patient.patientId}` : 'Patient')}
+              {patient.firstName ? `${patient.firstName} ${patient.lastName || ''}`.trim() : (patient.patientId ? `${t('twin_panels.patient_prefix', 'Patient')} #${patient.patientId}` : t('twin_panels.patient_prefix', 'Patient'))}
             </div>
             <div style={{ fontSize: '0.68rem', color: 'var(--dt-text-muted)', marginTop: '2px' }}>
               ID: {patient.patientId || patient.id || '—'}
@@ -81,26 +83,26 @@ function TelemetryTab() {
               gap: '4px'
             }}
           >
-            <ShieldCheck size={11} /> Connected
+            <ShieldCheck size={11} /> {t('twin_panels.connected', 'Connected')}
           </span>
         </div>
 
         {/* Demographic Stats Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', marginTop: '8px' }}>
           <div style={{ background: 'var(--dt-bg-surface)', padding: '6px 8px', borderRadius: '6px', border: '1px solid var(--dt-border-default)' }}>
-            <div style={{ fontSize: '0.58rem', color: 'var(--dt-text-muted)', fontWeight: 700 }}>BLOOD</div>
+            <div style={{ fontSize: '0.58rem', color: 'var(--dt-text-muted)', fontWeight: 700 }}>{t('twin_panels.blood', 'BLOOD')}</div>
             <div style={{ fontSize: '0.80rem', fontWeight: 800, color: 'var(--dt-accent-blue)' }}>{patient.bloodType || '—'}</div>
           </div>
           <div style={{ background: 'var(--dt-bg-surface)', padding: '6px 8px', borderRadius: '6px', border: '1px solid var(--dt-border-default)' }}>
-            <div style={{ fontSize: '0.58rem', color: 'var(--dt-text-muted)', fontWeight: 700 }}>SEX</div>
+            <div style={{ fontSize: '0.58rem', color: 'var(--dt-text-muted)', fontWeight: 700 }}>{t('twin_panels.sex', 'SEX')}</div>
             <div style={{ fontSize: '0.80rem', fontWeight: 700, color: 'var(--dt-text-primary)', textTransform: 'capitalize' }}>{patient.sex || '—'}</div>
           </div>
           <div style={{ background: 'var(--dt-bg-surface)', padding: '6px 8px', borderRadius: '6px', border: '1px solid var(--dt-border-default)' }}>
-            <div style={{ fontSize: '0.58rem', color: 'var(--dt-text-muted)', fontWeight: 700 }}>AGE</div>
+            <div style={{ fontSize: '0.58rem', color: 'var(--dt-text-muted)', fontWeight: 700 }}>{t('twin_panels.age', 'AGE')}</div>
             <div style={{ fontSize: '0.80rem', fontWeight: 700, color: 'var(--dt-text-primary)' }}>{patient.ageGroup || (patient.dateOfBirth ? `${new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear()} yrs` : '—')}</div>
           </div>
           <div style={{ background: 'var(--dt-bg-surface)', padding: '6px 8px', borderRadius: '6px', border: '1px solid var(--dt-border-default)' }}>
-            <div style={{ fontSize: '0.58rem', color: 'var(--dt-text-muted)', fontWeight: 700 }}>BMI</div>
+            <div style={{ fontSize: '0.58rem', color: 'var(--dt-text-muted)', fontWeight: 700 }}>{t('twin_panels.bmi', 'BMI')}</div>
             <div style={{ fontSize: '0.80rem', fontWeight: 800, color: 'var(--dt-text-primary)' }}>{hasBMI ? bmi : '—'}</div>
           </div>
         </div>
@@ -111,9 +113,9 @@ function TelemetryTab() {
       {hasVitals || hasBMI ? (
         <div className="dt-card" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <SectionHeader icon={Activity} title="Vitals & Metrics" color="var(--dt-accent-blue)" />
+            <SectionHeader icon={Activity} title={t('twin_panels.vitals_metrics', 'Vitals & Metrics')} color="var(--dt-accent-blue)" />
             <span style={{ fontSize: '0.62rem', color: 'var(--dt-accent-blue)', fontWeight: 600 }}>
-              Verified Baseline
+              {t('twin_panels.verified_baseline', 'Verified Baseline')}
             </span>
           </div>
 
@@ -121,7 +123,7 @@ function TelemetryTab() {
             {/* Body Temperature */}
             <div style={{ background: 'var(--dt-bg-surface)', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--dt-border-default)', display: 'flex', flexDirection: 'column', gap: '3px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.62rem', color: 'var(--dt-text-muted)', fontWeight: 700 }}>TEMPERATURE</span>
+                <span style={{ fontSize: '0.62rem', color: 'var(--dt-text-muted)', fontWeight: 700 }}>{t('twin_panels.temperature', 'TEMPERATURE')}</span>
                 <Thermometer size={12} color="#D97706" />
               </div>
               <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--dt-text-primary)', fontFamily: 'var(--dt-font-sans)' }}>
@@ -132,7 +134,7 @@ function TelemetryTab() {
             {/* Calculated BMI */}
             <div style={{ background: 'var(--dt-bg-surface)', padding: '10px 12px', borderRadius: '6px', border: '1px solid var(--dt-border-default)', display: 'flex', flexDirection: 'column', gap: '3px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.62rem', color: 'var(--dt-text-muted)', fontWeight: 700 }}>BMI</span>
+                <span style={{ fontSize: '0.62rem', color: 'var(--dt-text-muted)', fontWeight: 700 }}>{t('twin_panels.bmi', 'BMI')}</span>
                 <Scale size={12} color="var(--dt-accent-blue)" />
               </div>
               <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--dt-text-primary)', fontFamily: 'var(--dt-font-sans)' }}>
@@ -144,14 +146,14 @@ function TelemetryTab() {
       ) : (
         <div className="dt-card" style={{ textAlign: 'center', padding: '16px 12px' }}>
           <Activity size={20} color="var(--dt-text-muted)" style={{ margin: '0 auto 6px' }} />
-          <div style={{ fontSize: '0.74rem', color: 'var(--dt-text-secondary)', fontWeight: 700 }}>No vitals recorded</div>
-          <div style={{ fontSize: '0.68rem', color: 'var(--dt-text-muted)', marginTop: '3px' }}>Vitals populate automatically when connected to patient telemetry.</div>
+          <div style={{ fontSize: '0.74rem', color: 'var(--dt-text-secondary)', fontWeight: 700 }}>{t('twin_panels.no_vitals', 'No vitals recorded')}</div>
+          <div style={{ fontSize: '0.68rem', color: 'var(--dt-text-muted)', marginTop: '3px' }}>{t('twin_panels.no_vitals_desc', 'Vitals populate automatically when connected to patient telemetry.')}</div>
         </div>
       )}
 
       {/* Active Diagnosed Conditions & Symptoms */}
       <div className="dt-card">
-        <SectionHeader icon={AlertTriangle} title="Symptoms & Conditions" color="#D97706" />
+        <SectionHeader icon={AlertTriangle} title={t('twin_panels.symptoms_conditions', 'Symptoms & Conditions')} color="#D97706" />
         {patient.symptoms?.length > 0 ? (
           <div className="dt-symptoms-matrix">
             {patient.symptoms.map((symptom) => {
@@ -172,14 +174,14 @@ function TelemetryTab() {
           </div>
         ) : (
           <div style={{ fontSize: '0.72rem', color: 'var(--dt-text-muted)', fontStyle: 'italic', padding: '6px 0' }}>
-            No symptoms recorded
+            {t('twin_panels.no_symptoms', 'No symptoms recorded')}
           </div>
         )}
       </div>
 
       {/* Clinical Observations & Record Notes */}
       <div className="dt-card">
-        <label className="dt-label">Doctor Notes</label>
+        <label className="dt-label">{t('twin_panels.doctor_notes', 'Doctor Notes')}</label>
         <div
           style={{
             background: 'var(--dt-bg-surface)',
@@ -192,7 +194,7 @@ function TelemetryTab() {
             fontStyle: patient.notes ? 'normal' : 'italic',
           }}
         >
-          {patient.notes || 'No doctor notes recorded.'}
+          {patient.notes || t('twin_panels.no_doctor_notes', 'No doctor notes recorded.')}
         </div>
       </div>
     </div>
@@ -201,6 +203,7 @@ function TelemetryTab() {
 
 // ── Disease Simulation Tab ─────────────────────────────────────────────────────
 function DiseaseTab() {
+  const { t } = useLanguage();
   const selectedDisease = useTwinStore((s) => s.selectedDisease);
   const setDisease      = useTwinStore((s) => s.setDisease);
   const diseases        = Object.values(DISEASE_REGISTRY);
@@ -208,7 +211,7 @@ function DiseaseTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
       <div className="dt-card">
-        <SectionHeader icon={Stethoscope} title="Select Condition to Simulate" color="var(--dt-accent-blue)" />
+        <SectionHeader icon={Stethoscope} title={t('twin_panels.select_condition_to_simulate', 'Select Condition to Simulate')} color="var(--dt-accent-blue)" />
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           {diseases.map((d) => (
             <button
@@ -235,7 +238,7 @@ function DiseaseTab() {
                   fontWeight: 700,
                 }}
               >
-                {d.targetOrgans.length} organ{d.targetOrgans.length > 1 ? 's' : ''}
+                {d.targetOrgans.length} {d.targetOrgans.length === 1 ? t('twin_panels.affected_organs', 'organ') : t('twin_panels.affected_organs_plural', 'organs')}
               </span>
             </button>
           ))}
@@ -245,7 +248,7 @@ function DiseaseTab() {
       {/* Disease Controls */}
       <div className="dt-card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <label className="dt-label">Organ Adjustments</label>
+          <label className="dt-label">{t('twin_panels.organ_adjustments', 'Organ Adjustments')}</label>
           <span style={{ fontSize: '0.70rem', fontWeight: 700, color: 'var(--dt-accent-blue)' }}>
             {DISEASE_REGISTRY[selectedDisease]?.name}
           </span>
@@ -262,6 +265,7 @@ function DiseaseTab() {
 
 // ── Medical History & Allergies Tab ───────────────────────────────────────────
 function HistoryTab() {
+  const { t } = useLanguage();
   const patient              = useTwinStore((s) => s.patient);
   const addAllergy           = useTwinStore((s) => s.addAllergy);
   const removeAllergy        = useTwinStore((s) => s.removeAllergy);
@@ -291,7 +295,7 @@ function HistoryTab() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
       {/* Allergies Card */}
       <div className="dt-card">
-        <SectionHeader icon={AlertTriangle} title="Allergies" color="var(--dt-accent-blue)" />
+        <SectionHeader icon={AlertTriangle} title={t('twin_panels.allergies', 'Allergies')} color="var(--dt-accent-blue)" />
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
           {patient.allergies?.length > 0 ? (
             patient.allergies.map((allergy, idx) => {
@@ -325,14 +329,14 @@ function HistoryTab() {
               );
             })
           ) : (
-            <span style={{ fontSize: '0.72rem', color: 'var(--dt-text-muted)' }}>No known allergies.</span>
+            <span style={{ fontSize: '0.72rem', color: 'var(--dt-text-muted)' }}>{t('twin_panels.no_allergies', 'No known allergies.')}</span>
           )}
         </div>
 
         <form onSubmit={handleAddAllergy} style={{ display: 'flex', gap: '6px', marginTop: '4px' }}>
           <input
             type="text"
-            placeholder="Add new allergy..."
+            placeholder={t('twin_panels.add_allergy_placeholder', 'Add new allergy...')}
             value={newAllergy}
             onChange={(e) => setNewAllergy(e.target.value)}
             className="dt-input"
@@ -346,7 +350,7 @@ function HistoryTab() {
 
       {/* Chronic Conditions Card */}
       <div className="dt-card">
-        <SectionHeader icon={Clock} title="Chronic Conditions" color="var(--dt-accent-blue)" />
+        <SectionHeader icon={Clock} title={t('twin_panels.chronic_conditions', 'Chronic Conditions')} color="var(--dt-accent-blue)" />
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
           {((patient.chronicConditions && patient.chronicConditions.length > 0) ? patient.chronicConditions : (patient.medicalHistory || [])).length > 0 ? (
             ((patient.chronicConditions && patient.chronicConditions.length > 0) ? patient.chronicConditions : (patient.medicalHistory || [])).map((c, idx) => {
@@ -380,14 +384,14 @@ function HistoryTab() {
               );
             })
           ) : (
-            <span style={{ fontSize: '0.72rem', color: 'var(--dt-text-muted)' }}>No chronic conditions recorded.</span>
+            <span style={{ fontSize: '0.72rem', color: 'var(--dt-text-muted)' }}>{t('twin_panels.no_chronic_conditions', 'No chronic conditions recorded.')}</span>
           )}
         </div>
 
         <form onSubmit={handleAddCondition} style={{ display: 'flex', gap: '6px', marginTop: '4px' }}>
           <input
             type="text"
-            placeholder="Add condition..."
+            placeholder={t('twin_panels.add_condition_placeholder', 'Add condition...')}
             value={newCondition}
             onChange={(e) => setNewCondition(e.target.value)}
             className="dt-input"
@@ -404,6 +408,7 @@ function HistoryTab() {
 
 // ── Active Prescriptions & Medications Tab ────────────────────────────────────
 function MedsTab() {
+  const { t } = useLanguage();
   const patient           = useTwinStore((s) => s.patient);
   const addMedication     = useTwinStore((s) => s.addMedication);
   const removeMedication  = useTwinStore((s) => s.removeMedication);
@@ -425,7 +430,7 @@ function MedsTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
       <div className="dt-card">
-        <SectionHeader icon={Pill} title="Current Medications" color="var(--dt-accent-blue)" />
+        <SectionHeader icon={Pill} title={t('twin_panels.current_medications', 'Current Medications')} color="var(--dt-accent-blue)" />
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           {patient.medications?.length > 0 ? (
             patient.medications.map((m, idx) => (
@@ -459,14 +464,14 @@ function MedsTab() {
               </div>
             ))
           ) : (
-            <span style={{ fontSize: '0.72rem', color: 'var(--dt-text-muted)' }}>No medications listed.</span>
+            <span style={{ fontSize: '0.72rem', color: 'var(--dt-text-muted)' }}>{t('twin_panels.no_medications', 'No medications listed.')}</span>
           )}
         </div>
 
         <form onSubmit={handleAddMed} style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '8px' }}>
           <input
             type="text"
-            placeholder="Medication name..."
+            placeholder={t('twin_panels.med_name_placeholder', 'Medication name...')}
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="dt-input"
@@ -475,7 +480,7 @@ function MedsTab() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
             <input
               type="text"
-              placeholder="Dosage (e.g. 10mg)..."
+              placeholder={t('twin_panels.dosage_placeholder', 'Dosage (e.g. 10mg)...')}
               value={dosage}
               onChange={(e) => setDosage(e.target.value)}
               className="dt-input"
@@ -483,7 +488,7 @@ function MedsTab() {
             />
             <input
               type="text"
-              placeholder="Frequency (e.g. 1x daily)..."
+              placeholder={t('twin_panels.freq_placeholder', 'Frequency (e.g. 1x daily)...')}
               value={freq}
               onChange={(e) => setFreq(e.target.value)}
               className="dt-input"
@@ -491,7 +496,7 @@ function MedsTab() {
             />
           </div>
           <button type="submit" className="dt-action-btn" style={{ justifyContent: 'center', marginTop: '2px' }}>
-            <Plus size={13} /> Add Medication
+            <Plus size={13} /> {t('twin_panels.add_medication_btn', 'Add Medication')}
           </button>
         </form>
       </div>
@@ -501,6 +506,7 @@ function MedsTab() {
 
 // ── Master Left Sidebar Container ─────────────────────────────────────────────
 export default function LeftSidebar() {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('overview');
   const patient = useTwinStore((s) => s.patient);
   const loadPatientFromDB = useTwinStore((s) => s.loadPatientFromDB);
@@ -536,10 +542,10 @@ export default function LeftSidebar() {
         <div style={{ width: '100%' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
             <span style={{ fontSize: '0.66rem', fontWeight: 700, color: 'var(--dt-text-muted)', textTransform: 'uppercase' }}>
-              Patient Record
+              {t('twin_panels.patient_record', 'Patient Record')}
             </span>
             <span style={{ fontSize: '0.64rem', color: 'var(--dt-accent-blue)', fontWeight: 600 }}>
-              Live Sync
+              {t('twin_panels.live_sync', 'Live Sync')}
             </span>
           </div>
 
@@ -548,7 +554,7 @@ export default function LeftSidebar() {
               type="text"
               value={inputPatientId}
               onChange={(e) => setInputPatientId(e.target.value)}
-              placeholder="Enter Patient ID..."
+              placeholder={t('twin_panels.enter_patient_id', 'Enter Patient ID...')}
               className="dt-input"
               style={{ padding: '6px 10px', fontSize: '0.74rem' }}
             />
@@ -558,7 +564,7 @@ export default function LeftSidebar() {
               className="dt-action-btn-primary"
               style={{ padding: '6px 12px', fontSize: '0.72rem' }}
             >
-              {isFetchingPatient ? <Loader2 size={12} className="spin" /> : 'Load'}
+              {isFetchingPatient ? <Loader2 size={12} className="spin" /> : t('twin_panels.load', 'Load')}
             </button>
           </form>
         </div>
@@ -566,9 +572,10 @@ export default function LeftSidebar() {
 
       {/* Left Sidebar Tabs */}
       <div className="dt-tab-bar">
-        {TABS.map((tab) => {
+        {TAB_KEYS.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
+          const label = t(tab.labelKey, tab.fallback);
           return (
             <button
               key={tab.id}
@@ -577,7 +584,7 @@ export default function LeftSidebar() {
               className={`dt-tab-btn ${isActive ? 'active' : ''}`}
             >
               <Icon size={14} />
-              <span>{tab.label}</span>
+              <span>{label}</span>
             </button>
           );
         })}

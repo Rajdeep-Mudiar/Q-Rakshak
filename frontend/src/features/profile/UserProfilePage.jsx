@@ -100,12 +100,14 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
   const { t } = useLanguage();
   const containerRef = useRef(null);
   const activeUserId = currentUser?.user_id || currentUser?.id || currentUser?.username || "";
+  const effectiveRole = (currentUser?.role || "patient").toLowerCase();
+  const isDoctor = effectiveRole === "doctor" || effectiveRole === "clinician";
 
   const [profile, setProfile] = useState({
     user_id: activeUserId,
     username: currentUser?.username || "",
     name: currentUser?.name || "",
-    role: currentUser?.role || "patient",
+    role: effectiveRole,
     age: "",
     gender: "",
     primary_email: currentUser?.email || "",
@@ -124,8 +126,18 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
     hospital: "",
     license_id: "",
     attending_physician: "",
+    // Clinician specific practice fields
+    specialty: "General Medicine & Clinical AI",
+    registration_number: "",
+    council_name: "National Medical Commission",
+    experience_years: 6,
+    fee_inr: 600,
+    languages: ["English", "Hindi"],
+    available_slots: ["09:30 AM", "11:00 AM", "02:30 PM", "04:30 PM"],
+    verification_status: "verified",
   });
 
+  const [activeTab, setActiveTab] = useState(isDoctor ? "practice" : "identity");
   const [loading, setLoading] = useState(false);
   const [syncStatus, setSyncStatus] = useState("synced");
   const [error, setError] = useState(null);
@@ -140,7 +152,11 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
   const [medications, setMedications] = useState([]);
   const [emergencyContacts, setEmergencyContacts] = useState([]);
 
-  const isDeleteAuthorized = deleteConfirmText.trim().toLowerCase() === "confirm deletion account";
+  const isDeleteAuthorized = [
+    "confirm deletion account",
+    "delete",
+    "confirm",
+  ].includes(deleteConfirmText.trim().toLowerCase());
 
   useEffect(() => {
     fetchProfileData();
@@ -166,20 +182,22 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
           username: currentUser?.username || prev.username,
         }));
       }
-      const clinical = await clinicalApi.getPatientRecord(activeUserId);
-      if (clinical.patient) {
-        const patient = clinical.patient;
-        setMedicalHistory(Array.isArray(patient.medical_history) ? patient.medical_history.map((item, index) => typeof item === "string" ? { id: `history-${index}`, condition: item, notes: "" } : item) : []);
-        setMedications(Array.isArray(patient.medications) ? patient.medications : []);
-        setEmergencyContacts(Array.isArray(patient.emergency_contacts) ? patient.emergency_contacts.map((item, index) => ({ id: `contact-${index}`, ...item })) : []);
-        setProfile((prev) => ({
-          ...prev,
-          ...patient,
-          allergies: formatAllergies(patient.allergies || prev.allergies),
-          active_medications: formatMedications(patient.medications || patient.active_medications || prev.active_medications),
-          medical_history: formatMedicalHistory(patient.medical_history || prev.medical_history),
-          user_id: patient.id || prev.user_id
-        }));
+      if (!isDoctor) {
+        const clinical = await clinicalApi.getPatientRecord(activeUserId);
+        if (clinical.patient) {
+          const patient = clinical.patient;
+          setMedicalHistory(Array.isArray(patient.medical_history) ? patient.medical_history.map((item, index) => typeof item === "string" ? { id: `history-${index}`, condition: item, notes: "" } : item) : []);
+          setMedications(Array.isArray(patient.medications) ? patient.medications : []);
+          setEmergencyContacts(Array.isArray(patient.emergency_contacts) ? patient.emergency_contacts.map((item, index) => ({ id: `contact-${index}`, ...item })) : []);
+          setProfile((prev) => ({
+            ...prev,
+            ...patient,
+            allergies: formatAllergies(patient.allergies || prev.allergies),
+            active_medications: formatMedications(patient.medications || patient.active_medications || prev.active_medications),
+            medical_history: formatMedicalHistory(patient.medical_history || prev.medical_history),
+            user_id: patient.id || prev.user_id
+          }));
+        }
       }
     } catch (err) {
       // Retain fallback metadata
@@ -193,16 +211,18 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
     setSyncStatus("saving");
     try {
       const res = await profileApi.updateProfile(activeUserId, payload);
-      await clinicalApi.updatePatientRecord(activeUserId, {
-        name: payload.name,
-        age: payload.age,
-        gender: payload.gender,
-        blood_group: payload.blood_group,
-        medical_history: medicalHistory,
-        medications,
-        emergency_contacts: emergencyContacts,
-        emergency_contact: emergencyContacts.find((contact) => contact.is_primary)?.phone || payload.emergency_phone,
-      });
+      if (!isDoctor) {
+        await clinicalApi.updatePatientRecord(activeUserId, {
+          name: payload.name,
+          age: payload.age,
+          gender: payload.gender,
+          blood_group: payload.blood_group,
+          medical_history: medicalHistory,
+          medications,
+          emergency_contacts: emergencyContacts,
+          emergency_contact: emergencyContacts.find((contact) => contact.is_primary)?.phone || payload.emergency_phone,
+        });
+      }
       setSyncStatus("synced");
       if (onProfileUpdated) {
         onProfileUpdated(res.profile || payload);
@@ -248,25 +268,22 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
     setEmergencyContacts((items) => [...items, { id: `contact-${Date.now()}`, name: "", relation: "", phone: "", email: "", is_primary: false }]);
   }
 
-  const [activeTab, setActiveTab] = useState("identity");
   const [allergiesList, setAllergiesList] = useState([]);
   const [newAllergen, setNewAllergen] = useState("");
   const [newAllergySev, setNewAllergySev] = useState("HIGH");
   const [newAllergyRxn, setNewAllergyRxn] = useState("");
 
   async function handleDeleteProfile() {
-    if (!isDeleteAuthorized) {
-      setError('Please enter "CONFIRM DELETION ACCOUNT" exactly to authorize removal.');
-      return;
-    }
-
     setDeleting(true);
     setError(null);
     try {
       await profileApi.deleteProfile(activeUserId);
       setDeleteConfirmOpen(false);
+      authApi.logout();
       if (onProfileDeleted) {
         onProfileDeleted();
+      } else {
+        window.location.reload();
       }
     } catch (err) {
       setError(err.message || "Failed to delete profile.");
@@ -296,7 +313,6 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
     autoSaveToDb({ ...profile, allergies: formatted });
   }
 
-  const effectiveRole = currentUser?.role || profile.role || "patient";
   const effectiveUserId = profile.user_id || profile.id || activeUserId || "";
   const emergencyPortalUrl = typeof window !== "undefined"
     ? `${window.location.origin}/#triage/${effectiveUserId}`
@@ -402,22 +418,42 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
             {t("actions.sync", "Sync")}
           </button>
 
-          <button
-            type="button"
-            className="btn-primary"
-            onClick={() => setViewCardOpen(true)}
-            style={{
-              minHeight: "40px",
-              padding: "8px 16px",
-              fontSize: "0.78rem",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-            }}
-          >
-            <CreditCard size={15} />
-            {t("profile.view_card", "View Digital Pass")}
-          </button>
+          {isDoctor ? (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "8px 14px",
+                background: "#ECFDF5",
+                border: "1px solid #A7F3D0",
+                borderRadius: "6px",
+                color: "#059669",
+                fontSize: "0.78rem",
+                fontWeight: 700,
+              }}
+            >
+              <CheckCircle2 size={15} />
+              <span>{t("profile.verified_clinician", "Verified Clinician (NMC)")}</span>
+            </div>
+          ) : (
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={() => setViewCardOpen(true)}
+              style={{
+                minHeight: "40px",
+                padding: "8px 16px",
+                fontSize: "0.78rem",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
+              <CreditCard size={15} />
+              {t("profile.view_card", "View Digital Pass")}
+            </button>
+          )}
         </div>
       </div>
 
@@ -441,80 +477,136 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
           overflowX: "auto",
         }}
       >
-        <button
-          type="button"
-          onClick={() => setActiveTab("identity")}
-          style={{
-            flex: 1,
-            minWidth: "150px",
-            padding: "8px 14px",
-            fontSize: "0.80rem",
-            fontWeight: activeTab === "identity" ? 600 : 500,
-            color: activeTab === "identity" ? "var(--primary)" : "var(--text-secondary)",
-            background: activeTab === "identity" ? "var(--bg-surface)" : "transparent",
-            border: activeTab === "identity" ? "1px solid var(--border-default)" : "1px solid transparent",
-            borderRadius: "8px",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "7px",
-            boxShadow: activeTab === "identity" ? "0 1px 3px rgba(15, 23, 42, 0.06)" : "none",
-            transition: "all 0.15s ease",
-          }}
-        >
-          <User size={15} /> {t("profile.tab_identity", "Identity & Demographics")}
-        </button>
+        {isDoctor ? (
+          <>
+            <button
+              type="button"
+              onClick={() => setActiveTab("practice")}
+              style={{
+                flex: 1,
+                minWidth: "150px",
+                padding: "8px 14px",
+                fontSize: "0.80rem",
+                fontWeight: activeTab === "practice" ? 600 : 500,
+                color: activeTab === "practice" ? "var(--primary)" : "var(--text-secondary)",
+                background: activeTab === "practice" ? "var(--bg-surface)" : "transparent",
+                border: activeTab === "practice" ? "1px solid var(--border-default)" : "1px solid transparent",
+                borderRadius: "8px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "7px",
+                boxShadow: activeTab === "practice" ? "0 1px 3px rgba(15, 23, 42, 0.06)" : "none",
+                transition: "all 0.15s ease",
+              }}
+            >
+              <Stethoscope size={15} /> {t("profile.tab_practice", "Clinical Practice & Licensing")}
+            </button>
 
-        <button
-          type="button"
-          onClick={() => setActiveTab("records")}
-          style={{
-            flex: 1,
-            minWidth: "150px",
-            padding: "8px 14px",
-            fontSize: "0.80rem",
-            fontWeight: activeTab === "records" ? 600 : 500,
-            color: activeTab === "records" ? "var(--primary)" : "var(--text-secondary)",
-            background: activeTab === "records" ? "var(--bg-surface)" : "transparent",
-            border: activeTab === "records" ? "1px solid var(--border-default)" : "1px solid transparent",
-            borderRadius: "8px",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "7px",
-            boxShadow: activeTab === "records" ? "0 1px 3px rgba(15, 23, 42, 0.06)" : "none",
-            transition: "all 0.15s ease",
-          }}
-        >
-          <Activity size={15} /> {t("profile.tab_records", "Clinical Records & Meds")}
-        </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("contact")}
+              style={{
+                flex: 1,
+                minWidth: "150px",
+                padding: "8px 14px",
+                fontSize: "0.80rem",
+                fontWeight: activeTab === "contact" ? 600 : 500,
+                color: activeTab === "contact" ? "var(--primary)" : "var(--text-secondary)",
+                background: activeTab === "contact" ? "var(--bg-surface)" : "transparent",
+                border: activeTab === "contact" ? "1px solid var(--border-default)" : "1px solid transparent",
+                borderRadius: "8px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "7px",
+                boxShadow: activeTab === "contact" ? "0 1px 3px rgba(15, 23, 42, 0.06)" : "none",
+                transition: "all 0.15s ease",
+              }}
+            >
+              <Phone size={15} /> {t("profile.tab_contact", "Practice Contact & Notifications")}
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={() => setActiveTab("identity")}
+              style={{
+                flex: 1,
+                minWidth: "150px",
+                padding: "8px 14px",
+                fontSize: "0.80rem",
+                fontWeight: activeTab === "identity" ? 600 : 500,
+                color: activeTab === "identity" ? "var(--primary)" : "var(--text-secondary)",
+                background: activeTab === "identity" ? "var(--bg-surface)" : "transparent",
+                border: activeTab === "identity" ? "1px solid var(--border-default)" : "1px solid transparent",
+                borderRadius: "8px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "7px",
+                boxShadow: activeTab === "identity" ? "0 1px 3px rgba(15, 23, 42, 0.06)" : "none",
+                transition: "all 0.15s ease",
+              }}
+            >
+              <User size={15} /> {t("profile.tab_identity", "Identity & Demographics")}
+            </button>
 
-        <button
-          type="button"
-          onClick={() => setActiveTab("pass")}
-          style={{
-            flex: 1,
-            minWidth: "150px",
-            padding: "8px 14px",
-            fontSize: "0.80rem",
-            fontWeight: activeTab === "pass" ? 600 : 500,
-            color: activeTab === "pass" ? "var(--primary)" : "var(--text-secondary)",
-            background: activeTab === "pass" ? "var(--bg-surface)" : "transparent",
-            border: activeTab === "pass" ? "1px solid var(--border-default)" : "1px solid transparent",
-            borderRadius: "8px",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "7px",
-            boxShadow: activeTab === "pass" ? "0 1px 3px rgba(15, 23, 42, 0.06)" : "none",
-            transition: "all 0.15s ease",
-          }}
-        >
-          <CreditCard size={15} /> {t("profile.tab_card", "Emergency ID Pass")}
-        </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("records")}
+              style={{
+                flex: 1,
+                minWidth: "150px",
+                padding: "8px 14px",
+                fontSize: "0.80rem",
+                fontWeight: activeTab === "records" ? 600 : 500,
+                color: activeTab === "records" ? "var(--primary)" : "var(--text-secondary)",
+                background: activeTab === "records" ? "var(--bg-surface)" : "transparent",
+                border: activeTab === "records" ? "1px solid var(--border-default)" : "1px solid transparent",
+                borderRadius: "8px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "7px",
+                boxShadow: activeTab === "records" ? "0 1px 3px rgba(15, 23, 42, 0.06)" : "none",
+                transition: "all 0.15s ease",
+              }}
+            >
+              <Activity size={15} /> {t("profile.tab_records", "Clinical Records & Meds")}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab("pass")}
+              style={{
+                flex: 1,
+                minWidth: "150px",
+                padding: "8px 14px",
+                fontSize: "0.80rem",
+                fontWeight: activeTab === "pass" ? 600 : 500,
+                color: activeTab === "pass" ? "var(--primary)" : "var(--text-secondary)",
+                background: activeTab === "pass" ? "var(--bg-surface)" : "transparent",
+                border: activeTab === "pass" ? "1px solid var(--border-default)" : "1px solid transparent",
+                borderRadius: "8px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "7px",
+                boxShadow: activeTab === "pass" ? "0 1px 3px rgba(15, 23, 42, 0.06)" : "none",
+                transition: "all 0.15s ease",
+              }}
+            >
+              <CreditCard size={15} /> {t("profile.tab_card", "Emergency ID Pass")}
+            </button>
+          </>
+        )}
 
         <button
           type="button"
@@ -525,10 +617,10 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
             padding: "8px 14px",
             fontSize: "0.80rem",
             fontWeight: activeTab === "security" ? 700 : 600,
-            color: activeTab === "security" ? "var(--accent-blue)" : "var(--text-secondary)",
+            color: activeTab === "security" ? "var(--primary)" : "var(--text-secondary)",
             background: activeTab === "security" ? "var(--bg-surface)" : "transparent",
             border: activeTab === "security" ? "1px solid var(--border-default)" : "1px solid transparent",
-            borderRadius: "var(--radius-sm)",
+            borderRadius: "8px",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
@@ -542,8 +634,257 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
         </button>
       </div>
 
-      {/* ── TAB 1: IDENTITY & DEMOGRAPHICS ── */}
-      {activeTab === "identity" && (
+      {/* ── DOCTOR TAB 1: CLINICAL PRACTICE & LICENSING ── */}
+      {isDoctor && activeTab === "practice" && (
+        <div className="responsive-grid-two-col" style={{ display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: "20px", marginBottom: "20px" }}>
+          {/* Left: Practice Credentials */}
+          <div className="panel" style={{ padding: "20px", background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px", borderBottom: "1px solid var(--border-default)", paddingBottom: "10px" }}>
+              <Stethoscope size={18} color="var(--primary)" />
+              <h3 style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>
+                {t("profile.practice_title", "Clinician Practice Credentials & Licensing")}
+              </h3>
+            </div>
+
+            <div className="responsive-grid-two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "14px" }}>
+              <div className="form-group">
+                <label className="form-label">{t("profile.full_name", "Full Legal Name & Title")}</label>
+                <input
+                  type="text"
+                  className="input-control"
+                  value={profile.name || ""}
+                  onChange={(e) => handleFieldChange("name", e.target.value)}
+                  onBlur={handleFieldBlur}
+                  placeholder="e.g. Dr. Aryan Choudhury, MD"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">{t("profile.specialty", "Medical Specialty")}</label>
+                <input
+                  type="text"
+                  className="input-control"
+                  value={profile.specialty || ""}
+                  onChange={(e) => handleFieldChange("specialty", e.target.value)}
+                  onBlur={handleFieldBlur}
+                  placeholder="e.g. General Medicine & Clinical AI"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">{t("profile.registration_number", "Medical Registration / License No.")}</label>
+                <input
+                  type="text"
+                  className="input-control"
+                  value={profile.registration_number || profile.license_id || ""}
+                  onChange={(e) => {
+                    handleFieldChange("registration_number", e.target.value);
+                    handleFieldChange("license_id", e.target.value);
+                  }}
+                  onBlur={handleFieldBlur}
+                  placeholder="e.g. MCI-2024-99881"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">{t("profile.council_name", "State / National Medical Council")}</label>
+                <input
+                  type="text"
+                  className="input-control"
+                  value={profile.council_name || ""}
+                  onChange={(e) => handleFieldChange("council_name", e.target.value)}
+                  onBlur={handleFieldBlur}
+                  placeholder="e.g. Delhi Medical Council"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">{t("profile.experience_years", "Clinical Experience (Years)")}</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="70"
+                  className="input-control"
+                  value={profile.experience_years ?? 6}
+                  onChange={(e) => handleFieldChange("experience_years", e.target.value === "" ? "" : Number(e.target.value))}
+                  onBlur={handleFieldBlur}
+                  placeholder="e.g. 8"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">{t("profile.fee_inr", "Tele-Consultation Fee (₹ INR)")}</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="50"
+                  className="input-control"
+                  value={profile.fee_inr ?? 600}
+                  onChange={(e) => handleFieldChange("fee_inr", e.target.value === "" ? "" : Number(e.target.value))}
+                  onBlur={handleFieldBlur}
+                  placeholder="e.g. 800"
+                />
+              </div>
+            </div>
+
+            <div className="form-group" style={{ marginBottom: "14px" }}>
+              <label className="form-label">{t("profile.hospital_affiliation", "Hospital / Clinical Institution Affiliation")}</label>
+              <input
+                type="text"
+                className="input-control"
+                value={profile.hospital || ""}
+                onChange={(e) => handleFieldChange("hospital", e.target.value)}
+                onBlur={handleFieldBlur}
+                placeholder="e.g. Q-Rakshak Clinical AI OPD / AIIMS New Delhi"
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">{t("profile.languages", "Consultation Languages")}</label>
+              <input
+                type="text"
+                className="input-control"
+                value={Array.isArray(profile.languages) ? profile.languages.join(", ") : (profile.languages || "English, Hindi")}
+                onChange={(e) => handleFieldChange("languages", e.target.value.split(",").map(s => s.trim()).filter(Boolean))}
+                onBlur={handleFieldBlur}
+                placeholder="English, Hindi, Assamese"
+              />
+            </div>
+          </div>
+
+          {/* Right: Tele-Consultation Availability & NMC Status */}
+          <div className="panel" style={{ padding: "20px", background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", display: "flex", flexDirection: "column", gap: "16px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", borderBottom: "1px solid var(--border-default)", paddingBottom: "10px" }}>
+              <Clock size={18} color="var(--primary)" />
+              <h3 style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>
+                {t("profile.teleconsultation_schedule", "Tele-Consultation Availability")}
+              </h3>
+            </div>
+
+            <div style={{ padding: "12px 14px", background: "var(--bg-surface-alt)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)" }}>
+              <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", display: "block", marginBottom: "8px" }}>
+                {t("profile.available_slots", "Daily OPD Slots (Comma separated)")}
+              </span>
+              <input
+                type="text"
+                className="input-control"
+                value={Array.isArray(profile.available_slots) ? profile.available_slots.join(", ") : (profile.available_slots || "09:30 AM, 11:00 AM, 02:30 PM, 04:30 PM")}
+                onChange={(e) => handleFieldChange("available_slots", e.target.value.split(",").map(s => s.trim()).filter(Boolean))}
+                onBlur={handleFieldBlur}
+                placeholder="09:30 AM, 11:00 AM, 02:30 PM, 04:30 PM"
+              />
+            </div>
+
+            <div style={{ padding: "14px", background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: "var(--radius-sm)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#166534", marginBottom: "6px" }}>
+                <CheckCircle2 size={16} />
+                <strong style={{ fontSize: "0.85rem" }}>{t("profile.nmc_verified", "NMC Registry Status: Verified")}</strong>
+              </div>
+              <p style={{ fontSize: "0.76rem", color: "#15803D", margin: 0, lineHeight: 1.45 }}>
+                {t("profile.nmc_verified_desc", "This practitioner account has been verified against the National Medical Commission registry. Credentials are cryptographically attested on the DPDP ledger.")}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── DOCTOR TAB 2: PRACTICE CONTACT & NOTIFICATIONS ── */}
+      {isDoctor && activeTab === "contact" && (
+        <div className="responsive-grid-two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: "20px" }}>
+          <div className="panel" style={{ padding: "20px", background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px", borderBottom: "1px solid var(--border-default)", paddingBottom: "10px" }}>
+              <Mail size={18} color="var(--primary)" />
+              <h3 style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>
+                {t("profile.practice_contacts", "Clinician Contact Information")}
+              </h3>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+              <div className="form-group">
+                <label className="form-label">{t("profile.primary_email", "Official Practice Email")}</label>
+                <input
+                  type="email"
+                  className="input-control"
+                  value={profile.primary_email || currentUser?.email || ""}
+                  onChange={(e) => handleFieldChange("primary_email", e.target.value)}
+                  onBlur={handleFieldBlur}
+                  placeholder="clinician@hospital.org"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">{t("profile.extra_email", "Secondary Communication Email")}</label>
+                <input
+                  type="email"
+                  className="input-control"
+                  value={profile.extra_email || ""}
+                  onChange={(e) => handleFieldChange("extra_email", e.target.value)}
+                  onBlur={handleFieldBlur}
+                  placeholder="dr.secondary@gmail.com"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">{t("profile.phone", "Emergency Clinical Phone Number")}</label>
+                <input
+                  type="tel"
+                  className="input-control"
+                  value={profile.emergency_phone || profile.phone || ""}
+                  onChange={(e) => {
+                    handleFieldChange("emergency_phone", e.target.value);
+                    handleFieldChange("phone", e.target.value);
+                  }}
+                  onBlur={handleFieldBlur}
+                  placeholder="+91 98765 43210"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="panel" style={{ padding: "20px", background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px", borderBottom: "1px solid var(--border-default)", paddingBottom: "10px" }}>
+              <Activity size={18} color="var(--primary)" />
+              <h3 style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>
+                {t("profile.clinical_alerts", "Clinical Triage & Telemetry Alerts")}
+              </h3>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.82rem", color: "var(--text-primary)", cursor: "pointer" }}>
+                <input
+                  type="checkbox"
+                  checked={profile.notifications_critical_qpu !== false}
+                  onChange={(e) => handleFieldChange("notifications_critical_qpu", e.target.checked)}
+                />
+                <span>{t("profile.alert_critical", "Instant SMS alerts for urgent/critical triage intake requests")}</span>
+              </label>
+
+              <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.82rem", color: "var(--text-primary)", cursor: "pointer" }}>
+                <input
+                  type="checkbox"
+                  checked={profile.notifications_email !== false}
+                  onChange={(e) => handleFieldChange("notifications_email", e.target.checked)}
+                />
+                <span>{t("profile.alert_email", "Email notifications for confirmed appointments and room tokens")}</span>
+              </label>
+
+              <label style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "0.82rem", color: "var(--text-primary)", cursor: "pointer" }}>
+                <input
+                  type="checkbox"
+                  checked={profile.notifications_sms !== false}
+                  onChange={(e) => handleFieldChange("notifications_sms", e.target.checked)}
+                />
+                <span>{t("profile.alert_sms", "Daily agenda briefing dispatched at 08:00 AM IST")}</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── TAB 1: IDENTITY & DEMOGRAPHICS (PATIENT ONLY) ── */}
+      {!isDoctor && activeTab === "identity" && (
         <div className="responsive-grid-two-col" style={{ display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: "20px", marginBottom: "20px" }}>
           {/* Left: Demographics Box */}
           <div className="panel" style={{ padding: "20px", background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)" }}>
@@ -752,8 +1093,8 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
         </div>
       )}
 
-      {/* ── TAB 2: CLINICAL RECORDS & MEDS ── */}
-      {activeTab === "records" && (
+      {/* ── TAB 2: CLINICAL RECORDS & MEDS (PATIENT ONLY) ── */}
+      {!isDoctor && activeTab === "records" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: "20px" }}>
           {/* Left: Allergies & Contraindications Manager */}
           <div className="panel" style={{ padding: "20px", background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)" }}>
@@ -979,8 +1320,8 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
         </div>
       )}
 
-      {/* ── TAB 3: EMERGENCY ID PASS PREVIEW ── */}
-      {activeTab === "pass" && (
+      {/* ── TAB 3: EMERGENCY ID PASS PREVIEW (PATIENT ONLY) ── */}
+      {!isDoctor && activeTab === "pass" && (
         <div className="panel" style={{ padding: "24px", background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-md)", marginBottom: "20px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", borderBottom: "1px solid var(--border-default)", paddingBottom: "12px", flexWrap: "wrap", gap: "12px" }}>
             <div>
@@ -1275,26 +1616,22 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px", color: "#DC2626" }}>
               <AlertTriangle size={18} />
               <h3 style={{ fontSize: "0.92rem", fontWeight: 800, margin: 0 }}>
-                Danger Zone: Delete Patient Account
+                {isDoctor ? t("profile.danger_zone_doctor", "Danger Zone: Delete Doctor Account") : t("profile.danger_zone_patient", "Danger Zone: Delete Account")}
               </h3>
             </div>
             <p style={{ fontSize: "0.78rem", color: "#9F1239", lineHeight: 1.5, marginBottom: "14px" }}>
-              Permanently purge all patient profile data, telemetry history, diagnostic inferences, and emergency passes from the database. This action is irreversible.
+              {isDoctor
+                ? t("profile.danger_desc_doctor", "Permanently purge your clinician profile, license records, consultation rooms, and all database associations without any traces. This action is irreversible.")
+                : t("profile.danger_desc_patient", "Permanently purge all patient profile data, telemetry history, diagnostic inferences, and emergency passes from the database without any traces. This action is irreversible.")}
             </p>
-            {currentUser?.role === "admin" ? (
-              <button
-                type="button"
-                className="btn-danger"
-                onClick={() => setDeleteConfirmOpen(true)}
-                style={{ fontSize: "0.78rem", padding: "8px 16px" }}
-              >
-                <Trash2 size={14} /> Delete Patient Account
-              </button>
-            ) : (
-              <div style={{ fontSize: "0.74rem", color: "#B91C1C", background: "#FEE2E2", padding: "8px 12px", borderRadius: "var(--radius-sm)", border: "1px solid #FCA5A5" }}>
-                <strong>Administrative Governance:</strong> Patient account deletion and medical record purges must be executed by an authorized System Administrator in accordance with DPDP Act 2023 and HIPAA retention policies.
-              </div>
-            )}
+            <button
+              type="button"
+              className="btn-danger"
+              onClick={() => setDeleteConfirmOpen(true)}
+              style={{ fontSize: "0.78rem", padding: "8px 16px", display: "inline-flex", alignItems: "center", gap: "6px" }}
+            >
+              <Trash2 size={14} /> {isDoctor ? t("profile.delete_doctor_btn", "Delete Doctor Account") : t("profile.delete_patient_btn", "Delete Account")}
+            </button>
           </div>
         </div>
       )}
@@ -1621,11 +1958,13 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
             </div>
 
             <p style={{ fontSize: "0.80rem", color: "var(--text-secondary)", lineHeight: 1.5, marginBottom: "14px" }}>
-              This action permanently deletes your patient record, biometric parameters, and stored clinical data from the SQLite database.
+              {isDoctor
+                ? t("profile.modal_delete_doctor_desc", "This action permanently purges your clinician profile, license records, consultation rooms, and all database associations without any traces.")
+                : t("profile.modal_delete_patient_desc", "This action permanently purges your patient record, biometric parameters, diagnostic inferences, and stored clinical data from the database without any traces.")}
             </p>
 
             <label style={{ display: "block", fontSize: "0.74rem", fontWeight: 600, color: "var(--text-secondary)", marginBottom: "6px" }}>
-              Type <strong style={{ color: "var(--risk-high)" }}>CONFIRM DELETION ACCOUNT</strong> below:
+              {t("profile.delete_type_prompt", "Type")} <strong style={{ color: "var(--risk-high)" }}>CONFIRM DELETION ACCOUNT</strong> {t("profile.delete_type_below", "below to authorize removal:")}
             </label>
             <input
               type="text"

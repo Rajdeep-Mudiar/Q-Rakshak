@@ -20,7 +20,7 @@ import { animateEntrance, animateCardStagger } from "../../utils/motion";
 import { useLanguage } from "../../context/LanguageContext";
 
 export default function DoctorDiscovery({ onOpenBooking, onJoinRoom, patientId }) {
-  const { t } = useLanguage();
+  const { t, formatCurrency } = useLanguage();
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedSpecialty, setSelectedSpecialty] = useState("all");
@@ -250,7 +250,7 @@ export default function DoctorDiscovery({ onOpenBooking, onJoinRoom, patientId }
                       {t("telemedicine.next_slots", "Next Available Slots:")}
                     </span>
                     <span style={{ fontSize: "0.75rem", color: "var(--accent-teal)", fontWeight: 700 }}>
-                      ₹{doc.fee_inr} / Consult
+                      {formatCurrency ? formatCurrency(doc.fee_inr) : `₹${doc.fee_inr}`} {t("telemedicine.per_consult", "/ Consult")}
                     </span>
                   </div>
 

@@ -111,6 +111,69 @@ export default function DiseaseEarlyDetectionTimeline({
   const clinicalThresholdY = getY(clinicalThresholdVal);
   const qmlThresholdY = getY(qmlThresholdVal);
 
+  if (patientRiskScore === null && patientPrediction === null) {
+    return (
+      <div
+        className="disease-early-timeline-card"
+        style={{
+          background: "var(--bg-surface, #FFFFFF)",
+          border: "1px solid var(--border-default, #E2E8F0)",
+          borderRadius: "var(--radius-md, 6px)",
+          padding: "36px 24px",
+          textAlign: "center",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "14px",
+        }}
+      >
+        <div
+          style={{
+            width: "48px",
+            height: "48px",
+            borderRadius: "50%",
+            background: "var(--primary-soft, #E0F2FE)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "var(--primary, #0284C7)",
+          }}
+        >
+          <Activity size={24} />
+        </div>
+        <div>
+          <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text-primary, #0F172A)", margin: "0 0 6px" }}>
+            {t("early_detection.no_analysis_title", "No Clinical Analysis Performed Yet")}
+          </h3>
+          <p style={{ fontSize: "0.85rem", color: "var(--text-secondary, #64748B)", maxWidth: "480px", margin: "0 auto", lineHeight: 1.5 }}>
+            {t("early_detection.no_analysis_desc", "Personal longitudinal early detection curves and risk trajectories are only generated after completing a verified diagnostic screening. Run an instant checkup to establish your baseline.")}
+          </p>
+        </div>
+        {onStartAnalysis && (
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={onStartAnalysis}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "10px 20px",
+              fontSize: "0.85rem",
+              fontWeight: 600,
+              borderRadius: "var(--radius-sm, 4px)",
+              cursor: "pointer",
+            }}
+          >
+            <Activity size={16} />
+            <span>{t("actions.run_checkup", "Run Instant Quantum AI Checkup")}</span>
+          </button>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div
       className="disease-early-timeline-card"

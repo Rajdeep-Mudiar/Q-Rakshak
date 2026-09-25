@@ -1,12 +1,15 @@
 import React from "react";
 import { Shield, Activity, Heart, AlertTriangle, FileText, CheckCircle2, Stethoscope, Sparkles } from "lucide-react";
 import SquareLoader from "../../../components/common/SquareLoader.jsx";
+import { useLanguage } from "../../../context/LanguageContext";
 
 export default function PatientClinicalDossier({ dossier }) {
+  const { t } = useLanguage();
+
   if (!dossier) {
     return (
       <div style={{ padding: "40px 20px", textAlign: "center", display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <SquareLoader size="sm" label="Loading clinical dossier..." />
+        <SquareLoader size="sm" label={t("ai_doctor.loading_dossier_short", "Loading clinical dossier...")} />
       </div>
     );
   }
@@ -44,10 +47,10 @@ export default function PatientClinicalDossier({ dossier }) {
         <Sparkles size={15} color="var(--accent-blue)" style={{ flexShrink: 0 }} />
         <div>
           <div style={{ fontSize: "0.72rem", fontWeight: 700, color: "var(--accent-blue)" }}>
-            Context Active in Dr. Quantum
+            {t("ai_doctor.context_active", "Context Active in Dr. Quantum")}
           </div>
           <div style={{ fontSize: "0.65rem", color: "var(--text-secondary)" }}>
-            Medical records are dynamically primed for this voice consultation.
+            {t("ai_doctor.context_desc", "Medical records are dynamically primed for this voice consultation.")}
           </div>
         </div>
       </div>
@@ -85,17 +88,17 @@ export default function PatientClinicalDossier({ dossier }) {
       {/* Clinical Metrics */}
       <div>
         <div style={{ fontSize: "0.68rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.04em", color: "var(--text-muted)", marginBottom: "6px" }}>
-          Clinical Profile & Metrics
+          {t("ai_doctor.profile_metrics", "Clinical Profile & Metrics")}
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
           <div style={{ background: "var(--bg-surface-alt)", padding: "8px 10px", borderRadius: "var(--radius-xs)", border: "1px solid var(--border-default)" }}>
-            <div style={{ fontSize: "0.58rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 700 }}>Blood Group</div>
+            <div style={{ fontSize: "0.58rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 700 }}>{t("ai_doctor.blood_group", "Blood Group")}</div>
             <div style={{ fontSize: "0.82rem", fontWeight: 800, color: "var(--ink-primary)", fontFamily: "var(--font-mono)" }}>
               {dossier.blood_group || "O+"}
             </div>
           </div>
           <div style={{ background: "var(--bg-surface-alt)", padding: "8px 10px", borderRadius: "var(--radius-xs)", border: "1px solid var(--border-default)" }}>
-            <div style={{ fontSize: "0.58rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 700 }}>Temperature</div>
+            <div style={{ fontSize: "0.58rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 700 }}>{t("ai_doctor.temperature", "Temperature")}</div>
             <div style={{ fontSize: "0.82rem", fontWeight: 800, color: "var(--ink-primary)", fontFamily: "var(--font-mono)" }}>
               {vitals.temperature_f ? `${vitals.temperature_f} °F` : "98.6 °F"}
             </div>
@@ -107,10 +110,10 @@ export default function PatientClinicalDossier({ dossier }) {
       <div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
           <span style={{ fontSize: "0.68rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.04em", color: "var(--text-muted)" }}>
-            3D Digital Twin Composite Risk
+            {t("ai_doctor.twin_risk", "3D Digital Twin Composite Risk")}
           </span>
           <span style={{ fontSize: "0.64rem", color: "#059669", fontWeight: 700, background: "#ECFDF5", padding: "1px 6px", borderRadius: "3px" }}>
-            Optimal / Low Risk
+            {t("ai_doctor.optimal_low", "Optimal / Low Risk")}
           </span>
         </div>
         <div style={{ background: "var(--bg-surface-alt)", padding: "10px", borderRadius: "var(--radius-xs)", border: "1px solid var(--border-default)" }}>
@@ -138,7 +141,7 @@ export default function PatientClinicalDossier({ dossier }) {
       {/* Recent Inferences */}
       <div>
         <div style={{ fontSize: "0.68rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.04em", color: "var(--text-muted)", marginBottom: "6px" }}>
-          Recent Clinical Inferences
+          {t("ai_doctor.recent_inferences", "Recent Clinical Inferences")}
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
           <div style={{ background: "var(--bg-surface-alt)", padding: "8px 10px", borderRadius: "var(--radius-xs)", border: "1px solid var(--border-default)" }}>

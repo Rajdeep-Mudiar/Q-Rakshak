@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTwinStore } from '../store/twinStore';
+import { useLanguage } from '../../../context/LanguageContext';
 import {
   Layers,
   FileText,
@@ -12,6 +13,7 @@ import {
 } from 'lucide-react';
 
 export default function TopNavbar({ onExportReport }) {
+  const { t } = useLanguage();
   const layers = useTwinStore((state) => state.layers);
   const toggleLayer = useTwinStore((state) => state.toggleLayer);
   const setComparisonOpen = useTwinStore((state) => state.setComparisonOpen);
@@ -22,15 +24,15 @@ export default function TopNavbar({ onExportReport }) {
   const [layersMenuOpen, setLayersMenuOpen] = useState(false);
 
   const layerItems = [
-    { key: 'skin',          label: 'Skin Silhouette' },
-    { key: 'skeleton',      label: 'Skeleton & Bones' },
-    { key: 'organs',        label: 'Internal Organs' },
-    { key: 'vessels',       label: 'Blood Vessels' },
-    { key: 'airway',        label: 'Lungs & Airways' },
-    { key: 'digestive',     label: 'Digestive System' },
-    { key: 'urinary',       label: 'Kidneys & Bladder' },
-    { key: 'diseaseOverlay',label: 'Risk Highlights' },
-    { key: 'labels',        label: 'Organ Labels' },
+    { key: 'skin',          label: t('twin_panels.layer_skin', 'Skin Silhouette') },
+    { key: 'skeleton',      label: t('twin_panels.layer_skeleton', 'Skeleton & Bones') },
+    { key: 'organs',        label: t('twin_panels.layer_organs', 'Internal Organs') },
+    { key: 'vessels',       label: t('twin_panels.layer_vessels', 'Blood Vessels') },
+    { key: 'airway',        label: t('twin_panels.layer_airway', 'Lungs & Airways') },
+    { key: 'digestive',     label: t('twin_panels.layer_digestive', 'Digestive System') },
+    { key: 'urinary',       label: t('twin_panels.layer_urinary', 'Kidneys & Bladder') },
+    { key: 'diseaseOverlay',label: t('twin_panels.layer_diseaseOverlay', 'Risk Highlights') },
+    { key: 'labels',        label: t('twin_panels.layer_labels', 'Organ Labels') },
   ];
 
   return (
@@ -43,16 +45,16 @@ export default function TopNavbar({ onExportReport }) {
         <div>
           <div className="dt-topbar-title-wrap">
             <h1 className="dt-topbar-title">
-              3D Digital Twin
+              {t('twin_panels.title', '3D Digital Twin')}
             </h1>
             <span className="dt-topbar-pill">
-              3D BODY VIEW
+              {t('twin_panels.body_view_pill', '3D BODY VIEW')}
             </span>
           </div>
           <p className="dt-topbar-sub">
             {patientMode === 'active'
-              ? `Patient: ${patient.patientId || patient.id || 'Active Record'}`
-              : 'Interactive 3D Body Simulation'}
+              ? `${t('twin_panels.patient_prefix', 'Patient')}: ${patient.patientId || patient.id || t('twin_panels.active_record', 'Active Record')}`
+              : t('twin_panels.interactive_body', 'Interactive 3D Body Simulation')}
           </p>
         </div>
       </div>
@@ -67,7 +69,7 @@ export default function TopNavbar({ onExportReport }) {
             className="dt-action-btn"
           >
             <Layers size={14} color="var(--dt-accent-blue)" />
-            <span>Body Layers</span>
+            <span>{t('twin_panels.body_layers', 'Body Layers')}</span>
             <ChevronDown size={13} color="var(--dt-text-muted)" />
           </button>
 
@@ -97,7 +99,7 @@ export default function TopNavbar({ onExportReport }) {
                   borderBottom: '1px solid var(--dt-border-default)',
                 }}
               >
-                Toggle Visible Layers
+                {t('twin_panels.toggle_visible_layers', 'Toggle Visible Layers')}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '6px' }}>
                 {layerItems.map((item) => (
@@ -162,7 +164,7 @@ export default function TopNavbar({ onExportReport }) {
           className="dt-action-btn"
         >
           <Clock size={14} color="#D97706" />
-          <span>Timeline</span>
+          <span>{t('twin_panels.timeline', 'Timeline')}</span>
         </button>
 
         {/* Export Report Action */}
@@ -172,7 +174,7 @@ export default function TopNavbar({ onExportReport }) {
           className="dt-action-btn-primary"
         >
           <Download size={14} strokeWidth={2.5} />
-          <span>Export Report</span>
+          <span>{t('twin_panels.export_report', 'Export Report')}</span>
         </button>
       </div>
     </header>

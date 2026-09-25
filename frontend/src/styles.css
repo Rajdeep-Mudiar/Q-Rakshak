@@ -76,12 +76,12 @@
   --border-hover: #BAC7D5;
   --border-active: #087F8C;
 
-  /* ── Standardized Medical Radii ── */
-  --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 10px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  /* ── Standardized Clinical Precision Radii ── */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
   --radius-pill: 999px;
 
   /* ── Restrained Hospital Shadows ── */

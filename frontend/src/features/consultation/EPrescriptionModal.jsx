@@ -12,9 +12,11 @@ import {
   Lock,
 } from "lucide-react";
 import { consultationsApi } from "../../api/consultations";
+import { useLanguage } from "../../context/LanguageContext";
 import { animateModalOpen } from "../../utils/motion";
 
 export default function EPrescriptionModal({ booking, onClose, onSuccess }) {
+  const { t } = useLanguage();
   const overlayRef = useRef(null);
   const modalRef = useRef(null);
 
@@ -156,10 +158,10 @@ export default function EPrescriptionModal({ booking, onClose, onSuccess }) {
         >
           <div>
             <span className="step-badge" style={{ marginBottom: "4px", display: "inline-block" }}>
-              MODULE H • E-PRESCRIPTION & CARE PLAN
+              {t("telemedicine.prescription_title", "Digital Clinical e-Prescription (Rx)")}
             </span>
             <h3 style={{ margin: 0, fontSize: "1.05rem", color: "var(--text-primary)", fontWeight: 800 }}>
-              Digital Medical Prescription & SOAP Note
+              {t("telemedicine.prescription_title", "Digital Medical Prescription & SOAP Note")}
             </h3>
           </div>
           <button
@@ -195,7 +197,7 @@ export default function EPrescriptionModal({ booking, onClose, onSuccess }) {
           {/* Diagnosis */}
           <div>
             <label className="metric-label" style={{ display: "block", marginBottom: "4px" }}>
-              Clinical Diagnosis / Impression
+              {t("telemedicine.clinical_diagnosis", "Clinical Diagnosis / Impression")}
             </label>
             <input
               type="text"
@@ -209,11 +211,11 @@ export default function EPrescriptionModal({ booking, onClose, onSuccess }) {
           {/* SOAP Clinical Notes Section */}
           <div className="card-panel" style={{ background: "var(--bg-surface-alt)", padding: "14px" }}>
             <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "var(--primary)", marginBottom: "8px" }}>
-              STRUCTURED SOAP CLINICAL NOTES TEMPLATE:
+              {t("telemedicine.prescription_title", "SOAP CLINICAL NOTES")}
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
               <div>
-                <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontWeight: 600 }}>S - Subjective</span>
+                <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontWeight: 600 }}>{t("telemedicine.soap_subjective", "S - Subjective")}</span>
                 <textarea
                   className="terminal-input"
                   rows={2}
@@ -223,7 +225,7 @@ export default function EPrescriptionModal({ booking, onClose, onSuccess }) {
                 />
               </div>
               <div>
-                <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontWeight: 600 }}>O - Objective</span>
+                <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontWeight: 600 }}>{t("telemedicine.soap_objective", "O - Objective")}</span>
                 <textarea
                   className="terminal-input"
                   rows={2}
@@ -233,7 +235,7 @@ export default function EPrescriptionModal({ booking, onClose, onSuccess }) {
                 />
               </div>
               <div>
-                <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontWeight: 600 }}>A - Assessment</span>
+                <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontWeight: 600 }}>{t("telemedicine.soap_assessment", "A - Assessment")}</span>
                 <textarea
                   className="terminal-input"
                   rows={2}
@@ -243,7 +245,7 @@ export default function EPrescriptionModal({ booking, onClose, onSuccess }) {
                 />
               </div>
               <div>
-                <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontWeight: 600 }}>P - Plan</span>
+                <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontWeight: 600 }}>{t("telemedicine.soap_plan", "P - Plan")}</span>
                 <textarea
                   className="terminal-input"
                   rows={2}
@@ -258,7 +260,7 @@ export default function EPrescriptionModal({ booking, onClose, onSuccess }) {
           {/* Rx Medications Builder */}
           <div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-              <span className="metric-label">Rx Pharmacotherapy Builder ({medications.length})</span>
+              <span className="metric-label">{t("telemedicine.medications_heading", "Prescribed Medications")} ({medications.length})</span>
               <div style={{ display: "flex", gap: "8px" }}>
                 <button
                   type="button"
@@ -267,7 +269,7 @@ export default function EPrescriptionModal({ booking, onClose, onSuccess }) {
                   disabled={checkingInteractions}
                   style={{ fontSize: "0.74rem", padding: "4px 10px", display: "flex", alignItems: "center", gap: "4px" }}
                 >
-                  <Pill size={12} /> {checkingInteractions ? "Auditing..." : "Audit Drug Interactions"}
+                  <Pill size={12} /> {checkingInteractions ? "..." : t("telemedicine.check_interactions", "Check Interactions")}
                 </button>
                 <button
                   type="button"
@@ -275,7 +277,7 @@ export default function EPrescriptionModal({ booking, onClose, onSuccess }) {
                   onClick={handleAddMedication}
                   style={{ fontSize: "0.74rem", padding: "4px 10px", display: "flex", alignItems: "center", gap: "4px" }}
                 >
-                  <Plus size={12} /> Add Drug
+                  <Plus size={12} /> {t("telemedicine.add_medication", "Add Medication")}
                 </button>
               </div>
             </div>
@@ -303,7 +305,7 @@ export default function EPrescriptionModal({ booking, onClose, onSuccess }) {
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
               {medications.length === 0 ? (
                 <div style={{ padding: "14px", textAlign: "center", border: "1px dashed var(--border-default)", borderRadius: "6px", color: "var(--text-muted)", fontSize: "0.78rem" }}>
-                  No medications added. Click "+ Add Drug" above to specify prescribed pharmaceuticals.
+                  {t("twin_panels.no_medications", "No medications added. Click '+ Add Drug' above to specify prescribed pharmaceuticals.")}
                 </div>
               ) : (
                 medications.map((med, idx) => (
@@ -321,7 +323,7 @@ export default function EPrescriptionModal({ booking, onClose, onSuccess }) {
                 >
                   <input
                     type="text"
-                    placeholder="Drug name (e.g. Atorvastatin)"
+                    placeholder={t("telemedicine.med_name", "Medication Name")}
                     className="terminal-input"
                     value={med.name}
                     onChange={(e) => handleMedChange(idx, "name", e.target.value)}
@@ -329,7 +331,7 @@ export default function EPrescriptionModal({ booking, onClose, onSuccess }) {
                   />
                   <input
                     type="text"
-                    placeholder="Dosage"
+                    placeholder={t("telemedicine.med_dosage", "Dosage (e.g. 500mg)")}
                     className="terminal-input"
                     value={med.dosage}
                     onChange={(e) => handleMedChange(idx, "dosage", e.target.value)}
@@ -337,7 +339,7 @@ export default function EPrescriptionModal({ booking, onClose, onSuccess }) {
                   />
                   <input
                     type="text"
-                    placeholder="Frequency"
+                    placeholder={t("telemedicine.med_frequency", "Frequency")}
                     className="terminal-input"
                     value={med.frequency}
                     onChange={(e) => handleMedChange(idx, "frequency", e.target.value)}
@@ -345,7 +347,7 @@ export default function EPrescriptionModal({ booking, onClose, onSuccess }) {
                   />
                   <input
                     type="number"
-                    placeholder="Days"
+                    placeholder={t("telemedicine.med_duration", "Days")}
                     className="terminal-input"
                     value={med.duration_days}
                     onChange={(e) => handleMedChange(idx, "duration_days", parseInt(e.target.value) || 0)}
@@ -353,7 +355,7 @@ export default function EPrescriptionModal({ booking, onClose, onSuccess }) {
                   />
                   <input
                     type="text"
-                    placeholder="Instructions"
+                    placeholder={t("telemedicine.med_instructions", "Instructions")}
                     className="terminal-input"
                     value={med.instructions}
                     onChange={(e) => handleMedChange(idx, "instructions", e.target.value)}
@@ -375,7 +377,7 @@ export default function EPrescriptionModal({ booking, onClose, onSuccess }) {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
             <div>
               <label className="metric-label" style={{ display: "block", marginBottom: "4px" }}>
-                Diagnostic Tests Ordered
+                {t("checkup.clinical_verdict", "Diagnostic Tests Ordered")}
               </label>
               <input
                 type="text"
@@ -387,7 +389,7 @@ export default function EPrescriptionModal({ booking, onClose, onSuccess }) {
             </div>
             <div>
               <label className="metric-label" style={{ display: "block", marginBottom: "4px" }}>
-                Follow-Up Schedule
+                {t("timeline.action_plan", "Follow-Up Schedule")}
               </label>
               <input
                 type="text"
@@ -413,12 +415,12 @@ export default function EPrescriptionModal({ booking, onClose, onSuccess }) {
         >
           <div style={{ fontSize: "0.74rem", color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: "6px" }}>
             <Lock size={12} />
-            <span>Digital SHA-256 Signature Stamp will be appended per DPDP Act, 2023.</span>
+            <span>{t("compliance.hash_verified", "SHA-256 Validated")} • DPDP 2023</span>
           </div>
 
           <div style={{ display: "flex", gap: "8px" }}>
             <button type="button" className="action-btn" onClick={onClose}>
-              Cancel
+              {t("common.cancel", "Cancel")}
             </button>
             <button
               type="button"
@@ -427,7 +429,7 @@ export default function EPrescriptionModal({ booking, onClose, onSuccess }) {
               disabled={submitting}
               style={{ display: "flex", alignItems: "center", gap: "6px" }}
             >
-              <FileCheck size={14} /> {submitting ? "Signing & Issuing..." : "Sign & Issue E-Prescription"}
+              <FileCheck size={14} /> {submitting ? t("common.loading", "Signing...") : t("telemedicine.sign_and_issue", "Digitally Sign & Issue Prescription")}
             </button>
           </div>
         </div>

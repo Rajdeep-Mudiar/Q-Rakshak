@@ -2,8 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import { Cpu, Layers, Zap, Activity, ChevronDown, ChevronUp } from "lucide-react";
 import { quantumTelemetryApi } from "../../api/quantumTelemetry";
 import { animateEntrance } from "../../utils/motion";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function QuantumCircuitViewer({ modelName = "VQC-8Q" }) {
+  const { t } = useLanguage();
   const containerRef = useRef(null);
   const [telemetry, setTelemetry] = useState(null);
   const [expanded, setExpanded] = useState(false);
@@ -40,12 +42,12 @@ export default function QuantumCircuitViewer({ modelName = "VQC-8Q" }) {
         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
           <Cpu size={14} color="var(--primary)" />
           <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--ink-primary)", textTransform: "uppercase" }}>
-            Quantum Circuit Architecture ({telemetry?.n_qubits || 8} Qubits)
+            {t("quantum_circuit.title", `Quantum Circuit Architecture (${telemetry?.n_qubits || 8} Qubits)`, { qubits: telemetry?.n_qubits || 8 })}
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
           <span style={{ fontSize: "0.68rem", fontFamily: "var(--font-mono)", color: "var(--text-muted)" }}>
-            Depth: {telemetry?.circuit_depth || 12} | Gates: {telemetry?.total_gates || 144}
+            {t("quantum_circuit.depth", "Depth")}: {telemetry?.circuit_depth || 12} | {t("quantum_circuit.gates", "Gates")}: {telemetry?.total_gates || 144}
           </span>
           {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
         </div>
@@ -54,20 +56,20 @@ export default function QuantumCircuitViewer({ modelName = "VQC-8Q" }) {
       {/* Metrics Row */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "6px", marginTop: "8px" }}>
         <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-xs)", padding: "6px 8px" }}>
-          <p style={{ fontSize: "0.62rem", color: "var(--text-muted)", textTransform: "uppercase", margin: "0 0 2px" }}>Depth</p>
+          <p style={{ fontSize: "0.62rem", color: "var(--text-muted)", textTransform: "uppercase", margin: "0 0 2px" }}>{t("quantum_circuit.depth", "Depth")}</p>
           <p style={{ fontSize: "0.85rem", fontWeight: 700, fontFamily: "var(--font-mono)", color: "var(--primary)", margin: 0 }}>{telemetry?.circuit_depth || 12}</p>
         </div>
         <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-xs)", padding: "6px 8px" }}>
-          <p style={{ fontSize: "0.62rem", color: "var(--text-muted)", textTransform: "uppercase" }}>Gates</p>
+          <p style={{ fontSize: "0.62rem", color: "var(--text-muted)", textTransform: "uppercase" }}>{t("quantum_circuit.gates", "Gates")}</p>
           <p style={{ fontSize: "0.85rem", fontWeight: 700, fontFamily: "var(--font-mono)", color: "var(--accent-teal)" }}>{telemetry?.total_gates || 144}</p>
         </div>
         <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", padding: "6px" }}>
-          <p style={{ fontSize: "0.62rem", color: "var(--text-muted)", textTransform: "uppercase" }}>Hilbert Dim</p>
+          <p style={{ fontSize: "0.62rem", color: "var(--text-muted)", textTransform: "uppercase" }}>{t("quantum_circuit.hilbert_dim", "Hilbert Dim")}</p>
           <p style={{ fontSize: "0.85rem", fontWeight: 700, fontFamily: "var(--font-mono)", color: "var(--accent-violet)" }}>{telemetry?.hilbert_space_dimension || 256}</p>
         </div>
         <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", padding: "6px" }}>
-          <p style={{ fontSize: "0.62rem", color: "var(--text-muted)", textTransform: "uppercase" }}>Entanglement</p>
-          <p style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--risk-low)" }}>Circular</p>
+          <p style={{ fontSize: "0.62rem", color: "var(--text-muted)", textTransform: "uppercase" }}>{t("quantum_circuit.entanglement", "Entanglement")}</p>
+          <p style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--risk-low)" }}>{t("quantum_circuit.circular", "Circular")}</p>
         </div>
       </div>
 

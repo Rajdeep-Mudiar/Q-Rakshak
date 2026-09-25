@@ -231,7 +231,7 @@ const ROLE_PERMISSIONS = {
     label: "Doctor / Clinician (Tele-Consultations & Triage)",
     badgeColor: "var(--accent-teal)",
     defaultTab: "clinician_dashboard",
-    allowedTabs: ["home", "clinician_dashboard", "diagnostic", "disease_intro", "feature_intro", "ai_doctor", "portal", "profile"],
+    allowedTabs: ["home", "clinician_dashboard", "portal", "profile"],
     sections: [
       {
         title: "Overview",
@@ -243,7 +243,6 @@ const ROLE_PERMISSIONS = {
         title: "Clinical Practice",
         items: [
           { id: "clinician_dashboard", label: "Consultation Queue & Triage", icon: NavUsersSvg },
-          { id: "ai_doctor", label: "AI Doctor Simulation", icon: NavAIDoctorSvg },
         ],
       },
       {
@@ -264,7 +263,7 @@ const ROLE_PERMISSIONS = {
     label: "Doctor / Clinician (Tele-Consultations & Triage)",
     badgeColor: "var(--accent-teal)",
     defaultTab: "clinician_dashboard",
-    allowedTabs: ["home", "clinician_dashboard", "diagnostic", "disease_intro", "feature_intro", "ai_doctor", "portal", "profile"],
+    allowedTabs: ["home", "clinician_dashboard", "portal", "profile"],
     sections: [
       {
         title: "Overview",
@@ -276,7 +275,6 @@ const ROLE_PERMISSIONS = {
         title: "Clinical Practice",
         items: [
           { id: "clinician_dashboard", label: "Consultation Queue & Triage", icon: NavUsersSvg },
-          { id: "ai_doctor", label: "AI Doctor Simulation", icon: NavAIDoctorSvg },
         ],
       },
       {
@@ -297,7 +295,7 @@ const ROLE_PERMISSIONS = {
     label: "System & Compliance Administrator",
     badgeColor: "var(--accent-teal)",
     defaultTab: "home",
-    allowedTabs: ["home", "compliance", "users", "diagnostic", "disease_intro", "feature_intro", "ai_doctor", "benchmarks", "telemetry", "portal", "profile"],
+    allowedTabs: ["home", "compliance", "users", "portal", "profile"],
     sections: [
       {
         title: "Overview",
@@ -311,14 +309,6 @@ const ROLE_PERMISSIONS = {
           { id: "compliance", label: "Compliance & Audit", icon: NavComplianceSvg },
           { id: "users", label: "User Management", icon: NavUsersSvg },
           { id: "portal", label: "Patient Registry", icon: NavPortalSvg },
-        ],
-      },
-      {
-        title: "AI & Telemetry",
-        items: [
-          { id: "ai_doctor", label: "AI Doctor 1-on-1 Studio", icon: NavAIDoctorSvg },
-          { id: "benchmarks", label: "AI Health Benchmarks", icon: NavBenchmarkSvg },
-          { id: "telemetry", label: "System activity", icon: NavTelemetrySvg },
         ],
       },
       {
@@ -619,6 +609,8 @@ export default function UnifiedAnalysisPage() {
             if (googleUser) {
               setCurrentUser(googleUser);
               setPatientId(resolvePatientId(googleUser));
+              const roleCfg = ROLE_PERMISSIONS[googleUser.role] || ROLE_PERMISSIONS.patient;
+              setActiveTabState(roleCfg.defaultTab);
               const cleanUrl = window.location.pathname + window.location.hash;
               window.history.replaceState({}, document.title, cleanUrl);
               return;
@@ -1350,10 +1342,9 @@ export default function UnifiedAnalysisPage() {
   if (!currentUser) {
     return (
       <EditorialLoginPage
-        onGoogleLogin={(role) => {
+        onGoogleLogin={() => {
           const returnUrl = encodeURIComponent(window.location.origin + window.location.pathname);
-          const roleParam = role ? `&role=${encodeURIComponent(role)}` : "";
-          window.location.href = `${ENDPOINTS.AUTH_GOOGLE}?redirect_url=${returnUrl}${roleParam}`;
+          window.location.href = `${ENDPOINTS.AUTH_GOOGLE}?redirect_url=${returnUrl}`;
         }}
         onGoogleVerifySuccess={(user) => {
           setCurrentUser(user);
@@ -1507,7 +1498,9 @@ export default function UnifiedAnalysisPage() {
 
                 // ── Handlers for other platform features to go through Intro Page ──
                 const handleNavClick = () => {
-                  if (item.id === "doctor_booking") {
+                  if (item.id === "profile") {
+                    setActiveTab("profile");
+                  } else if (item.id === "doctor_booking") {
                     setIntroFeature("doctor_consultation");
                     navigateToTab("feature_intro", { featureParam: "doctor_consultation" });
                   } else if (item.id === "ai_doctor") {
@@ -1516,9 +1509,6 @@ export default function UnifiedAnalysisPage() {
                   } else if (item.id === "twin") {
                     setIntroFeature("twin");
                     navigateToTab("feature_intro", { featureParam: "twin" });
-                  } else if (item.id === "profile") {
-                    setIntroFeature("profile");
-                    navigateToTab("feature_intro", { featureParam: "profile" });
                   } else {
                     setActiveTab(item.id);
                   }

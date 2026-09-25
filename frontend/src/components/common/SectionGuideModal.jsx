@@ -74,7 +74,7 @@ export default function SectionGuideModal({ isOpen, onClose, guideData }) {
                     padding: "2px 6px",
                   }}
                 >
-                  PATIENT USER GUIDE
+                  {t("guide.patient_guide", "PATIENT USER GUIDE")}
                 </span>
                 <span style={{ fontSize: "0.62rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
                   {guideData.sectionId || "GUIDE-INFO"}
@@ -104,7 +104,7 @@ export default function SectionGuideModal({ isOpen, onClose, guideData }) {
               color: "var(--text-muted)",
               padding: "4px",
             }}
-            title="Close Guide"
+            title={t("actions.close", "Close")}
           >
             <X size={20} />
           </button>
@@ -137,7 +137,7 @@ export default function SectionGuideModal({ isOpen, onClose, guideData }) {
                 marginBottom: "8px",
               }}
             >
-              How to Use This Section (Step-by-Step):
+              {t("guide.how_to_use", "How to Use This Section (Step-by-Step):")}
             </h4>
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
               {guideData.steps.map((step, idx) => (
@@ -192,7 +192,7 @@ export default function SectionGuideModal({ isOpen, onClose, guideData }) {
                 marginBottom: "8px",
               }}
             >
-              Understanding Your Results & Key Indicators:
+              {t("guide.understanding_results", "Understanding Your Results & Key Indicators:")}
             </h4>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
               {guideData.metrics.map((m, idx) => (
@@ -239,7 +239,7 @@ export default function SectionGuideModal({ isOpen, onClose, guideData }) {
           >
             <Sparkles size={16} color="var(--primary)" style={{ flexShrink: 0 }} />
             <span>
-              <strong>Quantum Advantage: </strong>
+              <strong>{t("guide.quantum_advantage", "Quantum Advantage:")} </strong>
               {guideData.quantumBenefit}
             </span>
           </div>
@@ -253,7 +253,7 @@ export default function SectionGuideModal({ isOpen, onClose, guideData }) {
             onClick={onClose}
             style={{ padding: "8px 20px", fontSize: "0.78rem", fontWeight: 800, borderRadius: "var(--radius-sm)" }}
           >
-            Got It, Close Guide
+            {t("guide.close_btn", "Got It, Close Guide")}
           </button>
         </div>
       </div>

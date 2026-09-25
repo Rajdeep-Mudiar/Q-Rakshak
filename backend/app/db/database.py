@@ -283,6 +283,32 @@ def init_database():
     );
     """)
 
+    # Normalized Patient Predictions Table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS patient_predictions (
+        id TEXT PRIMARY KEY,
+        patient_id TEXT NOT NULL,
+        analysis_id TEXT NOT NULL,
+        disease_id TEXT NOT NULL,
+        model_version TEXT NOT NULL DEFAULT '1.0.0',
+        prediction_status TEXT NOT NULL DEFAULT 'completed' CHECK(prediction_status IN ('not_started', 'processing', 'completed', 'failed')),
+        prediction_class TEXT NOT NULL,
+        confidence REAL NOT NULL,
+        risk_score REAL NOT NULL,
+        probabilities_json TEXT DEFAULT '{}',
+        explainability_json TEXT DEFAULT '{}',
+        is_reference_model INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE,
+        FOREIGN KEY (analysis_id) REFERENCES diagnostic_records(id) ON DELETE CASCADE
+    );
+    """)
+    try:
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_predictions_patient_disease ON patient_predictions(patient_id, disease_id, created_at DESC);")
+    except Exception:
+        pass
+
     # Skin Cancer Predictions
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS skin_cancer_predictions (

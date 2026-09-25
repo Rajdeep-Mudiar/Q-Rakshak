@@ -30,10 +30,16 @@ export default function TriagePhysicalCard({
   const firstName = name.split(' ')[0] || 'Patient';
   const lastName = name.split(' ').slice(1).join(' ') || '';
   const bloodGroup = patient.blood_group || '—';
-  const abhaId = patient.abha_id || '—';
-  const patientId = patient.id || patient.user_id || '—';
+  const patientNameSlug = (patient.name || patient.username || 'PATIENT')
+    .replace(/^Dr\.?\s+/i, '')
+    .trim()
+    .toUpperCase()
+    .replace(/\s+/g, '_')
+    .replace(/[^A-Z0-9_]/g, '');
+  const cleanCardPatientId = `USR-${patientNameSlug}`;
+  const patientId = cleanCardPatientId;
   const hospital = patient.hospital || 'Clinical Healthcare System';
-  const mrn = patient.mrn || patient.license_id || (patientId !== '—' ? `MRN-${patientId}-QX` : '—');
+  const mrn = patient.mrn || patient.license_id || `MRN-${patientId}-QX`;
 
   const primaryContact = patient.emergency_contacts?.find(c => c.is_primary) || patient.emergency_contacts?.[0] || {
     name: patient.emergency_contact_name || '—',

@@ -123,48 +123,7 @@ async def login(req: LoginRequest):
     raw_identifier = (req.username or "").strip()
     clean_identifier = raw_identifier.lower()
 
-    # Convenient persona aliases mapping
-    alias_map = {
-        "patient": "aryan",
-        "doctor": "dr.kavita",
-        "kavita": "dr.kavita",
-        "clinician": "dr.aryan",
-        "dr.aryan": "dr.aryan",
-        "usr-aryan": "dr.aryan",
-        "usr aryan": "dr.aryan",
-        "doc-usr-aryan": "dr.aryan",
-        "doc_usr_aryan": "dr.aryan",
-        "aryan": "aryan",
-        "admin": "admin.audit",
-        "auditor": "admin.audit",
-        "researcher": "priya.qml",
-        "priya": "priya.qml",
-    }
-
-    target_identifier = alias_map.get(clean_identifier, raw_identifier)
-    user = DatabaseRepository.get_user_by_credentials(target_identifier)
-    if not user and target_identifier != clean_identifier:
-        user = DatabaseRepository.get_user_by_credentials(clean_identifier)
-
-    # Seed credentials for recognized platform personas
-    seed_passwords = {
-        "dr.kavita": "doctor123",
-        "dr.rajesh": "doctor123",
-        "dr.ananya": "doctor123",
-        "dr.vikram": "doctor123",
-        "dr.aryan": "clinician123",
-        "aryan": "patient123",
-        "alex.patient": "patient123",
-        "admin.audit": "admin123",
-        "priya.qml": "quantum123",
-    }
-
-    if not user and settings.IS_DEMO:
-        # Check if the user is a known seed account that needs auto-initialization
-        if clean_identifier in seed_passwords or target_identifier.lower() in seed_passwords:
-            from backend.app.db.database import init_database
-            init_database()
-            user = DatabaseRepository.get_user_by_credentials(target_identifier) or DatabaseRepository.get_user_by_credentials(clean_identifier)
+    user = DatabaseRepository.get_user_by_credentials(clean_identifier) or DatabaseRepository.get_user_by_credentials(raw_identifier)
 
     if not user:
         raise HTTPException(status_code=401, detail="Invalid username or password.")
@@ -172,25 +131,13 @@ async def login(req: LoginRequest):
     stored_hash = user.get("password_hash", "")
     pwd_match = verify_password(req.password, stored_hash)
 
-    # Allow official passwords for seed personas across all environments
-    user_uname = user.get("username", "").lower()
-    if not pwd_match and (user_uname in seed_passwords or str(user.get("id", "")).startswith(("PT-", "DOC-", "ADM-", "RES-", "USR-5EF", "USR-ARYAN", "USR-"))):
-        if req.password in (seed_passwords.get(user_uname), "patient123", "clinician123", "doctor123", "admin123", "quantum123"):
-            pwd_match = True
-
     if not pwd_match:
         raise HTTPException(status_code=401, detail="Invalid username or password.")
 
     is_test_account = settings.DB_MODE == "demo"
 
-    # Allow user to choose their persona / role on login (patient, doctor, admin)
-    stored_role = user.get("role", "patient")
-    if req.role and req.role in ("patient", "doctor", "clinician", "admin", "researcher"):
-        user_role = req.role
-    else:
-        user_role = stored_role
-
-    user["role"] = user_role
+    # Backend is the strict source of truth for authorization; user role comes from database record
+    user["role"] = user.get("role", "patient")
 
     doctor_id = None
     if user["role"] in ("doctor", "clinician"):
@@ -346,8 +293,8 @@ async def google_verify(req: GoogleVerifyRequest, request: Request):
                 user_role=target_role,
             )
         )
-    elif req.role and req.role in ("patient", "doctor", "clinician", "admin", "researcher"):
-        user["role"] = req.role
+    else:
+        user["role"] = user.get("role", "patient")
 
     doctor_id = None
     if user.get("role") in ("doctor", "clinician"):

@@ -153,7 +153,7 @@ export default function DigitalTwin3DPage({ patientId, result, onExportReport })
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <Clock size={18} color="#D97706" />
                   <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "var(--ink-primary)", margin: 0 }}>
-                    Longitudinal Trajectory &amp; 90% Early Detection Timeline
+                    {t('timeline.title', 'Longitudinal Trajectory & 90% Early Detection Timeline')}
                   </h3>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -186,7 +186,7 @@ export default function DigitalTwin3DPage({ patientId, result, onExportReport })
 
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "18px", paddingTop: "12px", borderTop: "1px solid var(--border-default)" }}>
                 <div style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
-                  Patient: <strong style={{ color: "var(--ink-primary)" }}>{activePid}</strong> • Updated
+                  {t('twin_panels.patient_prefix', 'Patient')}: <strong style={{ color: "var(--ink-primary)" }}>{activePid}</strong>
                 </div>
                 <button
                   type="button"
@@ -194,7 +194,7 @@ export default function DigitalTwin3DPage({ patientId, result, onExportReport })
                   onClick={() => setTimelineOpen(false)}
                   style={{ fontSize: "0.76rem" }}
                 >
-                  Close Timeline
+                  {t('common.close', 'Close')}
                 </button>
               </div>
             </div>
@@ -209,7 +209,7 @@ export default function DigitalTwin3DPage({ patientId, result, onExportReport })
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <FileText size={18} color="var(--accent-blue)" />
                   <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "var(--ink-primary)", margin: 0 }}>
-                    3D Digital Twin Clinical Report
+                    {t('twin_panels.export_report', '3D Digital Twin Clinical Report')}
                   </h3>
                 </div>
                 <button
@@ -225,35 +225,35 @@ export default function DigitalTwin3DPage({ patientId, result, onExportReport })
                 <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid var(--border-default)", paddingBottom: "8px", marginBottom: "10px" }}>
                   <div>
                     <h4 style={{ fontSize: "0.95rem", fontWeight: 800, margin: 0, color: "var(--ink-primary)" }}>
-                      {currentPatient.firstName || currentPatient.name || 'Patient'} {currentPatient.lastName || ''}
+                      {currentPatient.firstName || currentPatient.name || t('twin_panels.patient_prefix', 'Patient')} {currentPatient.lastName || ''}
                     </h4>
                     <span style={{ fontSize: "0.68rem", color: "var(--text-muted)" }}>
                       ID: {currentPatient.patientId || activePid || '—'} • ABHA: {currentPatient.abhaId || '—'}
                     </span>
                   </div>
                   <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#059669", background: "#ECFDF5", padding: "3px 8px", borderRadius: "4px" }}>
-                    Verified Digital Twin
+                    {t('twin_panels.verified_baseline', 'Verified Digital Twin')}
                   </span>
                 </div>
 
                 <div style={{ fontSize: "0.74rem", color: "var(--text-secondary)", marginBottom: "12px" }}>
-                  <strong>Affected Anatomical Structures:</strong>
+                  <strong>{t('twin_panels.organs_at_risk', 'Affected Anatomical Structures')}:</strong>
                   <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginTop: "6px" }}>
                     {affectedOrgans.length > 0 ? (
                       affectedOrgans.map((org, i) => (
                         <div key={i} style={{ display: "flex", justifyContent: "space-between", background: "var(--bg-surface-alt)", padding: "6px 10px", borderRadius: "4px" }}>
                           <span>{org.name}</span>
-                          <strong style={{ color: org.involvement > 50 ? "#DC2626" : "#D97706" }}>{org.involvement}% Involvement</strong>
+                          <strong style={{ color: org.involvement > 50 ? "#DC2626" : "#D97706" }}>{org.involvement}%</strong>
                         </div>
                       ))
                     ) : (
-                      <div style={{ color: "var(--text-muted)" }}>All 25 organ systems nominal / within baseline.</div>
+                      <div style={{ color: "var(--text-muted)" }}>{t('twin_panels.baseline_desc', 'All organ systems nominal / within baseline.')}</div>
                     )}
                   </div>
                 </div>
 
                 <div style={{ fontSize: "0.70rem", color: "var(--text-muted)" }}>
-                  Clinical report export • Privacy-protected record
+                  {t('compliance.audit_trail', 'Clinical report export • Privacy-protected record')}
                 </div>
               </div>
 
@@ -264,7 +264,7 @@ export default function DigitalTwin3DPage({ patientId, result, onExportReport })
                   onClick={() => setReportModalOpen(false)}
                   style={{ fontSize: "0.76rem" }}
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </button>
                 <button
                   type="button"
@@ -272,7 +272,7 @@ export default function DigitalTwin3DPage({ patientId, result, onExportReport })
                   onClick={() => { window.print(); }}
                   style={{ fontSize: "0.76rem", display: "flex", alignItems: "center", gap: "6px" }}
                 >
-                  <Printer size={14} /> Print Report
+                  <Printer size={14} /> {t('actions.print', 'Print Report')}
                 </button>
               </div>
             </div>

@@ -297,7 +297,6 @@ export default function DiseaseIntroPage({
       <div style={{ display: "flex", gap: "6px", borderBottom: "2px solid #E2E8F0", paddingBottom: "2px" }}>
         {[
           { id: "overview", label: t("diseases.tab_overview", "Overview & Symptoms"), icon: Info },
-          { id: "timeline", label: t("diseases.tab_timeline", "Early Prevention Timeline"), icon: TrendingUp },
           { id: "quantum", label: t("diseases.tab_quantum", "Quantum Circuit Architecture"), icon: Binary },
           { id: "benchmarks", label: t("diseases.tab_benchmarks", "Audited Benchmarks"), icon: BarChart3 },
         ].map((tItem) => {
@@ -417,12 +416,6 @@ export default function DiseaseIntroPage({
           </div>
         )}
 
-        {/* TAB 2: Early Prevention Timeline */}
-        {activeTab === "timeline" && (
-          <div className="fade-stagger-card">
-            <DiseaseEarlyDetectionTimeline diseaseId={diseaseId} />
-          </div>
-        )}
 
         {/* TAB 3: Quantum Circuit Architecture */}
         {activeTab === "quantum" && (

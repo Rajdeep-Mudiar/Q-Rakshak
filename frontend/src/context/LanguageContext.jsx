@@ -15,10 +15,32 @@ export const AVAILABLE_LANGUAGES = [
   { code: "as", label: "Assamese", nativeName: "অসমীয়া", shortBadge: "অ", flag: "🇮🇳" },
 ];
 
+export function normalizeLanguage(lang) {
+  if (!lang || typeof lang !== "string") return "en";
+  const lower = lang.toLowerCase().trim();
+  if (lower.startsWith("hi")) return "hi";
+  if (lower.startsWith("as")) return "as";
+  return "en";
+}
+
+export function getLocaleTag(lang) {
+  switch (normalizeLanguage(lang)) {
+    case "hi":
+      return "hi-IN";
+    case "as":
+      return "as-IN";
+    default:
+      return "en-IN";
+  }
+}
+
 const LanguageContext = createContext({
   language: "en",
   setLanguage: () => {},
   t: (key, fallback) => fallback || key,
+  formatDate: (date) => String(date || ""),
+  formatNumber: (num) => String(num || 0),
+  formatCurrency: (amount) => `₹${amount || 0}`,
   availableLanguages: AVAILABLE_LANGUAGES,
 });
 
@@ -26,17 +48,19 @@ export function LanguageProvider({ children }) {
   const [language, setLanguageState] = useState(() => {
     if (typeof window === "undefined") return "en";
     const saved = localStorage.getItem("qmed_language");
-    return saved && translations[saved] ? saved : "en";
+    return normalizeLanguage(saved);
   });
 
   const setLanguage = (nextLang) => {
-    if (!translations[nextLang]) return;
-    setLanguageState(nextLang);
+    const normalized = normalizeLanguage(nextLang);
+    setLanguageState(normalized);
     try {
-      localStorage.setItem("qmed_language", nextLang);
-      document.documentElement.lang = nextLang;
+      localStorage.setItem("qmed_language", normalized);
+      if (typeof document !== "undefined") {
+        document.documentElement.lang = normalized;
+      }
       window.dispatchEvent(
-        new CustomEvent("qmed:language_changed", { detail: { language: nextLang } })
+        new CustomEvent("qmed:language_changed", { detail: { language: normalized } })
       );
     } catch (e) {
       console.warn("Could not save language to localStorage:", e);
@@ -49,8 +73,8 @@ export function LanguageProvider({ children }) {
     }
 
     const handleStorage = (e) => {
-      if (e.key === "qmed_language" && e.newValue && translations[e.newValue]) {
-        setLanguageState(e.newValue);
+      if (e.key === "qmed_language" && e.newValue) {
+        setLanguageState(normalizeLanguage(e.newValue));
       }
     };
     window.addEventListener("storage", handleStorage);
@@ -115,14 +139,63 @@ export function LanguageProvider({ children }) {
     };
   }, [language]);
 
+  const formatDate = useMemo(() => {
+    const locale = getLocaleTag(language);
+    return (date, options) => {
+      if (!date) return "";
+      try {
+        const d = date instanceof Date ? date : new Date(date);
+        if (isNaN(d.getTime())) return String(date);
+        return new Intl.DateTimeFormat(locale, options || {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        }).format(d);
+      } catch {
+        return String(date);
+      }
+    };
+  }, [language]);
+
+  const formatNumber = useMemo(() => {
+    const locale = getLocaleTag(language);
+    return (num, options) => {
+      if (num === null || num === undefined || isNaN(Number(num))) return "—";
+      try {
+        return new Intl.NumberFormat(locale, options).format(Number(num));
+      } catch {
+        return String(num);
+      }
+    };
+  }, [language]);
+
+  const formatCurrency = useMemo(() => {
+    const locale = getLocaleTag(language);
+    return (amount, currency = "INR") => {
+      if (amount === null || amount === undefined || isNaN(Number(amount))) return "₹0";
+      try {
+        return new Intl.NumberFormat(locale, {
+          style: "currency",
+          currency,
+          maximumFractionDigits: 0,
+        }).format(Number(amount));
+      } catch {
+        return `₹${amount}`;
+      }
+    };
+  }, [language]);
+
   const value = useMemo(
     () => ({
       language,
       setLanguage,
       t,
+      formatDate,
+      formatNumber,
+      formatCurrency,
       availableLanguages: AVAILABLE_LANGUAGES,
     }),
-    [language, t]
+    [language, t, formatDate, formatNumber, formatCurrency]
   );
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;

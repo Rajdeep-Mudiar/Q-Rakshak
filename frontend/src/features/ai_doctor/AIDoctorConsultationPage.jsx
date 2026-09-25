@@ -552,17 +552,17 @@ export default function AIDoctorConsultationPage({ patientId = null, currentUser
 
   // Quick Questions Prompts
   const QUICK_PROMPTS = [
-    "Explain my blood pressure and cardiac risk score",
-    "What did my skin lesion test show?",
-    "Review my pneumonia chest radiograph",
-    "Check my Aspirin and Atorvastatin medications",
-    "Explain my 3D Digital Twin Composite Risk Score",
+    t("ai_doctor.prompt_bp", "Explain my blood pressure and cardiac risk score"),
+    t("ai_doctor.prompt_lesion", "What did my skin lesion test show?"),
+    t("ai_doctor.prompt_pneumonia", "Review my pneumonia chest radiograph"),
+    t("ai_doctor.prompt_meds", "Check my Aspirin and Atorvastatin medications"),
+    t("ai_doctor.prompt_twin", "Explain my 3D Digital Twin Composite Risk Score"),
   ];
 
   if (loadingContext) {
     return (
       <div style={{ padding: "80px 20px", textAlign: "center", display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
-        <SquareLoader label="Compiling patient clinical dossier and initializing Dr. Quantum AI..." />
+        <SquareLoader label={t("ai_doctor.loading_dossier", "Compiling patient clinical dossier and initializing Dr. Quantum AI...")} />
       </div>
     );
   }
@@ -599,7 +599,7 @@ export default function AIDoctorConsultationPage({ patientId = null, currentUser
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <h3 style={{ margin: 0, fontSize: "0.98rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.04em" }}>
-                Dr. Quantum 1-on-1 Voice Consultation
+                {t("ai_doctor.title", "Dr. Quantum 1-on-1 Voice Consultation")}
               </h3>
               <span
                 style={{
@@ -612,7 +612,7 @@ export default function AIDoctorConsultationPage({ patientId = null, currentUser
                   border: `1px solid ${callActive ? "var(--state-success)" : "var(--border-default)"}`,
                 }}
               >
-                {callActive ? `LIVE (${formatTime(callDuration)})` : "STANDBY"}
+                {callActive ? t("ai_doctor.live", `LIVE (${formatTime(callDuration)})`, { duration: formatTime(callDuration) }) : t("ai_doctor.standby", "STANDBY")}
               </span>
             </div>
             <p style={{ margin: "2px 0 0 0", fontSize: "0.74rem", color: "var(--text-secondary)" }}>
@@ -725,7 +725,7 @@ export default function AIDoctorConsultationPage({ patientId = null, currentUser
             ) : (
               <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "var(--text-muted)", fontSize: "0.68rem", background: "#F1F5F9" }}>
                 <User size={28} style={{ marginBottom: "4px", color: "var(--text-secondary)" }} />
-                <span style={{ fontWeight: 600, color: "var(--text-secondary)" }}>{cameraActive ? "Camera Standby" : "Camera Off"}</span>
+                <span style={{ fontWeight: 600, color: "var(--text-secondary)" }}>{cameraActive ? t("ai_doctor.camera_standby", "Camera Standby") : t("ai_doctor.camera_off", "Camera Off")}</span>
               </div>
             )}
 
@@ -769,7 +769,7 @@ export default function AIDoctorConsultationPage({ patientId = null, currentUser
             {/* Left Info */}
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <span style={{ fontSize: "0.68rem", color: "var(--text-secondary)", fontWeight: 700, fontFamily: "var(--font-mono)" }}>
-                {callActive ? `DURATION: ${formatTime(callDuration)}` : "NOT IN CALL"}
+                {callActive ? t("ai_doctor.duration", `DURATION: ${formatTime(callDuration)}`, { duration: formatTime(callDuration) }) : t("ai_doctor.not_in_call", "NOT IN CALL")}
               </span>
             </div>
 
@@ -793,7 +793,7 @@ export default function AIDoctorConsultationPage({ patientId = null, currentUser
                   justifyContent: "center",
                   transition: "all 0.15s ease",
                 }}
-                title={micMuted ? "Unmute Microphone" : "Mute Microphone"}
+                title={micMuted ? t("ai_doctor.unmute_mic", "Unmute Microphone") : t("ai_doctor.mute_mic", "Mute Microphone")}
               >
                 {micMuted ? <MicOff size={18} /> : <Mic size={18} />}
               </button>
@@ -816,7 +816,7 @@ export default function AIDoctorConsultationPage({ patientId = null, currentUser
                   justifyContent: "center",
                   transition: "all 0.15s ease",
                 }}
-                title={cameraActive ? "Turn Camera Off" : "Turn Camera On"}
+                title={cameraActive ? t("ai_doctor.camera_off_btn", "Turn Camera Off") : t("ai_doctor.camera_on", "Turn Camera On")}
               >
                 {!cameraActive ? <VideoOff size={18} /> : <Video size={18} />}
               </button>
@@ -839,7 +839,7 @@ export default function AIDoctorConsultationPage({ patientId = null, currentUser
                   }}
                 >
                   <PhoneCall size={16} />
-                  <span>Start Consultation</span>
+                  <span>{t("ai_doctor.start_call", "Start Consultation")}</span>
                 </button>
               ) : (
                 <button
@@ -862,7 +862,7 @@ export default function AIDoctorConsultationPage({ patientId = null, currentUser
                   }}
                 >
                   <PhoneOff size={16} />
-                  <span>End Call</span>
+                  <span>{t("ai_doctor.end_call", "End Call")}</span>
                 </button>
               )}
 
@@ -884,7 +884,7 @@ export default function AIDoctorConsultationPage({ patientId = null, currentUser
                   justifyContent: "center",
                   transition: "all 0.15s ease",
                 }}
-                title={speakerMuted ? "Unmute Speaker" : "Mute Speaker"}
+                title={speakerMuted ? t("ai_doctor.unmute_speaker", "Unmute Speaker") : t("ai_doctor.mute_speaker", "Mute Speaker")}
               >
                 {speakerMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
               </button>
@@ -909,7 +909,7 @@ export default function AIDoctorConsultationPage({ patientId = null, currentUser
                 }}
               >
                 <MessageSquare size={13} />
-                <span>Captions / Chat</span>
+                <span>{t("ai_doctor.captions_chat", "Captions / Chat")}</span>
               </button>
 
               <button
@@ -929,7 +929,7 @@ export default function AIDoctorConsultationPage({ patientId = null, currentUser
                 }}
               >
                 <FileText size={13} />
-                <span>My EHR Dossier</span>
+                <span>{t("ai_doctor.ehr_dossier", "My EHR Dossier")}</span>
               </button>
             </div>
           </div>

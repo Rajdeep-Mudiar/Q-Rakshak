@@ -20,6 +20,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { consultationsApi } from "../../api/consultations";
+import { useLanguage } from "../../context/LanguageContext";
 import EPrescriptionModal from "./EPrescriptionModal";
 import { animateEntrance } from "../../utils/motion";
 import {
@@ -30,6 +31,7 @@ import {
 } from "../../utils/webrtc";
 
 export default function VirtualConsultationRoom({ booking, isDoctor = false, onLeave }) {
+  const { t } = useLanguage();
   const [room, setRoom] = useState(null);
   const [isVideoOn, setIsVideoOn] = useState(true);
   const [isAudioOn, setIsAudioOn] = useState(true);
@@ -493,13 +495,13 @@ export default function VirtualConsultationRoom({ booking, isDoctor = false, onL
               <div style={{ textAlign: "center", padding: "28px", maxWidth: "460px", zIndex: 10 }}>
                 <Clock size={44} color="var(--gold)" style={{ margin: "0 auto 14px auto" }} />
                 <h3 style={{ fontFamily: "var(--font-display)", color: "var(--ink-primary)", margin: "0 0 8px 0", fontSize: "1.35rem", fontWeight: 800 }}>
-                  Secured Waiting Salon
+                  {t("telemedicine.patient_waiting_title", "Waiting for Clinician")}
                 </h3>
                 <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", margin: "0 0 16px 0", lineHeight: 1.5 }}>
-                  Dr. <strong>{booking.doctor_name}</strong> has been alerted. Your camera and microphone hardware are calibrated and awaiting doctor admission.
+                  {t("telemedicine.patient_waiting_subtitle", "Your doctor has been notified and will admit you into the encrypted WebRTC consultation room shortly.")}
                 </p>
                 <div style={{ fontSize: "0.76rem", color: "var(--emerald-couture)", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", fontFamily: "var(--font-mono)" }}>
-                  <ShieldCheck size={15} /> Encrypted WebRTC Media Channel Ready
+                  <ShieldCheck size={15} /> {t("telemedicine.encrypted_channel_ready", "Encrypted WebRTC Media Channel Ready")}
                 </div>
               </div>
             ) : isWaiting && isDoctor ? (
@@ -507,10 +509,10 @@ export default function VirtualConsultationRoom({ booking, isDoctor = false, onL
               <div style={{ textAlign: "center", padding: "28px", maxWidth: "460px", zIndex: 10 }}>
                 <User size={44} color="var(--gold)" style={{ margin: "0 auto 14px auto" }} />
                 <h3 style={{ fontFamily: "var(--font-display)", color: "var(--ink-primary)", margin: "0 0 8px 0", fontSize: "1.35rem", fontWeight: 800 }}>
-                  Patient in Queue
+                  {t("telemedicine.patient_in_queue", "Patient in Queue")}
                 </h3>
                 <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", margin: "0 0 20px 0", lineHeight: 1.5 }}>
-                  Patient <strong>{booking.patient_name || "Unknown patient"}</strong> is verified in the waiting room.
+                  {t("telemedicine.patient_waiting_desc", "Patient {name} is verified in the waiting room.", { name: booking.patient_name || "Unknown patient" })}
                 </p>
                 <button
                   type="button"
@@ -526,7 +528,7 @@ export default function VirtualConsultationRoom({ booking, isDoctor = false, onL
                     border: "1px solid var(--gold)",
                   }}
                 >
-                  <Video size={16} color="var(--gold)" /> Admit to WebRTC Consultation
+                  <Video size={16} color="var(--gold)" /> {t("telemedicine.admit_to_consultation", "Admit to WebRTC Consultation")}
                 </button>
               </div>
             ) : null}
@@ -559,10 +561,10 @@ export default function VirtualConsultationRoom({ booking, isDoctor = false, onL
                   }}
                 />
                 <h4 style={{ fontFamily: "var(--font-display)", color: "var(--gold)", margin: "0 0 6px 0", fontSize: "1.1rem" }}>
-                  Synchronizing Peer Stream
+                  {t("telemedicine.synchronizing_stream", "Synchronizing Peer Stream")}
                 </h4>
                 <p style={{ color: "var(--text-secondary)", fontSize: "0.78rem", margin: 0, fontFamily: "var(--font-mono)" }}>
-                  Connecting with {isDoctor ? (booking.patient_name || "Patient") : (booking.doctor_name || "Doctor")} via 256-bit DTLS-SRTP tunnel...
+                  {t("telemedicine.connecting_peer_tunnel", "Connecting with {name} via 256-bit DTLS-SRTP tunnel...", { name: isDoctor ? (booking.patient_name || "Patient") : (booking.doctor_name || "Doctor") })}
                 </p>
               </div>
             )}
@@ -613,7 +615,7 @@ export default function VirtualConsultationRoom({ booking, isDoctor = false, onL
               ) : (
                 <div style={{ textAlign: "center", color: "var(--text-muted)", fontSize: "0.68rem" }}>
                   <VideoOff size={18} color="var(--risk-high)" style={{ margin: "0 auto 4px auto" }} />
-                  <span>Cam Muted</span>
+                  <span>{t("telemedicine.cam_muted", "Cam Muted")}</span>
                 </div>
               )}
 
@@ -631,7 +633,7 @@ export default function VirtualConsultationRoom({ booking, isDoctor = false, onL
                   borderRadius: "2px",
                 }}
               >
-                {isDoctor ? (booking.doctor_name || "Doctor") : (booking.patient_name || "Patient")} (YOU)
+                {isDoctor ? (booking.doctor_name || "Doctor") : (booking.patient_name || "Patient")} {t("telemedicine.you_suffix", "(YOU)")}
               </div>
             </div>
 
@@ -654,10 +656,10 @@ export default function VirtualConsultationRoom({ booking, isDoctor = false, onL
                 }}
               >
                 <span style={{ display: "flex", alignItems: "center", gap: "5px", color: "var(--emerald-couture)" }}>
-                  <ShieldCheck size={12} /> SECURE WebRTC 1080p
+                  <ShieldCheck size={12} /> {t("telemedicine.secure_webrtc", "SECURE WebRTC 1080p")}
                 </span>
                 <span style={{ display: "flex", alignItems: "center", gap: "5px", color: "var(--text-gold)" }}>
-                  <Sparkles size={12} /> TELEMETRY: ACTIVE (0.94)
+                  <Sparkles size={12} /> {t("telemedicine.telemetry_active", "TELEMETRY: ACTIVE")}
                 </span>
               </div>
             )}
@@ -683,7 +685,7 @@ export default function VirtualConsultationRoom({ booking, isDoctor = false, onL
                 }}
               >
                 <CheckCircle size={14} color="var(--emerald-couture)" />
-                <span>Clinical snapshot appended to session notes</span>
+                <span>{t("telemedicine.snapshot_toast", "Clinical snapshot appended to session notes")}</span>
               </div>
             )}
           </div>
@@ -718,7 +720,7 @@ export default function VirtualConsultationRoom({ booking, isDoctor = false, onL
                 title={isAudioOn ? "Mute Microphone" : "Unmute Microphone"}
               >
                 {isAudioOn ? <Mic size={14} /> : <MicOff size={14} color="var(--risk-high)" />}
-                <span>{isAudioOn ? "Mic Active" : "Mic Muted"}</span>
+                <span>{isAudioOn ? t("telemedicine.mic_active", "Mic Active") : t("telemedicine.mic_muted", "Mic Muted")}</span>
               </button>
 
               <button
@@ -736,7 +738,7 @@ export default function VirtualConsultationRoom({ booking, isDoctor = false, onL
                 title={isVideoOn ? "Turn Camera Off" : "Turn Camera On"}
               >
                 {isVideoOn ? <Video size={14} /> : <VideoOff size={14} color="var(--risk-high)" />}
-                <span>{isVideoOn ? "Cam Active" : "Cam Paused"}</span>
+                <span>{isVideoOn ? t("telemedicine.cam_active", "Cam Active") : t("telemedicine.cam_paused", "Cam Paused")}</span>
               </button>
 
               <button
@@ -754,7 +756,7 @@ export default function VirtualConsultationRoom({ booking, isDoctor = false, onL
                 title={isScreenSharing ? "Stop Sharing Screen" : "Share Diagnostic Desktop"}
               >
                 <Share2 size={14} />
-                <span>{isScreenSharing ? "Sharing Scan" : "Share Screen"}</span>
+                <span>{isScreenSharing ? t("telemedicine.screen_sharing", "Sharing Screen") : t("telemedicine.screen_share", "Share Screen")}</span>
               </button>
 
               <button
@@ -772,7 +774,7 @@ export default function VirtualConsultationRoom({ booking, isDoctor = false, onL
                 title="Capture clinical frame snapshot to EHR"
               >
                 <Camera size={14} />
-                <span>Capture Frame</span>
+                <span>{t("telemedicine.take_snapshot", "Capture Frame")}</span>
               </button>
             </div>
 
@@ -795,7 +797,7 @@ export default function VirtualConsultationRoom({ booking, isDoctor = false, onL
                   }}
                 >
                   <FileText size={14} color="var(--gold)" />
-                  <span>Issue E-Prescription</span>
+                  <span>{t("telemedicine.issue_eprescription", "Issue E-Prescription")}</span>
                 </button>
               )}
 
@@ -817,7 +819,7 @@ export default function VirtualConsultationRoom({ booking, isDoctor = false, onL
                 }}
               >
                 <PhoneOff size={14} />
-                <span>End Call</span>
+                <span>{t("telemedicine.end_session", "End Call")}</span>
               </button>
             </div>
           </div>
@@ -860,7 +862,7 @@ export default function VirtualConsultationRoom({ booking, isDoctor = false, onL
                 cursor: "pointer",
               }}
             >
-              Session Chat ({chatMessages.length})
+              {t("telemedicine.chat_tab", "Session Chat")} ({chatMessages.length})
             </button>
             <button
               type="button"
@@ -880,7 +882,7 @@ export default function VirtualConsultationRoom({ booking, isDoctor = false, onL
                 cursor: "pointer",
               }}
             >
-              EHR Context
+              {t("telemedicine.clinical_context_tab", "EHR Context")}
             </button>
           </div>
 

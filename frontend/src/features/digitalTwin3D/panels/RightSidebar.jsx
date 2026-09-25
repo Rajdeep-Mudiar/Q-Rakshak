@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTwinStore } from '../store/twinStore';
+import { useLanguage } from '../../../context/LanguageContext';
 import { ANATOMY_REGISTRY } from '../data/anatomyRegistry';
 import { DISEASE_REGISTRY } from '../data/diseaseRegistry';
 import { getSeverityTier } from '../data/visualizationRules';
@@ -14,6 +15,7 @@ import {
 } from 'lucide-react';
 
 export default function RightSidebar() {
+  const { t } = useLanguage();
   const selectedAnatomy = useTwinStore((state) => state.selectedAnatomy);
   const setSelectedAnatomy = useTwinStore((state) => state.setSelectedAnatomy);
   const selectedDisease = useTwinStore((state) => state.selectedDisease);
@@ -45,7 +47,7 @@ export default function RightSidebar() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Info size={16} color="var(--dt-accent-blue)" />
           <h3 style={{ fontSize: '0.82rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--dt-text-primary)', margin: 0 }}>
-            Organ Details
+            {t('twin_panels.organ_details', 'Organ Details')}
           </h3>
         </div>
         <span
@@ -60,7 +62,7 @@ export default function RightSidebar() {
             fontWeight: 700,
           }}
         >
-          {selectedAnatomy || (affectedList.length === 0 ? 'HEALTHY BASELINE' : 'SELECT AN ORGAN')}
+          {selectedAnatomy || (affectedList.length === 0 ? t('twin_panels.healthy_baseline', 'HEALTHY BASELINE') : t('twin_panels.select_an_organ', 'SELECT AN ORGAN'))}
         </span>
       </div>
 
@@ -69,7 +71,7 @@ export default function RightSidebar() {
         <div className="dt-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: '0.74rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--dt-text-primary)' }}>
-              Organs at Risk ({affectedList.length})
+              {t('twin_panels.organs_at_risk', 'Organs at Risk')} ({affectedList.length})
             </span>
             {affectedList.length > 0 ? (
               <ShieldAlert size={14} color="#DC2626" />
@@ -83,10 +85,10 @@ export default function RightSidebar() {
               <div style={{ padding: '12px 10px', textAlign: 'center', background: 'rgba(16, 185, 129, 0.06)', borderRadius: '6px', border: '1px dashed rgba(16, 185, 129, 0.3)' }}>
                 <ShieldCheck size={24} color="#10B981" style={{ margin: '0 auto 6px auto', display: 'block' }} />
                 <strong style={{ fontSize: '0.78rem', color: '#10B981', display: 'block', marginBottom: '4px' }}>
-                  Anatomical Baseline
+                  {t('twin_panels.anatomical_baseline', 'Anatomical Baseline')}
                 </strong>
                 <p style={{ fontSize: '0.72rem', color: 'var(--dt-text-muted)', margin: 0, lineHeight: 1.4 }}>
-                  No active clinical disease risks detected. Complete a diagnostic assessment to project organ-specific involvement.
+                  {t('twin_panels.baseline_desc', 'No active clinical disease risks detected. Complete a diagnostic assessment to project organ-specific involvement.')}
                 </p>
               </div>
             ) : (
@@ -124,30 +126,30 @@ export default function RightSidebar() {
         <div className="dt-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: '0.74rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--dt-text-primary)' }}>
-              Simulation Overview
+              {t('twin_panels.simulation_overview', 'Simulation Overview')}
             </span>
             <Activity size={14} color="var(--dt-accent-blue)" />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.76rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--dt-text-muted)' }}>Sex:</span>
-              <strong style={{ color: 'var(--dt-text-primary)', textTransform: 'capitalize' }}>{patient.sex || 'Not Specified'}</strong>
+              <span style={{ color: 'var(--dt-text-muted)' }}>{t('twin_panels.sex', 'Sex')}:</span>
+              <strong style={{ color: 'var(--dt-text-primary)', textTransform: 'capitalize' }}>{patient.sex || t('twin_panels.not_specified', 'Not Specified')}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--dt-text-muted)' }}>Age Group:</span>
-              <strong style={{ color: 'var(--dt-text-primary)' }}>{patient.ageGroup || 'Adult'}</strong>
+              <span style={{ color: 'var(--dt-text-muted)' }}>{t('twin_panels.age_group', 'Age Group')}:</span>
+              <strong style={{ color: 'var(--dt-text-primary)' }}>{patient.ageGroup || t('twin_panels.adult', 'Adult')}</strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--dt-text-muted)' }}>Active Status:</span>
+              <span style={{ color: 'var(--dt-text-muted)' }}>{t('twin_panels.active_status', 'Active Status')}:</span>
               <strong style={{ color: affectedList.length > 0 ? '#DC2626' : '#10B981' }}>
-                {affectedList.length > 0 ? `${affectedList.length} Organs Monitored` : 'Baseline Healthy'}
+                {affectedList.length > 0 ? t('twin_panels.organs_monitored', '{count} Organs Monitored', { count: affectedList.length }) : t('twin_panels.baseline_healthy', 'Baseline Healthy')}
               </strong>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: 'var(--dt-text-muted)' }}>Diagnostic State:</span>
+              <span style={{ color: 'var(--dt-text-muted)' }}>{t('twin_panels.diagnostic_state', 'Diagnostic State')}:</span>
               <strong style={{ color: affectedList.length > 0 ? 'var(--dt-accent-blue)' : 'var(--dt-text-muted)' }}>
-                {affectedList.length > 0 ? (disease?.name || 'Assessed') : 'Pending Checkup'}
+                {affectedList.length > 0 ? (disease?.name || 'Assessed') : t('twin_panels.pending_checkup', 'Pending Checkup')}
               </strong>
             </div>
           </div>

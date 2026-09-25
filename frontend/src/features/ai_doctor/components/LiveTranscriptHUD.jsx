@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import { User, Stethoscope, Copy, Check, MessageSquare, Sparkles } from "lucide-react";
+import { useLanguage } from "../../../context/LanguageContext";
 
 export default function LiveTranscriptHUD({
   transcript = [],
@@ -7,6 +8,7 @@ export default function LiveTranscriptHUD({
   isAIDoctorSpeaking = false,
   onSendTextMessage,
 }) {
+  const { t } = useLanguage();
   const bottomRef = useRef(null);
   const [copiedIdx, setCopiedIdx] = React.useState(null);
   const [textInput, setTextInput] = React.useState("");
@@ -55,11 +57,11 @@ export default function LiveTranscriptHUD({
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <MessageSquare size={15} color="var(--primary)" />
           <h4 style={{ margin: 0, fontSize: "0.82rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.04em" }}>
-            Live Conversation Transcript & Captions
+            {t("ai_doctor.transcript_title", "Live Conversation Transcript & Captions")}
           </h4>
         </div>
         <span style={{ fontSize: "0.64rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
-          {transcript.length} turns
+          {t("ai_doctor.turns_count", `${transcript.length} turns`, { count: transcript.length })}
         </span>
       </div>
 
@@ -84,9 +86,9 @@ export default function LiveTranscriptHUD({
               margin: "auto",
             }}
           >
-            <p style={{ margin: "0 0 6px 0", fontWeight: 600 }}>Start talking with Dr. Quantum</p>
+            <p style={{ margin: "0 0 6px 0", fontWeight: 600 }}>{t("ai_doctor.start_talking", "Start talking with Dr. Quantum")}</p>
             <p style={{ margin: 0, fontSize: "0.68rem" }}>
-              Your voice conversation will be transcribed in real time right here.
+              {t("ai_doctor.transcript_hint", "Your voice conversation will be transcribed in real time right here.")}
             </p>
           </div>
         )}
@@ -118,7 +120,7 @@ export default function LiveTranscriptHUD({
                 }}
               >
                 {isDoctor ? <Stethoscope size={12} /> : <User size={12} />}
-                <span>{isDoctor ? "Dr. Quantum (AI)" : "You (Patient)"}</span>
+                <span>{isDoctor ? t("ai_doctor.dr_quantum", "Dr. Quantum (AI)") : t("ai_doctor.you_patient", "You (Patient)")}</span>
                 {item.timestamp && (
                   <span style={{ color: "var(--text-muted)", fontWeight: 400, fontFamily: "var(--font-mono)" }}>
                     • {item.timestamp}
@@ -190,7 +192,7 @@ export default function LiveTranscriptHUD({
         {interimUserSpeech && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
             <div style={{ fontSize: "0.66rem", color: "var(--accent-teal)", fontWeight: 700, marginBottom: "4px" }}>
-              You (Speaking...)
+              {t("ai_doctor.you_speaking", "You (Speaking...)")}
             </div>
             <div
               style={{
@@ -212,7 +214,7 @@ export default function LiveTranscriptHUD({
         {isAIDoctorSpeaking && (
           <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--gold)", fontSize: "0.72rem", padding: "4px 0" }}>
             <Sparkles size={14} className="spin" />
-            <span style={{ fontWeight: 700 }}>Dr. Quantum is speaking...</span>
+            <span style={{ fontWeight: 700 }}>{t("ai_doctor.dr_speaking", "Dr. Quantum is speaking...")}</span>
           </div>
         )}
 
@@ -232,7 +234,7 @@ export default function LiveTranscriptHUD({
       >
         <input
           type="text"
-          placeholder="Ask Dr. Quantum a health question or type if microphone is muted..."
+          placeholder={t("ai_doctor.input_placeholder", "Ask Dr. Quantum a health question or type if microphone is muted...")}
           value={textInput}
           onChange={(e) => setTextInput(e.target.value)}
           style={{
@@ -250,7 +252,7 @@ export default function LiveTranscriptHUD({
           className="btn-primary"
           style={{ padding: "8px 16px", fontSize: "0.76rem", fontWeight: 800, textTransform: "uppercase" }}
         >
-          Send
+          {t("ai_doctor.send_btn", "Send")}
         </button>
       </form>
     </div>

@@ -2,26 +2,19 @@ import { useState, useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
-  ShieldCheck,
   Lock,
-  Play,
   Cpu,
   CheckCircle2,
   User,
   KeyRound,
   LogIn,
-  Stethoscope,
-  Sparkles,
-  ArrowRight,
   ArrowDown,
   AlertCircle,
   Activity,
-  Layers,
   ExternalLink,
   Eye,
   EyeOff,
-  UserPlus,
-  ChevronDown
+  UserPlus
 } from "lucide-react";
 import { animateErrorShake } from "../../utils/motion.js";
 import ModelEvaluationShowcase from "./components/ModelEvaluationShowcase.jsx";
@@ -37,12 +30,6 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
   const [showGuideModal, setShowGuideModal] = useState(false);
   const [gisLoading, setGisLoading] = useState(false);
   const [localError, setLocalError] = useState(null);
-  const [selectedRole, setSelectedRole] = useState("patient"); // 'patient' | 'doctor' | 'admin'
-  const selectedRoleRef = useRef(selectedRole);
-  useEffect(() => {
-    selectedRoleRef.current = selectedRole;
-  }, [selectedRole]);
-
   const [authMode, setAuthMode] = useState("login"); // 'login' | 'register'
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -55,6 +42,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
   const [regUsername, setRegUsername] = useState("");
   const [regPassword, setRegPassword] = useState("");
   const [regPhone, setRegPhone] = useState("");
+  const [regRole, setRegRole] = useState("patient"); // for new account registration only
 
   const modalContainerRef = useRef(null);
   const narrativeRef = useRef(null);
@@ -117,7 +105,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                 try {
                   setGisLoading(true);
                   setLocalError(null);
-                  const verifiedUser = await authApi.verifyGoogleCredential(response.credential, selectedRoleRef.current);
+                  const verifiedUser = await authApi.verifyGoogleCredential(response.credential);
                   if (verifiedUser) {
                     if (onLoginSuccess) {
                       onLoginSuccess(verifiedUser);
@@ -166,21 +154,8 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
   }, [onGoogleVerifySuccess, onLoginSuccess]);
 
   const handleGoogleClick = () => {
-    if (typeof window !== "undefined" && window.google?.accounts?.id) {
-      try {
-        window.google.accounts.id.prompt((notification) => {
-          if (notification.isNotDisplayed() || notification.isSkippedMoment() || notification.isDismissedMoment()) {
-            if (onGoogleLogin) onGoogleLogin(selectedRoleRef.current);
-          }
-        });
-        return;
-      } catch {
-        if (onGoogleLogin) onGoogleLogin(selectedRoleRef.current);
-        return;
-      }
-    }
     if (onGoogleLogin) {
-      onGoogleLogin(selectedRoleRef.current);
+      onGoogleLogin();
     }
   };
 
@@ -193,7 +168,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
     setSubmitting(true);
     setLocalError(null);
     try {
-      const data = await authApi.login(username.trim(), password, selectedRole);
+      const data = await authApi.login(username.trim(), password);
       if (data?.user) {
         if (onLoginSuccess) onLoginSuccess(data.user);
         else if (onGoogleVerifySuccess) onGoogleVerifySuccess(data.user);
@@ -201,26 +176,6 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
       }
     } catch (err) {
       setLocalError(err?.message || "Invalid credentials. Please verify your handle and password.");
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  async function handleQuickLogin(quickUsername, quickPassword, quickRole) {
-    setUsername(quickUsername);
-    setPassword(quickPassword);
-    setSelectedRole(quickRole);
-    setSubmitting(true);
-    setLocalError(null);
-    try {
-      const data = await authApi.login(quickUsername, quickPassword, quickRole);
-      if (data?.user) {
-        if (onLoginSuccess) onLoginSuccess(data.user);
-        else if (onGoogleVerifySuccess) onGoogleVerifySuccess(data.user);
-        else window.location.reload();
-      }
-    } catch (err) {
-      setLocalError(err?.message || "Quick demo login failed.");
     } finally {
       setSubmitting(false);
     }
@@ -235,9 +190,9 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
     setSubmitting(true);
     setLocalError(null);
     try {
-      const defaultLicense = selectedRole === "doctor"
+      const defaultLicense = regRole === "doctor"
         ? `DOC-LIC-${Math.floor(10000 + Math.random() * 90000)}`
-        : selectedRole === "admin"
+        : regRole === "admin"
         ? `ADM-SEC-${Math.floor(1000 + Math.random() * 9000)}`
         : `PT-REC-${Math.floor(10000 + Math.random() * 90000)}`;
 
@@ -246,11 +201,11 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
         email: regEmail.trim(),
         username: regUsername.trim().toLowerCase(),
         password: regPassword,
-        role: selectedRole,
+        role: regRole,
         emergency_phone: regPhone || "+91 98765 43210",
-        hospital_affiliation: selectedRole === "doctor" ? "Q-Rakshak" : "Community Healthcare",
+        hospital_affiliation: regRole === "doctor" ? "Q-Rakshak" : "Community Healthcare",
         license_number: defaultLicense,
-        specialty: selectedRole === "doctor" ? "General Medicine & Clinical AI" : undefined,
+        specialty: regRole === "doctor" ? "General Medicine & Clinical AI" : undefined,
       });
       if (data?.user) {
         if (onLoginSuccess) onLoginSuccess(data.user);
@@ -643,41 +598,39 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
             background: "#FFFFFF",
             border: "1px solid #E2E8F0",
             borderRadius: "14px",
-            padding: "clamp(24px, 3.5vw, 40px) clamp(20px, 3.5vw, 36px)",
+            padding: "clamp(24px, 3.5vw, 36px) clamp(20px, 3.5vw, 32px)",
             position: "relative",
-            boxShadow: "0 12px 36px rgba(0, 0, 0, 0.07)",
+            boxShadow: "0 10px 32px rgba(15, 23, 42, 0.06)",
             display: "flex",
             flexDirection: "column",
-            alignItems: "center",
+            alignItems: "stretch",
             width: "100%",
-            maxWidth: "480px",
+            maxWidth: "460px",
             margin: "0 auto",
             boxSizing: "border-box",
           }}
         >
-          {/* Header & Icon */}
-          <div style={{ marginBottom: "20px", textAlign: "center" }}>
+          {/* Header & Clean Clinical Branding */}
+          <div style={{ marginBottom: "22px", textAlign: "left" }}>
             <div
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                justifyContent: "center",
-                width: "52px",
-                height: "52px",
-                background: selectedRole === "doctor" ? "#F0F9FF" : selectedRole === "admin" ? "#FAF5FF" : "#F0FDF4",
-                border: `1px solid ${selectedRole === "doctor" ? "#BAE6FD" : selectedRole === "admin" ? "#E9D5FF" : "#BBF7D0"}`,
-                borderRadius: "50%",
-                marginBottom: "14px",
-                transition: "all 0.3s ease",
+                gap: "6px",
+                padding: "3px 9px",
+                borderRadius: "5px",
+                background: "#ECFDF5",
+                border: "1px solid #A7F3D0",
+                color: "#059669",
+                fontSize: "0.72rem",
+                fontWeight: 700,
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+                marginBottom: "12px",
               }}
             >
-              {selectedRole === "doctor" ? (
-                <Stethoscope size={24} color="#0284C7" />
-              ) : selectedRole === "admin" ? (
-                <ShieldCheck size={24} color="#7C3AED" />
-              ) : (
-                <User size={24} color="#059669" />
-              )}
+              <Activity size={13} />
+              <span>Q-Rakshak Platform</span>
             </div>
             <h2
               style={{
@@ -685,119 +638,20 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                 fontSize: "1.6rem",
                 fontWeight: 800,
                 color: "#0F172A",
-                letterSpacing: "-0.02em",
+                letterSpacing: "-0.025em",
                 margin: "0 0 6px 0",
               }}
             >
-              {authMode === "register" ? t("login.create_account", "Create Q-RAKSHAK Account") : t("login.title", "Sign in to Q-RAKSHAK")}
+              {authMode === "register" ? "Create Account" : "Sign In"}
             </h2>
-            <p style={{ fontSize: "0.85rem", color: "#64748B", margin: 0, lineHeight: 1.4 }}>
-              {t("login.role_desc", "Select your clinical role to access your dedicated workspace.")}
+            <p style={{ fontSize: "0.86rem", color: "#64748B", margin: 0, lineHeight: 1.45 }}>
+              {authMode === "register"
+                ? "Register a new clinical account to get started."
+                : "Enter your identifier and password to continue."}
             </p>
           </div>
 
-          {/* 1. Explicit Role Selector Dropdown */}
-          <div style={{ width: "100%", marginBottom: "14px", textAlign: "left" }}>
-            <label
-              htmlFor="login-role-select"
-              style={{
-                display: "block",
-                fontSize: "0.70rem",
-                fontWeight: 700,
-                color: "#475569",
-                textTransform: "uppercase",
-                letterSpacing: "0.06em",
-                marginBottom: "5px",
-              }}
-            >
-              {t("login.workspace_role", "Workspace Role")}
-            </label>
-            <div style={{ position: "relative" }}>
-              <select
-                id="login-role-select"
-                value={selectedRole}
-                onChange={(e) => setSelectedRole(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "10px 14px",
-                  paddingRight: "36px",
-                  borderRadius: "8px",
-                  border: `1.5px solid ${selectedRole === "doctor" ? "#0284C7" : selectedRole === "admin" ? "#7C3AED" : "#059669"}`,
-                  fontSize: "0.88rem",
-                  fontWeight: 600,
-                  color: "#0F172A",
-                  background: "#FFFFFF",
-                  appearance: "none",
-                  cursor: "pointer",
-                  outline: "none",
-                  transition: "border-color 0.2s ease",
-                }}
-              >
-                <option value="patient">👤 {t("login.role_patient_opt", "Patient — Health Checkups & 3D Digital Twin")}</option>
-                <option value="doctor">🩺 {t("login.role_doctor_opt", "Doctor / Clinician — OPD Queue & Telemedicine")}</option>
-                <option value="admin">🛡️ {t("login.role_admin_opt", "System Administrator — Governance & Audit Trail")}</option>
-              </select>
-              <ChevronDown
-                size={16}
-                color="#64748B"
-                style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
-              />
-            </div>
-          </div>
-
-          {/* 2. Visual Role Cards */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr 1fr",
-              gap: "8px",
-              width: "100%",
-              marginBottom: "16px",
-            }}
-          >
-            {[
-              { id: "patient", label: t("login.role_patient", "Patient"), sub: t("login.role_patient_sub", "Personal"), color: "#059669", bg: "#F0FDF4", border: "#A7F3D0", icon: User },
-              { id: "doctor", label: t("login.role_doctor", "Doctor"), sub: t("login.role_doctor_sub", "Clinician"), color: "#0284C7", bg: "#F0F9FF", border: "#BAE6FD", icon: Stethoscope },
-              { id: "admin", label: t("login.role_admin", "Admin"), sub: t("login.role_admin_sub", "Security"), color: "#7C3AED", bg: "#FAF5FF", border: "#E9D5FF", icon: ShieldCheck },
-            ].map((r) => {
-              const Icon = r.icon;
-              const isActive = selectedRole === r.id;
-              return (
-                <button
-                  key={r.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedRole(r.id);
-                    if (!username || username === "aryan" || username === "alex.patient" || username === "dr.kavita" || username === "admin.audit") {
-                      if (r.id === "doctor") { setUsername("dr.kavita"); setPassword("doctor123"); }
-                      else if (r.id === "admin") { setUsername("admin.audit"); setPassword("admin123"); }
-                      else { setUsername("aryan"); setPassword("patient123"); }
-                    }
-                  }}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: "3px",
-                    padding: "8px 4px",
-                    borderRadius: "8px",
-                    border: isActive ? `2px solid ${r.color}` : "1px solid #E2E8F0",
-                    background: isActive ? r.bg : "#F8FAFC",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                  }}
-                >
-                  <Icon size={16} color={isActive ? r.color : "#64748B"} />
-                  <span style={{ fontSize: "0.78rem", fontWeight: 700, color: isActive ? r.color : "#334155" }}>
-                    {r.label}
-                  </span>
-                  <span style={{ fontSize: "0.62rem", color: "#64748B" }}>{r.sub}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* 3. Auth Mode Switcher (Sign In vs Register) */}
+          {/* Mode Switcher Tabs */}
           <div
             style={{
               display: "flex",
@@ -805,16 +659,16 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
               padding: "3px",
               borderRadius: "8px",
               width: "100%",
-              marginBottom: "16px",
+              marginBottom: "18px",
             }}
           >
             <button
               type="button"
-              onClick={() => setAuthMode("login")}
+              onClick={() => { setAuthMode("login"); setLocalError(null); }}
               style={{
                 flex: 1,
-                padding: "6px 0",
-                fontSize: "0.78rem",
+                padding: "7px 0",
+                fontSize: "0.80rem",
                 fontWeight: 700,
                 borderRadius: "6px",
                 border: "none",
@@ -825,15 +679,15 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                 transition: "all 0.2s ease",
               }}
             >
-              {t("login.sign_in", "Sign In")}
+              Sign In
             </button>
             <button
               type="button"
-              onClick={() => setAuthMode("register")}
+              onClick={() => { setAuthMode("register"); setLocalError(null); }}
               style={{
                 flex: 1,
-                padding: "6px 0",
-                fontSize: "0.78rem",
+                padding: "7px 0",
+                fontSize: "0.80rem",
                 fontWeight: 700,
                 borderRadius: "6px",
                 border: "none",
@@ -844,39 +698,56 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                 transition: "all 0.2s ease",
               }}
             >
-              {t("login.register", "Create Account")}
+              Register New Account
             </button>
           </div>
 
-          {/* 4. Credentials Form */}
+          {/* Credentials Form */}
           {authMode === "login" ? (
-            <form onSubmit={handleCredentialSubmit} style={{ width: "100%", display: "flex", flexDirection: "column", gap: "12px" }}>
+            <form onSubmit={handleCredentialSubmit} style={{ width: "100%", display: "flex", flexDirection: "column", gap: "14px" }}>
               <div style={{ textAlign: "left" }}>
-                <label style={{ display: "block", fontSize: "0.70rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", marginBottom: "4px" }}>
-                  {t("login.username_label", "Username / Handle")}
+                <label
+                  htmlFor="login-username"
+                  style={{
+                    display: "block",
+                    fontSize: "0.72rem",
+                    fontWeight: 700,
+                    color: "#475569",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.04em",
+                    marginBottom: "6px",
+                  }}
+                >
+                  Username or Identifier
                 </label>
                 <div style={{ position: "relative" }}>
                   <input
+                    id="login-username"
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    placeholder={
-                      selectedRole === "doctor"
-                        ? t("login.username_ph_doctor", "e.g. dr.kavita")
-                        : selectedRole === "admin"
-                        ? t("login.username_ph_admin", "e.g. admin.audit")
-                        : t("login.username_ph_patient", "e.g. alex.patient")
-                    }
+                    placeholder="Enter username or identifier"
                     autoComplete="username"
+                    required
                     style={{
                       width: "100%",
-                      padding: "10px 12px",
-                      paddingLeft: "36px",
+                      padding: "11px 12px 11px 38px",
                       borderRadius: "8px",
                       border: "1px solid #CBD5E1",
-                      fontSize: "0.88rem",
+                      fontSize: "0.90rem",
+                      color: "#0F172A",
+                      background: "#FFFFFF",
                       boxSizing: "border-box",
                       outline: "none",
+                      transition: "border-color 0.2s ease, box-shadow 0.2s ease",
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = "#059669";
+                      e.target.style.boxShadow = "0 0 0 3px rgba(5, 150, 105, 0.12)";
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = "#CBD5E1";
+                      e.target.style.boxShadow = "none";
                     }}
                   />
                   <User size={16} color="#94A3B8" style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)" }} />
@@ -884,32 +755,55 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
               </div>
 
               <div style={{ textAlign: "left" }}>
-                <label style={{ display: "block", fontSize: "0.70rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", marginBottom: "4px" }}>
-                  {t("login.password_label", "Password")}
+                <label
+                  htmlFor="login-password"
+                  style={{
+                    display: "block",
+                    fontSize: "0.72rem",
+                    fontWeight: 700,
+                    color: "#475569",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.04em",
+                    marginBottom: "6px",
+                  }}
+                >
+                  Password
                 </label>
                 <div style={{ position: "relative" }}>
                   <input
+                    id="login-password"
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder={t("login.password_placeholder", "Enter account password")}
+                    placeholder="Enter password"
                     autoComplete="current-password"
+                    required
                     style={{
                       width: "100%",
-                      padding: "10px 12px",
-                      paddingLeft: "36px",
-                      paddingRight: "36px",
+                      padding: "11px 38px 11px 38px",
                       borderRadius: "8px",
                       border: "1px solid #CBD5E1",
-                      fontSize: "0.88rem",
+                      fontSize: "0.90rem",
+                      color: "#0F172A",
+                      background: "#FFFFFF",
                       boxSizing: "border-box",
                       outline: "none",
+                      transition: "border-color 0.2s ease, box-shadow 0.2s ease",
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = "#059669";
+                      e.target.style.boxShadow = "0 0 0 3px rgba(5, 150, 105, 0.12)";
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = "#CBD5E1";
+                      e.target.style.boxShadow = "none";
                     }}
                   />
                   <KeyRound size={16} color="#94A3B8" style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)" }} />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                     style={{
                       position: "absolute",
                       right: "10px",
@@ -918,8 +812,10 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                       background: "none",
                       border: "none",
                       cursor: "pointer",
-                      padding: 0,
+                      padding: "4px",
                       color: "#94A3B8",
+                      display: "flex",
+                      alignItems: "center",
                     }}
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -935,150 +831,46 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                   padding: "11px 16px",
                   borderRadius: "8px",
                   border: "none",
-                  background:
-                    selectedRole === "doctor"
-                      ? "#0284C7"
-                      : selectedRole === "admin"
-                      ? "#7C3AED"
-                      : "#059669",
+                  background: "#059669",
                   color: "#FFFFFF",
                   fontWeight: 700,
-                  fontSize: "0.88rem",
-                  cursor: "pointer",
+                  fontSize: "0.90rem",
+                  cursor: submitting || loading ? "not-allowed" : "pointer",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   gap: "8px",
                   marginTop: "4px",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                  transition: "opacity 0.2s ease",
+                  boxShadow: "0 2px 8px rgba(5, 150, 105, 0.2)",
+                  transition: "background 0.2s ease, opacity 0.2s ease",
+                  opacity: submitting || loading ? 0.7 : 1,
                 }}
+                onMouseEnter={(e) => { if (!submitting && !loading) e.currentTarget.style.background = "#047857"; }}
+                onMouseLeave={(e) => { if (!submitting && !loading) e.currentTarget.style.background = "#059669"; }}
               >
                 <LogIn size={16} />
-                <span>
-                  {submitting ? t("login.signing_in", "Authenticating...") : `${t("login.sign_in_as", "Sign in as")} ${selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}`}
-                </span>
+                <span>{submitting ? "Signing In..." : "Sign In"}</span>
               </button>
-
-              {/* 1-Click Instant Demo Persona Access */}
-              <div style={{ marginTop: "10px", borderTop: "1px dashed #E2E8F0", paddingTop: "10px" }}>
-                <div style={{ fontSize: "0.66rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase", marginBottom: "6px", letterSpacing: "0.04em", textAlign: "left" }}>
-                  ⚡ {t("login.quick_demo_access", "1-Click Demo Sign In")}
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                  <button
-                    type="button"
-                    onClick={() => handleQuickLogin("aryan", "patient123", "patient")}
-                    disabled={submitting || loading}
-                    style={{
-                      padding: "6px 8px",
-                      borderRadius: "6px",
-                      border: "1px solid #A7F3D0",
-                      background: "#ECFDF5",
-                      color: "#065F46",
-                      fontSize: "0.72rem",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                      textAlign: "left",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <span>👤 Aryan (Patient)</span>
-                    <span style={{ fontSize: "0.58rem", opacity: 0.7 }}>patient123</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleQuickLogin("alex.patient", "patient123", "patient")}
-                    disabled={submitting || loading}
-                    style={{
-                      padding: "6px 8px",
-                      borderRadius: "6px",
-                      border: "1px solid #A7F3D0",
-                      background: "#ECFDF5",
-                      color: "#065F46",
-                      fontSize: "0.72rem",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                      textAlign: "left",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <span>👤 Alex (Patient)</span>
-                    <span style={{ fontSize: "0.58rem", opacity: 0.7 }}>patient123</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleQuickLogin("dr.kavita", "doctor123", "doctor")}
-                    disabled={submitting || loading}
-                    style={{
-                      padding: "6px 8px",
-                      borderRadius: "6px",
-                      border: "1px solid #BAE6FD",
-                      background: "#F0F9FF",
-                      color: "#0369A1",
-                      fontSize: "0.72rem",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                      textAlign: "left",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <span>🩺 Dr. Kavita</span>
-                    <span style={{ fontSize: "0.58rem", opacity: 0.7 }}>doctor123</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleQuickLogin("admin.audit", "admin123", "admin")}
-                    disabled={submitting || loading}
-                    style={{
-                      padding: "6px 8px",
-                      borderRadius: "6px",
-                      border: "1px solid #E9D5FF",
-                      background: "#FAF5FF",
-                      color: "#6B21A8",
-                      fontSize: "0.72rem",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                      textAlign: "left",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <span>🛡️ Admin Audit</span>
-                    <span style={{ fontSize: "0.58rem", opacity: 0.7 }}>admin123</span>
-                  </button>
-                </div>
-              </div>
             </form>
           ) : (
-            <form onSubmit={handleRegisterSubmit} style={{ width: "100%", display: "flex", flexDirection: "column", gap: "10px" }}>
+            <form onSubmit={handleRegisterSubmit} style={{ width: "100%", display: "flex", flexDirection: "column", gap: "12px" }}>
               <div style={{ textAlign: "left" }}>
-                <label style={{ display: "block", fontSize: "0.68rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", marginBottom: "3px" }}>
-                  {t("login.full_name_label", "Full Legal Name")}
+                <label style={{ display: "block", fontSize: "0.70rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", marginBottom: "4px" }}>
+                  Full Legal Name
                 </label>
                 <input
                   type="text"
                   value={regName}
                   onChange={(e) => setRegName(e.target.value)}
-                  placeholder="e.g. Dr. Aryan Sharma / Alex Patient"
+                  placeholder="e.g. Dr. Maya Patel / Alex Roy"
                   required
-                  style={{ width: "100%", padding: "8px 12px", borderRadius: "6px", border: "1px solid #CBD5E1", fontSize: "0.84rem", boxSizing: "border-box" }}
+                  style={{ width: "100%", padding: "9px 12px", borderRadius: "7px", border: "1px solid #CBD5E1", fontSize: "0.86rem", boxSizing: "border-box" }}
                 />
               </div>
 
               <div style={{ textAlign: "left" }}>
-                <label style={{ display: "block", fontSize: "0.68rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", marginBottom: "3px" }}>
-                  {t("login.email_label", "Email Address")}
+                <label style={{ display: "block", fontSize: "0.70rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", marginBottom: "4px" }}>
+                  Email Address
                 </label>
                 <input
                   type="email"
@@ -1086,14 +878,14 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                   onChange={(e) => setRegEmail(e.target.value)}
                   placeholder="name@hospital.org"
                   required
-                  style={{ width: "100%", padding: "8px 12px", borderRadius: "6px", border: "1px solid #CBD5E1", fontSize: "0.84rem", boxSizing: "border-box" }}
+                  style={{ width: "100%", padding: "9px 12px", borderRadius: "7px", border: "1px solid #CBD5E1", fontSize: "0.86rem", boxSizing: "border-box" }}
                 />
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                 <div style={{ textAlign: "left" }}>
-                  <label style={{ display: "block", fontSize: "0.68rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", marginBottom: "3px" }}>
-                    {t("login.username_label", "Username")}
+                  <label style={{ display: "block", fontSize: "0.70rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", marginBottom: "4px" }}>
+                    Username
                   </label>
                   <input
                     type="text"
@@ -1101,12 +893,12 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                     onChange={(e) => setRegUsername(e.target.value)}
                     placeholder="handle"
                     required
-                    style={{ width: "100%", padding: "8px 10px", borderRadius: "6px", border: "1px solid #CBD5E1", fontSize: "0.84rem", boxSizing: "border-box" }}
+                    style={{ width: "100%", padding: "9px 10px", borderRadius: "7px", border: "1px solid #CBD5E1", fontSize: "0.86rem", boxSizing: "border-box" }}
                   />
                 </div>
                 <div style={{ textAlign: "left" }}>
-                  <label style={{ display: "block", fontSize: "0.68rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", marginBottom: "3px" }}>
-                    {t("login.password_label", "Password")}
+                  <label style={{ display: "block", fontSize: "0.70rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", marginBottom: "4px" }}>
+                    Password
                   </label>
                   <input
                     type="password"
@@ -1114,9 +906,33 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                     onChange={(e) => setRegPassword(e.target.value)}
                     placeholder="••••••••"
                     required
-                    style={{ width: "100%", padding: "8px 10px", borderRadius: "6px", border: "1px solid #CBD5E1", fontSize: "0.84rem", boxSizing: "border-box" }}
+                    style={{ width: "100%", padding: "9px 10px", borderRadius: "7px", border: "1px solid #CBD5E1", fontSize: "0.86rem", boxSizing: "border-box" }}
                   />
                 </div>
+              </div>
+
+              <div style={{ textAlign: "left" }}>
+                <label style={{ display: "block", fontSize: "0.70rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", marginBottom: "4px" }}>
+                  Account Type
+                </label>
+                <select
+                  value={regRole}
+                  onChange={(e) => setRegRole(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "9px 12px",
+                    borderRadius: "7px",
+                    border: "1px solid #CBD5E1",
+                    fontSize: "0.86rem",
+                    background: "#FFFFFF",
+                    color: "#0F172A",
+                    boxSizing: "border-box",
+                  }}
+                >
+                  <option value="patient">Patient (Health Checkups & 3D Twin)</option>
+                  <option value="doctor">Doctor / Clinician (Clinical OPD & Telemedicine)</option>
+                  <option value="admin">Administrator (Governance & Audits)</option>
+                </select>
               </div>
 
               <button
@@ -1124,32 +940,34 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                 disabled={submitting || loading}
                 style={{
                   width: "100%",
-                  padding: "10px 16px",
+                  padding: "11px 16px",
                   borderRadius: "8px",
                   border: "none",
-                  background: selectedRole === "doctor" ? "#0284C7" : selectedRole === "admin" ? "#7C3AED" : "#059669",
+                  background: "#059669",
                   color: "#FFFFFF",
                   fontWeight: 700,
-                  fontSize: "0.86rem",
-                  cursor: "pointer",
+                  fontSize: "0.88rem",
+                  cursor: submitting || loading ? "not-allowed" : "pointer",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   gap: "8px",
                   marginTop: "4px",
+                  boxShadow: "0 2px 8px rgba(5, 150, 105, 0.2)",
+                  opacity: submitting || loading ? 0.7 : 1,
                 }}
               >
                 <UserPlus size={16} />
-                <span>{submitting ? t("login.registering", "Registering...") : `${t("login.register_as", "Register as")} ${selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}`}</span>
+                <span>{submitting ? "Creating Account..." : "Create Account"}</span>
               </button>
             </form>
           )}
 
-          {/* Google Sign-In with Selected Role */}
-          <div style={{ width: "100%", marginTop: "14px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+          {/* Neutral Divider & Google Sign-In */}
+          <div style={{ width: "100%", marginTop: "16px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" }}>
               <div style={{ flex: 1, height: "1px", background: "#E2E8F0" }} />
-              <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#94A3B8", textTransform: "uppercase" }}>{t("common.or", "Or")}</span>
+              <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.06em" }}>Or</span>
               <div style={{ flex: 1, height: "1px", background: "#E2E8F0" }} />
             </div>
 
@@ -1158,7 +976,24 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
               onClick={handleGoogleClick}
               disabled={loading || gisLoading}
               className="editorial-google-btn"
-              style={{ width: "100%", boxSizing: "border-box" }}
+              style={{
+                width: "100%",
+                minHeight: "44px",
+                padding: "10px 16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
+                background: "#FFFFFF",
+                color: "#0F172A",
+                border: "1px solid #CBD5E1",
+                borderRadius: "8px",
+                fontSize: "0.88rem",
+                fontWeight: 600,
+                cursor: "pointer",
+                boxSizing: "border-box",
+                transition: "all 0.2s ease",
+              }}
             >
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M17.64 9.20455C17.64 8.56636 17.5827 7.95273 17.4764 7.36364H9V10.845H13.8436C13.635 11.97 13.0009 12.9232 12.0477 13.5614V15.8195H14.9564C16.6582 14.2527 17.64 11.9455 17.64 9.20455Z" fill="#4285F4"/>
@@ -1167,42 +1002,45 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                 <path d="M9 3.57955C10.3214 3.57955 11.5077 4.03364 12.4405 4.92545L15.0218 2.34409C13.4632 0.891818 11.4259 0 9 0C5.48182 0 2.43818 2.01682 0.957275 4.95818L3.96409 7.29C4.67182 5.16273 6.65591 3.57955 9 3.57955Z" fill="#EA4335"/>
               </svg>
               <span>
-                  {loading || gisLoading
-                    ? t("common.loading", "Connecting...")
-                    : `${t("login.google_btn", "Continue with Google as")} ${selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}`}
+                {loading || gisLoading ? "Connecting..." : "Continue with Google"}
               </span>
             </button>
           </div>
 
-          {/* 7. Error Display */}
+          {/* Error Display */}
           {(error || localError) && (
             <div
+              role="alert"
               style={{
                 marginTop: "14px",
-                padding: "8px 12px",
+                padding: "9px 12px",
                 background: "#FEF2F2",
                 border: "1px solid #FECACA",
-                borderRadius: "6px",
+                borderRadius: "8px",
                 color: "#DC2626",
                 fontSize: "0.80rem",
                 fontWeight: 600,
                 width: "100%",
                 boxSizing: "border-box",
                 textAlign: "left",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
               }}
             >
-              {error || localError}
+              <AlertCircle size={15} color="#DC2626" style={{ flexShrink: 0 }} />
+              <span>{error || localError}</span>
             </div>
           )}
 
-          {/* 8. HIPAA & ABDM Compliance Footer Badge */}
+          {/* Legitimate Clinical Security Notice */}
           <div
             style={{
               marginTop: "16px",
-              padding: "8px 10px",
+              padding: "8px 12px",
               background: "#F8FAFC",
               border: "1px solid #E2E8F0",
-              borderRadius: "6px",
+              borderRadius: "8px",
               width: "100%",
               boxSizing: "border-box",
               display: "flex",
@@ -1210,9 +1048,9 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
               gap: "8px",
             }}
           >
-            <ShieldCheck size={14} color="#059669" />
-            <span style={{ fontSize: "0.70rem", color: "#64748B", lineHeight: 1.3 }}>
-              {t("login.hipaa_notice", "Protected under HIPAA, ABDM M1-M3 & ISO 27001 cryptographic security protocols.")}
+            <Lock size={13} color="#059669" style={{ flexShrink: 0 }} />
+            <span style={{ fontSize: "0.72rem", color: "#64748B", lineHeight: 1.35 }}>
+              End-to-end encrypted session with secure clinical audit logging.
             </span>
           </div>
         </div>

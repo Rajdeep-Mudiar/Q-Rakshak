@@ -14,7 +14,7 @@ class DatabaseRepository:
     def get_user_by_username(username: str) -> Optional[dict[str, Any]]:
         conn = get_db_connection()
         clean = (username or "").strip()
-        row = conn.execute("SELECT * FROM users WHERE LOWER(username) = LOWER(?) OR LOWER(email) = LOWER(?);", (clean, clean)).fetchone()
+        row = conn.execute("SELECT * FROM users WHERE LOWER(username) = LOWER(?) OR LOWER(email) = LOWER(?) ORDER BY CASE WHEN role IN ('doctor', 'clinician') THEN 1 WHEN role = 'admin' THEN 2 ELSE 3 END ASC;", (clean, clean)).fetchone()
         conn.close()
         if not row:
             return None
@@ -171,12 +171,77 @@ class DatabaseRepository:
         return updated or {}
 
     @staticmethod
-    def delete_user(user_id: str) -> bool:
+    def purge_user_account_completely(user_id: str) -> bool:
+        """Permanently and cleanly purges a user and all associated records across all tables without any traces."""
         conn = get_db_connection()
-        conn.execute("DELETE FROM users WHERE id = ? OR username = ?;", (user_id, user_id))
+        clean = (user_id or "").strip()
+        user_row = conn.execute("SELECT id, username FROM users WHERE id = ? OR username = ?;", (clean, clean)).fetchone()
+        u_id = user_row["id"] if user_row else clean
+        u_name = user_row["username"] if user_row else clean
+
+        # Find any doctor records
+        doc_row = conn.execute("SELECT id FROM doctors WHERE user_id IN (?, ?) OR id IN (?, ?);", (u_id, u_name, u_id, u_name)).fetchone()
+        doc_id = doc_row["id"] if doc_row else f"DOC-{u_id.replace('USR-', '')}"
+
+        # 1. Consultation signals
+        conn.execute("""
+            DELETE FROM consultation_signals 
+            WHERE sender_id IN (?, ?) 
+               OR booking_id IN (SELECT id FROM bookings WHERE patient_id IN (?, ?) OR doctor_id IN (?, ?));
+        """, (u_id, u_name, u_id, u_name, doc_id, u_id))
+
+        # 2. Consultation rooms
+        conn.execute("""
+            DELETE FROM consultation_rooms 
+            WHERE booking_id IN (SELECT id FROM bookings WHERE patient_id IN (?, ?) OR doctor_id IN (?, ?));
+        """, (u_id, u_name, doc_id, u_id))
+
+        # 3. Prescriptions
+        conn.execute("""
+            DELETE FROM prescriptions 
+            WHERE patient_id IN (?, ?) OR doctor_id IN (?, ?);
+        """, (u_id, u_name, doc_id, u_id))
+
+        # 4. Bookings
+        conn.execute("""
+            DELETE FROM bookings 
+            WHERE patient_id IN (?, ?) OR doctor_id IN (?, ?);
+        """, (u_id, u_name, doc_id, u_id))
+
+        # 5. Diagnostic records
+        conn.execute("DELETE FROM diagnostic_records WHERE patient_id IN (?, ?);", (u_id, u_name))
+
+        # 5b. Patient predictions
+        try:
+            conn.execute("DELETE FROM patient_predictions WHERE patient_id IN (?, ?);", (u_id, u_name))
+        except Exception:
+            pass
+
+        # 6. Early detection assessments
+        conn.execute("DELETE FROM early_detection_assessments WHERE patient_id IN (?, ?);", (u_id, u_name))
+
+        # 7. Consents
+        conn.execute("DELETE FROM consents WHERE patient_id IN (?, ?);", (u_id, u_name))
+
+        # 8. Notifications
+        conn.execute("DELETE FROM notifications WHERE user_id IN (?, ?);", (u_id, u_name))
+
+        # 9. Patients table
+        conn.execute("DELETE FROM patients WHERE id IN (?, ?) OR mrn IN (?, ?);", (u_id, u_name, u_id, u_name))
+
+        # 10. Doctors table
+        conn.execute("DELETE FROM doctors WHERE user_id IN (?, ?) OR id IN (?, ?);", (u_id, u_name, doc_id, u_id))
+
+        # 11. Users table
+        conn.execute("DELETE FROM users WHERE id IN (?, ?) OR username IN (?, ?);", (u_id, u_name, u_id, u_name))
+
         conn.commit()
         conn.close()
         return True
+
+    @staticmethod
+    def delete_user(user_id: str) -> bool:
+        return DatabaseRepository.purge_user_account_completely(user_id)
 
     @staticmethod
     def update_user_profile(user_id: str, updates: dict[str, Any]) -> dict[str, Any]:
@@ -198,18 +263,25 @@ class DatabaseRepository:
         try:
             p_updates = []
             p_values = []
-            if "name" in updates:
+            if "name" in updates and updates["name"]:
                 p_updates.append("name = ?")
                 p_values.append(updates["name"])
-            if "blood_group" in updates:
+            if "blood_group" in updates and updates["blood_group"]:
                 p_updates.append("blood_group = ?")
                 p_values.append(updates["blood_group"])
-            if "emergency_phone" in updates:
+            if "emergency_phone" in updates and updates["emergency_phone"]:
                 p_updates.append("emergency_contact = ?")
                 p_values.append(updates["emergency_phone"])
+            if "age" in updates and updates["age"] is not None:
+                p_updates.append("age = ?")
+                p_values.append(int(updates["age"]))
+            if "gender" in updates and updates["gender"]:
+                p_updates.append("gender = ?")
+                p_values.append(updates["gender"])
             if p_updates:
                 p_values.append(user_id)
-                p_query = f"UPDATE patients SET {', '.join(p_updates)} WHERE id = ?;"
+                p_values.append(user_id)
+                p_query = f"UPDATE patients SET {', '.join(p_updates)} WHERE id = ? OR id = (SELECT id FROM users WHERE username = ?);"
                 conn.execute(p_query, tuple(p_values))
                 conn.commit()
         except Exception:
@@ -231,13 +303,47 @@ class DatabaseRepository:
             if "license_number" in updates:
                 d_updates.append("registration_number = ?")
                 d_values.append(updates["license_number"])
+            if "registration_number" in updates:
+                d_updates.append("registration_number = ?")
+                d_values.append(updates["registration_number"])
             if "specialty" in updates:
                 d_updates.append("specialty = ?")
                 d_values.append(updates["specialty"])
+            if "council_name" in updates:
+                d_updates.append("council_name = ?")
+                d_values.append(updates["council_name"])
+            if "experience_years" in updates and updates["experience_years"] is not None:
+                d_updates.append("experience_years = ?")
+                d_values.append(int(updates["experience_years"]))
+            if "fee_inr" in updates and updates["fee_inr"] is not None:
+                d_updates.append("fee_inr = ?")
+                d_values.append(float(updates["fee_inr"]))
+            if "languages" in updates and updates["languages"] is not None:
+                langs = updates["languages"]
+                if isinstance(langs, str):
+                    try:
+                        langs = json.loads(langs)
+                    except Exception:
+                        langs = [l.strip() for l in langs.split(",") if l.strip()]
+                d_updates.append("languages_json = ?")
+                d_values.append(json.dumps(langs))
+            if "available_slots" in updates and updates["available_slots"] is not None:
+                slots = updates["available_slots"]
+                if isinstance(slots, str):
+                    try:
+                        slots = json.loads(slots)
+                    except Exception:
+                        slots = [s.strip() for s in slots.split(",") if s.strip()]
+                d_updates.append("available_slots_json = ?")
+                d_values.append(json.dumps(slots))
+            if "verification_status" in updates and updates["verification_status"] is not None:
+                d_updates.append("verification_status = ?")
+                d_values.append(updates["verification_status"])
+
             if d_updates:
                 d_values.append(user_id)
-                d_query = f"UPDATE doctors SET {', '.join(d_updates)} WHERE user_id = ?;"
-                conn.execute(d_query, tuple(d_values))
+                d_query = f"UPDATE doctors SET {', '.join(d_updates)} WHERE user_id = ? OR id = ?;"
+                conn.execute(d_query, tuple(d_values + [user_id]))
                 conn.commit()
         except Exception:
             pass
@@ -469,8 +575,65 @@ class DatabaseRepository:
             str(created_at_val),
         ))
         conn.commit()
+
+        # Mirror genuine prediction into patient_predictions
+        try:
+            pred_id = f"PRED-{uuid.uuid4().hex[:8].upper()}"
+            clean_dis = str(disease).lower().replace("-", "_").strip()
+            conn.execute("""
+            INSERT OR REPLACE INTO patient_predictions (
+                id, patient_id, analysis_id, disease_id, model_version,
+                prediction_status, prediction_class, confidence, risk_score,
+                probabilities_json, explainability_json, is_reference_model, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?);
+            """, (
+                pred_id,
+                patient_id,
+                rid,
+                clean_dis,
+                str(model_ver),
+                str(status_val),
+                str(pred_class),
+                float(conf),
+                float(risk_score),
+                json.dumps(record.get("probabilities", {})),
+                json.dumps(record.get("explainability", {})),
+                str(created_at_val),
+                str(created_at_val),
+            ))
+            conn.commit()
+        except Exception:
+            pass
+
         conn.close()
         return rid
+
+    @staticmethod
+    def get_latest_patient_prediction(patient_id: str, disease_id: str) -> Optional[dict[str, Any]]:
+        """Retrieves the latest completed prediction from patient_predictions for a given patient and disease."""
+        conn = get_db_connection()
+        clean_pat = (patient_id or "").strip()
+        clean_dis = (disease_id or "").lower().replace("-", "_").strip()
+        row = conn.execute("""
+            SELECT * FROM patient_predictions 
+            WHERE (patient_id = ? OR patient_id = (SELECT username FROM users WHERE id = ?))
+              AND (LOWER(disease_id) = ? OR LOWER(disease_id) LIKE ?)
+              AND prediction_status = 'completed'
+            ORDER BY created_at DESC LIMIT 1;
+        """, (clean_pat, clean_pat, clean_dis, f"%{clean_dis}%")).fetchone()
+        conn.close()
+        if not row:
+            return None
+        d = dict(row)
+        try:
+            d["probabilities"] = json.loads(d.get("probabilities_json") or "{}")
+        except Exception:
+            d["probabilities"] = {}
+        try:
+            d["explainability"] = json.loads(d.get("explainability_json") or "{}")
+        except Exception:
+            d["explainability"] = {}
+        return d
 
     @staticmethod
     def get_patient_diagnostic_records(patient_id: str) -> list[dict[str, Any]]:

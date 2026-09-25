@@ -2,8 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import { Bell, ShieldCheck, Check, Clock, AlertCircle } from "lucide-react";
 import { notificationsApi } from "../../api/notifications";
 import { authApi } from "../../api/auth";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function NotificationBell() {
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -67,7 +69,7 @@ export default function NotificationBell() {
         type="button"
         onClick={() => setOpen(!open)}
         className="nav-btn"
-        title="Notifications & Security Alerts"
+        title={t("notifications.bell_title", "Notifications & Security Alerts")}
         style={{
           position: "relative",
           display: "flex",
@@ -133,10 +135,10 @@ export default function NotificationBell() {
             }}
           >
             <strong style={{ fontSize: "0.82rem", color: "var(--text-primary)" }}>
-              In-App Security & Health Feed
+              {t("notifications.feed_title", "In-App Security & Health Feed")}
             </strong>
             <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
-              {unreadCount} Unread
+              {t("notifications.unread_count", `${unreadCount} Unread`, { count: unreadCount })}
             </span>
           </div>
 
@@ -154,14 +156,14 @@ export default function NotificationBell() {
             }}
           >
             <ShieldCheck size={13} color="var(--primary)" style={{ flexShrink: 0 }} />
-            <span>Anti-Phishing: Verified alerts always reference your secure in-app portal.</span>
+            <span>{t("notifications.anti_phishing", "Anti-Phishing: Verified alerts always reference your secure in-app portal.")}</span>
           </div>
 
           {/* Notifications List */}
           <div style={{ overflowY: "auto", maxHeight: "340px", display: "flex", flexDirection: "column" }}>
             {notifications.length === 0 ? (
               <div style={{ padding: "24px", textAlign: "center", color: "var(--text-muted)", fontSize: "0.78rem" }}>
-                No notifications to display.
+                {t("notifications.no_notifications", "No notifications to display.")}
               </div>
             ) : (
               notifications.map((n) => {
@@ -186,7 +188,7 @@ export default function NotificationBell() {
                         <button
                           type="button"
                           onClick={(e) => handleMarkRead(n.id, e)}
-                          title="Mark as read"
+                          title={t("notifications.mark_read", "Mark as read")}
                           style={{
                             background: "transparent",
                             border: "none",

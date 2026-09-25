@@ -11,7 +11,6 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
   const [authMode, setAuthMode] = useState("login"); // 'login' | 'register'
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("patient");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -41,7 +40,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
     setLoading(true);
     setError(null);
     try {
-      const data = await authApi.login(username, password, role);
+      const data = await authApi.login(username, password);
       if (onLoginSuccess) onLoginSuccess(data.user);
       onClose();
     } catch (err) {
@@ -219,21 +218,6 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
               </div>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-              <label style={{ fontSize: "0.70rem", fontWeight: 700, color: "var(--text-secondary)" }}>
-                Role (Auto-Detected from Database)
-              </label>
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                style={{ width: "100%", padding: "8px 10px", border: "1px solid var(--border-default)", fontSize: "0.80rem" }}
-              >
-                <option value="patient">Patient (Health Checkup & 3D Twin)</option>
-                <option value="doctor">Doctor / Clinician (Diagnostics & Tele-OPD)</option>
-                <option value="admin">Administrator (Compliance & Governance)</option>
-              </select>
-            </div>
-
             <button
               type="submit"
               className="btn-primary"
@@ -241,7 +225,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
               style={{ width: "100%", padding: "10px", marginTop: "4px", minHeight: "38px" }}
             >
               <LogIn size={15} />
-              <span>{loading ? "Signing In..." : "Sign In to Portal"}</span>
+              <span>{loading ? "Signing In..." : "Sign In"}</span>
             </button>
           </form>
         )}

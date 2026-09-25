@@ -404,6 +404,30 @@ async def persist_clinical_diagnostic_record(
     return {"status": "success", "record_id": rid, "message": "Diagnostic record stored in database."}
 
 
+@router.get("/prediction/{patient_id}/{disease_id}")
+async def get_patient_disease_prediction(
+    patient_id: str,
+    disease_id: str,
+    current_user: dict[str, Any] = Depends(get_optional_user),
+):
+    """Retrieves the latest genuine completed prediction for a patient and disease. Returns not_available if no genuine analysis exists."""
+    user_role = current_user.get("role", "patient")
+    user_id = current_user.get("user_id", "")
+    if user_role == "patient" and user_id not in ("GUEST-USER", "") and user_id != patient_id:
+        raise HTTPException(
+            status_code=403,
+            detail="Forbidden: You are authorized to access only your own clinical predictions.",
+        )
+    pred = await anyio.to_thread.run_sync(
+        DatabaseRepository.get_latest_patient_prediction,
+        patient_id,
+        disease_id,
+    )
+    if not pred:
+        return {"status": "not_available", "prediction": None}
+    return {"status": "success", "prediction": pred}
+
+
 @router.get("/patient")
 @router.get("/patient/{patient_id}")
 async def get_patient_clinical_record(patient_id: str | None = None, current_user: dict | None = Depends(get_optional_user)):

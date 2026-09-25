@@ -2,8 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import { Cpu, Play, RefreshCw, CheckCircle2, Zap, Sliders, Database, Layers, Terminal, Activity } from "lucide-react";
 import { researcherApi } from "../../api/researcher";
 import { animateEntrance, animateCardStagger } from "../../utils/motion";
+import { useLanguage } from "../../context/LanguageContext";
 
 export default function ResearcherConsole() {
+  const { t } = useLanguage();
   const containerRef = useRef(null);
   const [dataset, setDataset] = useState("wdbc");
   const [modelArchitecture, setModelArchitecture] = useState("VQC");
@@ -53,10 +55,10 @@ export default function ResearcherConsole() {
       <div className="card-panel" style={{ borderRadius: "var(--radius-sm)", border: "1px solid var(--border-default)" }}>
         <div className="card-header">
           <span className="card-title">
-            <Sliders size={16} color="var(--primary)" /> QML Retraining Studio & Hyperparameter Optimizer
+            <Sliders size={16} color="var(--primary)" /> {t("researcher.title", "QML Retraining Studio & Hyperparameter Optimizer")}
           </span>
           <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
-            PennyLane TorchLayer + Autograd
+            {t("researcher.badge", "PennyLane TorchLayer + Autograd")}
           </span>
         </div>
 
@@ -65,39 +67,39 @@ export default function ResearcherConsole() {
             {/* Dataset selection */}
             <div>
               <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-secondary)", marginBottom: "4px" }}>
-                Target Dataset
+                {t("researcher.target_dataset", "Target Dataset")}
               </label>
               <select
                 value={dataset}
                 onChange={(e) => setDataset(e.target.value)}
                 style={{ width: "100%", padding: "7px 10px", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", fontSize: "0.82rem", background: "var(--bg-surface)" }}
               >
-                <option value="wdbc">Wisconsin Breast Cancer (WDBC - 30 Features)</option>
-                <option value="cleveland">Cleveland Heart Disease (14 Features)</option>
-                <option value="pima">PIMA Indian Diabetes (8 Features)</option>
+                <option value="wdbc">{t("researcher.dataset_wdbc", "Wisconsin Breast Cancer (WDBC - 30 Features)")}</option>
+                <option value="cleveland">{t("researcher.dataset_cleveland", "Cleveland Heart Disease (14 Features)")}</option>
+                <option value="pima">{t("researcher.dataset_pima", "PIMA Indian Diabetes (8 Features)")}</option>
               </select>
             </div>
 
             {/* Architecture selection */}
             <div>
               <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-secondary)", marginBottom: "4px" }}>
-                Quantum Model Class
+                {t("researcher.quantum_model_class", "Quantum Model Class")}
               </label>
               <select
                 value={modelArchitecture}
                 onChange={(e) => setModelArchitecture(e.target.value)}
                 style={{ width: "100%", padding: "7px 10px", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", fontSize: "0.82rem", background: "var(--bg-surface)" }}
               >
-                <option value="VQC">VQC (Strongly Entangling Layers)</option>
-                <option value="QSVM">QSVM (Quantum Fidelity Kernel)</option>
-                <option value="QNN">QNN (Multi-Class Pauli-Z Head)</option>
+                <option value="VQC">{t("researcher.arch_vqc", "VQC (Strongly Entangling Layers)")}</option>
+                <option value="QSVM">{t("researcher.arch_qsvm", "QSVM (Quantum Fidelity Kernel)")}</option>
+                <option value="QNN">{t("researcher.arch_qnn", "QNN (Multi-Class Pauli-Z Head)")}</option>
               </select>
             </div>
 
             {/* Loss Function */}
             <div>
               <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-secondary)", marginBottom: "4px" }}>
-                Loss Function
+                {t("researcher.loss_function", "Loss Function")}
               </label>
               <select
                 value={lossFunction}
@@ -114,7 +116,7 @@ export default function ResearcherConsole() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px", background: "var(--bg-canvas)", padding: "12px", borderRadius: "var(--radius-sm)", border: "1px solid var(--border-subtle)" }}>
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.72rem", fontWeight: 700, marginBottom: "4px" }}>
-                <span>Qubits</span>
+                <span>{t("researcher.n_qubits", "Qubits")}</span>
                 <span style={{ color: "var(--primary)", fontFamily: "var(--font-mono)" }}>{qubits} Q</span>
               </div>
               <input
@@ -129,7 +131,7 @@ export default function ResearcherConsole() {
 
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.72rem", fontWeight: 700, marginBottom: "4px" }}>
-                <span>Variational Layers</span>
+                <span>{t("researcher.n_layers", "Variational Layers")}</span>
                 <span style={{ color: "var(--primary)", fontFamily: "var(--font-mono)" }}>{layers} L</span>
               </div>
               <input
@@ -144,7 +146,7 @@ export default function ResearcherConsole() {
 
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.72rem", fontWeight: 700, marginBottom: "4px" }}>
-                <span>Epochs</span>
+                <span>{t("researcher.epochs", "Epochs")}</span>
                 <span style={{ color: "var(--primary)", fontFamily: "var(--font-mono)" }}>{epochs} Ep</span>
               </div>
               <input
@@ -159,7 +161,7 @@ export default function ResearcherConsole() {
 
             <div>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.72rem", fontWeight: 700, marginBottom: "4px" }}>
-                <span>Learning Rate</span>
+                <span>{t("researcher.learning_rate", "Learning Rate")}</span>
                 <span style={{ color: "var(--primary)", fontFamily: "var(--font-mono)" }}>{lr}</span>
               </div>
               <input
@@ -178,11 +180,11 @@ export default function ResearcherConsole() {
             <button type="submit" className="btn-primary" disabled={loading} style={{ borderRadius: "var(--radius-sm)" }}>
               {loading ? (
                 <>
-                  <RefreshCw size={14} className="spin" /> Executing Quantum Training Pipeline...
+                  <RefreshCw size={14} className="spin" /> {t("researcher.retraining_in_progress", "Executing Quantum Training Pipeline...")}
                 </>
               ) : (
                 <>
-                  <Play size={14} /> Run Live Retraining Experiment
+                  <Play size={14} /> {t("researcher.start_retraining", "Run Live Retraining Experiment")}
                 </>
               )}
             </button>
@@ -201,7 +203,7 @@ export default function ResearcherConsole() {
         <div className="card-panel" style={{ borderRadius: "var(--radius-sm)", border: "1px solid var(--border-default)" }}>
           <div className="card-header">
             <span className="card-title">
-              <CheckCircle2 size={16} color="var(--risk-low)" /> Retraining Job Completed: {jobResult.job_id}
+              <CheckCircle2 size={16} color="var(--risk-low)" /> {t("researcher.training_completed", "Retraining Job Completed")}: {jobResult.job_id}
             </span>
             <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "var(--risk-low)", background: "var(--risk-low-bg)", padding: "2px 8px", border: "1px solid var(--risk-low)", borderRadius: "var(--radius-sm)" }}>
               Registered: {jobResult.registered_model_tag}
@@ -211,7 +213,7 @@ export default function ResearcherConsole() {
           <div className="kpi-grid" style={{ marginTop: "12px", marginBottom: "16px", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" }}>
             <div className="kpi-tile" style={{ borderRadius: "var(--radius-sm)", border: "1px solid var(--border-default)" }}>
               <div>
-                <p className="kpi-tile-label">Final Accuracy</p>
+                <p className="kpi-tile-label">{t("researcher.metric_val_acc", "Final Accuracy")}</p>
                 <p className="kpi-tile-value" style={{ color: "var(--risk-low)" }}>{(jobResult.final_accuracy * 100).toFixed(1)}%</p>
                 <p className="kpi-tile-sub">Convergence verified</p>
               </div>
@@ -240,9 +242,9 @@ export default function ResearcherConsole() {
             <table className="clinical-data-table">
               <thead>
                 <tr>
-                  <th>Epoch</th>
-                  <th>Loss</th>
-                  <th>Training Accuracy</th>
+                  <th>{t("researcher.epochs", "Epoch")}</th>
+                  <th>{t("researcher.metric_test_loss", "Loss")}</th>
+                  <th>{t("researcher.metric_val_acc", "Training Accuracy")}</th>
                   <th>Optimization Gradient Step</th>
                 </tr>
               </thead>
