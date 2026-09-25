@@ -366,30 +366,6 @@ export default function EditorialHeader({
           )}
         </div>
 
-        {/* A11y Contrast Toggle */}
-        <button
-          type="button"
-          className={`a11y-pill-btn ${highContrast ? "active" : ""}`}
-          onClick={() => setHighContrast(!highContrast)}
-          title="Toggle High Contrast Mode"
-          style={{
-            background: highContrast ? "var(--text-primary)" : "var(--bg-surface)",
-            color: highContrast ? "#FFFFFF" : "var(--text-secondary)",
-            border: "1px solid var(--border-default)",
-            borderRadius: "8px",
-            padding: "6px 10px",
-            fontSize: "0.74rem",
-            fontWeight: 600,
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            transition: "all 0.15s ease",
-          }}
-        >
-          Aa
-        </button>
-
         {/* User Profile Dropdown */}
         <div style={{ position: "relative" }}>
           <button
