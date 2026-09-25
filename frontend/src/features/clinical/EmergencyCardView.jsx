@@ -75,33 +75,75 @@ export default function EmergencyCardView({ patientId = null }) {
     loadData();
   }, [patientId]);
 
+  const [motionPermissionGranted, setMotionPermissionGranted] = useState(false);
+
+  async function requestMotionPermission() {
+    if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+      try {
+        const res = await DeviceMotionEvent.requestPermission();
+        if (res === 'granted') {
+          setMotionPermissionGranted(true);
+          if (navigator.vibrate) navigator.vibrate(100);
+        }
+      } catch (err) {
+        console.warn('DeviceMotion permission request error:', err);
+      }
+    } else {
+      setMotionPermissionGranted(true);
+    }
+  }
+
   useEffect(() => {
     let lastX = 0, lastY = 0, lastZ = 0;
     let lastTime = 0;
-    const SHAKE_THRESHOLD = 18;
+    let shakeHits = 0;
+    let lastHitTime = 0;
 
     function handleMotion(e) {
-      const current = e.accelerationIncludingGravity;
-      if (!current) return;
+      const acc = e.acceleration || e.accelerationIncludingGravity;
+      if (!acc) return;
 
       const currentTime = Date.now();
-      if (currentTime - lastTime > 100) {
-        const diffTime = currentTime - lastTime;
-        lastTime = currentTime;
+      if (currentTime - lastTime < 50) return; // Sample rate limiter
 
-        const speed = Math.abs(current.x + current.y + current.z - lastX - lastY - lastZ) / diffTime * 10000;
-        if (speed > SHAKE_THRESHOLD * 10) {
-          setShakeTriggered(true);
+      const diffTime = currentTime - lastTime;
+      lastTime = currentTime;
+
+      const curX = acc.x ?? 0;
+      const curY = acc.y ?? 0;
+      const curZ = acc.z ?? 0;
+
+      const deltaX = Math.abs(curX - lastX);
+      const deltaY = Math.abs(curY - lastY);
+      const deltaZ = Math.abs(curZ - lastZ);
+
+      lastX = curX;
+      lastY = curY;
+      lastZ = curZ;
+
+      const speed = ((deltaX + deltaY + deltaZ) / diffTime) * 10000;
+
+      // Realistic shake threshold for mobile phones
+      if (speed > 75) {
+        if (currentTime - lastHitTime < 1500) {
+          shakeHits += 1;
+        } else {
+          shakeHits = 1;
         }
+        lastHitTime = currentTime;
 
-        lastX = current.x;
-        lastY = current.y;
-        lastZ = current.z;
+        if (shakeHits >= 2) {
+          if (navigator.vibrate) {
+            navigator.vibrate([250, 100, 250]);
+          }
+          setShakeTriggered(true);
+          shakeHits = 0;
+        }
       }
     }
 
     if (typeof window !== 'undefined' && window.DeviceMotionEvent) {
-      window.addEventListener('devicemotion', handleMotion);
+      window.addEventListener('devicemotion', handleMotion, { passive: true });
     }
 
     return () => {
@@ -267,6 +309,47 @@ export default function EmergencyCardView({ patientId = null }) {
           background: #F0F9FF;
           transform: translateY(-1px);
           box-shadow: 0 4px 12px rgba(2, 132, 199, 0.08);
+        }
+
+        /* ── Mobile Viewport Optimizations ── */
+        @media (max-width: 768px) {
+          .triage-hero-banner {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            padding: 16px 18px !important;
+            gap: 16px !important;
+          }
+          .triage-hero-banner > div:first-child {
+            flex-direction: row !important;
+            align-items: center !important;
+            width: 100% !important;
+          }
+          .triage-hero-banner > div:last-child {
+            width: 100% !important;
+            min-width: 100% !important;
+            box-sizing: border-box !important;
+          }
+          .triage-sexy-card {
+            padding: 16px !important;
+            border-radius: 14px !important;
+          }
+          .triage-card-viewport-wrapper {
+            max-width: 100% !important;
+            overflow-x: auto !important;
+            padding: 4px 0 !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .triage-hero-banner > div:first-child {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 12px !important;
+          }
+          .triage-pill-btn {
+            padding: 6px 10px !important;
+            font-size: 0.70rem !important;
+          }
         }
       `}</style>
 
@@ -1353,6 +1436,48 @@ export default function EmergencyCardView({ patientId = null }) {
           </div>
         </div>
       )}
+
+      {/* ── Floating Mobile Shake / SOS Sensor Indicator ── */}
+      <div
+        className="no-print"
+        style={{
+          position: 'fixed',
+          bottom: '18px',
+          right: '18px',
+          zIndex: 90,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-end',
+          gap: '8px',
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => {
+            requestMotionPermission();
+            setShakeTriggered(true);
+          }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
+            color: '#FFFFFF',
+            border: '2px solid rgba(255, 255, 255, 0.4)',
+            borderRadius: '999px',
+            padding: '10px 18px',
+            boxShadow: '0 8px 24px rgba(220, 38, 38, 0.38)',
+            cursor: 'pointer',
+            fontWeight: 800,
+            fontSize: '0.78rem',
+            letterSpacing: '0.02em',
+          }}
+          title="Shake phone or click to activate emergency SOS dialer"
+        >
+          <Smartphone size={16} />
+          <span>Shake Phone for SOS</span>
+        </button>
+      </div>
     </div>
   );
 }
