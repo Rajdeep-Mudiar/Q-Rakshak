@@ -79,6 +79,18 @@ export const consultationsApi = {
     });
   },
 
+  async getPharmaCatalog() {
+    return apiClient.get(ENDPOINTS.CONSULTATIONS_PHARMA_CATALOG);
+  },
+
+  async analyzePharma(medications = [], dietaryItems = [], patientId = null) {
+    return apiClient.post(ENDPOINTS.CONSULTATIONS_PHARMA_ANALYZE, {
+      medications,
+      dietary_items: dietaryItems,
+      patient_id: patientId,
+    });
+  },
+
   async createPrescription(prescriptionPayload) {
     return apiClient.post(ENDPOINTS.CONSULTATIONS_PRESCRIPTION_CREATE, prescriptionPayload);
   },

@@ -31,6 +31,7 @@ import {
   UserRound,
   UsersRound,
   CircleUserRound,
+  Pill,
 } from "lucide-react";
 import { DigitalTwin3DPage } from "../../features/digitalTwin3D/index.js";
 import DigitalTwin3D from "../../components/visualizations/DigitalTwin3D.jsx";
@@ -50,6 +51,7 @@ import UserProfilePage from "../profile/UserProfilePage.jsx";
 import DoctorDiscovery from "../consultation/DoctorDiscovery.jsx";
 import VirtualConsultationRoom from "../consultation/VirtualConsultationRoom.jsx";
 import ClinicianDashboard from "../clinical/ClinicianDashboard.jsx";
+import DrugInteractionMatrix from "../clinical/DrugInteractionMatrix.jsx";
 import NotificationBell from "../../components/common/NotificationBell.jsx";
 import EditorialLoginPage from "../auth/EditorialLoginPage.jsx";
 import EditorialHeader from "../../components/common/EditorialHeader.jsx";
@@ -90,6 +92,7 @@ const NavComplianceSvg = ShieldCheck;
 const NavPortalSvg = UserRound;
 const NavUsersSvg = UsersRound;
 const NavProfileSvg = CircleUserRound;
+const NavDrugSvg = Pill;
 
 /* ── Interactive Plain-English Patient Guides Dictionary ─────────────────────── */
 const GUIDE_DATA = {
@@ -181,6 +184,22 @@ const GUIDE_DATA = {
     ],
     quantumBenefit: "Patient data is fully de-identified and client-encrypted before being processed by quantum circuits.",
   },
+  drug_interactions: {
+    sectionId: "SEC-07",
+    title: "Multi-Drug & Drug-Food Interaction Risk Matrix",
+    summary: "Proactive clinical pharmacology safety checker cross-referencing active medications, candidate prescriptions, and dietary contraindications.",
+    steps: [
+      { heading: "Configure Medication Regimen", description: "Select or search active prescriptions and candidate medications in your clinical workbench." },
+      { heading: "Audit Food & Dietary Contraindications", description: "Select dietary items like Grapefruit, Dairy, or Vitamin K to assess absorption and metabolic collisions." },
+      { heading: "Inspect 2D Interaction Matrix", description: "Review color-coded severity grading (Major Contraindication, Moderate Caution, Minor Synergy) across all drug pairs." },
+    ],
+    metrics: [
+      { label: "Major Contraindication", explanation: "Critical clinical hazard requiring immediate prescription substitution or dose adjustment.", color: "var(--risk-high, #EF4444)" },
+      { label: "Moderate Caution", explanation: "Clinically significant interaction requiring careful therapeutic monitoring.", color: "var(--risk-mid, #F59E0B)" },
+      { label: "Minor Synergy", explanation: "Documented pharmacological interaction with minimal clinical risk.", color: "var(--primary, #0284C7)" },
+    ],
+    quantumBenefit: "Pharmacological collision rules simulate multi-target biochemical pathways and metabolic enzyme inhibitors (CYP3A4, CYP2C19, CYP2D6).",
+  },
 };
 
 /* ── Role-Based Access Control (RBAC) Authority Configurations ──────────────── */
@@ -189,7 +208,7 @@ const ROLE_PERMISSIONS = {
     label: "Patient (Autonomous Health Checkups & Twin)",
     badgeColor: "var(--primary)",
     defaultTab: "home",
-    allowedTabs: ["home", "diagnostic", "disease_intro", "feature_intro", "twin", "early_detection", "ai_doctor", "doctor_booking", "my_consultations", "portal", "profile"],
+    allowedTabs: ["home", "diagnostic", "disease_intro", "feature_intro", "twin", "early_detection", "ai_doctor", "doctor_booking", "my_consultations", "drug_interactions", "portal", "profile"],
     sections: [
       {
         title: "Overview",
@@ -214,6 +233,12 @@ const ROLE_PERMISSIONS = {
         ],
       },
       {
+        title: "Pharmacology & Safety",
+        items: [
+          { id: "drug_interactions", label: "Drug & Food Interactions", icon: NavDrugSvg },
+        ],
+      },
+      {
         title: "Health Records",
         items: [
           { id: "portal", label: "My Health Records", icon: NavPortalSvg },
@@ -231,7 +256,7 @@ const ROLE_PERMISSIONS = {
     label: "Doctor / Clinician (Tele-Consultations & Triage)",
     badgeColor: "var(--accent-teal)",
     defaultTab: "clinician_dashboard",
-    allowedTabs: ["home", "clinician_dashboard", "portal", "profile"],
+    allowedTabs: ["home", "clinician_dashboard", "drug_interactions", "portal", "profile"],
     sections: [
       {
         title: "Overview",
@@ -243,6 +268,12 @@ const ROLE_PERMISSIONS = {
         title: "Clinical Practice",
         items: [
           { id: "clinician_dashboard", label: "Consultation Queue & Triage", icon: NavUsersSvg },
+        ],
+      },
+      {
+        title: "Pharmacology & Safety",
+        items: [
+          { id: "drug_interactions", label: "Drug & Food Interactions", icon: NavDrugSvg },
         ],
       },
       {
@@ -263,7 +294,7 @@ const ROLE_PERMISSIONS = {
     label: "Doctor / Clinician (Tele-Consultations & Triage)",
     badgeColor: "var(--accent-teal)",
     defaultTab: "clinician_dashboard",
-    allowedTabs: ["home", "clinician_dashboard", "portal", "profile"],
+    allowedTabs: ["home", "clinician_dashboard", "drug_interactions", "portal", "profile"],
     sections: [
       {
         title: "Overview",
@@ -275,6 +306,12 @@ const ROLE_PERMISSIONS = {
         title: "Clinical Practice",
         items: [
           { id: "clinician_dashboard", label: "Consultation Queue & Triage", icon: NavUsersSvg },
+        ],
+      },
+      {
+        title: "Pharmacology & Safety",
+        items: [
+          { id: "drug_interactions", label: "Drug & Food Interactions", icon: NavDrugSvg },
         ],
       },
       {
@@ -295,7 +332,7 @@ const ROLE_PERMISSIONS = {
     label: "System & Compliance Administrator",
     badgeColor: "var(--accent-teal)",
     defaultTab: "home",
-    allowedTabs: ["home", "compliance", "users", "portal", "profile"],
+    allowedTabs: ["home", "compliance", "users", "drug_interactions", "portal", "profile"],
     sections: [
       {
         title: "Overview",
@@ -309,6 +346,12 @@ const ROLE_PERMISSIONS = {
           { id: "compliance", label: "Compliance & Audit", icon: NavComplianceSvg },
           { id: "users", label: "User Management", icon: NavUsersSvg },
           { id: "portal", label: "Patient Registry", icon: NavPortalSvg },
+        ],
+      },
+      {
+        title: "Pharmacology & Safety",
+        items: [
+          { id: "drug_interactions", label: "Drug & Food Interactions", icon: NavDrugSvg },
         ],
       },
       {
@@ -2420,6 +2463,33 @@ export default function UnifiedAnalysisPage() {
                   patientId={effectivePatientId}
                   currentUser={currentUser}
                 />
+              </ErrorBoundary>
+            </div>
+          )}
+
+          {/* ── VIEW 15: PHARMACOLOGY & DRUG-FOOD INTERACTION MATRIX ─────────── */}
+          {activeTab === "drug_interactions" && (
+            <div style={{ height: "100%", overflowY: "auto", display: "flex", flexDirection: "column", gap: "10px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--bg-surface)", border: "1px solid var(--border-default)", padding: "10px 14px" }}>
+                <div>
+                  <h3 style={{ fontSize: "0.95rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em", margin: 0 }}>
+                    {t("pharma.page_title", "Clinical Pharmacology & Drug-Food Interaction Matrix")}
+                  </h3>
+                  <p style={{ fontSize: "0.72rem", color: "var(--text-secondary)", margin: 0 }}>
+                    {t("pharma.page_subtitle", "Proactive multi-drug collision detection, metabolic enzyme cross-referencing, and dietary contraindications.")}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="section-guide-btn"
+                  onClick={() => setActiveGuide(GUIDE_DATA.drug_interactions)}
+                  title="How Drug Interaction Matrix works"
+                >
+                  <Info size={14} />
+                </button>
+              </div>
+              <ErrorBoundary title="Pharmacology Interaction Matrix Notice" message="The drug interaction checker encountered a temporary notice. Click Try Again to reload.">
+                <DrugInteractionMatrix patientId={effectivePatientId} />
               </ErrorBoundary>
             </div>
           )}

@@ -11,7 +11,8 @@
     "clinical_care": "Clinical Care & Tele-Medicine",
     "advanced_tools": "Advanced Physiological Studio",
     "account_profile": "Account & Security",
-    "system_admin": "System Governance & Audit"
+    "system_admin": "System Governance & Audit",
+    "pharmacology_safety": "Pharmacology & Safety"
   },
   "nav": {
     "overview": "Overview & Home",
@@ -28,7 +29,8 @@
     "user_management": "User Management",
     "patient_registry": "Patient Registry",
     "benchmarks": "AI Health Benchmarks",
-    "telemetry": "System Activity"
+    "telemetry": "System Activity",
+    "drug_interactions": "Drug & Food Interactions"
   },
   "header": {
     "search_placeholder": "Search checkups, doctors, organs, medical terms...",
@@ -936,5 +938,42 @@
   "early_detection": {
     "no_analysis_title": "No Clinical Analysis Performed Yet",
     "no_analysis_desc": "Personal longitudinal early detection curves and risk trajectories are only generated after completing a verified diagnostic screening. Run an instant checkup to establish your baseline."
+  },
+  "pharma": {
+    "sa_md_badge": "Clinical Pharmacology & Safety SaMD",
+    "title": "Multi-Drug & Drug-Food Interaction Risk Matrix",
+    "subtitle": "Proactive clinical pharmacology safety analyzer. Cross-references active medications, newly prescribed candidates, and dietary contraindications in real-time.",
+    "page_title": "Clinical Pharmacology & Drug-Food Interaction Matrix",
+    "page_subtitle": "Proactive multi-drug collision detection, metabolic enzyme cross-referencing, and dietary contraindications.",
+    "regimen_safety": "Regimen Safety Status",
+    "tier_safe": "SAFE / OPTIMAL",
+    "tier_caution": "MODERATE CAUTION",
+    "tier_hazard": "CRITICAL HAZARD",
+    "print_report": "Print / Export Rx Audit",
+    "quick_scenarios": "Quick Clinical Regimens",
+    "tab_workbench": "Regimen Workbench",
+    "tab_matrix": "2D Interaction Matrix",
+    "tab_food": "Food & Dietary Hazards",
+    "tab_library": "Pharmacology Rules Database",
+    "current_regimen_label": "Active Prescriptions & Candidate Medications",
+    "type_med_placeholder": "Type drug name (e.g. Aspirin, Warfarin, Metformin)...",
+    "add_btn": "Add",
+    "selected_count": "Active Medications",
+    "clear_all": "Clear All",
+    "no_meds_selected": "No medications selected. Choose from the catalog below or type a custom drug name.",
+    "quick_add_catalog": "Quick Add from Formulary Catalog",
+    "patient_dietary_habits": "Patient Dietary & Nutritional Intake",
+    "drug_drug_collisions": "Drug-Drug Collisions Detected",
+    "food_contraindications": "Drug-Food Dietary Contraindications",
+    "hazard_summary_title": "Severe Interaction Warnings Requiring Clinical Intervention",
+    "safe_summary_title": "No Adverse Multi-Drug or Dietary Collisions Detected",
+    "matrix_title": "2D N×N Multi-Drug Collision Grid",
+    "matrix_desc": "Pairwise pharmacological compatibility matrix evaluating metabolic pathway interference and pharmacokinetic collisions.",
+    "matrix_select_more": "Select at least 2 medications in the workbench to view the 2D cross-table matrix.",
+    "library_title": "Evidence-Based Clinical Pharmacology Rules Database",
+    "no_drug_collisions": "No adverse drug-drug collisions found in this regimen.",
+    "no_food_warnings": "No adverse dietary contraindications flagged.",
+    "active_medications": "Active Medications",
+    "evaluating_state": "Analyzing pharmacology pathways..."
   }
 }

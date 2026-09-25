@@ -102,6 +102,8 @@ export const ENDPOINTS = {
   },
   CONSULTATIONS_ROOM_PUBLISH_SIGNAL: (bookingId) => `${API_BASE_URL}/consultations/rooms/${encodeURIComponent(bookingId)}/signals`,
   CONSULTATIONS_DRUG_INTERACTIONS: `${API_BASE_URL}/consultations/prescriptions/check-interactions`,
+  CONSULTATIONS_PHARMA_CATALOG: `${API_BASE_URL}/consultations/pharma/catalog`,
+  CONSULTATIONS_PHARMA_ANALYZE: `${API_BASE_URL}/consultations/pharma/analyze`,
   CONSULTATIONS_PRESCRIPTIONS: (patientId = null, doctorId = null) => {
     let url = `${API_BASE_URL}/consultations/prescriptions`;
     const params = [];

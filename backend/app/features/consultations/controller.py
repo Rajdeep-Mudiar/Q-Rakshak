@@ -27,37 +27,239 @@ def _clean_expired_locks():
 
 
 # ── Drug Contraindication Matrix (Module H) ───────────────────────────────────
+# ── Drug & Food Contraindication Database (Clinical SaMD) ─────────────────────
 DRUG_INTERACTIONS = [
     {
         "drug_a": "aspirin",
         "drug_b": "warfarin",
         "severity": "high",
-        "warning": "Severe bleeding risk: Concurrent use of Aspirin and Warfarin significantly increases major hemorrhagic events.",
+        "mechanism": "Synergistic Anticoagulation & Antiplatelet",
+        "warning": "Severe bleeding risk: Concurrent use of Aspirin and Warfarin significantly increases major hemorrhagic events and GI ulceration.",
+        "recommendation": "Avoid combination unless strictly indicated for mechanical heart valves under close INR monitoring.",
+    },
+    {
+        "drug_a": "aspirin",
+        "drug_b": "ibuprofen",
+        "severity": "moderate",
+        "mechanism": "Competitive COX-1 Binding",
+        "warning": "Reduced cardioprotection & GI Toxicity: Ibuprofen competitively interferes with Aspirin's irreversible platelet inhibition.",
+        "recommendation": "Take immediate-release Aspirin at least 30 minutes before or 8 hours after Ibuprofen.",
     },
     {
         "drug_a": "nitroglycerin",
         "drug_b": "sildenafil",
         "severity": "critical",
-        "warning": "Fatal hypotension risk: Co-administration causes profound refractory vasodilation and cardiovascular collapse.",
+        "mechanism": "Synergistic cGMP-Mediated Vasodilation",
+        "warning": "Fatal hypotension risk: Co-administration causes profound refractory vasodilation, acute myocardial ischemia, and cardiovascular collapse.",
+        "recommendation": "ABSOLUTE CONTRAINDICATION: Do not administer nitrates within 24h of sildenafil or 48h of tadalafil.",
     },
     {
         "drug_a": "clopidogrel",
         "drug_b": "omeprazole",
         "severity": "moderate",
-        "warning": "Reduced efficacy: Omeprazole inhibits CYP2C19 bioactivation of Clopidogrel, increasing thrombotic risk.",
+        "mechanism": "CYP2C19 Competitive Inhibition",
+        "warning": "Reduced antiplatelet efficacy: Omeprazole inhibits hepatic bioactivation of Clopidogrel into its active thiol metabolite.",
+        "recommendation": "Switch to Pantoprazole or H2-blocker (Famotidine) which demonstrate minimal CYP2C19 inhibition.",
     },
     {
         "drug_a": "simvastatin",
         "drug_b": "clarithromycin",
         "severity": "high",
-        "warning": "Rhabdomyolysis risk: CYP3A4 inhibition raises statin plasma concentration, leading to severe myopathy.",
+        "mechanism": "Potent CYP3A4 Hepatic Inhibition",
+        "warning": "Rhabdomyolysis risk: Clarithromycin raises statin plasma concentration up to 10-fold, triggering acute myopathy and acute kidney injury.",
+        "recommendation": "Temporarily suspend statin therapy during macrolide antibiotic course or switch to Rosuvastatin / Azithromycin.",
+    },
+    {
+        "drug_a": "atorvastatin",
+        "drug_b": "clarithromycin",
+        "severity": "high",
+        "mechanism": "CYP3A4 Inhibition",
+        "warning": "Elevated statin toxicity: Marked increase in Atorvastatin exposure with elevated risk of skeletal muscle necrosis.",
+        "recommendation": "Limit Atorvastatin dose to maximum 20mg daily or switch to non-CYP3A4 antibiotic (Azithromycin).",
     },
     {
         "drug_a": "lisinopril",
         "drug_b": "spironolactone",
         "severity": "high",
-        "warning": "Severe hyperkalemia: Concomitant ACE-inhibitor and potassium-sparing diuretic can cause fatal cardiac arrhythmias.",
+        "mechanism": "Synergistic Distal Tubule Potassium Retention",
+        "warning": "Severe hyperkalemia: Concomitant ACE-inhibitor and potassium-sparing aldosterone antagonist can cause fatal cardiac arrhythmias.",
+        "recommendation": "Monitor baseline and weekly serum potassium (K+) and serum creatinine; avoid concurrent potassium supplements.",
     },
+    {
+        "drug_a": "metformin",
+        "drug_b": "contrast",
+        "severity": "high",
+        "mechanism": "Contrast-Induced Nephropathy (CIN)",
+        "warning": "Lactic acidosis risk: Iodinated intravascular radiocontrast agents can induce acute renal impairment, precipitating fatal metformin accumulation.",
+        "recommendation": "Withhold Metformin 48h prior to and 48h post iodinated contrast imaging; resume only after eGFR confirmation.",
+    },
+    {
+        "drug_a": "methotrexate",
+        "drug_b": "ibuprofen",
+        "severity": "high",
+        "mechanism": "Decreased Renal Tubular Secretion",
+        "warning": "Severe bone marrow suppression: NSAIDs inhibit renal prostaglandins and competitive elimination of Methotrexate.",
+        "recommendation": "Avoid high-dose NSAID co-prescription; substitute with Paracetamol for analgesia.",
+    },
+    {
+        "drug_a": "fluoxetine",
+        "drug_b": "tramadol",
+        "severity": "high",
+        "mechanism": "Additive Central Serotonergic Hyperactivity",
+        "warning": "Serotonin Syndrome & Seizures: Combined SSRI and Tramadol leads to hyperthermia, autonomic instability, clonus, and lowered seizure threshold.",
+        "recommendation": "Avoid concurrent use; use non-serotonergic analgesics (Acetaminophen or mild Opioids).",
+    },
+    {
+        "drug_a": "levothyroxine",
+        "drug_b": "calcium",
+        "severity": "moderate",
+        "mechanism": "Insoluble Chelation / Physical Adsorption",
+        "warning": "Impaired thyroid absorption: Calcium supplements form insoluble chelate complexes with Levothyroxine in the gut.",
+        "recommendation": "Separate Levothyroxine and Calcium carbonate administration by at least 4 hours.",
+    },
+    {
+        "drug_a": "ciprofloxacin",
+        "drug_b": "theophylline",
+        "severity": "high",
+        "mechanism": "CYP1A2 Inhibition",
+        "warning": "Theophylline toxicity: Ciprofloxacin elevates serum theophylline levels by 100-300%, triggering intractable nausea, arrhythmias, and seizures.",
+        "recommendation": "Reduce theophylline dosage by 50% and monitor plasma concentrations closely, or choose alternative antibiotic.",
+    },
+    {
+        "drug_a": "lithium",
+        "drug_b": "hydrochlorothiazide",
+        "severity": "high",
+        "mechanism": "Natriuresis-Induced Proximal Lithium Reabsorption",
+        "warning": "Severe Lithium toxicity: Thiazide diuretics deplete sodium, causing compensatory proximal tubular retention of Lithium.",
+        "recommendation": "Reduce Lithium dose by 25-50% and monitor serum lithium levels weekly when initiating thiazide therapy.",
+    },
+    {
+        "drug_a": "digoxin",
+        "drug_b": "amiodarone",
+        "severity": "high",
+        "mechanism": "P-glycoprotein (P-gp) & Renal Clearance Inhibition",
+        "warning": "Digitalis toxicity: Amiodarone reduces renal and biliary excretion of Digoxin, doubling serum digoxin levels.",
+        "recommendation": "Empirically reduce Digoxin dose by 50% when starting Amiodarone and monitor ECG for heart block.",
+    },
+    {
+        "drug_a": "losartan",
+        "drug_b": "lisinopril",
+        "severity": "high",
+        "mechanism": "Dual Renin-Angiotensin-Aldosterone Blockade",
+        "warning": "Renal failure and severe hypotension: Combined ARB and ACE inhibitor increases mortality without cardiovascular gain.",
+        "recommendation": "Avoid dual RAAS blockade; select single optimal agent with a calcium channel blocker or diuretic.",
+    },
+    {
+        "drug_a": "amoxicillin",
+        "drug_b": "allopurinol",
+        "severity": "moderate",
+        "mechanism": "Immunological Hypersensitivity",
+        "warning": "High incidence of skin rash: Co-prescription markedly increases maculopapular drug eruptions.",
+        "recommendation": "Advise patient to inspect skin daily; substitute Cephalosporin or Macrolide if antibiotic is required.",
+    },
+]
+
+DRUG_FOOD_INTERACTIONS = [
+    {
+        "food_name": "Grapefruit & Grapefruit Juice",
+        "food_key": "grapefruit",
+        "drugs_affected": ["atorvastatin", "simvastatin", "amlodipine", "cyclosporine", "buspirone"],
+        "severity": "high",
+        "mechanism": "Intestinal CYP3A4 & P-gp Enzyme Inhibition",
+        "warning": "Furanocoumarins in grapefruit irreversibly inhibit intestinal CYP3A4, causing 300% surge in systemic drug levels and severe rhabdomyolysis or profound hypotension.",
+        "dietary_guidance": "Completely avoid grapefruit and Seville oranges while taking CYP3A4-metabolized statins or calcium channel blockers.",
+    },
+    {
+        "food_name": "Dark Green Leafy Vegetables (Vitamin K)",
+        "food_key": "leafy_greens",
+        "drugs_affected": ["warfarin", "coumadin"],
+        "severity": "high",
+        "mechanism": "Vitamin K Clotting Factor Synthesis Antagonism",
+        "warning": "Spinach, kale, and broccoli supply exogenous Vitamin K1, directly overriding Warfarin's inhibition of VKORC1 and plummeting INR, risking acute stroke/thrombosis.",
+        "dietary_guidance": "Maintain a strictly consistent daily intake of Vitamin K-rich vegetables rather than sudden binge consumption or total avoidance.",
+    },
+    {
+        "food_name": "Dairy Products (Milk, Cheese, Yogurt)",
+        "food_key": "dairy_calcium",
+        "drugs_affected": ["ciprofloxacin", "levofloxacin", "doxycycline", "tetracycline", "levothyroxine"],
+        "severity": "moderate",
+        "mechanism": "Multivalent Cation Chelation",
+        "warning": "Divalent Calcium (Ca2+) ions bind directly to fluoroquinolones, tetracyclines, and thyroid hormone, creating unabsorbable precipitation complexes.",
+        "dietary_guidance": "Consume dairy products at least 2 hours before or 4 hours after taking these medications.",
+    },
+    {
+        "food_name": "High-Potassium Foods (Bananas, Salt Substitutes)",
+        "food_key": "high_potassium",
+        "drugs_affected": ["lisinopril", "enalapril", "losartan", "valsartan", "spironolactone"],
+        "severity": "high",
+        "mechanism": "Synergistic Extracellular Potassium Accumulation",
+        "warning": "Potassium-rich foods and KCl salt substitutes combined with ACE inhibitors or ARBs lead to life-threatening hyperkalemia (K+ > 5.5 mEq/L) and cardiac arrest.",
+        "dietary_guidance": "Limit potassium-rich salt substitutes and consult clinician before consuming high amounts of bananas, avocados, and coconut water.",
+    },
+    {
+        "food_name": "Aged Cheeses & Fermented Foods (Tyramine)",
+        "food_key": "tyramine_foods",
+        "drugs_affected": ["selegiline", "phenelzine", "tranylcypromine", "linezolid"],
+        "severity": "critical",
+        "mechanism": "Inhibition of MAO-A Tyramine Catabolism",
+        "warning": "Inhibited monoamine oxidase allows dietary tyramine to enter systemic circulation and displace norepinephrine, triggering lethal Hypertensive Crisis (BP > 200/120).",
+        "dietary_guidance": "Follow strict low-tyramine diet: avoid aged parmesan/cheddar, salami, tap beer, soy sauce, and kimchi during and 14 days after therapy.",
+    },
+    {
+        "food_name": "Alcohol & Alcoholic Beverages",
+        "food_key": "alcohol",
+        "drugs_affected": ["metronidazole", "paracetamol", "acetaminophen", "alprazolam", "diazepam", "metformin"],
+        "severity": "critical",
+        "mechanism": "Aldehyde Dehydrogenase Blockade / Synergistic CNS & Hepatic Toxicity",
+        "warning": "Severe disulfiram-like acetaldehyde poisoning with Metronidazole; accelerated NAPQI hepatotoxicity with Paracetamol; fatal respiratory depression with Sedatives.",
+        "dietary_guidance": "Strict abstinence from all alcoholic drinks and ethanol-containing syrups during course of treatment.",
+    },
+    {
+        "food_name": "Caffeinated Beverages (Coffee, Tea, Energy Drinks)",
+        "food_key": "caffeine",
+        "drugs_affected": ["ciprofloxacin", "theophylline", "pseudoephedrine"],
+        "severity": "moderate",
+        "mechanism": "Hepatic CYP1A2 Metabolic Competition",
+        "warning": "Ciprofloxacin inhibits caffeine clearance, compounding central nervous excitation, severe palpitations, panic, insomnia, and tremors.",
+        "dietary_guidance": "Reduce daily coffee/tea intake to maximum 1 small cup or switch to decaffeinated alternatives.",
+    },
+    {
+        "food_name": "St. John's Wort & Herbal Extracts",
+        "food_key": "st_johns_wort",
+        "drugs_affected": ["sertraline", "fluoxetine", "escitalopram", "digoxin", "warfarin", "oral_contraceptives"],
+        "severity": "high",
+        "mechanism": "CYP3A4 / P-gp Induction & Serotonin Transporter Inhibition",
+        "warning": "Severe reduction in therapeutic efficacy of critical cardiovascular / contraceptive drugs, or acute Serotonin Syndrome when combined with SSRIs.",
+        "dietary_guidance": "Discontinue all over-the-counter herbal and botanical supplements and notify attending physician.",
+    },
+]
+
+COMMON_DRUG_CATALOG = [
+    {"name": "Aspirin", "class": "Antiplatelet / NSAID", "common_dose": "75mg - 150mg OD"},
+    {"name": "Warfarin", "class": "Oral Anticoagulant (VKA)", "common_dose": "2.5mg - 5mg OD"},
+    {"name": "Clopidogrel", "class": "P2Y12 Antiplatelet", "common_dose": "75mg OD"},
+    {"name": "Atorvastatin", "class": "HMG-CoA Reductase Inhibitor", "common_dose": "10mg - 40mg HS"},
+    {"name": "Simvastatin", "class": "HMG-CoA Reductase Inhibitor", "common_dose": "20mg - 40mg HS"},
+    {"name": "Lisinopril", "class": "ACE Inhibitor (Antihypertensive)", "common_dose": "5mg - 20mg OD"},
+    {"name": "Losartan", "class": "Angiotensin II Receptor Blocker", "common_dose": "25mg - 50mg OD"},
+    {"name": "Metformin", "class": "Biguanide Antidiabetic", "common_dose": "500mg - 1000mg BD"},
+    {"name": "Spironolactone", "class": "Aldosterone Antagonist", "common_dose": "25mg - 50mg OD"},
+    {"name": "Omeprazole", "class": "Proton Pump Inhibitor (PPI)", "common_dose": "20mg - 40mg OD"},
+    {"name": "Pantoprazole", "class": "Proton Pump Inhibitor (PPI)", "common_dose": "40mg OD"},
+    {"name": "Levothyroxine", "class": "Thyroid Hormone (T4)", "common_dose": "25mcg - 100mcg OD"},
+    {"name": "Ciprofloxacin", "class": "Fluoroquinolone Antibiotic", "common_dose": "500mg BD"},
+    {"name": "Amoxicillin", "class": "Beta-Lactam Antibiotic", "common_dose": "500mg TDS"},
+    {"name": "Clarithromycin", "class": "Macrolide Antibiotic", "common_dose": "250mg - 500mg BD"},
+    {"name": "Ibuprofen", "class": "NSAID Analgesic", "common_dose": "400mg TDS"},
+    {"name": "Paracetamol", "class": "Analgesic / Antipyretic", "common_dose": "500mg - 650mg TDS"},
+    {"name": "Sildenafil", "class": "PDE-5 Inhibitor", "common_dose": "25mg - 50mg PRN"},
+    {"name": "Nitroglycerin", "class": "Nitrate Vasodilator", "common_dose": "0.4mg SL PRN"},
+    {"name": "Digoxin", "class": "Cardiac Glycoside", "common_dose": "0.125mg - 0.25mg OD"},
+    {"name": "Amiodarone", "class": "Class III Antiarrhythmic", "common_dose": "100mg - 200mg OD"},
+    {"name": "Methotrexate", "class": "DMARD / Antimetabolite", "common_dose": "7.5mg - 15mg Weekly"},
+    {"name": "Lithium", "class": "Mood Stabilizer", "common_dose": "300mg - 600mg BD"},
+    {"name": "Fluoxetine", "class": "SSRI Antidepressant", "common_dose": "20mg OD"},
+    {"name": "Tramadol", "class": "Opioid Analgesic", "common_dose": "50mg BD/TDS"},
 ]
 
 # ── Emergency Red-Flag Keyword Sets (Module F Triage) ─────────────────────────
@@ -142,6 +344,12 @@ class PrescriptionCreateRequest(BaseModel):
 class InteractionCheckRequest(BaseModel):
     candidate_drugs: list[str]
     current_medications: list[str] = Field(default_factory=list)
+
+
+class PharmaAnalysisRequest(BaseModel):
+    medications: list[str] = Field(default_factory=list)
+    dietary_items: list[str] = Field(default_factory=list)
+    patient_id: Optional[str] = None
 
 
 # ── Endpoints ─────────────────────────────────────────────────────────────────
@@ -657,3 +865,92 @@ def get_prescription_by_id(presc_id: str):
     if not p:
         raise HTTPException(status_code=404, detail="Prescription not found.")
     return {"status": "success", "prescription": p}
+
+
+# ── Interactive Multi-Drug & Drug-Food Risk Matrix ───────────────────────────
+
+@router.get("/pharma/catalog")
+def get_pharma_catalog():
+    """Returns the reference database of medications, food contraindications, and known collisions."""
+    return {
+        "status": "success",
+        "common_medications": COMMON_DRUG_CATALOG,
+        "drug_interactions_db": DRUG_INTERACTIONS,
+        "food_interactions_db": DRUG_FOOD_INTERACTIONS,
+        "total_rules": len(DRUG_INTERACTIONS) + len(DRUG_FOOD_INTERACTIONS),
+    }
+
+
+@router.post("/pharma/analyze")
+def analyze_pharma_interactions(req: PharmaAnalysisRequest):
+    """Evaluates multi-drug collisions and drug-food contraindications with clinical severity grading."""
+    raw_meds = [m.lower().strip() for m in req.medications if m and m.strip()]
+    raw_diet = [f.lower().strip() for f in req.dietary_items if f and f.strip()]
+
+    # 1. Multi-Drug Collisions
+    detected_drug_interactions = []
+    matrix_pairs = []
+
+    for i in range(len(raw_meds)):
+        for j in range(i + 1, len(raw_meds)):
+            med_1 = raw_meds[i]
+            med_2 = raw_meds[j]
+            for rule in DRUG_INTERACTIONS:
+                ra = rule["drug_a"].lower()
+                rb = rule["drug_b"].lower()
+                if (ra in med_1 and rb in med_2) or (ra in med_2 and rb in med_1):
+                    collision = {
+                        **rule,
+                        "matched_pair": [req.medications[i], req.medications[j]],
+                    }
+                    detected_drug_interactions.append(collision)
+                    matrix_pairs.append({
+                        "drug_a": req.medications[i],
+                        "drug_b": req.medications[j],
+                        "severity": rule["severity"],
+                        "warning": rule["warning"],
+                    })
+
+    # 2. Drug-Food Contraindications
+    detected_food_interactions = []
+    for food_rule in DRUG_FOOD_INTERACTIONS:
+        food_key = food_rule["food_key"].lower()
+        # Check if food is in dietary list or if active drugs match
+        food_active = (not raw_diet) or any(food_key in d or d in food_key for d in raw_diet)
+        if food_active:
+            matched_drugs = []
+            for target_drug in food_rule["drugs_affected"]:
+                for user_drug in req.medications:
+                    if target_drug in user_drug.lower():
+                        matched_drugs.append(user_drug)
+            if matched_drugs:
+                detected_food_interactions.append({
+                    **food_rule,
+                    "matched_drugs": list(set(matched_drugs)),
+                })
+
+    # 3. Calculate Composite Risk Score (0 - 100%)
+    critical_count = sum(1 for d in detected_drug_interactions if d["severity"] == "critical") + sum(1 for f in detected_food_interactions if f["severity"] == "critical")
+    high_count = sum(1 for d in detected_drug_interactions if d["severity"] == "high") + sum(1 for f in detected_food_interactions if f["severity"] == "high")
+    mod_count = sum(1 for d in detected_drug_interactions if d["severity"] == "moderate") + sum(1 for f in detected_food_interactions if f["severity"] == "moderate")
+
+    composite_score = min(100, (critical_count * 45) + (high_count * 25) + (mod_count * 10))
+    safety_tier = "SAFE" if composite_score == 0 else ("MODERATE_RISK" if composite_score < 40 else "CRITICAL_HAZARD")
+
+    return {
+        "status": "success",
+        "total_medications_evaluated": len(req.medications),
+        "total_dietary_factors_evaluated": len(req.dietary_items),
+        "safety_tier": safety_tier,
+        "composite_risk_score": composite_score,
+        "counts": {
+            "critical": critical_count,
+            "high": high_count,
+            "moderate": mod_count,
+            "total_warnings": len(detected_drug_interactions) + len(detected_food_interactions),
+        },
+        "drug_interactions": detected_drug_interactions,
+        "food_interactions": detected_food_interactions,
+        "matrix_pairs": matrix_pairs,
+        "summary": "No pharmacological contraindications detected for this regimen." if composite_score == 0 else f"Flagged {len(detected_drug_interactions)} drug-drug collision(s) and {len(detected_food_interactions)} food contraindication(s).",
+    }
