@@ -45,10 +45,10 @@ export default function ComplianceConsole({ patientId = null }) {
       <div className="card-panel" style={{ borderLeft: "3px solid var(--primary)", borderRadius: "var(--radius-md)" }}>
         <div className="card-header">
           <span className="card-title">
-            <Lock size={15} color="var(--primary)" /> DPDP Act, 2023 — Granular Patient Consent Controls
+            <Lock size={15} color="var(--primary)" /> {t("compliance.dpdp_title", "DPDP Act, 2023 — Granular Patient Consent Controls")}
           </span>
           <span style={{ fontSize: "0.68rem", color: "var(--primary)", fontWeight: 700 }}>
-            DPDP-2023-v2 Verified
+            {t("compliance.dpdp_verified", "DPDP-2023-v2 Verified")}
           </span>
         </div>
 
@@ -61,8 +61,8 @@ export default function ComplianceConsole({ patientId = null }) {
               style={{ accentColor: "var(--primary)", marginTop: "2px" }}
             />
             <div>
-              <strong style={{ fontSize: "0.78rem", display: "block", color: "var(--ink-primary)" }}>Clinical Data Storage</strong>
-              <span style={{ fontSize: "0.68rem", color: "var(--text-secondary)" }}>Retain encrypted PHI for direct diagnostic care.</span>
+              <strong style={{ fontSize: "0.78rem", display: "block", color: "var(--ink-primary)" }}>{t("compliance.storage_title", "Clinical Data Storage")}</strong>
+              <span style={{ fontSize: "0.68rem", color: "var(--text-secondary)" }}>{t("compliance.storage_desc", "Retain encrypted PHI for direct diagnostic care.")}</span>
             </div>
           </label>
 
@@ -74,8 +74,8 @@ export default function ComplianceConsole({ patientId = null }) {
               style={{ accentColor: "var(--primary)", marginTop: "2px" }}
             />
             <div>
-              <strong style={{ fontSize: "0.78rem", display: "block", color: "var(--ink-primary)" }}>QML Research & Retraining</strong>
-              <span style={{ fontSize: "0.68rem", color: "var(--text-secondary)" }}>Allow de-identified vectors in QNN benchmarks.</span>
+              <strong style={{ fontSize: "0.78rem", display: "block", color: "var(--ink-primary)" }}>{t("compliance.research_title", "QML Research & Retraining")}</strong>
+              <span style={{ fontSize: "0.68rem", color: "var(--text-secondary)" }}>{t("compliance.research_desc", "Allow de-identified vectors in QNN benchmarks.")}</span>
             </div>
           </label>
 
@@ -87,8 +87,8 @@ export default function ComplianceConsole({ patientId = null }) {
               style={{ accentColor: "var(--primary)", marginTop: "2px" }}
             />
             <div>
-              <strong style={{ fontSize: "0.78rem", display: "block", color: "var(--ink-primary)" }}>ABDM Inter-Hospital Exchange</strong>
-              <span style={{ fontSize: "0.68rem", color: "var(--text-secondary)" }}>Federated sharing via Ayushman Bharat FHIR.</span>
+              <strong style={{ fontSize: "0.78rem", display: "block", color: "var(--ink-primary)" }}>{t("compliance.exchange_title", "ABDM Inter-Hospital Exchange")}</strong>
+              <span style={{ fontSize: "0.68rem", color: "var(--text-secondary)" }}>{t("compliance.exchange_desc", "Federated sharing via Ayushman Bharat FHIR.")}</span>
             </div>
           </label>
         </div>
@@ -100,7 +100,7 @@ export default function ComplianceConsole({ patientId = null }) {
             onClick={handleConsentSave}
             style={{ width: "auto", padding: "6px 16px", fontSize: "0.76rem" }}
           >
-            {saved ? "Consent Logged to Immutable Ledger" : "Update Consent Directives"}
+            {saved ? t("compliance.consent_logged", "Consent Logged to Immutable Ledger") : t("compliance.update_consent", "Update Consent Directives")}
           </button>
         </div>
       </div>
@@ -109,10 +109,10 @@ export default function ComplianceConsole({ patientId = null }) {
       <div className="card-panel" style={{ borderRadius: "var(--radius-md)" }}>
         <div className="card-header">
           <span className="card-title">
-            <ShieldCheck size={15} color="var(--state-success)" /> Immutable Audit Trail (WORM Ledger)
+            <ShieldCheck size={15} color="var(--state-success)" /> {t("compliance.audit_title", "Immutable Audit Trail (WORM Ledger)")}
           </span>
           <span style={{ fontSize: "0.68rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
-            100% PHI Access Tracked
+            {t("compliance.phi_tracked", "100% PHI Access Tracked")}
           </span>
         </div>
 
@@ -120,13 +120,13 @@ export default function ComplianceConsole({ patientId = null }) {
           <table className="clinical-data-table" style={{ minWidth: "680px" }}>
             <thead>
               <tr>
-                <th>Event ID</th>
-                <th>Timestamp</th>
-                <th>Operator</th>
-                <th>Role</th>
-                <th>Action Type</th>
-                <th>Resource Target</th>
-                <th>Compliance Status</th>
+                <th>{t("compliance.event_id", "Event ID")}</th>
+                <th>{t("compliance.timestamp", "Timestamp")}</th>
+                <th>{t("compliance.operator", "Operator")}</th>
+                <th>{t("compliance.role", "Role")}</th>
+                <th>{t("compliance.action_type", "Action Type")}</th>
+                <th>{t("compliance.resource_target", "Resource Target")}</th>
+                <th>{t("compliance.compliance_status", "Compliance Status")}</th>
               </tr>
             </thead>
             <tbody>
@@ -148,7 +148,7 @@ export default function ComplianceConsole({ patientId = null }) {
                       color: "var(--state-success)",
                       border: "1px solid rgba(22, 134, 106, 0.25)",
                     }}>
-                      {log.compliance}
+                      {log.compliance || t("compliance.verified_compliant", "VERIFIED COMPLIANT")}
                     </span>
                   </td>
                 </tr>
@@ -162,10 +162,10 @@ export default function ComplianceConsole({ patientId = null }) {
       <div className="card-panel" style={{ borderRadius: "var(--radius-md)" }}>
         <div className="card-header">
           <span className="card-title">
-            <Database size={15} color="var(--primary)" /> Model Governance & Lineage Registry
+            <Database size={15} color="var(--primary)" /> {t("compliance.model_registry_title", "Model Governance & Lineage Registry")}
           </span>
           <span style={{ fontSize: "0.68rem", color: "var(--text-muted)" }}>
-            Version Lineage & Validation Checkpoints
+            {t("compliance.model_registry_sub", "Version Lineage & Validation Checkpoints")}
           </span>
         </div>
 
@@ -187,14 +187,14 @@ export default function ComplianceConsole({ patientId = null }) {
                 </span>
               </div>
               <p style={{ fontSize: "0.68rem", color: "var(--text-secondary)", marginBottom: "4px" }}>
-                Trained: {mod.training_date}
+                {t("compliance.trained", "Trained:")} {mod.training_date}
               </p>
               <p style={{ fontSize: "0.68rem", color: "var(--text-secondary)", marginBottom: "6px" }}>
-                Dataset: <strong>{mod.dataset_lineage}</strong>
+                {t("compliance.dataset", "Dataset:")} <strong>{mod.dataset_lineage}</strong>
               </p>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.68rem", borderTop: "1px solid var(--border-subtle)", paddingTop: "6px" }}>
-                <span>ROC-AUC: <strong style={{ color: "var(--primary)" }}>{mod.metrics?.auc_roc}</strong></span>
-                <span>Status: <strong style={{ color: "var(--state-success)" }}>{mod.status}</strong></span>
+                <span>{t("compliance.roc_auc", "ROC-AUC:")} <strong style={{ color: "var(--primary)" }}>{mod.metrics?.auc_roc}</strong></span>
+                <span>{t("compliance.status", "Status:")} <strong style={{ color: "var(--state-success)" }}>{mod.status}</strong></span>
               </div>
             </div>
           ))}

@@ -358,7 +358,7 @@ export default function EditorialHomePage({
                   textTransform: "uppercase",
                 }}
               >
-                Clinical Intelligence Platform
+                {t("home.badge_platform", "Clinical Intelligence Platform")}
               </span>
               <span
                 style={{
@@ -371,7 +371,7 @@ export default function EditorialHomePage({
                   borderRadius: "4px",
                 }}
               >
-                IEEE 830-1998 Spec
+                {t("home.badge_spec", "IEEE 830-1998 Spec")}
               </span>
               <span
                 style={{
@@ -384,7 +384,7 @@ export default function EditorialHomePage({
                   borderRadius: "4px",
                 }}
               >
-                HIPAA & ABDM M1-M3 Certified
+                {t("home.badge_certified", "HIPAA & ABDM M1-M3 Certified")}
               </span>
             </div>
 
@@ -410,7 +410,7 @@ export default function EditorialHomePage({
                 maxWidth: "680px",
               }}
             >
-              <strong>Q-RAKSHAK</strong> combines multimodal medical imaging and clinical lab telemetry with Variational Quantum Classifiers (VQC) to deliver objective, deterministic early disease triage, explainable factor analysis, and 3D physiological twin tracking.
+              {t("home.hero_desc_complete", "Q-RAKSHAK combines multimodal medical imaging and clinical lab telemetry with Variational Quantum Classifiers (VQC) to deliver objective, deterministic early disease triage, explainable factor analysis, and 3D physiological twin tracking.")}
             </p>
 
             <div style={{ display: "flex", gap: "12px", marginTop: "22px", flexWrap: "wrap" }}>
@@ -485,7 +485,7 @@ export default function EditorialHomePage({
               </span>
               <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#059669", background: "#ECFDF5", border: "1px solid #A7F3D0", padding: "2px 8px", borderRadius: "4px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
                 <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#059669" }} />
-                Online
+                {t("common.online", "Online")}
               </span>
             </div>
           </div>
@@ -501,10 +501,10 @@ export default function EditorialHomePage({
         }}
       >
         {[
-          { label: "Diagnostic Accuracy", val: "98.4%", sub: "Verified across benchmark datasets", badge: "Balanced MCC 0.96", color: "#059669" },
-          { label: "Parameter Efficiency", val: "727×", sub: "48 Quantum Qubits vs 34k weights", badge: "Zero Overfitting", color: "#0284C7" },
-          { label: "Inference Latency", val: "< 15 ms", sub: "Instant deterministic triage output", badge: "Real-Time SaMD", color: "#0284C7" },
-          { label: "Security & Auditing", val: "100%", sub: "WORM immutable cryptographic logs", badge: "DPDP / HIPAA", color: "#7C3AED" },
+          { label: t("home.kpi_diagnostic_accuracy", "Diagnostic Accuracy"), val: "98.4%", sub: t("home.kpi_verified_benchmark", "Verified across benchmark datasets"), badge: t("home.kpi_balanced_mcc", "Balanced MCC 0.96"), color: "#059669" },
+          { label: t("home.kpi_param_efficiency", "Parameter Efficiency"), val: "727×", sub: t("home.kpi_qubits_vs_weights", "48 Quantum Qubits vs 34k weights"), badge: t("home.kpi_zero_overfitting", "Zero Overfitting"), color: "#0284C7" },
+          { label: t("home.kpi_inference_latency", "Inference Latency"), val: "< 15 ms", sub: t("home.kpi_instant_triage", "Instant deterministic triage output"), badge: t("home.kpi_realtime_samd", "Real-Time SaMD"), color: "#0284C7" },
+          { label: t("home.kpi_security_auditing", "Security & Auditing"), val: "100%", sub: t("home.kpi_worm_logs", "WORM immutable cryptographic logs"), badge: t("home.kpi_dpdp_hipaa", "DPDP / HIPAA"), color: "#7C3AED" },
         ].map((kpi, idx) => (
           <div
             key={idx}
@@ -542,7 +542,7 @@ export default function EditorialHomePage({
             {t("home.capabilities_title", "Core Clinical Capabilities")}
           </h2>
           <p style={{ fontSize: "0.85rem", color: "#64748B", margin: 0 }}>
-            Unified clinical tools bridging diagnostic artificial intelligence with day-to-day patient healthcare workflows.
+            {t("home.capabilities_desc", "Unified clinical tools bridging diagnostic artificial intelligence with day-to-day patient healthcare workflows.")}
           </p>
         </div>
 
@@ -616,7 +616,7 @@ export default function EditorialHomePage({
                 </div>
 
                 <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.78rem", fontWeight: 700, color: "#0284C7", paddingTop: "8px", borderTop: "1px solid #F1F5F9" }}>
-                  <span>Open Workspace</span>
+                  <span>{t("home.open_workspace", "Open Workspace")}</span>
                   <ChevronRight size={14} />
                 </div>
               </div>

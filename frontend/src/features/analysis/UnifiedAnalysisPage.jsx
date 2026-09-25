@@ -2252,10 +2252,10 @@ export default function UnifiedAnalysisPage() {
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--bg-surface)", border: "1px solid var(--border-default)", padding: "10px 14px" }}>
                 <div>
                   <h3 style={{ fontSize: "0.95rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em", margin: 0 }}>
-                    Encrypted Health Records & Data Privacy
+                    {t("portal.banner_title", "Encrypted Health Records & Data Privacy")}
                   </h3>
                   <p style={{ fontSize: "0.72rem", color: "var(--text-secondary)", margin: 0 }}>
-                    Verified medical history, active medications, and DPDP / ABDM privacy consent.
+                    {t("portal.banner_desc", "Verified medical history, active medications, and DPDP / ABDM privacy consent.")}
                   </p>
                 </div>
                 <button

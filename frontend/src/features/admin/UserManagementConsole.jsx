@@ -152,13 +152,13 @@ export default function UserManagementConsole() {
             </div>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
-                <span className="step-badge">ADMIN GOVERNANCE</span>
+                <span className="step-badge">{t("users.admin_governance", "ADMIN GOVERNANCE")}</span>
                 <h2 style={{ fontFamily: "var(--font-display)", fontSize: "1.35rem", fontWeight: 800, color: "var(--ink-primary)", margin: 0 }}>
-                  Enterprise User & Authority Management
+                  {t("users.title", "Enterprise User & Authority Management")}
                 </h2>
               </div>
               <p style={{ fontSize: "0.78rem", color: "var(--text-secondary)", margin: 0 }}>
-                Manage role access control, credentials, institutional profiles, and emergency routing in SQLite.
+                {t("users.subtitle", "Manage role access control, credentials, institutional profiles, and emergency routing in SQLite.")}
               </p>
             </div>
           </div>
@@ -169,7 +169,7 @@ export default function UserManagementConsole() {
             style={{ padding: "8px 16px", fontSize: "0.78rem" }}
           >
             <UserPlus size={14} />
-            <span>Add New User Account</span>
+            <span>{t("users.add_new_user", "Add New User Account")}</span>
           </button>
         </div>
 
@@ -179,7 +179,7 @@ export default function UserManagementConsole() {
             <Search size={14} style={{ position: "absolute", left: "10px", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
             <input
               type="text"
-              placeholder="Search by name, username, or email..."
+              placeholder={t("users.search_placeholder", "Search by name, username, or email...")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{ width: "100%", padding: "7px 12px 7px 32px", border: "1px solid var(--border-default)", fontSize: "0.78rem", background: "var(--bg-canvas)", borderRadius: "var(--radius-sm)" }}
@@ -195,7 +195,7 @@ export default function UserManagementConsole() {
                 style={{ borderRadius: "var(--radius-sm)", padding: "5px 12px", fontSize: "0.72rem", textTransform: "capitalize" }}
                 onClick={() => setFilterRole(r)}
               >
-                {r === "all" ? "All Users" : (r === "patient" ? "Patients" : "Admins")}
+                {r === "all" ? t("users.filter_all", "All Users") : (r === "patient" ? t("users.filter_patients", "Patients") : t("users.filter_admins", "Admins"))}
               </button>
             ))}
           </div>
@@ -208,7 +208,7 @@ export default function UserManagementConsole() {
             title="Refresh user list"
           >
             <RefreshCw size={12} className={loading ? "spin" : ""} />
-            <span>Sync</span>
+            <span>{t("users.sync", "Sync")}</span>
           </button>
         </div>
       </div>
@@ -224,28 +224,28 @@ export default function UserManagementConsole() {
         <div className="bento-stat" style={{ borderRadius: "var(--radius-md)" }}>
           <div className="corner-tag-arrow">↗</div>
           <div className="bento-stat-num">{users.length}</div>
-          <div className="bento-stat-label">Total Accounts</div>
+          <div className="bento-stat-label">{t("users.total_accounts", "Total Accounts")}</div>
         </div>
         <div className="bento-stat" style={{ background: "var(--bg-surface-alt)", borderRadius: "var(--radius-md)" }}>
           <div className="corner-tag-arrow">↗</div>
           <div className="bento-stat-num" style={{ color: "var(--primary)" }}>
             {users.filter((u) => u.role === "patient").length}
           </div>
-          <div className="bento-stat-label">Patients</div>
+          <div className="bento-stat-label">{t("users.patients", "Patients")}</div>
         </div>
         <div className="bento-stat" style={{ background: "var(--bg-surface-alt)", borderRadius: "var(--radius-md)" }}>
           <div className="corner-tag-arrow">↗</div>
           <div className="bento-stat-num" style={{ color: "var(--primary)" }}>
             {users.filter((u) => u.role === "doctor" || u.role === "clinician").length}
           </div>
-          <div className="bento-stat-label">Doctors</div>
+          <div className="bento-stat-label">{t("users.doctors", "Doctors")}</div>
         </div>
         <div className="bento-stat" style={{ borderRadius: "var(--radius-md)" }}>
           <div className="corner-tag-arrow">↗</div>
           <div className="bento-stat-num" style={{ color: "var(--ink-primary)" }}>
             {users.filter((u) => u.role === "admin").length}
           </div>
-          <div className="bento-stat-label">Admins</div>
+          <div className="bento-stat-label">{t("users.admins", "Admins")}</div>
         </div>
       </div>
 
@@ -255,13 +255,13 @@ export default function UserManagementConsole() {
           <table className="clinical-data-table" style={{ minWidth: "720px" }}>
             <thead>
               <tr>
-                <th>User ID</th>
-                <th>Full Name & Username</th>
-                <th>Authority Role</th>
-                <th>Primary Contact</th>
-                <th>Hospital / Lab Affiliation</th>
-                <th>Medical License</th>
-                <th style={{ textAlign: "right" }}>Actions</th>
+                <th>{t("users.user_id", "User ID")}</th>
+                <th>{t("users.fullname_username", "Full Name & Username")}</th>
+                <th>{t("users.authority_role", "Authority Role")}</th>
+                <th>{t("users.primary_contact", "Primary Contact")}</th>
+                <th>{t("users.hospital_affiliation", "Hospital / Lab Affiliation")}</th>
+                <th>{t("users.medical_license", "Medical License")}</th>
+                <th style={{ textAlign: "right" }}>{t("users.actions", "Actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -284,7 +284,7 @@ export default function UserManagementConsole() {
                         color: u.role === "admin" ? "var(--accent-violet)" : (u.role === "doctor" || u.role === "clinician") ? "var(--gold)" : "var(--risk-low)",
                         textTransform: "capitalize",
                       }}>
-                        {u.role === "admin" ? "Administrator" : (u.role === "doctor" || u.role === "clinician") ? "Doctor" : "Patient"}
+                        {u.role === "admin" ? t("users.admin_role", "Administrator") : (u.role === "doctor" || u.role === "clinician") ? t("users.doctor_role", "Doctor") : t("users.patient_role", "Patient")}
                       </span>
                     </td>
                     <td>
@@ -306,7 +306,7 @@ export default function UserManagementConsole() {
                             fontStyle: "italic",
                           }}
                         >
-                          Protected (Patient)
+                          {t("users.protected_patient", "Protected (Patient)")}
                         </span>
                       ) : (
                         <div style={{ display: "inline-flex", gap: "4px" }}>

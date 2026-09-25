@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { ChevronDown, Stethoscope, Sparkles, Languages } from "lucide-react";
-import { DISEASE_LIST } from "../../data/diseaseRegistry.js";
+import { DISEASE_LIST, getLocalizedDiseaseById } from "../../data/diseaseRegistry.js";
 import { FEATURE_INTRO_REGISTRY } from "../../data/featureIntroRegistry.js";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 
@@ -37,7 +37,6 @@ export default function EditorialHeader({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
 
   useEffect(() => {
     function updateClock() {
@@ -121,7 +120,7 @@ export default function EditorialHeader({
               letterSpacing: "0.02em",
             }}
           >
-            Clinical Platform
+            {t("header.clinical_platform", "Clinical Platform")}
           </span>
         </button>
 
@@ -155,7 +154,7 @@ export default function EditorialHeader({
               background: "var(--risk-low)",
             }}
           />
-          <span style={{ fontWeight: 600 }}>SYSTEM READY</span>
+          <span style={{ fontWeight: 600 }}>{t("header.system_ready", "SYSTEM READY")}</span>
           <span style={{ color: "var(--border-hover)" }}>•</span>
           <span>{timeString}</span>
         </div>
@@ -173,31 +172,34 @@ export default function EditorialHeader({
             title="Browse Disease Protocols"
           >
             <Stethoscope size={13} color="var(--primary)" />
-            <span>Diseases</span>
+            <span>{t("header.diseases", "Diseases")}</span>
             <ChevronDown size={12} color="var(--text-muted)" style={{ transform: diseaseMenuOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.15s ease" }} />
           </button>
 
           {diseaseMenuOpen && (
             <div className="header-dropdown-menu">
               <div style={{ padding: "6px 8px", borderBottom: "1px solid var(--border-default)", fontSize: "0.64rem", fontWeight: 800, textTransform: "uppercase", color: "var(--text-muted)", letterSpacing: "0.06em" }}>
-                Select Disease Protocol
+                {t("header.select_disease_protocol", "Select Disease Protocol")}
               </div>
-              {DISEASE_LIST.map((d) => (
-                <button
-                  key={d.id}
-                  type="button"
-                  className="header-dropdown-item"
-                  onClick={() => {
-                    setDiseaseMenuOpen(false);
-                    onSelectDisease && onSelectDisease(d.id);
-                  }}
-                >
-                  <span style={{ fontWeight: 600 }}>{d.name}</span>
-                  <span style={{ fontSize: "0.62rem", color: d.accentColor, background: d.accentBg, padding: "2px 6px", borderRadius: "4px", fontWeight: 700 }}>
-                    {d.category}
-                  </span>
-                </button>
-              ))}
+              {DISEASE_LIST.map((d) => {
+                const locD = getLocalizedDiseaseById(d.id, t);
+                return (
+                  <button
+                    key={d.id}
+                    type="button"
+                    className="header-dropdown-item"
+                    onClick={() => {
+                      setDiseaseMenuOpen(false);
+                      onSelectDisease && onSelectDisease(d.id);
+                    }}
+                  >
+                    <span style={{ fontWeight: 600 }}>{locD.name || d.name}</span>
+                    <span style={{ fontSize: "0.62rem", color: d.accentColor, background: d.accentBg, padding: "2px 6px", borderRadius: "4px", fontWeight: 700 }}>
+                      {locD.category || d.category}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
@@ -215,14 +217,14 @@ export default function EditorialHeader({
             title="Explore Platform Features"
           >
             <Sparkles size={13} color="var(--accent-violet)" />
-            <span>Modules</span>
+            <span>{t("header.modules", "Modules")}</span>
             <ChevronDown size={12} color="var(--text-muted)" style={{ transform: moduleMenuOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.15s ease" }} />
           </button>
 
           {moduleMenuOpen && (
             <div className="header-dropdown-menu">
               <div style={{ padding: "6px 8px", borderBottom: "1px solid var(--border-default)", fontSize: "0.64rem", fontWeight: 800, textTransform: "uppercase", color: "var(--text-muted)", letterSpacing: "0.06em" }}>
-                Platform Modules
+                {t("header.platform_modules", "Platform Modules")}
               </div>
               {Object.values(FEATURE_INTRO_REGISTRY).map((f) => (
                 <button
@@ -408,7 +410,7 @@ export default function EditorialHeader({
                 {currentUser?.role || "GUEST"}
               </div>
             </div>
-            <span className="header-more">More</span>
+            <span className="header-more">{t("header.more", "More")}</span>
           </button>
 
           {/* Menu dropdown */}
@@ -446,13 +448,13 @@ export default function EditorialHeader({
                     display: "block",
                   }}
                 >
-                  AUTHENTICATED AS
+                  {t("header.authenticated_as", "AUTHENTICATED AS")}
                 </span>
                 <strong style={{ fontSize: "0.82rem", color: "var(--ink-primary)", display: "block" }}>
                   {currentUser?.name}
                 </strong>
                 <span style={{ fontSize: "0.68rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
-                  Role: {currentUser?.role?.toUpperCase()}
+                  {t("header.role", "Role")}: {currentUser?.role?.toUpperCase()}
                 </span>
               </div>
 
@@ -477,7 +479,7 @@ export default function EditorialHeader({
                   borderRadius: "var(--radius-xs)",
                 }}
               >
-                <span>Profile & Identity</span>
+                <span>{t("header.profile_identity", "Profile & Identity")}</span>
               </button>
 
               <div style={{ height: "1px", background: "var(--border-subtle)", margin: "4px 0" }} />
@@ -504,7 +506,7 @@ export default function EditorialHeader({
                 }}
                 title="Log out to switch role or account"
               >
-                <span>Sign Out / Switch Persona</span>
+                <span>{t("header.sign_out_switch", "Sign Out / Switch Persona")}</span>
               </button>
             </div>
           )}
