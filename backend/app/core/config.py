@@ -62,7 +62,7 @@ class Settings:
     IS_DEMO: bool = DB_MODE == "demo"
 
     # Always ensure database paths are resolved absolutely to prevent root vs backend cwd drift
-    _raw_real_db = os.getenv("QMED_REAL_DB_PATH", "q-rakshak.db")
+    _raw_real_db = os.getenv("QMED_REAL_DB_PATH", "qmedsense.db")
     REAL_DB_PATH: Path = (BACKEND_DIR / _raw_real_db) if not Path(_raw_real_db).is_absolute() else Path(_raw_real_db)
     
     _raw_demo_db = os.getenv("QMED_DEMO_DB_PATH", "q-rakshak_demo.db")

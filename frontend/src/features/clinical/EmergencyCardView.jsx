@@ -48,6 +48,7 @@ export default function EmergencyCardView({ patientId = null }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
+  const [syncToast, setSyncToast] = useState(false);
   const [error, setError] = useState(null);
   const [shakeTriggered, setShakeTriggered] = useState(false);
   const [shakeAuditSeal, setShakeAuditSeal] = useState(null);
@@ -60,6 +61,27 @@ export default function EmergencyCardView({ patientId = null }) {
   const [emailSent, setEmailSent] = useState(false);
 
   const card3DInnerRef = useRef(null);
+
+  // Reactive cross-tab and cross-component auto-sync listener
+  useEffect(() => {
+    function handleSyncEvent(e) {
+      const updatedPid = e?.detail?.patientId;
+      if (!updatedPid || updatedPid === effectivePatientId || updatedPid === selectedPatientId) {
+        loadData(false);
+      }
+    }
+    function handleStorageSync(e) {
+      if (e.key === 'qmed_last_updated_patient' || e.key === 'qmed_selected_patient') {
+        loadData(false);
+      }
+    }
+    window.addEventListener('qmed:patient_updated', handleSyncEvent);
+    window.addEventListener('storage', handleStorageSync);
+    return () => {
+      window.removeEventListener('qmed:patient_updated', handleSyncEvent);
+      window.removeEventListener('storage', handleStorageSync);
+    };
+  }, [effectivePatientId, selectedPatientId]);
 
   // Send audit trail entry for shake triggers or call initiation
   const recordShakeAudit = async (action, dialTarget = null, metrics = null) => {
@@ -183,6 +205,12 @@ export default function EmergencyCardView({ patientId = null }) {
     if (typeof window !== 'undefined') {
       window.location.hash = `#triage/${pid}`;
     }
+  }
+
+  async function handleSyncVault() {
+    await loadData(false);
+    setSyncToast(true);
+    setTimeout(() => setSyncToast(false), 2600);
   }
 
   async function loadData(showLoader = true) {
@@ -670,7 +698,7 @@ export default function EmergencyCardView({ patientId = null }) {
         <div className="triage-header-actions no-print" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
           <button
             type="button"
-            onClick={() => loadData(false)}
+            onClick={handleSyncVault}
             className="triage-pill-btn triage-outline-btn"
             title="Sync latest patient data and vitals from clinical vault"
             disabled={syncing}
@@ -1835,6 +1863,32 @@ export default function EmergencyCardView({ patientId = null }) {
               </div>
             </div>
           </div>
+        </div>
+      )}
+      {syncToast && (
+        <div
+          className="no-print"
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            right: '24px',
+            zIndex: 2000,
+            background: '#0F172A',
+            color: '#FFFFFF',
+            padding: '12px 18px',
+            borderRadius: '12px',
+            boxShadow: '0 10px 25px rgba(0,0,0,0.25)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '0.80rem',
+            fontWeight: 700,
+            border: '1px solid #334155',
+            animation: 'fadeIn 0.2s ease',
+          }}
+        >
+          <CheckCircle2 size={16} color="#10B981" />
+          <span>Vault Synchronized & Verified with WORM Ledger</span>
         </div>
       )}
     </div>

@@ -50,6 +50,11 @@ export default function ProfileSettingsModal({ isOpen, onClose, userId = null, u
     try {
       const res = await profileApi.updateProfile(userId, profile);
       setSaved(true);
+      const syncMeta = { patientId: userId, timestamp: Date.now() };
+      window.dispatchEvent(new CustomEvent("qmed:patient_updated", { detail: syncMeta }));
+      try {
+        localStorage.setItem("qmed_last_updated_patient", JSON.stringify(syncMeta));
+      } catch (_) {}
       if (onProfileUpdated) onProfileUpdated(res.profile || profile);
       setTimeout(() => {
         setSaved(false);

@@ -266,6 +266,12 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
       });
 
       setSyncStatus("synced");
+      // Broadcast patient update event to triage and other open tabs
+      const syncMeta = { patientId: activeUserId, timestamp: Date.now() };
+      window.dispatchEvent(new CustomEvent("qmed:patient_updated", { detail: syncMeta }));
+      try {
+        localStorage.setItem("qmed_last_updated_patient", JSON.stringify(syncMeta));
+      } catch (_) {}
       if (onProfileUpdated) {
         onProfileUpdated(res.profile || payload);
       }
