@@ -6,7 +6,7 @@ import {
   Smartphone, MapPin, Building2, Copy, Check, Printer,
   QrCode, ExternalLink, Flame, ShieldAlert, ShieldCheck,
   RotateCw, Mail, Sparkles, ArrowUpRight, ChevronDown,
-  Search, Users
+  Search, Users, Volume2, VolumeX, Timer, Zap, X
 } from 'lucide-react';
 import apiClient from '../../api/client';
 import QRCodeSVG from '../../components/common/QRCodeSVG';
@@ -17,6 +17,11 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useShakeDetection } from '../../utils/useShake.js';
 import ShakeFeatureGuide from '../../components/clinical/ShakeFeatureGuide';
 import { getEmergencyPortalUrl } from '../../api/config';
+import {
+  playCountdownTick,
+  startEmergencySiren,
+  stopEmergencySiren,
+} from '../../utils/emergencyAudio.js';
 
 import { authApi } from '../../api/auth';
 
@@ -53,6 +58,24 @@ export default function EmergencyCardView({ patientId = null }) {
   const [shakeTriggered, setShakeTriggered] = useState(false);
   const [shakeAuditSeal, setShakeAuditSeal] = useState(null);
   const [shakeMetrics, setShakeMetrics] = useState(null);
+  const [autoDialCountdown, setAutoDialCountdown] = useState(5);
+  const [autoDialActive, setAutoDialActive] = useState(false);
+  const [alarmAudioMuted, setAlarmAudioMuted] = useState(false);
+  const [shakeSensitivity, setShakeSensitivity] = useState(() => {
+    try {
+      return localStorage.getItem('qmed_shake_sensitivity') || 'normal';
+    } catch (_) {
+      return 'normal';
+    }
+  });
+  const countdownTimerRef = useRef(null);
+
+  const handleSensitivityChange = (newSens) => {
+    setShakeSensitivity(newSens);
+    try {
+      localStorage.setItem('qmed_shake_sensitivity', newSens);
+    } catch (_) {}
+  };
   const [copiedLink, setCopiedLink] = useState(false);
   const [cardTheme, setCardTheme] = useState('light');
   const [cardFace, setCardFace] = useState('dual');
@@ -102,32 +125,111 @@ export default function EmergencyCardView({ patientId = null }) {
     }
   };
 
-  // High-reliability mobile Shake-to-Call hook with enabled-gate to prevent infinite re-triggering loops
-  const { isSupported: isShakeSupported, permissionState, requestMotionPermission, triggerShake } = useShakeDetection(
+  // High-reliability mobile Shake-to-Call hook with low-pass gravity filter & live telemetry
+  const {
+    isSupported: isShakeSupported,
+    permissionState,
+    currentMagnitude,
+    effectiveThreshold,
+    requestMotionPermission,
+    triggerShake,
+  } = useShakeDetection(
     (metrics) => {
-      // Only trigger if not already open
       if (!shakeTriggered) {
         setShakeMetrics(metrics);
         setShakeTriggered(true);
+        setAutoDialCountdown(5);
+        setAutoDialActive(true);
         recordShakeAudit('SHAKE_EMERGENCY_TRIGGERED', null, metrics);
+        if (!alarmAudioMuted) {
+          startEmergencySiren();
+        }
       }
     },
     {
-      threshold: 16.5,
+      sensitivity: shakeSensitivity,
       timeout: 4000,
       reversalsRequired: 2,
-      windowMs: 650,
-      enabled: !shakeTriggered, // Critical: Disables listener while emergency modal is active
+      windowMs: 750,
+      enabled: !shakeTriggered, // Critical: Disables sensor while emergency modal is active
     }
   );
 
-  const handleDismissShakeModal = () => {
+  // Automated 5-Second Emergency Countdown Dialer with audio beeps and native haptic pulses
+  useEffect(() => {
+    if (shakeTriggered && autoDialActive) {
+      countdownTimerRef.current = setInterval(() => {
+        setAutoDialCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(countdownTimerRef.current);
+            stopEmergencySiren();
+            setAutoDialActive(false);
+
+            // Execute automated emergency dial (primary contact or 108)
+            const targetNum = (primaryContact.phone || '108').replace(/[^0-9+]/g, '');
+            recordShakeAudit('EMERGENCY_CALL_AUTO_DIALED', `${primaryContact.name} (${targetNum})`);
+            window.location.href = `tel:${targetNum}`;
+            return 0;
+          }
+          const next = prev - 1;
+          if (!alarmAudioMuted) {
+            playCountdownTick(next === 1 ? 1200 : 880);
+          }
+          if (navigator.vibrate) {
+            try {
+              navigator.vibrate([180, 80, 180]);
+            } catch (_) {}
+          }
+          return next;
+        });
+      }, 1000);
+    } else {
+      if (countdownTimerRef.current) {
+        clearInterval(countdownTimerRef.current);
+        countdownTimerRef.current = null;
+      }
+      stopEmergencySiren();
+    }
+    return () => {
+      if (countdownTimerRef.current) {
+        clearInterval(countdownTimerRef.current);
+        countdownTimerRef.current = null;
+      }
+      stopEmergencySiren();
+    };
+  }, [shakeTriggered, autoDialActive, alarmAudioMuted, primaryContact.phone, primaryContact.name]);
+
+  const handleCancelShakeModal = () => {
+    if (countdownTimerRef.current) {
+      clearInterval(countdownTimerRef.current);
+      countdownTimerRef.current = null;
+    }
+    stopEmergencySiren();
+    setAutoDialActive(false);
     setShakeTriggered(false);
-    recordShakeAudit('SHAKE_EMERGENCY_DISMISSED');
+    recordShakeAudit('SHAKE_EMERGENCY_CANCELLED');
   };
 
-  const handleDialContact = (targetPhone, contactName) => {
+  const handleImmediateDial = (targetPhone, contactName) => {
+    if (countdownTimerRef.current) {
+      clearInterval(countdownTimerRef.current);
+      countdownTimerRef.current = null;
+    }
+    stopEmergencySiren();
+    setAutoDialActive(false);
     recordShakeAudit('EMERGENCY_CALL_INITIATED', `${contactName} (${targetPhone})`);
+    const cleanNumber = targetPhone.replace(/[^0-9+]/g, '');
+    window.location.href = `tel:${cleanNumber}`;
+  };
+
+  const toggleMuteAlarm = () => {
+    const next = !alarmAudioMuted;
+    setAlarmAudioMuted(next);
+    if (next) {
+      stopEmergencySiren();
+    } else if (shakeTriggered && autoDialActive) {
+      startEmergencySiren();
+    }
   };
 
   async function handleEmailCard() {
@@ -731,7 +833,7 @@ export default function EmergencyCardView({ patientId = null }) {
             type="button"
             onClick={async () => {
               await requestMotionPermission();
-              setShakeTriggered(true);
+              triggerShake({ simulated: true, manualClick: true, timestamp: Date.now() });
             }}
             className="triage-pill-btn triage-call-cta"
             title="Shake phone or click to activate SOS emergency dialer"
@@ -742,61 +844,154 @@ export default function EmergencyCardView({ patientId = null }) {
         </div>
       </header>
 
-      {/* ── Shake-to-Call Emergency Trigger Modal ── */}
+      {/* ── Shake-to-Call Emergency Trigger Modal with 5s Auto-Dialer ── */}
       {shakeTriggered && (
         <div
           style={{
             position: 'fixed',
             inset: 0,
             zIndex: 1000,
-            background: 'rgba(15, 23, 42, 0.7)',
-            backdropFilter: 'blur(8px)',
+            background: 'rgba(15, 23, 42, 0.78)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             padding: '20px',
             animation: 'fadeIn 0.15s ease',
           }}
-          onClick={handleDismissShakeModal}
+          onClick={handleCancelShakeModal}
         >
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              maxWidth: '440px',
+              maxWidth: '460px',
               width: '100%',
               textAlign: 'center',
-              padding: '32px 28px',
+              padding: '28px 24px',
               background: '#FFFFFF',
-              borderRadius: '20px',
-              boxShadow: '0 25px 60px -12px rgba(15, 23, 42, 0.3)',
-              border: '1px solid #E2E8F0',
+              borderRadius: '24px',
+              boxShadow: '0 25px 65px -12px rgba(220, 38, 38, 0.35)',
+              border: '2px solid #FECACA',
+              position: 'relative',
+              overflow: 'hidden',
             }}
           >
+            {/* Top Bar with Siren Audio Mute & Close */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#DC2626' }} />
+                <span style={{ fontSize: '0.66rem', fontWeight: 800, color: '#DC2626', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                  DISTRESS MOTION DETECTED
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <button
+                  type="button"
+                  onClick={toggleMuteAlarm}
+                  style={{
+                    background: alarmAudioMuted ? '#F1F5F9' : '#FEF2F2',
+                    border: '1px solid #E2E8F0',
+                    borderRadius: '8px',
+                    padding: '5px 8px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    fontSize: '0.66rem',
+                    color: alarmAudioMuted ? '#64748B' : '#DC2626',
+                    fontWeight: 700,
+                  }}
+                  title={alarmAudioMuted ? 'Unmute Siren Alarm' : 'Mute Siren Alarm'}
+                >
+                  {alarmAudioMuted ? <VolumeX size={13} /> : <Volume2 size={13} />}
+                  <span>{alarmAudioMuted ? 'Muted' : 'Siren Active'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCancelShakeModal}
+                  style={{
+                    background: '#F1F5F9',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '5px 7px',
+                    cursor: 'pointer',
+                    color: '#64748B',
+                  }}
+                  title="Close / Cancel"
+                >
+                  <X size={15} />
+                </button>
+              </div>
+            </div>
+
+            {/* Circular Countdown Progress Badge */}
             <div
               style={{
-                width: '64px',
-                height: '64px',
-                background: '#FEF2F2',
-                borderRadius: '50%',
+                position: 'relative',
+                width: '100px',
+                height: '100px',
+                margin: '0 auto 14px auto',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                margin: '0 auto 14px auto',
-                color: '#DC2626',
-                border: '2px solid #FECACA',
               }}
             >
-              <PhoneCall size={28} />
+              <svg width="100" height="100" style={{ transform: 'rotate(-90deg)' }}>
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="42"
+                  stroke="#FEE2E2"
+                  strokeWidth="6"
+                  fill="none"
+                />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="42"
+                  stroke="#DC2626"
+                  strokeWidth="6"
+                  fill="none"
+                  strokeDasharray={264}
+                  strokeDashoffset={autoDialActive ? 264 * (1 - autoDialCountdown / 5) : 0}
+                  strokeLinecap="round"
+                  style={{ transition: 'stroke-dashoffset 0.9s linear' }}
+                />
+              </svg>
+              <div
+                style={{
+                  position: 'absolute',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: '2rem',
+                    fontWeight: 900,
+                    color: autoDialCountdown <= 2 ? '#DC2626' : '#0F172A',
+                    lineHeight: 1,
+                  }}
+                >
+                  {autoDialCountdown}
+                </span>
+                <span style={{ fontSize: '0.58rem', fontWeight: 800, color: '#64748B', letterSpacing: '0.04em' }}>
+                  SEC
+                </span>
+              </div>
             </div>
 
-            <span style={{ fontSize: '0.66rem', fontWeight: 800, color: '#DC2626', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-              DISTRESS SENSOR ACTIVATED
-            </span>
-            <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F172A', margin: '4px 0 8px 0' }}>
-              Call Primary Emergency Contact?
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0F172A', margin: '0 0 4px 0' }}>
+              {autoDialCountdown === 0
+                ? 'Dialing Emergency Contact...'
+                : `Auto-Calling in ${autoDialCountdown} Seconds`}
             </h2>
-            <p style={{ fontSize: '0.80rem', color: '#64748B', lineHeight: 1.5, marginBottom: '16px' }}>
-              Physical device shake confirmed. Ready to dial emergency responder for <strong style={{ color: '#0F172A' }}>{data?.name || 'Patient'}</strong>:
+
+            <p style={{ fontSize: '0.78rem', color: '#64748B', lineHeight: 1.45, marginBottom: '14px' }}>
+              Incapacitation safety protocol engaged for <strong style={{ color: '#0F172A' }}>{data?.name || 'Patient'}</strong>. Phone will dial automatically if not cancelled:
             </p>
 
             {/* Cryptographic Audit Confirmation Badge */}
@@ -809,83 +1004,104 @@ export default function EmergencyCardView({ patientId = null }) {
                 border: '1px solid #BBF7D0',
                 borderRadius: '8px',
                 padding: '4px 10px',
-                fontSize: '0.68rem',
+                fontSize: '0.66rem',
                 color: '#166534',
                 fontWeight: 600,
-                marginBottom: '16px',
+                marginBottom: '14px',
                 fontFamily: 'monospace',
               }}
             >
-              <ShieldCheck size={13} color="#16A34A" />
+              <ShieldCheck size={12} color="#16A34A" />
               <span>
                 {shakeAuditSeal
-                  ? `Audit Logged: ${shakeAuditSeal.substring(0, 14)}...`
+                  ? `Seal: ${shakeAuditSeal.substring(0, 14)}...`
                   : 'Ledger Audit Synchronized'}
               </span>
+              {shakeMetrics?.magnitude && (
+                <span style={{ color: '#0284C7' }}>• {shakeMetrics.magnitude} m/s²</span>
+              )}
             </div>
 
+            {/* Target Contact Card */}
             <div
               style={{
                 background: '#F8FAFC',
                 border: '1px solid #E2E8F0',
                 borderRadius: '12px',
-                padding: '14px 16px',
+                padding: '12px 14px',
                 textAlign: 'left',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '8px',
-                marginBottom: '20px',
+                gap: '6px',
+                marginBottom: '16px',
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
-                <span style={{ color: '#64748B' }}>Contact Person:</span>
-                <strong style={{ color: '#0F172A' }}>{primaryContact.name}</strong>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.80rem' }}>
+                <span style={{ color: '#64748B' }}>Primary Responder:</span>
+                <strong style={{ color: '#0F172A' }}>{primaryContact.name} ({primaryContact.relation})</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
-                <span style={{ color: '#64748B' }}>Relationship:</span>
-                <span style={{ color: '#475569', fontWeight: 600 }}>{primaryContact.relation}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
-                <span style={{ color: '#64748B' }}>Telephone:</span>
+                <span style={{ color: '#64748B' }}>Phone:</span>
                 <strong style={{ color: '#0284C7', fontFamily: 'monospace' }}>{primaryContact.phone}</strong>
               </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <a
-                href={`tel:${primaryContact.phone.replace(/[^0-9+]/g, '')}`}
-                onClick={() => handleDialContact(primaryContact.phone, primaryContact.name)}
+            {/* Action Buttons */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <button
+                type="button"
+                onClick={() => handleImmediateDial(primaryContact.phone, primaryContact.name)}
                 className="triage-pill-btn triage-call-cta"
-                style={{ justifyContent: 'center', padding: '13px', fontSize: '0.88rem' }}
+                style={{
+                  justifyContent: 'center',
+                  padding: '12px',
+                  fontSize: '0.88rem',
+                  fontWeight: 800,
+                  width: '100%',
+                }}
               >
                 <PhoneCall size={16} />
-                <span>DIAL {primaryContact.phone}</span>
-              </a>
-
-              <a
-                href="tel:108"
-                onClick={() => handleDialContact('108', 'National Ambulance')}
-                className="triage-pill-btn triage-outline-btn"
-                style={{ justifyContent: 'center', padding: '11px', fontSize: '0.80rem' }}
-              >
-                <Siren size={15} color="#DC2626" />
-                <span>Or Call 108 (National Ambulance)</span>
-              </a>
+                <span>CALL NOW (SKIP TIMER)</span>
+              </button>
 
               <button
                 type="button"
-                onClick={handleDismissShakeModal}
+                onClick={() => handleImmediateDial('108', 'National Ambulance')}
+                className="triage-pill-btn triage-outline-btn"
                 style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#94A3B8',
-                  fontSize: '0.74rem',
-                  cursor: 'pointer',
-                  padding: '6px',
-                  marginTop: '4px',
+                  justifyContent: 'center',
+                  padding: '10px',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  width: '100%',
                 }}
               >
-                Dismiss SOS Prompt
+                <Siren size={15} color="#DC2626" />
+                <span>Call 108 Ambulance Instead</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleCancelShakeModal}
+                style={{
+                  background: '#FEF2F2',
+                  border: '1.5px solid #FECACA',
+                  borderRadius: '10px',
+                  color: '#DC2626',
+                  fontSize: '0.78rem',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  padding: '10px',
+                  marginTop: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <X size={15} />
+                <span>CANCEL / FALSE ALARM</span>
               </button>
             </div>
           </div>
@@ -903,6 +1119,68 @@ export default function EmergencyCardView({ patientId = null }) {
           gap: '22px',
         }}
       >
+        {/* iOS 13+ & Mobile Accelerometer Permission Activation Banner */}
+        {isShakeSupported && permissionState !== 'granted' && (
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)',
+              border: '1.5px solid #93C5FD',
+              borderRadius: '16px',
+              padding: '12px 18px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '12px',
+              flexWrap: 'wrap',
+              boxShadow: '0 4px 14px rgba(37, 99, 235, 0.08)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '10px',
+                  background: '#2563EB',
+                  color: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 2px 8px rgba(37, 99, 235, 0.25)',
+                }}
+              >
+                <Smartphone size={20} />
+              </div>
+              <div>
+                <strong style={{ fontSize: '0.86rem', color: '#1E3A8A' }}>
+                  Enable Emergency Motion Sensor on this Device
+                </strong>
+                <div style={{ fontSize: '0.74rem', color: '#1D4ED8' }}>
+                  Tap to grant mobile accelerometer permissions for hands-free Shake-to-Call emergency dialing.
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={requestMotionPermission}
+              className="triage-pill-btn"
+              style={{
+                background: '#2563EB',
+                color: '#FFFFFF',
+                border: 'none',
+                padding: '8px 16px',
+                fontWeight: 700,
+                fontSize: '0.78rem',
+                cursor: 'pointer',
+                boxShadow: '0 2px 8px rgba(37, 99, 235, 0.3)',
+              }}
+            >
+              <Zap size={14} />
+              <span>Grant Sensor Access</span>
+            </button>
+          </div>
+        )}
+
         {/* 1. Executive Hero Patient Banner */}
         <div className="triage-hero-banner">
           <div className="triage-hero-left-wrap" style={{ display: 'flex', alignItems: 'flex-start', gap: '20px', flex: 1, minWidth: 0 }}>
@@ -1255,6 +1533,10 @@ export default function EmergencyCardView({ patientId = null }) {
           onRequestPermission={requestMotionPermission}
           permissionState={permissionState}
           isSupported={isShakeSupported}
+          currentMagnitude={currentMagnitude}
+          effectiveThreshold={effectiveThreshold}
+          sensitivity={shakeSensitivity}
+          onSensitivityChange={handleSensitivityChange}
         />
 
         {/* 3. Clinical Direct Intelligence 2-Column Grid */}

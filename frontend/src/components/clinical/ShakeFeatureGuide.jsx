@@ -1,12 +1,24 @@
 import React, { useState } from 'react';
 import {
   Smartphone, Siren, PhoneCall, Zap, ShieldAlert,
-  CheckCircle2, Sparkles, AlertTriangle, ArrowRight, Play
+  CheckCircle2, Sparkles, AlertTriangle, ArrowRight, Play,
+  Volume2, VolumeX, Sliders, Activity
 } from 'lucide-react';
+import { playCountdownTick, startEmergencySiren, stopEmergencySiren } from '../../utils/emergencyAudio.js';
 
-export default function ShakeFeatureGuide({ onTriggerShake, onRequestPermission, permissionState, isSupported }) {
+export default function ShakeFeatureGuide({
+  onTriggerShake,
+  onRequestPermission,
+  permissionState,
+  isSupported,
+  currentMagnitude = 0,
+  effectiveThreshold = 11.8,
+  sensitivity = 'normal',
+  onSensitivityChange,
+}) {
   const [isHovered, setIsHovered] = useState(false);
   const [simulating, setSimulating] = useState(false);
+  const [soundTesting, setSoundTesting] = useState(false);
 
   const handleSimulate = async () => {
     setSimulating(true);
@@ -16,17 +28,33 @@ export default function ShakeFeatureGuide({ onTriggerShake, onRequestPermission,
     if (navigator.vibrate) {
       try {
         navigator.vibrate([100, 50, 100, 50, 200]);
-      } catch (e) {
-        // ignore vibration failures
-      }
+      } catch (_) {}
     }
     setTimeout(() => {
       setSimulating(false);
       if (onTriggerShake) {
         onTriggerShake();
       }
-    }, 600);
+    }, 400);
   };
+
+  const handleTestSirenSound = () => {
+    if (soundTesting) {
+      stopEmergencySiren();
+      setSoundTesting(false);
+    } else {
+      setSoundTesting(true);
+      startEmergencySiren();
+      playCountdownTick(880);
+      setTimeout(() => {
+        stopEmergencySiren();
+        setSoundTesting(false);
+      }, 2500);
+    }
+  };
+
+  // Percentage of current motion relative to threshold (capped at 100%)
+  const meterPercent = Math.min(100, Math.round((currentMagnitude / (effectiveThreshold || 12)) * 100));
 
   return (
     <div
@@ -133,12 +161,13 @@ export default function ShakeFeatureGuide({ onTriggerShake, onRequestPermission,
               Motion Sensor SOS • Shake to Emergency Dial
             </h3>
             <span style={{ fontSize: '0.70rem', color: '#64748B' }}>
-              Instant distress trigger for physical emergency response
+              Instant distress trigger for physical emergency response with 5-second auto-dialer
             </span>
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          {/* Live Motion Status Tag */}
           <span
             style={{
               fontSize: '0.66rem',
@@ -219,10 +248,8 @@ export default function ShakeFeatureGuide({ onTriggerShake, onRequestPermission,
 
             {/* Left & Right Motion Vibration Trails */}
             <g stroke="#087F8C" strokeWidth="2.5" strokeLinecap="round" opacity="0.65">
-              {/* Left motion arcs */}
               <path d="M 38 75 C 32 88 32 112 38 125" />
               <path d="M 28 82 C 22 92 22 108 28 118" strokeDasharray="3 3" />
-              {/* Right motion arcs */}
               <path d="M 162 75 C 168 88 168 112 162 125" stroke="#DC2626" />
               <path d="M 172 82 C 178 92 178 108 172 118" stroke="#DC2626" strokeDasharray="3 3" />
             </g>
@@ -256,14 +283,14 @@ export default function ShakeFeatureGuide({ onTriggerShake, onRequestPermission,
                 SOS READY
               </text>
               <text x="100" y="128" textAnchor="middle" fill="#94A3B8" fontSize="5.5" fontWeight="600" fontFamily="sans-serif">
-                SHAKE DETECTED
+                5s AUTO-DIAL
               </text>
 
               {/* Bottom Home Indicator */}
               <line x1="88" y1="154" x2="112" y2="154" stroke="#475569" strokeWidth="2" strokeLinecap="round" />
             </g>
 
-            {/* Subtle Gradient Definitions */}
+            {/* Gradient Definitions */}
             <defs>
               <radialGradient id="sosGrad" cx="0.5" cy="0.5" r="0.5" fx="0.5" fy="0.5">
                 <stop offset="0%" stopColor="#EF4444" stopOpacity="0.6" />
@@ -289,7 +316,7 @@ export default function ShakeFeatureGuide({ onTriggerShake, onRequestPermission,
                 letterSpacing: '0.04em',
               }}
             >
-              Hardware Accelerometer Assist
+              Hardware Accelerometer Assist • Gravity-Compensated
             </span>
           </div>
 
@@ -297,20 +324,49 @@ export default function ShakeFeatureGuide({ onTriggerShake, onRequestPermission,
             How Emergency Shake Detection Works
           </h4>
 
-          <p style={{ fontSize: '0.80rem', color: '#475569', lineHeight: 1.55, margin: '0 0 14px 0' }}>
-            In high-stress medical emergencies, cardiac events, or severe physical injury, navigating phone menus can be impossible.
-            Simply <strong>shake your smartphone 2–3 times</strong> to instantly trigger the Q-Rakshak Emergency Protocol and one-tap dial your primary next-of-kin or national 108 EMS.
+          <p style={{ fontSize: '0.80rem', color: '#475569', lineHeight: 1.55, margin: '0 0 12px 0' }}>
+            In acute trauma, seizure, or severe cardiac events, victims cannot navigate phone touchscreens.
+            Simply <strong>shake your smartphone 2–3 times</strong>: Q-Rakshak sounds an audio alarm beacon and begins a <strong>5-second auto-dial countdown</strong> to reach your next-of-kin or 108 EMS even if you lose consciousness!
           </p>
 
-          <div className="shake-guide-actions" style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+          {/* Real-time Dynamic Accelerometer Diagnostics Bar */}
+          {isSupported && (
+            <div style={{ background: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '10px', padding: '10px 12px', marginBottom: '14px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                <span style={{ fontSize: '0.70rem', color: '#475569', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <Activity size={12} color="#0284C7" />
+                  <span>Real-Time Kinetic Motion:</span>
+                  <strong style={{ fontFamily: 'monospace', color: currentMagnitude > effectiveThreshold ? '#DC2626' : '#0F172A' }}>
+                    {currentMagnitude.toFixed(1)} m/s²
+                  </strong>
+                </span>
+                <span style={{ fontSize: '0.68rem', color: '#64748B', fontFamily: 'monospace' }}>
+                  Target: {effectiveThreshold} m/s²
+                </span>
+              </div>
+              <div style={{ width: '100%', height: '6px', background: '#E2E8F0', borderRadius: '3px', overflow: 'hidden' }}>
+                <div
+                  style={{
+                    height: '100%',
+                    width: `${meterPercent}%`,
+                    background: meterPercent >= 90 ? 'linear-gradient(90deg, #F59E0B, #DC2626)' : '#0284C7',
+                    transition: 'width 0.1s ease',
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Action Bar */}
+          <div className="shake-guide-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
             <button
               type="button"
               onClick={handleSimulate}
               disabled={simulating}
               className="triage-pill-btn triage-call-cta"
               style={{
-                padding: '8px 16px',
-                fontSize: '0.78rem',
+                padding: '8px 14px',
+                fontSize: '0.76rem',
                 fontWeight: 700,
                 cursor: 'pointer',
                 display: 'inline-flex',
@@ -318,8 +374,27 @@ export default function ShakeFeatureGuide({ onTriggerShake, onRequestPermission,
                 gap: '6px',
               }}
             >
-              <Play size={14} />
+              <Play size={13} />
               <span>{simulating ? 'Detecting Shake...' : 'Simulate Shake SOS'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleTestSirenSound}
+              className="triage-pill-btn triage-outline-btn"
+              style={{
+                padding: '8px 12px',
+                fontSize: '0.76rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+              title="Test siren audio beacon volume"
+            >
+              {soundTesting ? <VolumeX size={13} color="#DC2626" /> : <Volume2 size={13} color="#087F8C" />}
+              <span>{soundTesting ? 'Stop Siren' : 'Test Siren Sound'}</span>
             </button>
 
             {onRequestPermission && permissionState !== 'granted' && (
@@ -328,8 +403,8 @@ export default function ShakeFeatureGuide({ onTriggerShake, onRequestPermission,
                 onClick={onRequestPermission}
                 className="triage-pill-btn triage-outline-btn"
                 style={{
-                  padding: '8px 14px',
-                  fontSize: '0.78rem',
+                  padding: '8px 12px',
+                  fontSize: '0.76rem',
                   fontWeight: 700,
                   cursor: 'pointer',
                   display: 'inline-flex',
@@ -337,9 +412,37 @@ export default function ShakeFeatureGuide({ onTriggerShake, onRequestPermission,
                   gap: '6px',
                 }}
               >
-                <Zap size={14} color="#087F8C" />
-                <span>Grant Motion Access</span>
+                <Zap size={13} color="#087F8C" />
+                <span>Grant Sensor Access</span>
               </button>
+            )}
+
+            {/* Sensitivity Preset Switcher */}
+            {onSensitivityChange && (
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#F1F5F9', padding: '3px 8px', borderRadius: '8px' }}>
+                <span style={{ fontSize: '0.66rem', color: '#64748B', fontWeight: 600 }}>Sensitivity:</span>
+                {['high', 'normal', 'low'].map((lvl) => (
+                  <button
+                    key={lvl}
+                    type="button"
+                    onClick={() => onSensitivityChange(lvl)}
+                    style={{
+                      border: 'none',
+                      background: sensitivity === lvl ? '#FFFFFF' : 'transparent',
+                      color: sensitivity === lvl ? '#0F172A' : '#64748B',
+                      boxShadow: sensitivity === lvl ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                      borderRadius: '5px',
+                      padding: '2px 6px',
+                      fontSize: '0.66rem',
+                      fontWeight: sensitivity === lvl ? 700 : 500,
+                      cursor: 'pointer',
+                      textTransform: 'capitalize',
+                    }}
+                  >
+                    {lvl === 'high' ? 'High (Gentle)' : lvl === 'normal' ? 'Normal' : 'Low (Vigorous)'}
+                  </button>
+                ))}
+              </div>
             )}
           </div>
         </div>
@@ -375,10 +478,10 @@ export default function ShakeFeatureGuide({ onTriggerShake, onRequestPermission,
             >
               1
             </div>
-            <strong style={{ fontSize: '0.82rem', color: '#0F172A' }}>Rapid Shake Motion</strong>
+            <strong style={{ fontSize: '0.82rem', color: '#0F172A' }}>Dual-Reversal Shake</strong>
           </div>
           <p style={{ fontSize: '0.72rem', color: '#64748B', margin: 0, lineHeight: 1.45 }}>
-            Vigorously shake device along X/Y axes (calibrated &gt;12G threshold to prevent accidental triggers).
+            Rapid kinetic shake in hand. Low-pass filter extracts pure linear acceleration from Earth's 9.8m/s² gravity.
           </p>
         </div>
 
@@ -410,10 +513,10 @@ export default function ShakeFeatureGuide({ onTriggerShake, onRequestPermission,
             >
               2
             </div>
-            <strong style={{ fontSize: '0.82rem', color: '#0F172A' }}>Zero-Lag Sensor Hook</strong>
+            <strong style={{ fontSize: '0.82rem', color: '#0F172A' }}>Audio Siren & Haptics</strong>
           </div>
           <p style={{ fontSize: '0.72rem', color: '#64748B', margin: 0, lineHeight: 1.45 }}>
-            Native <code>DeviceMotionEvent</code> listener detects sudden kinetic acceleration instantaneously.
+            Immediate high-audibility Web Audio alarm beacon alerts bystanders and confirms trigger via vibration telemetry.
           </p>
         </div>
 
@@ -445,10 +548,10 @@ export default function ShakeFeatureGuide({ onTriggerShake, onRequestPermission,
             >
               3
             </div>
-            <strong style={{ fontSize: '0.82rem', color: '#0F172A' }}>Auto 1-Tap SOS Dialer</strong>
+            <strong style={{ fontSize: '0.82rem', color: '#0F172A' }}>5s Cancelable Auto-Dial</strong>
           </div>
           <p style={{ fontSize: '0.72rem', color: '#64748B', margin: 0, lineHeight: 1.45 }}>
-            Immediate cellular dialer overlay appears with verified contact numbers and 108 Emergency Helpline.
+            Automated 5-second countdown timer. Auto-dials primary contact or 108 if victim is incapacitated; cancelable with 1 tap.
           </p>
         </div>
       </div>

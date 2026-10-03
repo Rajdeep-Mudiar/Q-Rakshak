@@ -1,40 +1,51 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 /**
- * High-precision, zero-false-positive Shake Detection Hook for Emergency Medical Callers.
+ * High-Precision, Cross-Platform Shake Detection Hook for Emergency Medical Callers.
  *
- * Problems in previous version:
- * 1. Read `event.accelerationIncludingGravity`, causing standard tilt/hand-tremor (9.8 m/s²)
- *    to cross naive thresholds continuously.
- * 2. No oscillation direction-reversal validation; a single bump or tilting car triggered it.
- * 3. Cooldown was only 1500ms, and it didn't respect whether the SOS modal was already open,
- *    leading to infinite re-triggering loops ("call is going again and again").
+ * Designed specifically for Q-Rakshak Mobile & PWA Emergency Responders:
+ * 1. Handles Android Chrome / Samsung Internet where `event.acceleration` is null
+ *    by using digital low-pass gravity vector isolation (alpha filter).
+ * 2. Handles modern iOS Safari 13+ user-gesture permission model (`requestPermission`).
+ * 3. Oscillation Direction Reversal: requires at least 2 sign reversals within a 750ms window
+ *    to eliminate false positives from car bumps, footsteps, or tilting the device.
+ * 4. Calibrated default threshold (11.8 m/s²) with high/normal/low sensitivity profiles
+ *    to accommodate pediatric, elderly, and trauma patients.
+ * 5. Native haptic feedback burst upon detection.
+ * 6. Enabled-gate: prevents infinite re-triggering loops while the SOS modal is open.
+ * 7. Live motion telemetry for accelerometer diagnostic meters.
  *
- * Improvements in this version:
- * 1. Prioritizes pure linear acceleration (`event.acceleration`).
- * 2. If only gravity-inclusive acceleration is present, applies high-pass delta filtering.
- * 3. Requires MULTI-DIRECTIONAL reversal oscillations (at least 2 direction sign flips)
- *    within a short time window (600ms) with peak magnitude exceeding threshold (calibrated 16.0 m/s²).
- * 4. Accepts `enabled` flag so modal can pause detection completely while open.
- * 5. Extended cooldown (default 4000ms).
- * 6. Native haptic feedback (`navigator.vibrate([200, 100, 200])`) upon genuine shake.
- *
- * @param {Function} onShake - Callback function triggered when a genuine shake is confirmed
+ * @param {Function} onShake - Callback invoked upon verified emergency shake
  * @param {Object} options - Configuration options
  */
+
+const SENSITIVITY_PRESETS = {
+  high: 9.8,    // Easier to shake: recommended for elderly, pediatric, or acute shock
+  normal: 11.8, // Balanced: intentional human hand shake, filters out walking & drops
+  low: 14.5,    // Stiff: vigorous shaking required, prevents false alarms in vehicles
+};
+
 export function useShakeDetection(onShake, options = {}) {
   const {
-    threshold = 16.5, // Calibrated acceleration threshold in m/s^2 (excluding gravity)
-    timeout = 4000,   // Cooldown between shake events (ms)
-    reversalsRequired = 2, // At least 2 direction changes required for genuine shake
-    windowMs = 650,   // Time window to accumulate reversals
+    sensitivity = 'normal',
+    threshold: customThreshold,
+    timeout = 4000,
+    reversalsRequired = 2,
+    windowMs = 750,
     enabled = true,
   } = options;
 
+  const effectiveThreshold = customThreshold !== undefined
+    ? Number(customThreshold)
+    : (SENSITIVITY_PRESETS[sensitivity] || SENSITIVITY_PRESETS.normal);
+
   const [isSupported, setIsSupported] = useState(false);
   const [permissionState, setPermissionState] = useState('unknown'); // 'unknown' | 'granted' | 'denied'
+  const [currentMagnitude, setCurrentMagnitude] = useState(0);
+
   const callbackRef = useRef(onShake);
   const enabledRef = useRef(enabled);
+  const lastMeterUpdateRef = useRef(0);
 
   useEffect(() => {
     callbackRef.current = onShake;
@@ -44,7 +55,7 @@ export function useShakeDetection(onShake, options = {}) {
     enabledRef.current = enabled;
   }, [enabled]);
 
-  // Request permission for iOS 13+ devices on user gesture
+  // Request motion permission on iOS 13+ user gesture
   const requestMotionPermission = useCallback(async () => {
     if (typeof window === 'undefined') return false;
 
@@ -67,37 +78,51 @@ export function useShakeDetection(onShake, options = {}) {
     }
   }, []);
 
-  // Manual test trigger for simulators, desktop or UI test buttons
+  // Manual test trigger for simulators, desktop browsers, or preview buttons
   const triggerShake = useCallback((metrics = null) => {
     if (navigator.vibrate) {
       try {
-        navigator.vibrate([150, 80, 150]);
-      } catch (e) {
-        // ignore vibration block
+        navigator.vibrate([180, 80, 180, 80, 250]);
+      } catch (_) {
+        // vibration blocked or unsupported
       }
     }
     if (callbackRef.current) {
-      callbackRef.current(metrics || { simulated: true, timestamp: Date.now() });
+      callbackRef.current(
+        metrics || {
+          simulated: true,
+          magnitude: effectiveThreshold + 2.5,
+          timestamp: Date.now(),
+        }
+      );
     }
-  }, []);
+  }, [effectiveThreshold]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     if (window.DeviceMotionEvent) {
       setIsSupported(true);
+    } else {
+      setIsSupported(false);
+      return;
     }
 
     if (!enabled) return;
 
-    let lastX = 0;
-    let lastY = 0;
-    let lastZ = 0;
+    // Digital gravity low-pass state
+    let gravityX = 0;
+    let gravityY = 0;
+    let gravityZ = 0;
+    let initializedGravity = false;
+
     let lastDirectionX = 0;
     let lastDirectionY = 0;
     let reversalCount = 0;
     let gestureStartTime = 0;
     let lastTriggerTime = 0;
+
+    const ALPHA = 0.82; // Gravity smoothing constant
 
     function handleMotion(event) {
       if (!enabledRef.current) return;
@@ -105,66 +130,89 @@ export function useShakeDetection(onShake, options = {}) {
       const now = Date.now();
       if (now - lastTriggerTime < timeout) return;
 
-      // Prefer pure linear acceleration (without earth's 9.8m/s² gravity vector)
       let curX = 0;
       let curY = 0;
       let curZ = 0;
 
-      if (event.acceleration && (event.acceleration.x !== null || event.acceleration.y !== null)) {
+      // Case 1: Pure linear acceleration directly provided (iOS, modern fused sensors)
+      if (
+        event.acceleration &&
+        event.acceleration.x !== null &&
+        event.acceleration.y !== null
+      ) {
         curX = Number(event.acceleration.x) || 0;
         curY = Number(event.acceleration.y) || 0;
         curZ = Number(event.acceleration.z) || 0;
-      } else if (event.accelerationIncludingGravity) {
-        // High-pass filter delta when only gravity-inclusive sensor is available
+      }
+      // Case 2: Acceleration including gravity (Standard Android Chrome / WebViews)
+      else if (event.accelerationIncludingGravity) {
         const rawX = Number(event.accelerationIncludingGravity.x) || 0;
         const rawY = Number(event.accelerationIncludingGravity.y) || 0;
         const rawZ = Number(event.accelerationIncludingGravity.z) || 0;
-        curX = rawX - lastX;
-        curY = rawY - lastY;
-        curZ = rawZ - lastZ;
-        lastX = rawX;
-        lastY = rawY;
-        lastZ = rawZ;
+
+        if (!initializedGravity) {
+          gravityX = rawX;
+          gravityY = rawY;
+          gravityZ = rawZ;
+          initializedGravity = true;
+          return;
+        }
+
+        // Low-pass filter to isolate Earth's 9.8 m/s² gravity vector across orientations
+        gravityX = ALPHA * gravityX + (1 - ALPHA) * rawX;
+        gravityY = ALPHA * gravityY + (1 - ALPHA) * rawY;
+        gravityZ = ALPHA * gravityZ + (1 - ALPHA) * rawZ;
+
+        // High-pass dynamic linear motion
+        curX = rawX - gravityX;
+        curY = rawY - gravityY;
+        curZ = rawZ - gravityZ;
       } else {
         return;
       }
 
+      // Net dynamic magnitude (m/s²)
       const magnitude = Math.sqrt(curX * curX + curY * curY + curZ * curZ);
 
-      // Only evaluate if acceleration is significant enough to be an active shake
-      if (magnitude > threshold) {
+      // Throttled UI telemetry meter update (~10 fps to prevent React render saturation)
+      if (now - lastMeterUpdateRef.current > 100) {
+        lastMeterUpdateRef.current = now;
+        setCurrentMagnitude(Math.round(magnitude * 10) / 10);
+      }
+
+      // Evaluate kinetic shake oscillation
+      if (magnitude > effectiveThreshold) {
         const dirX = curX > 0 ? 1 : -1;
         const dirY = curY > 0 ? 1 : -1;
 
-        if (gestureStartTime === 0 || (now - gestureStartTime) > windowMs) {
-          // Start a new shake candidate gesture
+        if (gestureStartTime === 0 || now - gestureStartTime > windowMs) {
+          // Begin gesture observation window
           gestureStartTime = now;
           reversalCount = 0;
           lastDirectionX = dirX;
           lastDirectionY = dirY;
         } else {
-          // Check for sign change in primary axis
-          const reversed = (dirX !== lastDirectionX && Math.abs(curX) > (threshold * 0.7)) ||
-                           (dirY !== lastDirectionY && Math.abs(curY) > (threshold * 0.7));
+          // Check for direction reversal in the primary moving axes
+          const reversed =
+            (dirX !== lastDirectionX && Math.abs(curX) > effectiveThreshold * 0.65) ||
+            (dirY !== lastDirectionY && Math.abs(curY) > effectiveThreshold * 0.65);
 
           if (reversed) {
             reversalCount++;
             lastDirectionX = dirX;
             lastDirectionY = dirY;
 
-            // Genuine shake confirmed when multiple rapid direction reversals occur
+            // Verified genuine shake confirmed
             if (reversalCount >= reversalsRequired) {
               lastTriggerTime = now;
               gestureStartTime = 0;
               reversalCount = 0;
 
-              // Haptic feedback
+              // Native multi-pulse haptic vibration
               if (navigator.vibrate) {
                 try {
-                  navigator.vibrate([200, 100, 200]);
-                } catch (e) {
-                  // vibration not allowed
-                }
+                  navigator.vibrate([220, 90, 220, 90, 320]);
+                } catch (_) {}
               }
 
               if (callbackRef.current) {
@@ -179,8 +227,8 @@ export function useShakeDetection(onShake, options = {}) {
           }
         }
       } else {
-        // Reset window if prolonged calm
-        if (gestureStartTime !== 0 && (now - gestureStartTime) > windowMs) {
+        // Reset gesture window on prolonged rest
+        if (gestureStartTime !== 0 && now - gestureStartTime > windowMs) {
           gestureStartTime = 0;
           reversalCount = 0;
         }
@@ -192,11 +240,13 @@ export function useShakeDetection(onShake, options = {}) {
     return () => {
       window.removeEventListener('devicemotion', handleMotion);
     };
-  }, [enabled, threshold, timeout, reversalsRequired, windowMs]);
+  }, [enabled, effectiveThreshold, timeout, reversalsRequired, windowMs]);
 
   return {
     isSupported,
     permissionState,
+    currentMagnitude,
+    effectiveThreshold,
     requestMotionPermission,
     triggerShake,
   };
