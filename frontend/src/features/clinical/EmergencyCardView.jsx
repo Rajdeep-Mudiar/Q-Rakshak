@@ -5,7 +5,8 @@ import {
   PhoneCall, AlertOctagon, CheckCircle2, Siren,
   Smartphone, MapPin, Building2, Copy, Check, Printer,
   QrCode, ExternalLink, Flame, ShieldAlert, ShieldCheck,
-  RotateCw, Mail, Sparkles, ArrowUpRight
+  RotateCw, Mail, Sparkles, ArrowUpRight, ChevronDown,
+  Search, Users
 } from 'lucide-react';
 import apiClient from '../../api/client';
 import QRCodeSVG from '../../components/common/QRCodeSVG';
@@ -22,7 +23,28 @@ import { authApi } from '../../api/auth';
 export default function EmergencyCardView({ patientId = null }) {
   const { t } = useLanguage();
   const storedUser = authApi.getStoredUser();
-  const effectivePatientId = patientId || storedUser?.patient_id || storedUser?.user_id || storedUser?.id || (storedUser?.username ? `USR-${storedUser.username.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()}` : '') || 'USR-ARYAN';
+
+  // Active patient roster for triage selector
+  const [patientRoster, setPatientRoster] = useState([]);
+  const [selectedPatientId, setSelectedPatientId] = useState(() => {
+    if (patientId) return patientId;
+    if (typeof window !== 'undefined' && window.location.hash) {
+      const parts = window.location.hash.replace(/^#\/?/, '').split('?')[0].split('/');
+      if (parts.length > 1 && parts[1]) return parts[1];
+    }
+    const saved = typeof localStorage !== 'undefined' ? localStorage.getItem('qmed_selected_patient') : null;
+    if (saved) return saved;
+    if (storedUser?.role === 'patient') {
+      return storedUser?.patient_id || storedUser?.user_id || storedUser?.id || '';
+    }
+    return '';
+  });
+
+  const [patientSearchQuery, setPatientSearchQuery] = useState('');
+  const [patientDropdownOpen, setPatientDropdownOpen] = useState(false);
+  const patientDropdownRef = useRef(null);
+
+  const effectivePatientId = selectedPatientId || patientId || (patientRoster[0]?.id) || 'PT-89421';
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
@@ -108,13 +130,85 @@ export default function EmergencyCardView({ patientId = null }) {
 
   const emergencyPortalUrl = getEmergencyPortalUrl(effectivePatientId);
 
+  // Load roster of active patients on mount
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchRoster() {
+      try {
+        const res = await apiClient.get('/api/v1/emergency/patients/list');
+        if (isMounted && res?.patients && Array.isArray(res.patients) && res.patients.length > 0) {
+          setPatientRoster(res.patients);
+          if (!selectedPatientId && !patientId) {
+            const firstPid = res.patients[0].id;
+            setSelectedPatientId(firstPid);
+            try { localStorage.setItem('qmed_selected_patient', firstPid); } catch (_) {}
+          }
+        }
+      } catch (err) {
+        console.warn('Could not fetch emergency patient roster:', err);
+      }
+    }
+    fetchRoster();
+    return () => { isMounted = false; };
+  }, []);
+
+  // Sync selectedPatientId when prop patientId changes
+  useEffect(() => {
+    if (patientId && patientId !== selectedPatientId) {
+      setSelectedPatientId(patientId);
+      try { localStorage.setItem('qmed_selected_patient', patientId); } catch (_) {}
+    }
+  }, [patientId]);
+
+  // Click-outside listener for patient dropdown
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (patientDropdownRef.current && !patientDropdownRef.current.contains(e.target)) {
+        setPatientDropdownOpen(false);
+      }
+    }
+    if (patientDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [patientDropdownOpen]);
+
+  function handleSelectPatient(pid) {
+    if (!pid) return;
+    setSelectedPatientId(pid);
+    try { localStorage.setItem('qmed_selected_patient', pid); } catch (_) {}
+    setPatientDropdownOpen(false);
+    if (typeof window !== 'undefined') {
+      window.location.hash = `#triage/${pid}`;
+    }
+  }
+
   async function loadData(showLoader = true) {
+    if (!effectivePatientId) return;
     if (showLoader) setLoading(true);
     else setSyncing(true);
     setError(null);
     try {
       const res = await apiClient.get(`/api/v1/emergency/${effectivePatientId}`);
-      if (res && (res.name || res.patient_id || res.blood_group)) {
+      if (res && res.id) {
+        // If baseline vitals or allergies are missing, enrich from clinical records
+        if (!res.baseline_vitals || (!res.allergies?.length && !res.conditions?.length)) {
+          try {
+            const clinRes = await apiClient.get(`/api/v1/clinical/patient/${effectivePatientId}`);
+            if (clinRes?.patient) {
+              setData({
+                ...clinRes.patient,
+                ...res,
+                baseline_vitals: clinRes.patient.baseline_vitals || res.baseline_vitals,
+                allergies: (clinRes.patient.allergies?.length ? clinRes.patient.allergies : res.allergies) || [],
+                conditions: (clinRes.patient.conditions?.length ? clinRes.patient.conditions : res.conditions) || [],
+              });
+              return;
+            }
+          } catch (_) {}
+        }
         setData(res);
       } else {
         const clinRes = await apiClient.get(`/api/v1/clinical/patient/${effectivePatientId}`);
@@ -145,8 +239,10 @@ export default function EmergencyCardView({ patientId = null }) {
   }
 
   useEffect(() => {
-    loadData(true);
-  }, [patientId, effectivePatientId]);
+    if (effectivePatientId) {
+      loadData(true);
+    }
+  }, [effectivePatientId]);
 
   const primaryContact = data?.emergency_contacts?.find((c) => c.is_primary && c.phone && c.phone !== '—') ||
     data?.emergency_contacts?.find((c) => c.phone && c.phone !== '—') ||
@@ -422,6 +518,153 @@ export default function EmergencyCardView({ patientId = null }) {
               <span>Verified Medical Passport • 24/7 Active</span>
             </div>
           </div>
+        </div>
+
+        {/* Clinician & Triage Patient Switcher HUD */}
+        <div ref={patientDropdownRef} className="no-print" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+          <div
+            onClick={() => setPatientDropdownOpen((prev) => !prev)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '6px 14px',
+              background: '#FFFFFF',
+              border: '1.5px solid #CBD5E1',
+              borderRadius: '12px',
+              cursor: 'pointer',
+              userSelect: 'none',
+              transition: 'all 0.18s ease',
+              boxShadow: '0 2px 6px rgba(15, 23, 42, 0.04)',
+            }}
+            title="Click to switch active emergency patient record"
+          >
+            <div style={{
+              width: '28px',
+              height: '28px',
+              borderRadius: '8px',
+              background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
+              color: '#FFFFFF',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '0.72rem',
+              fontWeight: 900,
+              boxShadow: '0 2px 6px rgba(220, 38, 38, 0.25)',
+            }}>
+              {data?.blood_group && data.blood_group !== '—' ? data.blood_group : <Users size={14} />}
+            </div>
+            <div style={{ textAlign: 'left', lineHeight: 1.25 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#0F172A' }}>
+                  {data?.name || 'Select Patient'}
+                </span>
+                <span style={{ fontSize: '0.62rem', fontWeight: 700, padding: '1px 6px', borderRadius: '4px', background: '#F1F5F9', color: '#475569', fontFamily: 'monospace' }}>
+                  {data?.id || effectivePatientId}
+                </span>
+              </div>
+              <span style={{ fontSize: '0.68rem', color: '#64748B' }}>
+                {data?.age ? `${data.age} Yrs` : 'Active Record'} {data?.gender ? `• ${data.gender}` : ''} {data?.mrn ? `• ${data.mrn}` : ''}
+              </span>
+            </div>
+            <ChevronDown size={14} color="#64748B" style={{ transform: patientDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease', marginLeft: '4px' }} />
+          </div>
+
+          {/* Patient Roster Dropdown */}
+          {patientDropdownOpen && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 'calc(100% + 8px)',
+                left: 0,
+                width: '330px',
+                background: '#FFFFFF',
+                border: '1px solid #E2E8F0',
+                borderRadius: '14px',
+                boxShadow: '0 15px 35px -5px rgba(15, 23, 42, 0.15)',
+                zIndex: 1000,
+                overflow: 'hidden',
+              }}
+            >
+              <div style={{ padding: '10px 12px', borderBottom: '1px solid #F1F5F9', background: '#F8FAFC' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#FFFFFF', border: '1px solid #CBD5E1', borderRadius: '8px', padding: '6px 10px' }}>
+                  <Search size={13} color="#94A3B8" />
+                  <input
+                    type="text"
+                    placeholder="Search by name, ID, or MRN..."
+                    value={patientSearchQuery}
+                    onChange={(e) => setPatientSearchQuery(e.target.value)}
+                    style={{ border: 'none', outline: 'none', fontSize: '0.74rem', width: '100%', background: 'transparent' }}
+                    autoFocus
+                  />
+                </div>
+              </div>
+
+              <div style={{ maxHeight: '250px', overflowY: 'auto', padding: '6px' }}>
+                {patientRoster.length === 0 ? (
+                  <div style={{ padding: '12px', textAlign: 'center', fontSize: '0.74rem', color: '#64748B' }}>
+                    No other patients found in registry.
+                  </div>
+                ) : (
+                  patientRoster
+                    .filter((p) => {
+                      if (!patientSearchQuery.trim()) return true;
+                      const q = patientSearchQuery.toLowerCase();
+                      return (
+                        (p.name || '').toLowerCase().includes(q) ||
+                        (p.id || '').toLowerCase().includes(q) ||
+                        (p.mrn || '').toLowerCase().includes(q)
+                      );
+                    })
+                    .map((p) => {
+                      const isSelected = p.id === effectivePatientId;
+                      return (
+                        <div
+                          key={p.id}
+                          onClick={() => handleSelectPatient(p.id)}
+                          style={{
+                            padding: '8px 10px',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            background: isSelected ? '#EFF6FF' : 'transparent',
+                            border: isSelected ? '1px solid #BFDBFE' : '1px solid transparent',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            gap: '8px',
+                            marginBottom: '2px',
+                            transition: 'background 0.15s ease',
+                          }}
+                        >
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', textAlign: 'left' }}>
+                            <span style={{ fontSize: '0.78rem', fontWeight: 700, color: isSelected ? '#1D4ED8' : '#0F172A' }}>
+                              {p.name || p.id}
+                            </span>
+                            <span style={{ fontSize: '0.66rem', color: '#64748B', fontFamily: 'monospace' }}>
+                              {p.id} {p.mrn ? `• ${p.mrn}` : ''} {p.age ? `• ${p.age}y` : ''}
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{
+                              fontSize: '0.66rem',
+                              fontWeight: 800,
+                              padding: '2px 7px',
+                              borderRadius: '4px',
+                              background: '#FEF2F2',
+                              color: '#DC2626',
+                              border: '1px solid #FECACA',
+                            }}>
+                              {p.blood_group || '—'}
+                            </span>
+                            {isSelected && <Check size={14} color="#2563EB" />}
+                          </div>
+                        </div>
+                      );
+                    })
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="triage-header-actions no-print" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
@@ -716,9 +959,34 @@ export default function EmergencyCardView({ patientId = null }) {
                 )}
               </div>
 
-              <h1 style={{ fontSize: 'clamp(1.4rem, 4vw, 2.2rem)', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', margin: 0, wordBreak: 'break-word' }}>
-                {data?.name || 'Patient'}
-              </h1>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                <h1 style={{ fontSize: 'clamp(1.4rem, 4vw, 2.2rem)', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', margin: 0, wordBreak: 'break-word' }}>
+                  {data?.name || 'Patient'}
+                </h1>
+                {patientRoster.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => setPatientDropdownOpen(true)}
+                    className="no-print"
+                    style={{
+                      background: '#F1F5F9',
+                      border: '1px solid #CBD5E1',
+                      borderRadius: '8px',
+                      padding: '4px 10px',
+                      fontSize: '0.70rem',
+                      fontWeight: 700,
+                      color: '#0284C7',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                    title="Switch active patient"
+                  >
+                    <Users size={12} /> Switch Record
+                  </button>
+                )}
+              </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748B', fontSize: '0.80rem', flexWrap: 'wrap' }}>
                 <span>{data?.age ? `${data.age} Yrs` : 'Age Unspecified'}</span>

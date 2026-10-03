@@ -21,29 +21,42 @@ function AppRouter() {
       return clean || null;
     }
 
-    // 1. Hash-based triage and emergency routes (e.g. #triage, #triage/USR-ARYAN, #/emergency/USR-ALEX)
+    // Extract potential query parameters embedded inside the hash
+    const hashQueryString = hash.includes("?") ? hash.substring(hash.indexOf("?") + 1) : "";
+    const hashParams = new URLSearchParams(hashQueryString);
+
+    function extractPatientId(parts) {
+      if (parts.length > 1 && parts[1]) return parts[1];
+      const fromHash = hashParams.get("patient") || hashParams.get("id") || hashParams.get("patient_id");
+      if (fromHash) return fromHash;
+      const fromSearch = search.get("patient") || search.get("id") || search.get("patient_id");
+      if (fromSearch) return fromSearch;
+      try {
+        return localStorage.getItem("qmed_selected_patient");
+      } catch (_) {
+        return null;
+      }
+    }
+
+    // 1. Hash-based triage and emergency routes (e.g. #triage, #triage/PT-89421, #triage?patient=PT-89421)
     const cleanHash = hash.replace(/^#\/?/, "");
     if (cleanHash === "triage" || cleanHash.startsWith("triage/") || cleanHash.startsWith("triage?")) {
       const parts = cleanHash.split("?")[0].split("/").filter(Boolean);
-      const pid = parts.length > 1 ? parts[1] : (search.get("patient") || search.get("id"));
-      return { isEmergency: true, patientId: sanitizeId(pid) };
+      return { isEmergency: true, patientId: sanitizeId(extractPatientId(parts)) };
     }
     if (cleanHash === "emergency" || cleanHash.startsWith("emergency/") || cleanHash.startsWith("emergency?")) {
       const parts = cleanHash.split("?")[0].split("/").filter(Boolean);
-      const pid = parts.length > 1 ? parts[1] : (search.get("patient") || search.get("id"));
-      return { isEmergency: true, patientId: sanitizeId(pid) };
+      return { isEmergency: true, patientId: sanitizeId(extractPatientId(parts)) };
     }
 
-    // 2. Path-based triage and emergency routes (e.g. /triage/USR-ARYAN, /emergency)
+    // 2. Path-based triage and emergency routes (e.g. /triage/PT-89421, /emergency)
     if (path.startsWith("/triage/") || path === "/triage") {
       const parts = path.split("/").filter(Boolean);
-      const pid = parts.length > 1 ? parts[parts.length - 1] : search.get("patient") || search.get("id");
-      return { isEmergency: true, patientId: sanitizeId(pid) };
+      return { isEmergency: true, patientId: sanitizeId(extractPatientId(parts)) };
     }
     if (path.startsWith("/emergency/") || path === "/emergency") {
       const parts = path.split("/").filter(Boolean);
-      const pid = parts.length > 1 ? parts[parts.length - 1] : search.get("patient") || search.get("id");
-      return { isEmergency: true, patientId: sanitizeId(pid) };
+      return { isEmergency: true, patientId: sanitizeId(extractPatientId(parts)) };
     }
 
     // 3. Query-parameter based triage routing (e.g. ?tab=emergency&patient=USR-ALEX)

@@ -572,11 +572,21 @@ export default function UnifiedAnalysisPage() {
   // Dynamic authenticated user state with session recovery and cross-tab sync
   useEffect(() => {
     if (currentUser) {
-      setPatientId(resolvePatientId(currentUser));
+      const pid = resolvePatientId(currentUser);
+      setPatientId(pid);
+      if (pid) {
+        try { localStorage.setItem("qmed_selected_patient", pid); } catch (_) {}
+      }
     } else {
       setPatientId("");
     }
   }, [currentUser]);
+
+  useEffect(() => {
+    if (effectivePatientId && effectivePatientId !== "PATIENT") {
+      try { localStorage.setItem("qmed_selected_patient", effectivePatientId); } catch (_) {}
+    }
+  }, [effectivePatientId]);
 
   useEffect(() => {
     function handleStorageChange(e) {

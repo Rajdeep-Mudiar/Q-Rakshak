@@ -15,17 +15,14 @@ export const EMERGENCY_PORTAL_BASE =
  * code can reach the emergency passport without localhost connection refused errors.
  */
 export function getEmergencyPortalUrl(patientId) {
-  const pid = String(patientId || "USR-ARYAN").trim();
+  const pid = String(patientId || "PT-89421").trim();
   const envBase = import.meta.env.VITE_EMERGENCY_PORTAL_BASE || import.meta.env.VITE_APP_URL;
   if (envBase) {
     const clean = envBase.replace(/\/+$/, "");
     return clean.includes("#triage") ? `${clean}/${pid}` : `${clean}/#triage/${pid}`;
   }
-  if (typeof window !== "undefined") {
-    const host = window.location.hostname;
-    if (host !== "localhost" && host !== "127.0.0.1" && host !== "0.0.0.0") {
-      return `${window.location.origin}/#triage/${pid}`;
-    }
+  if (typeof window !== "undefined" && window.location.origin) {
+    return `${window.location.origin}/#triage/${pid}`;
   }
   return `https://q-rakshak.vercel.app/#triage/${pid}`;
 }
