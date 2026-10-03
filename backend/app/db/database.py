@@ -194,9 +194,32 @@ def init_database():
         allergies_json TEXT,
         medications_json TEXT,
         emergency_contacts_json TEXT,
+        organ_donor INTEGER DEFAULT 1,
+        abha_id TEXT,
+        address TEXT,
+        hospital TEXT,
+        updated_at TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     """)
+
+    # Dynamic migration for Patients table
+    if not is_postgres:
+        try:
+            p_cols = {row[1] for row in cursor.execute("PRAGMA table_info(patients);").fetchall()}
+            if "organ_donor" not in p_cols:
+                cursor.execute("ALTER TABLE patients ADD COLUMN organ_donor INTEGER DEFAULT 1;")
+            if "abha_id" not in p_cols:
+                cursor.execute("ALTER TABLE patients ADD COLUMN abha_id TEXT;")
+            if "address" not in p_cols:
+                cursor.execute("ALTER TABLE patients ADD COLUMN address TEXT;")
+            if "hospital" not in p_cols:
+                cursor.execute("ALTER TABLE patients ADD COLUMN hospital TEXT;")
+            if "updated_at" not in p_cols:
+                cursor.execute("ALTER TABLE patients ADD COLUMN updated_at TIMESTAMP;")
+        except Exception as e:
+            logger.warning(f"Failed to migrate patients table columns: {e}")
+
 
     # Diagnostic Records Table
     cursor.execute("""

@@ -177,29 +177,54 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
       if (activeUserId) {
         const res = await profileApi.getProfile(activeUserId);
         if (res?.profile) {
+          const prof = res.profile;
           setProfile((prev) => ({
             ...prev,
-            ...res.profile,
-            user_id: res.profile.user_id || activeUserId,
+            ...prof,
+            user_id: prof.user_id || activeUserId,
             username: currentUser?.username || prev.username,
           }));
-        }
-        if (!isDoctor) {
-          const clinical = await clinicalApi.getPatientRecord(activeUserId);
-          if (clinical?.patient) {
-            const patient = clinical.patient;
-            setMedicalHistory(Array.isArray(patient.medical_history) ? patient.medical_history.map((item, index) => typeof item === "string" ? { id: `history-${index}`, condition: item, notes: "" } : item) : []);
-            setMedications(Array.isArray(patient.medications) ? patient.medications : []);
-            setEmergencyContacts(Array.isArray(patient.emergency_contacts) ? patient.emergency_contacts.map((item, index) => ({ id: `contact-${index}`, ...item })) : []);
-            setProfile((prev) => ({
-              ...prev,
-              ...patient,
-              allergies: formatAllergies(patient.allergies || prev.allergies),
-              active_medications: formatMedications(patient.medications || patient.active_medications || prev.active_medications),
-              medical_history: formatMedicalHistory(patient.medical_history || prev.medical_history),
-              user_id: patient.id || prev.user_id
-            }));
+
+          if (Array.isArray(prof.allergies) && prof.allergies.length > 0) {
+            setAllergiesList(prof.allergies.map((item, index) => typeof item === "string" ? { id: `alg-${index}`, allergen: item, severity: "HIGH", reaction: "Sensitivity" } : { id: `alg-${index}`, ...item }));
+          } else if (typeof prof.allergies === "string" && prof.allergies.trim()) {
+            setAllergiesList(prof.allergies.split(",").map((item, index) => ({ id: `alg-${index}`, allergen: item.trim(), severity: "HIGH", reaction: "Sensitivity" })));
           }
+
+          if (Array.isArray(prof.medications) && prof.medications.length > 0) {
+            setMedications(prof.medications);
+          }
+          if (Array.isArray(prof.medical_history) && prof.medical_history.length > 0) {
+            setMedicalHistory(prof.medical_history.map((item, index) => typeof item === "string" ? { id: `history-${index}`, condition: item, notes: "" } : item));
+          }
+          if (Array.isArray(prof.emergency_contacts) && prof.emergency_contacts.length > 0) {
+            setEmergencyContacts(prof.emergency_contacts.map((item, index) => ({ id: `contact-${index}`, ...item })));
+          }
+        }
+
+        const clinical = await clinicalApi.getPatientRecord(activeUserId);
+        if (clinical?.patient) {
+          const patient = clinical.patient;
+          if (Array.isArray(patient.medical_history) && patient.medical_history.length > 0) {
+            setMedicalHistory(patient.medical_history.map((item, index) => typeof item === "string" ? { id: `history-${index}`, condition: item, notes: "" } : item));
+          }
+          if (Array.isArray(patient.medications) && patient.medications.length > 0) {
+            setMedications(patient.medications);
+          }
+          if (Array.isArray(patient.emergency_contacts) && patient.emergency_contacts.length > 0) {
+            setEmergencyContacts(patient.emergency_contacts.map((item, index) => ({ id: `contact-${index}`, ...item })));
+          }
+          if (Array.isArray(patient.allergies) && patient.allergies.length > 0) {
+            setAllergiesList(patient.allergies.map((item, index) => typeof item === "string" ? { id: `alg-${index}`, allergen: item, severity: "HIGH", reaction: "Sensitivity" } : { id: `alg-${index}`, ...item }));
+          }
+          setProfile((prev) => ({
+            ...prev,
+            ...patient,
+            allergies: formatAllergies(patient.allergies || prev.allergies),
+            active_medications: formatMedications(patient.medications || patient.active_medications || prev.active_medications),
+            medical_history: formatMedicalHistory(patient.medical_history || prev.medical_history),
+            user_id: patient.id || prev.user_id,
+          }));
         }
       }
     } catch (err) {
@@ -213,19 +238,33 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
     const payload = updatedProfile || profile;
     setSyncStatus("saving");
     try {
-      const res = await profileApi.updateProfile(activeUserId, payload);
-      if (!isDoctor) {
-        await clinicalApi.updatePatientRecord(activeUserId, {
-          name: payload.name,
-          age: payload.age,
-          gender: payload.gender,
-          blood_group: payload.blood_group,
-          medical_history: medicalHistory,
-          medications,
-          emergency_contacts: emergencyContacts,
-          emergency_contact: emergencyContacts.find((contact) => contact.is_primary)?.phone || payload.emergency_phone,
-        });
-      }
+      const activeAllergies = allergiesList.length > 0 ? allergiesList : (payload.allergies || []);
+      const res = await profileApi.updateProfile(activeUserId, {
+        ...payload,
+        allergies: activeAllergies,
+        medications,
+        medical_history: medicalHistory,
+        emergency_contacts: emergencyContacts,
+        organ_donor: payload.organ_donor,
+        abha_id: payload.abha_id,
+        hospital: payload.hospital,
+      });
+
+      await clinicalApi.updatePatientRecord(activeUserId, {
+        name: payload.name,
+        age: payload.age,
+        gender: payload.gender,
+        blood_group: payload.blood_group,
+        allergies: activeAllergies,
+        medications,
+        medical_history: medicalHistory,
+        emergency_contacts: emergencyContacts,
+        emergency_contact: emergencyContacts.find((contact) => contact.is_primary)?.phone || payload.emergency_phone || payload.phone,
+        organ_donor: payload.organ_donor,
+        abha_id: payload.abha_id,
+        hospital: payload.hospital,
+      });
+
       setSyncStatus("synced");
       if (onProfileUpdated) {
         onProfileUpdated(res.profile || payload);

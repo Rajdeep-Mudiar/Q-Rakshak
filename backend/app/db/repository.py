@@ -278,12 +278,46 @@ class DatabaseRepository:
             if "gender" in updates and updates["gender"]:
                 p_updates.append("gender = ?")
                 p_values.append(updates["gender"])
+            if "hospital_affiliation" in updates and updates["hospital_affiliation"]:
+                p_updates.append("hospital = ?")
+                p_values.append(updates["hospital_affiliation"])
+            elif "hospital" in updates and updates["hospital"]:
+                p_updates.append("hospital = ?")
+                p_values.append(updates["hospital"])
+            if "abha_id" in updates and updates["abha_id"]:
+                p_updates.append("abha_id = ?")
+                p_values.append(updates["abha_id"])
+            if "organ_donor" in updates and updates["organ_donor"] is not None:
+                p_updates.append("organ_donor = ?")
+                p_values.append(1 if updates["organ_donor"] else 0)
+            if "allergies" in updates and updates["allergies"] is not None:
+                al = updates["allergies"]
+                p_updates.append("allergies_json = ?")
+                p_values.append(json.dumps(al) if not isinstance(al, str) else json.dumps([a.strip() for a in al.split(",") if a.strip()]))
+            if "medications" in updates and updates["medications"] is not None:
+                meds = updates["medications"]
+                p_updates.append("medications_json = ?")
+                p_values.append(json.dumps(meds) if not isinstance(meds, str) else json.dumps([m.strip() for m in meds.split(",") if m.strip()]))
+            if "medical_history" in updates and updates["medical_history"] is not None:
+                mh = updates["medical_history"]
+                p_updates.append("medical_history_json = ?")
+                p_values.append(json.dumps(mh) if not isinstance(mh, str) else json.dumps([h.strip() for h in mh.split(",") if h.strip()]))
+            if "emergency_contacts" in updates and updates["emergency_contacts"] is not None:
+                ec = updates["emergency_contacts"]
+                p_updates.append("emergency_contacts_json = ?")
+                p_values.append(json.dumps(ec) if not isinstance(ec, str) else ec)
+
+            p_updates.append("updated_at = datetime('now')")
+
             if p_updates:
                 p_values.append(user_id)
                 p_values.append(user_id)
                 p_query = f"UPDATE patients SET {', '.join(p_updates)} WHERE id = ? OR id = (SELECT id FROM users WHERE username = ?);"
-                conn.execute(p_query, tuple(p_values))
+                cur = conn.execute(p_query, tuple(p_values))
                 conn.commit()
+                # If no existing patient row was updated, ensure one is created
+                if cur.rowcount == 0:
+                    DatabaseRepository.get_patient(user_id)
         except Exception:
             pass
 
@@ -356,20 +390,49 @@ class DatabaseRepository:
     def get_patient(patient_id: str) -> Optional[dict[str, Any]]:
         conn = get_db_connection()
         clean = (patient_id or "").strip()
-        row = conn.execute("SELECT * FROM patients WHERE id = ? OR mrn = ?;", (clean, clean)).fetchone()
+        if not clean:
+            conn.close()
+            return None
+
+        # 1. Direct query by id, mrn, or name (case-insensitive)
+        row = conn.execute("""
+            SELECT * FROM patients 
+            WHERE id = ? OR mrn = ? 
+               OR LOWER(id) = LOWER(?) OR LOWER(mrn) = LOWER(?)
+               OR LOWER(name) = LOWER(?);
+        """, (clean, clean, clean, clean, clean)).fetchone()
+
         if not row:
-            # Check users table for matching username, id, or email
-            u_row = conn.execute("SELECT * FROM users WHERE id = ? OR LOWER(username) = LOWER(?) OR LOWER(email) = LOWER(?);", (clean, clean, clean)).fetchone()
+            # 2. Check users table for matching username, id, email, or name
+            u_row = conn.execute("""
+                SELECT * FROM users 
+                WHERE id = ? OR LOWER(id) = LOWER(?)
+                   OR LOWER(username) = LOWER(?) 
+                   OR LOWER(email) = LOWER(?)
+                   OR LOWER(name) = LOWER(?);
+            """, (clean, clean, clean, clean, clean)).fetchone()
+
             if u_row:
                 u_dict = dict(u_row)
-                row = conn.execute("SELECT * FROM patients WHERE id = ? OR mrn = ? OR LOWER(name) = LOWER(?);", (u_dict["id"], u_dict.get("license_number"), u_dict.get("name"))).fetchone()
+                row = conn.execute("""
+                    SELECT * FROM patients 
+                    WHERE id = ? OR mrn = ? OR LOWER(name) = LOWER(?);
+                """, (u_dict["id"], u_dict.get("license_number"), u_dict.get("name"))).fetchone()
+
                 if not row:
                     new_pid = u_dict["id"]
                     new_mrn = f"MRN-{new_pid}-QX"
+                    user_phone = u_dict.get("emergency_phone") or u_dict.get("phone") or "+91 98765 43210"
+                    user_hosp = u_dict.get("hospital_affiliation") or "Q-Rakshak Clinical AI OPD"
                     try:
                         conn.execute("""
-                            INSERT INTO patients (id, mrn, name, age, gender, blood_group, height_cm, weight_kg, conditions_json, baseline_vitals_json, organ_donor, abha_id, emergency_contact, emergency_contacts_json, allergies_json, medications_json, medical_history_json, created_at, updated_at)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'));
+                            INSERT INTO patients (
+                                id, mrn, name, age, gender, blood_group, height_cm, weight_kg, 
+                                conditions_json, baseline_vitals_json, organ_donor, abha_id, 
+                                emergency_contact, emergency_contacts_json, allergies_json, 
+                                medications_json, medical_history_json, hospital, created_at, updated_at
+                            )
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'));
                         """, (
                             new_pid,
                             new_mrn,
@@ -380,14 +443,15 @@ class DatabaseRepository:
                             float(u_dict.get("height_cm", 175.0)),
                             float(u_dict.get("weight_kg", 70.0)),
                             json.dumps(["Active Health Monitoring"]),
-                            json.dumps({"heart_rate_bpm": 72, "blood_pressure": "120/80 mmHg", "spo2_percent": 98, "temperature_f": 98.6}),
+                            json.dumps({"heart_rate_bpm": 72, "blood_pressure": "120/80 mmHg", "spo2_percent": 98, "temperature_f": 98.6, "blood_glucose_mg_dl": 95}),
                             1,
                             u_dict.get("abha_id") or f"91-{new_pid.replace('USR-', '')}-4821",
-                            u_dict.get("phone") or "+91 98765 43210",
-                            json.dumps([{"name": "Emergency Contact", "relation": "Next of Kin", "phone": u_dict.get("phone") or "+91 98765 43210", "is_primary": True}]),
+                            user_phone,
+                            json.dumps([{"name": "Emergency Contact", "relation": "Next of Kin", "phone": user_phone, "is_primary": True}]),
                             json.dumps([]),
                             json.dumps([]),
                             json.dumps([]),
+                            user_hosp,
                         ))
                         conn.commit()
                         row = conn.execute("SELECT * FROM patients WHERE id = ?;", (new_pid,)).fetchone()
@@ -404,7 +468,7 @@ class DatabaseRepository:
         try:
             d["baseline_vitals"] = json.loads(d["baseline_vitals_json"])
         except Exception:
-            d["baseline_vitals"] = {"heart_rate_bpm": 72, "blood_pressure": "120/80 mmHg", "spo2_percent": 98, "temperature_f": 98.6}
+            d["baseline_vitals"] = {"heart_rate_bpm": 72, "blood_pressure": "120/80 mmHg", "spo2_percent": 98, "temperature_f": 98.6, "blood_glucose_mg_dl": 95}
 
         for field in ("medical_history", "allergies", "medications", "emergency_contacts"):
             json_field = f"{field}_json"
@@ -414,9 +478,10 @@ class DatabaseRepository:
             except (TypeError, json.JSONDecodeError):
                 d[field] = []
 
-        d["organ_donor"] = bool(d.get("organ_donor", False))
+        d["organ_donor"] = bool(d.get("organ_donor", True))
         d["abha_id"] = d.get("abha_id") or ""
         d["address"] = d.get("address") or ""
+        d["hospital"] = d.get("hospital") or "Q-Rakshak Clinical AI OPD"
         return d
 
     @staticmethod
@@ -425,6 +490,35 @@ class DatabaseRepository:
         patient = DatabaseRepository.get_patient(patient_id)
         if not patient:
             return None
+
+        # Correlate with users table for user contact & email
+        conn = get_db_connection()
+        user_row = conn.execute("""
+            SELECT * FROM users 
+            WHERE id = ? OR LOWER(id) = LOWER(?) OR LOWER(username) = LOWER(?) OR LOWER(name) = LOWER(?);
+        """, (patient["id"], patient["id"], patient["id"], patient["name"])).fetchone()
+        conn.close()
+        u_dict = dict(user_row) if user_row else {}
+
+        email = u_dict.get("email") or patient.get("email") or ""
+        secondary_email = u_dict.get("secondary_email") or ""
+        phone = patient.get("emergency_contact") or u_dict.get("emergency_phone") or "+91 98765 43210"
+        hospital = patient.get("hospital") or u_dict.get("hospital_affiliation") or "Q-Rakshak Clinical AI OPD"
+
+        # Ensure primary contact is present and formatted
+        contacts = patient.get("emergency_contacts", [])
+        if not contacts and phone:
+            contacts = [{
+                "name": u_dict.get("name") if u_dict and u_dict.get("name") != patient.get("name") else "Emergency Contact",
+                "relation": "Next of Kin",
+                "phone": phone,
+                "is_primary": True,
+            }]
+        elif isinstance(contacts, list) and len(contacts) > 0:
+            # Guarantee every contact has a phone number fallback
+            for c in contacts:
+                if isinstance(c, dict) and not c.get("phone"):
+                    c["phone"] = phone
 
         # Dynamically derive critical alerts from real clinical records
         critical_alerts = []
@@ -439,6 +533,8 @@ class DatabaseRepository:
         for c in patient.get("conditions", []):
             if isinstance(c, str) and c.strip():
                 critical_alerts.append(f"Condition: {c.strip()}")
+        if patient.get("organ_donor"):
+            critical_alerts.append("Organ Donor: Registered & Consented")
         if not critical_alerts:
             critical_alerts.append(f"Blood Group: {patient.get('blood_group', 'Unspecified')}")
             critical_alerts.append("No critical drug contraindications documented")
@@ -446,6 +542,7 @@ class DatabaseRepository:
         return {
             "status": "success",
             "patient_id": patient["id"],
+            "id": patient["id"],
             "mrn": patient["mrn"],
             "name": patient["name"],
             "age": patient["age"],
@@ -454,14 +551,26 @@ class DatabaseRepository:
             "height_cm": patient.get("height_cm", 175.0),
             "weight_kg": patient.get("weight_kg", 70.0),
             "organ_donor": patient.get("organ_donor", True),
-            "abha_id": patient.get("abha_id") or "",
+            "abha_id": patient.get("abha_id") or (u_dict.get("abha_id") if u_dict else "") or f"91-{patient['id'].replace('USR-', '')}-4821",
             "address": patient.get("address") or "",
-            "emergency_contact": patient.get("emergency_contact") or "",
-            "emergency_contacts": patient.get("emergency_contacts", []),
+            "hospital": hospital,
+            "email": email,
+            "primary_email": email,
+            "secondary_email": secondary_email,
+            "phone": phone,
+            "emergency_phone": phone,
+            "emergency_contact": phone,
+            "emergency_contacts": contacts,
             "allergies": patient.get("allergies", []),
             "medications": patient.get("medications", []),
             "conditions": patient.get("conditions", []),
-            "baseline_vitals": patient.get("baseline_vitals", {}),
+            "baseline_vitals": patient.get("baseline_vitals", {
+                "heart_rate_bpm": 72,
+                "blood_pressure": "120/80 mmHg",
+                "spo2_percent": 98,
+                "temperature_f": 98.6,
+                "blood_glucose_mg_dl": 95,
+            }),
             "critical_alerts": critical_alerts,
             "verified_at": "2026-09-08 UTC",
             "issuer": "Q-RAKSHAK Quantum Clinical Network // WORM Ledger Verified",
@@ -478,17 +587,49 @@ class DatabaseRepository:
         blood = patient_data.get("blood_group", "O+")
         h = float(patient_data.get("height_cm", 175.0))
         w = float(patient_data.get("weight_kg", 70.0))
-        conds = json.dumps(patient_data.get("conditions", []))
-        vitals = json.dumps(patient_data.get("baseline_vitals", {"heart_rate_bpm": 72, "blood_pressure": "120/80 mmHg", "spo2_percent": 98, "temperature_f": 98.6}))
-        em = patient_data.get("emergency_contact", "")
-        history = json.dumps(patient_data.get("medical_history", []))
-        allergies = json.dumps(patient_data.get("allergies", []))
-        medications = json.dumps(patient_data.get("medications", []))
-        contacts = json.dumps(patient_data.get("emergency_contacts", []))
+        
+        raw_conds = patient_data.get("conditions", [])
+        conds = json.dumps(raw_conds if isinstance(raw_conds, list) else [str(raw_conds)])
+        
+        raw_vitals = patient_data.get("baseline_vitals", {})
+        default_vitals = {"heart_rate_bpm": 72, "blood_pressure": "120/80 mmHg", "spo2_percent": 98, "temperature_f": 98.6, "blood_glucose_mg_dl": 95}
+        if isinstance(raw_vitals, dict):
+            default_vitals.update(raw_vitals)
+        vitals = json.dumps(default_vitals)
+        
+        em = patient_data.get("emergency_contact") or patient_data.get("emergency_phone") or patient_data.get("phone") or ""
+        
+        raw_history = patient_data.get("medical_history", [])
+        history = json.dumps(raw_history if isinstance(raw_history, (list, dict)) else [str(raw_history)])
+        
+        raw_allergies = patient_data.get("allergies", [])
+        if isinstance(raw_allergies, str):
+            allergies = json.dumps([a.strip() for a in raw_allergies.split(",") if a.strip()])
+        else:
+            allergies = json.dumps(raw_allergies)
+            
+        raw_meds = patient_data.get("medications", patient_data.get("active_medications", []))
+        if isinstance(raw_meds, str):
+            medications = json.dumps([m.strip() for m in raw_meds.split(",") if m.strip()])
+        else:
+            medications = json.dumps(raw_meds)
+            
+        raw_contacts = patient_data.get("emergency_contacts", [])
+        contacts = json.dumps(raw_contacts if isinstance(raw_contacts, list) else [])
+        
+        donor = 1 if patient_data.get("organ_donor", True) else 0
+        abha = patient_data.get("abha_id") or ""
+        addr = patient_data.get("address") or ""
+        hosp = patient_data.get("hospital") or "Q-Rakshak Clinical AI OPD"
 
         conn.execute("""
-        INSERT INTO patients (id, mrn, name, age, gender, blood_group, height_cm, weight_kg, conditions_json, baseline_vitals_json, emergency_contact, medical_history_json, allergies_json, medications_json, emergency_contacts_json)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO patients (
+            id, mrn, name, age, gender, blood_group, height_cm, weight_kg, 
+            conditions_json, baseline_vitals_json, emergency_contact, 
+            medical_history_json, allergies_json, medications_json, 
+            emergency_contacts_json, organ_donor, abha_id, address, hospital, updated_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
         ON CONFLICT(id) DO UPDATE SET
             name=excluded.name,
             age=excluded.age,
@@ -502,8 +643,13 @@ class DatabaseRepository:
             medical_history_json=excluded.medical_history_json,
             allergies_json=excluded.allergies_json,
             medications_json=excluded.medications_json,
-            emergency_contacts_json=excluded.emergency_contacts_json;
-        """, (pid, mrn, name, age, gender, blood, h, w, conds, vitals, em, history, allergies, medications, contacts))
+            emergency_contacts_json=excluded.emergency_contacts_json,
+            organ_donor=excluded.organ_donor,
+            abha_id=CASE WHEN excluded.abha_id != '' THEN excluded.abha_id ELSE patients.abha_id END,
+            address=CASE WHEN excluded.address != '' THEN excluded.address ELSE patients.address END,
+            hospital=CASE WHEN excluded.hospital != '' THEN excluded.hospital ELSE patients.hospital END,
+            updated_at=datetime('now');
+        """, (pid, mrn, name, age, gender, blood, h, w, conds, vitals, em, history, allergies, medications, contacts, donor, abha, addr, hosp))
         conn.commit()
         conn.close()
         return DatabaseRepository.get_patient(pid)

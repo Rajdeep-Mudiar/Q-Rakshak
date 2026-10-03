@@ -24,6 +24,16 @@ class ProfileUpdateRequest(BaseModel):
     department: str | None = None
     hospital: str | None = None
     license_id: str | None = None
+    # Clinical & Emergency Triage fields
+    allergies: Any | None = None
+    medications: Any | None = None
+    active_medications: Any | None = None
+    medical_history: Any | None = None
+    emergency_contacts: list[Any] | None = None
+    emergency_contact_name: str | None = None
+    emergency_contact_relation: str | None = None
+    organ_donor: bool | None = None
+    abha_id: str | None = None
     # Doctor specific fields
     specialty: str | None = None
     registration_number: str | None = None
@@ -48,23 +58,34 @@ async def get_user_profile(user_id: str):
     if user:
         uid = user.get("id") or user_id
         role = (user.get("role") or "patient").lower()
-        patient = DatabaseRepository.get_patient(uid) if role in ("patient", "user") else None
+        patient = DatabaseRepository.get_patient(uid)
         doctor = DatabaseRepository.get_doctor_by_user_id(uid) if role in ("doctor", "clinician") else None
 
         profile = {
             "user_id": uid,
-            "name": user.get("name") or "",
+            "id": uid,
+            "patient_id": uid,
+            "name": user.get("name") or (patient.get("name") if patient else "") or "",
             "role": role,
             "primary_email": user.get("email") or "",
             "extra_email": user.get("secondary_email") or "",
-            "emergency_phone": user.get("emergency_phone") or "",
-            "phone": user.get("emergency_phone") or "",
-            "blood_group": (patient.get("blood_group") if patient else "") or "",
-            "age": (patient.get("age") if patient and patient.get("age") is not None else None),
-            "gender": (patient.get("gender") if patient else "") or "",
+            "emergency_phone": user.get("emergency_phone") or (patient.get("emergency_contact") if patient else "") or "",
+            "phone": user.get("emergency_phone") or (patient.get("emergency_contact") if patient else "") or "",
+            "blood_group": (patient.get("blood_group") if patient else "") or "O+",
+            "age": (patient.get("age") if patient and patient.get("age") is not None else 28),
+            "gender": (patient.get("gender") if patient else "") or "Unspecified",
             "department": user.get("department") or "",
-            "hospital": (doctor.get("hospital_affiliation") if doctor else user.get("hospital_affiliation")) or "",
-            "license_id": (doctor.get("registration_number") if doctor else user.get("license_number")) or "",
+            "hospital": (patient.get("hospital") if patient else None) or (doctor.get("hospital_affiliation") if doctor else user.get("hospital_affiliation")) or "Q-Rakshak Clinical AI OPD",
+            "license_id": (doctor.get("registration_number") if doctor else user.get("license_number")) or (patient.get("mrn") if patient else "") or "",
+            "mrn": (patient.get("mrn") if patient else f"MRN-{uid}-QX"),
+            "allergies": patient.get("allergies", []) if patient else [],
+            "medications": patient.get("medications", []) if patient else [],
+            "active_medications": patient.get("medications", []) if patient else [],
+            "medical_history": patient.get("medical_history", []) if patient else [],
+            "emergency_contacts": patient.get("emergency_contacts", []) if patient else [],
+            "organ_donor": patient.get("organ_donor", True) if patient else True,
+            "abha_id": (patient.get("abha_id") if patient else "") or f"91-{uid.replace('USR-', '')}-4821",
+            "baseline_vitals": patient.get("baseline_vitals", {}) if patient else {},
             # Doctor specific fields
             "specialty": doctor.get("specialty", "General Medicine & Clinical AI") if doctor else "",
             "registration_number": doctor.get("registration_number", user.get("license_number", "")) if doctor else "",
@@ -82,20 +103,32 @@ async def get_user_profile(user_id: str):
         }
     else:
         patient = DatabaseRepository.get_patient(user_id)
+        pid = patient.get("id", user_id) if patient else user_id
         profile = {
-            "user_id": user_id,
-            "name": (patient.get("name") if patient else "") or "",
+            "user_id": pid,
+            "id": pid,
+            "patient_id": pid,
+            "name": (patient.get("name") if patient else "") or "Patient",
             "role": "patient",
             "primary_email": "",
             "extra_email": "",
-            "emergency_phone": (patient.get("emergency_contact") if patient else "") or "",
-            "phone": (patient.get("emergency_contact") if patient else "") or "",
-            "blood_group": (patient.get("blood_group") if patient else "") or "",
-            "age": (patient.get("age") if patient and patient.get("age") is not None else None),
-            "gender": (patient.get("gender") if patient else "") or "",
+            "emergency_phone": (patient.get("emergency_contact") if patient else "") or "+91 98765 43210",
+            "phone": (patient.get("emergency_contact") if patient else "") or "+91 98765 43210",
+            "blood_group": (patient.get("blood_group") if patient else "") or "O+",
+            "age": (patient.get("age") if patient and patient.get("age") is not None else 28),
+            "gender": (patient.get("gender") if patient else "") or "Unspecified",
             "department": "",
-            "hospital": "",
-            "license_id": (patient.get("mrn") if patient else "") or "",
+            "hospital": (patient.get("hospital") if patient else "") or "Q-Rakshak Clinical AI OPD",
+            "license_id": (patient.get("mrn") if patient else "") or f"MRN-{pid}-QX",
+            "mrn": (patient.get("mrn") if patient else f"MRN-{pid}-QX"),
+            "allergies": patient.get("allergies", []) if patient else [],
+            "medications": patient.get("medications", []) if patient else [],
+            "active_medications": patient.get("medications", []) if patient else [],
+            "medical_history": patient.get("medical_history", []) if patient else [],
+            "emergency_contacts": patient.get("emergency_contacts", []) if patient else [],
+            "organ_donor": patient.get("organ_donor", True) if patient else True,
+            "abha_id": (patient.get("abha_id") if patient else "") or f"91-{pid.replace('USR-', '')}-4821",
+            "baseline_vitals": patient.get("baseline_vitals", {}) if patient else {},
             "specialty": "",
             "registration_number": "",
             "council_name": "",
@@ -120,12 +153,19 @@ async def update_user_profile(user_id: str, req: ProfileUpdateRequest):
         "name": req.name,
         "email": req.primary_email,
         "secondary_email": req.extra_email,
-        "emergency_phone": req.emergency_phone,
+        "emergency_phone": req.emergency_phone or req.phone,
         "blood_group": req.blood_group,
         "age": req.age,
         "gender": req.gender,
         "hospital_affiliation": req.hospital,
         "license_number": req.license_id or req.registration_number,
+        "allergies": req.allergies,
+        "medications": req.medications or req.active_medications,
+        "medical_history": req.medical_history,
+        "emergency_contacts": req.emergency_contacts,
+        "organ_donor": req.organ_donor,
+        "abha_id": req.abha_id,
+        "hospital": req.hospital,
         "specialty": req.specialty,
         "registration_number": req.registration_number or req.license_id,
         "council_name": req.council_name,

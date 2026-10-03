@@ -16,14 +16,14 @@ export default function PrintableMedicalCardSheet({
   cardFace = 'dual',   // 'dual' | 'front' | 'back'
   emergencyPortalUrl = '',
 }) {
+  const resolvedId = patient?.user_id || patient?.patient_id || patient?.id || (patient?.mrn ? String(patient.mrn).replace(/^MRN-/, '').replace(/-QX$/, '') : '') || '';
   const patientNameSlug = (patient.name || patient.username || 'PATIENT')
     .replace(/^Dr\.?\s+/i, '')
     .trim()
     .toUpperCase()
     .replace(/\s+/g, '_')
     .replace(/[^A-Z0-9_]/g, '');
-  const cleanCardPatientId = `USR-${patientNameSlug}`;
-  const patientId = cleanCardPatientId;
+  const patientId = resolvedId || `USR-${patientNameSlug}`;
   const rawLicense = patient?.license_id || patient?.mrn;
   const mrn = (rawLicense && rawLicense !== 'PT-REC-89421') ? rawLicense : `MRN-${patientId}-QX`;
   const abhaId = patient?.abha_id || patient?.abhaId || '—';

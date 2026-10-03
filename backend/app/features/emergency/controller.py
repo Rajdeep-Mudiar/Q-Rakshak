@@ -39,6 +39,15 @@ def get_public_emergency_card(patient_id: str):
     return record
 
 
+@router.put("/{patient_id}")
+async def update_emergency_card_data_endpoint(patient_id: str, payload: dict):
+    """Sync and update emergency card patient clinical data."""
+    payload["id"] = patient_id
+    DatabaseRepository.create_or_update_patient(payload)
+    profile = DatabaseRepository.get_emergency_profile(patient_id)
+    return {"status": "success", "message": "Emergency triage records synced successfully.", "data": profile}
+
+
 @router.get("/{patient_id}/card-data")
 async def get_emergency_card_data(patient_id: str):
     """Fetches comprehensive clinical and emergency contact data formatted for card and triage HUD."""
@@ -238,5 +247,45 @@ async def email_emergency_card(patient_id: str, req: Optional[EmailEmergencyCard
         "patient_id": patient_id,
         "message": f"Emergency triage pass dispatched to {target_email}",
     }
+
+
+class ShakeAuditRequest(BaseModel):
+    action: str = "SHAKE_EMERGENCY_TRIGGERED"
+    actor: Optional[str] = None
+    dial_target: Optional[str] = None
+    motion_metrics: Optional[dict] = None
+    ip_address: Optional[str] = "127.0.0.1"
+
+
+@router.post("/{patient_id}/audit-shake")
+async def log_shake_emergency_audit(patient_id: str, req: ShakeAuditRequest):
+    """
+    Logs physical shake triggers and emergency dialing events to the WORM cryptographic audit ledger.
+    Actions supported:
+    - SHAKE_EMERGENCY_TRIGGERED
+    - EMERGENCY_CALL_INITIATED
+    - SHAKE_EMERGENCY_DISMISSED
+    """
+    actor = req.actor or f"PATIENT:{patient_id}"
+    resource = f"EMERGENCY_SHAKE_PROTOCOL/{patient_id}"
+    if req.dial_target:
+        resource = f"{resource}/DIAL:{req.dial_target}"
+
+    audit_entry = DatabaseRepository.add_audit_log(
+        actor=actor,
+        action=req.action,
+        resource=resource,
+        ip_address=req.ip_address or "127.0.0.1",
+        status="SUCCESS",
+    )
+
+    return {
+        "status": "success",
+        "audit_entry": audit_entry,
+        "patient_id": patient_id,
+        "action": req.action,
+        "cryptographic_seal": audit_entry.get("hash_signature"),
+    }
+
 
 

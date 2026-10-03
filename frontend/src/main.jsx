@@ -21,14 +21,17 @@ function AppRouter() {
       return clean || null;
     }
 
-    // 1. Hash-based triage and emergency routes (e.g. #triage/USR-ARYAN, #/emergency/USR-ALEX)
-    if (hash.startsWith("#triage/") || hash.startsWith("#/triage/")) {
-      const parts = hash.split("/");
-      return { isEmergency: true, patientId: sanitizeId(parts[parts.length - 1]) };
+    // 1. Hash-based triage and emergency routes (e.g. #triage, #triage/USR-ARYAN, #/emergency/USR-ALEX)
+    const cleanHash = hash.replace(/^#\/?/, "");
+    if (cleanHash === "triage" || cleanHash.startsWith("triage/") || cleanHash.startsWith("triage?")) {
+      const parts = cleanHash.split("?")[0].split("/").filter(Boolean);
+      const pid = parts.length > 1 ? parts[1] : (search.get("patient") || search.get("id"));
+      return { isEmergency: true, patientId: sanitizeId(pid) };
     }
-    if (hash.startsWith("#emergency/") || hash.startsWith("#/emergency/")) {
-      const parts = hash.split("/");
-      return { isEmergency: true, patientId: sanitizeId(parts[parts.length - 1]) };
+    if (cleanHash === "emergency" || cleanHash.startsWith("emergency/") || cleanHash.startsWith("emergency?")) {
+      const parts = cleanHash.split("?")[0].split("/").filter(Boolean);
+      const pid = parts.length > 1 ? parts[1] : (search.get("patient") || search.get("id"));
+      return { isEmergency: true, patientId: sanitizeId(pid) };
     }
 
     // 2. Path-based triage and emergency routes (e.g. /triage/USR-ARYAN, /emergency)
