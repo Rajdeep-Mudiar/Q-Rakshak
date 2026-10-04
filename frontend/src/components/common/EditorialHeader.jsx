@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { ChevronDown, Stethoscope, Sparkles, Languages, Menu, X } from "lucide-react";
+import { ChevronDown, Stethoscope, Sparkles, Languages, Menu, X, Cpu } from "lucide-react";
 import { DISEASE_LIST, getLocalizedDiseaseById } from "../../data/diseaseRegistry.js";
 import { FEATURE_INTRO_REGISTRY } from "../../data/featureIntroRegistry.js";
 import { useLanguage } from "../../context/LanguageContext.jsx";
@@ -258,6 +258,29 @@ export default function EditorialHeader({
             </div>
           )}
         </div>
+
+        {/* Model Accuracy Classical vs Quantum AI Link Route */}
+        <a
+          href="#CLASSICALvsQUANTUMN"
+          style={{
+            textDecoration: "none",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "6px",
+            fontSize: "0.72rem",
+            fontWeight: 700,
+            color: "var(--primary-dark, #0284C7)",
+            background: "var(--primary-soft, #F0F9FF)",
+            border: "1px solid var(--border-default, #CBD5E1)",
+            borderRadius: "6px",
+            padding: "5px 10px",
+            transition: "all 0.15s ease",
+          }}
+          title="Open Classical vs Quantum Model Accuracy Benchmarks (#CLASSICALvsQUANTUMN)"
+        >
+          <Cpu size={13} color="var(--primary, #0284C7)" />
+          <span>Classical vs Quantum</span>
+        </a>
       </div>
 
       {/* ── Right: Language Switcher, A11y & User Profile ── */}

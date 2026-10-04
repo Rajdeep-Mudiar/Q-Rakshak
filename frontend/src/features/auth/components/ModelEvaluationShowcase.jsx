@@ -464,10 +464,32 @@ export default function ModelEvaluationShowcase() {
     return () => ctx.revert();
   }, []);
 
+  useEffect(() => {
+    function scrollToMeIfHashMatches() {
+      const hash = (window.location.hash || "").replace(/^#\/?/, "").toLowerCase();
+      if (
+        hash === "classicalvsquantumn" ||
+        hash === "classicalvsquantum" ||
+        hash === "classical-vs-quantum" ||
+        hash === "quantum-model-benchmarks"
+      ) {
+        if (containerRef.current) {
+          setTimeout(() => {
+            containerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 150);
+        }
+      }
+    }
+    scrollToMeIfHashMatches();
+    window.addEventListener("hashchange", scrollToMeIfHashMatches);
+    return () => window.removeEventListener("hashchange", scrollToMeIfHashMatches);
+  }, []);
+
   return (
     <div
       ref={containerRef}
-      id="quantum-model-benchmarks"
+      id="CLASSICALvsQUANTUMN"
+      data-route="CLASSICALvsQUANTUMN"
       style={{
         width: "100%",
         backgroundColor: "#F8FAFC",
@@ -479,6 +501,12 @@ export default function ModelEvaluationShowcase() {
         borderTop: "1px solid #E2E8F0",
       }}
     >
+      {/* Target anchor aliases for routing and hash navigation */}
+      <span id="CLASSICALvsQUANTUM" style={{ position: "absolute", top: 0, left: 0, width: "1px", height: "1px", opacity: 0 }} />
+      <span id="quantum-model-benchmarks" style={{ position: "absolute", top: 0, left: 0, width: "1px", height: "1px", opacity: 0 }} />
+      <span id="classicalvsquantumn" style={{ position: "absolute", top: 0, left: 0, width: "1px", height: "1px", opacity: 0 }} />
+      <span id="classicalvsquantum" style={{ position: "absolute", top: 0, left: 0, width: "1px", height: "1px", opacity: 0 }} />
+      <span id="classical-vs-quantum" style={{ position: "absolute", top: 0, left: 0, width: "1px", height: "1px", opacity: 0 }} />
       {/* Header Section */}
       <div
         style={{

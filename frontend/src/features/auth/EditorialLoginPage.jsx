@@ -477,7 +477,30 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
             </span>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            <a
+              href="#CLASSICALvsQUANTUMN"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "7px",
+                padding: "7px 14px",
+                background: "#0284C7",
+                color: "#FFFFFF",
+                border: "1px solid #0284C7",
+                borderRadius: "0px",
+                fontSize: "0.72rem",
+                fontWeight: 700,
+                textDecoration: "none",
+                letterSpacing: "0.02em",
+                transition: "background 0.2s, transform 0.15s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#0369A1")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "#0284C7")}
+            >
+              <Cpu size={14} />
+              <span>Model Accuracy: Classical vs Quantum</span>
+            </a>
             <a
               href="https://github.com/ARYANCY/QDoc"
               target="_blank"
@@ -1209,12 +1232,18 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
           zIndex: 10,
         }}
       >
-        <div
-          onClick={() => {
-            const el = document.getElementById("quantum-model-benchmarks");
-            if (el) el.scrollIntoView({ behavior: "smooth" });
+        <a
+          href="#CLASSICALvsQUANTUMN"
+          onClick={(e) => {
+            const el = document.getElementById("CLASSICALvsQUANTUMN") || document.getElementById("quantum-model-benchmarks");
+            if (el) {
+              e.preventDefault();
+              window.history.pushState(null, "", "#CLASSICALvsQUANTUMN");
+              el.scrollIntoView({ behavior: "smooth" });
+            }
           }}
           className="scroll-cue-pill"
+          style={{ textDecoration: "none" }}
         >
           {/* Pulsing Radar Dot Matching User Screenshot */}
           <span
@@ -1262,7 +1291,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
           </span>
 
           <ArrowDown size={14} color="#059669" className="scroll-arrow-anim" />
-        </div>
+        </a>
       </div>
     </div>
 
