@@ -116,6 +116,38 @@ export const DISEASE_REGISTRY = {
       LIVER: 55
     },
     clinicalDisclaimer: "Simulated hepatic parenchymal visualization; does not correlate with liver function tests (LFTs) or METAVIR fibrosis staging."
+  },
+
+  PARKINSONS: {
+    id: "PARKINSONS",
+    name: "Parkinson's Disease (Neurodegeneration)",
+    category: "Neurology",
+    badgeColor: "from-purple-500 to-indigo-700",
+    description: "Dopaminergic neurodegeneration and basal ganglia motor circuitry assessment via phonation and neuromotor acoustic telemetry.",
+    targetOrgans: ["BRAIN"],
+    supportedSexes: ["female", "male"],
+    supportedAgeGroups: ["<18", "18-40", "40-60", "60+"],
+    visualizationModes: ["overlay"],
+    defaultInvolvement: {
+      BRAIN: 65
+    },
+    clinicalDisclaimer: "Neuromotor and basal ganglia visual telemetry based on clinical voice biomarkers; does not represent DaTscan radiotracer uptake."
+  },
+
+  SKIN_CANCER: {
+    id: "SKIN_CANCER",
+    name: "Dermatological Melanoma",
+    category: "Dermatology & Oncology",
+    badgeColor: "from-amber-600 to-rose-700",
+    description: "Cutaneous melanocytic lesion and epidermal dermoscopy assessment with ABCD architectural lesion grading.",
+    targetOrgans: ["SKIN"],
+    supportedSexes: ["female", "male"],
+    supportedAgeGroups: ["<18", "18-40", "40-60", "60+"],
+    visualizationModes: ["overlay"],
+    defaultInvolvement: {
+      SKIN: 70
+    },
+    clinicalDisclaimer: "Dermatological skin surface visual telemetry; does not replace full-thickness excisional biopsy histology."
   }
 };
 
@@ -125,9 +157,13 @@ export const DISEASE_TO_ORGAN = {
   diabetes: "PANCREAS",
   pneumonia: "LUNG_RIGHT",
   skin: "SKIN",
+  parkinsons: "BRAIN",
   BREAST_CANCER: "BREAST_LEFT",
   HEART_DISEASE: "HEART",
   DIABETES: "PANCREAS",
   PNEUMONIA: "LUNG_RIGHT",
   LIVER_DISEASE: "LIVER",
+  PARKINSONS: "BRAIN",
+  SKIN_CANCER: "SKIN",
 };
+

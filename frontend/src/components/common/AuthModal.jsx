@@ -90,7 +90,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
         name: regName.trim(),
         email: regEmail.trim(),
         role: regRole,
-        emergency_phone: regPhone || "+91 98765 43210",
+        emergency_phone: regPhone ? regPhone.trim() : "",
         hospital_affiliation: regAffiliation || (regRole === "doctor" ? "Q-Rakshak" : "Community Hospital"),
         license_number: defaultLicense,
         specialty: regRole === "doctor" ? (regSpecialty || "General Medicine & Clinical AI") : undefined,

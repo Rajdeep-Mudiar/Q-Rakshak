@@ -31,14 +31,14 @@ export default function TriagePhysicalCard({
   const name = patient.name || patient.full_name || patient.username || (resolvedPatientId ? `Patient ${resolvedPatientId}` : 'Patient');
   const firstName = name.split(' ')[0] || 'Patient';
   const lastName = name.split(' ').slice(1).join(' ') || '';
-  const bloodGroup = patient.blood_group || patient.bloodGroup || 'O+';
+  const bloodGroup = patient.blood_group || patient.bloodGroup || '—';
 
   const patientId = resolvedPatientId || (name && name !== 'Patient'
     ? `USR-${name.replace(/^Dr\.?\s+/i, '').trim().toUpperCase().replace(/\s+/g, '_').replace(/[^A-Z0-9_]/g, '')}`
-    : 'USR-PATIENT');
+    : '');
 
-  const hospital = patient.hospital || patient.attending_center || patient.attendingCenter || patient.facility || 'Q-Rakshak Clinical AI';
-  const mrn = patient.mrn || patient.license_id || (patientId ? `MRN-${patientId}-QX` : 'MRN-USR-PATIENT-QX');
+  const hospital = patient.hospital || patient.attending_center || patient.attendingCenter || patient.facility || '—';
+  const mrn = patient.mrn || patient.license_id || (patientId ? `MRN-${patientId}-QX` : '—');
 
   const primaryContact = patient.emergency_contacts?.find(c => c.is_primary) || patient.emergency_contacts?.[0] || {
     name: patient.emergency_contact_name || patient.emergency_contact || '—',
@@ -46,9 +46,9 @@ export default function TriagePhysicalCard({
     phone: patient.emergency_phone || patient.phone || '—'
   };
   const phoneFormatted = primaryContact.phone || patient.emergency_phone || patient.phone || '—';
-  const emailFormatted = patient.primary_email || patient.email || (patient.name ? `${firstName.toLowerCase()}.${lastName ? lastName.toLowerCase() : 'pt'}@qrakshak.org` : '—');
-  const locationFormatted = String(hospital).split(',')[0] || 'Emergency OPD';
-  const abhaId = patient.abha_id || patient.abhaId || (patient.username ? `ABHA-${patient.username.toUpperCase()}` : (patientId ? `91-${patientId.replace(/[^A-Z0-9]/gi, '')}-3910` : '91-1029-4821-3910'));
+  const emailFormatted = patient.primary_email || patient.email || '—';
+  const locationFormatted = hospital !== '—' ? String(hospital).split(',')[0] : '—';
+  const abhaId = patient.abha_id || patient.abhaId || '—';
 
   // Clinical Details
   const allergiesList = Array.isArray(patient.allergies)
@@ -275,7 +275,7 @@ export default function TriagePhysicalCard({
             <div className="triage-inner-frame triage-bottom-frame">
               <div className="triage-handle-text" style={{ fontSize: '0.74rem' }}>
                 <ShieldCheck size={14} style={{ marginRight: '4px', opacity: 0.8 }} />
-                <span>WORM SHA-256: e3b0c442...991b7852</span>
+                <span>{patient.cryptographic_hash ? `WORM SHA-256: ${patient.cryptographic_hash.slice(0, 8)}...${patient.cryptographic_hash.slice(-8)}` : 'WORM CRYPTOGRAPHIC LEDGER SEAL'}</span>
               </div>
 
               <div className="triage-bottom-meta">

@@ -67,7 +67,7 @@ class DatabaseRepository:
         name = user_data.get("name", username.replace(".", " ").title()).strip()
         email = user_data.get("email", f"{username.lower()}@q-rakshak.health").strip()
         sec_email = user_data.get("secondary_email", "").strip()
-        phone = user_data.get("emergency_phone", "+91 98765 43210").strip()
+        phone = (user_data.get("emergency_phone") or "").strip()
         role = user_data.get("role", "patient").strip().lower()
         aff = user_data.get("hospital_affiliation", "Q-Rakshak" if role in ("doctor", "clinician") else "Q-RAKSHAK Network")
         lic = user_data.get("license_number", f"MCI-2026-{uuid.uuid4().hex[:4].upper()}" if role in ("doctor", "clinician") else f"LIC-{uuid.uuid4().hex[:4].upper()}")
@@ -382,7 +382,7 @@ class DatabaseRepository:
             if upper_clean in ("USR-ARYAN", "DOC-USR-ARYAN", "ARYAN"):
                 row = conn.execute("SELECT * FROM patients WHERE id = 'USR-ALEX' OR LOWER(name) LIKE '%aryan choudhury%' LIMIT 1;").fetchone()
                 if not row:
-                    row = conn.execute("SELECT * FROM patients WHERE id = 'PT-89421' LIMIT 1;").fetchone()
+                    row = conn.execute("SELECT * FROM patients WHERE id NOT LIKE 'DOC-%' AND id NOT LIKE 'ADM-%' ORDER BY updated_at DESC LIMIT 1;").fetchone()
             elif upper_clean.startswith("DOC-") or upper_clean.startswith("ADM-"):
                 # Doctor/Admin ID queried as patient: fallback to first real clinical patient
                 row = conn.execute("SELECT * FROM patients WHERE id NOT LIKE 'DOC-%' AND id NOT LIKE 'ADM-%' ORDER BY updated_at DESC LIMIT 1;").fetchone()
@@ -411,7 +411,7 @@ class DatabaseRepository:
                 if not row:
                     new_pid = u_dict["id"]
                     new_mrn = f"MRN-{new_pid}-QX"
-                    user_phone = u_dict.get("emergency_phone") or u_dict.get("phone") or "+91 98765 43210"
+                    user_phone = u_dict.get("emergency_phone") or u_dict.get("phone") or ""
                     user_hosp = u_dict.get("hospital_affiliation") or "Q-Rakshak Clinical AI OPD"
                     try:
                         conn.execute("""
@@ -521,7 +521,7 @@ class DatabaseRepository:
 
         email = u_dict.get("email") or patient.get("email") or ""
         secondary_email = u_dict.get("secondary_email") or ""
-        phone = patient.get("emergency_contact") or u_dict.get("emergency_phone") or "+91 98765 43210"
+        phone = patient.get("emergency_contact") or u_dict.get("emergency_phone") or ""
         hospital = patient.get("hospital") or u_dict.get("hospital_affiliation") or "Q-Rakshak Clinical AI OPD"
 
         # Ensure primary contact is present and formatted
@@ -690,11 +690,14 @@ class DatabaseRepository:
         try:
             p_check = conn.execute("SELECT id FROM patients WHERE id = ?;", (patient_id,)).fetchone()
             if not p_check:
+                u_row = conn.execute("SELECT name, emergency_phone FROM users WHERE id = ?;", (patient_id,)).fetchone()
+                u_name = u_row["name"] if u_row and u_row["name"] else f"Patient {patient_id}"
+                u_phone = u_row["emergency_phone"] if u_row and u_row["emergency_phone"] else ""
                 conn.execute("""
                 INSERT INTO patients (id, mrn, name, age, gender, blood_group, height_cm, weight_kg, conditions_json, baseline_vitals_json, emergency_contact)
-                VALUES (?, ?, ?, 35, 'Not Specified', 'O+', 175.0, 70.0, '[]', '{}', '+91 98765 43210')
+                VALUES (?, ?, ?, 35, 'Not Specified', 'Not Specified', 175.0, 70.0, '[]', '{}', ?)
                 ON CONFLICT (id) DO NOTHING;
-                """, (patient_id, f"MRN-{str(patient_id).replace('USR-', '')}", f"Patient {patient_id}"))
+                """, (patient_id, f"MRN-{str(patient_id).replace('USR-', '')}", u_name, u_phone))
                 conn.commit()
         except Exception:
             pass
@@ -921,13 +924,14 @@ class DatabaseRepository:
                 "heart": ["heart", "cardio", "cleveland"],
                 "diabetes": ["diabetes", "diabetic", "pima", "metabolic"],
                 "pneumonia": ["pneumonia", "pneu", "chest", "radiography"],
-                "skin": ["skin", "derma", "melanoma"],
+                "skin": ["skin", "derma", "melanoma", "ham10000"],
                 "parkinsons": ["parkinson", "voice", "neuro"],
             }
             for key, terms in synonyms.items():
-                if td == key or any(t in td for t in terms):
-                    if any(t in rd for t in terms):
-                        return True
+                target_matches = (td == key) or any(t in td for t in terms)
+                record_matches = (rd == key) or any(t in rd for t in terms)
+                if target_matches and record_matches:
+                    return True
             return False
 
         # Sort chronologically ascending
@@ -963,19 +967,6 @@ class DatabaseRepository:
 
         # Step 3: Handle Zero Historical Records (STRICT ZERO DUMMY DATA)
         if not history_points:
-            projections = []
-            for d in milestone_days:
-                projections.append({
-                    "day": d,
-                    "date": (now + datetime.timedelta(days=d)).strftime("%Y-%m-%d"),
-                    "projected_risk": 20.0,
-                    "ci_lower": 15.0,
-                    "ci_upper": 25.0,
-                    "status": "Optimal",
-                    "milestone": f"Day +{d}" if d > 0 else "Today (Current)",
-                    "intervention": "Maintain standard health regimen & routine preventative checkups",
-                })
-
             return {
                 "status": "NO_EARLY_DISEASE_DETECTED",
                 "patient_id": patient_id,
@@ -992,7 +983,7 @@ class DatabaseRepository:
                 "insight_narrative": "No previous prediction analyses are available for this patient yet.",
                 "history": [],
                 "daily_aggregates": [],
-                "projections": projections,
+                "projections": [],
                 "trend": {
                     "status": "NO_HISTORY",
                     "trend_direction": "No history",
@@ -1027,18 +1018,6 @@ class DatabaseRepository:
         if is_disease_filtered:
             history_points = [p for p in history_points if matches_disease(p["disease"], disease)]
             if not history_points:
-                projections = []
-                for d in milestone_days:
-                    projections.append({
-                        "day": d,
-                        "date": (now + datetime.timedelta(days=d)).strftime("%Y-%m-%d"),
-                        "projected_risk": 20.0,
-                        "ci_lower": 15.0,
-                        "ci_upper": 25.0,
-                        "status": "Optimal",
-                        "milestone": f"Day +{d}" if d > 0 else "Today (Current)",
-                        "intervention": "Maintain standard health regimen & routine preventative checkups",
-                    })
                 return {
                     "status": "NO_EARLY_DISEASE_DETECTED",
                     "patient_id": patient_id,
@@ -1055,7 +1034,7 @@ class DatabaseRepository:
                     "insight_narrative": f"No previous prediction analyses for {disease} are available for this patient yet.",
                     "history": [],
                     "daily_aggregates": [],
-                    "projections": projections,
+                    "projections": [],
                     "trend": {
                         "status": "NO_HISTORY",
                         "trend_direction": "No history",
@@ -1671,13 +1650,13 @@ class DatabaseRepository:
             if u_row:
                 pid = u_row["id"]
                 p_name = u_row["name"]
-                p_phone = u_row["emergency_phone"] or "+91 98765 43210"
+                p_phone = u_row["emergency_phone"] or ""
             else:
                 p_name = "Registered Patient"
-                p_phone = "+91 98765 43210"
+                p_phone = ""
             conn.execute("""
             INSERT INTO patients (id, mrn, name, age, gender, blood_group, height_cm, weight_kg, conditions_json, baseline_vitals_json, emergency_contact)
-            VALUES (?, ?, ?, 35, 'Male', 'O+', 175.0, 70.0, '[]', '{}', ?)
+            VALUES (?, ?, ?, 35, 'Not Specified', 'Not Specified', 175.0, 70.0, '[]', '{}', ?)
             ON CONFLICT (id) DO NOTHING;
             """, (pid, f"MRN-{uuid.uuid4().hex[:6].upper()}", p_name, p_phone))
             conn.commit()
@@ -1707,7 +1686,7 @@ class DatabaseRepository:
                COALESCE(u.name, p.name, 'Registered Patient') as patient_name,
                COALESCE(p.age, 35) as patient_age,
                COALESCE(p.gender, 'Not Specified') as patient_gender,
-               COALESCE(u.emergency_phone, p.emergency_contact, '+91 98765 43210') as patient_phone,
+               COALESCE(u.emergency_phone, p.emergency_contact, '') as patient_phone,
                COALESCE(u.email, '') as patient_email,
                p.conditions_json, p.baseline_vitals_json, p.allergies_json, p.medications_json
         FROM bookings b
@@ -1734,7 +1713,7 @@ class DatabaseRepository:
                COALESCE(u.name, p.name, 'Registered Patient') as patient_name,
                COALESCE(p.age, 35) as patient_age,
                COALESCE(p.gender, 'Not Specified') as patient_gender,
-               COALESCE(u.emergency_phone, p.emergency_contact, '+91 98765 43210') as patient_phone,
+               COALESCE(u.emergency_phone, p.emergency_contact, '') as patient_phone,
                COALESCE(u.email, '') as patient_email,
                p.conditions_json, p.baseline_vitals_json, p.allergies_json, p.medications_json
         FROM bookings b

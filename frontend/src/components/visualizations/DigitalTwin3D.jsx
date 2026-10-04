@@ -54,14 +54,19 @@ export default function DigitalTwin3D({ patientId, analysisResult = null, onOpen
     }
   }, []);
 
+  const setCameraAction = useTwinStore((state) => state.setCameraAction);
+
   const organList = [
     { id: "HEART", label: "Heart" },
-    { id: "LUNG_LEFT", label: "Lungs" },
+    { id: "LUNG_RIGHT", label: "Lungs" },
     { id: "BRAIN", label: "Brain" },
     { id: "PANCREAS", label: "Pancreas" },
-    { id: "LIVER", label: "Liver" },
     { id: "BREAST_LEFT", label: "Breast" },
+    { id: "LIVER", label: "Liver" },
+    { id: "SKIN", label: "Skin" },
   ];
+
+  const activeAnalysis = patientAnalysis || analysisResult;
 
   return (
     <div
@@ -99,8 +104,8 @@ export default function DigitalTwin3D({ patientId, analysisResult = null, onOpen
               width: "7px",
               height: "7px",
               borderRadius: "50%",
-              background: patientAnalysis?.severity === "danger" ? "var(--rose-couture)" : "var(--emerald-couture)",
-              boxShadow: patientAnalysis?.severity === "danger" ? "0 0 8px rgba(225, 29, 72, 0.5)" : "0 0 8px rgba(15, 118, 110, 0.4)",
+              background: activeAnalysis && !activeAnalysis.isHealthyOrBenign ? "var(--rose-couture)" : "var(--emerald-couture)",
+              boxShadow: activeAnalysis && !activeAnalysis.isHealthyOrBenign ? "0 0 8px rgba(225, 29, 72, 0.5)" : "0 0 8px rgba(15, 118, 110, 0.4)",
             }}
           />
           <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, letterSpacing: "0.04em", color: "var(--ink-primary)" }}>
@@ -174,14 +179,41 @@ export default function DigitalTwin3D({ patientId, analysisResult = null, onOpen
           gap: "6px",
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.65rem" }}>
-          <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>
-            Anatomical Telemetry
-          </span>
-          <span style={{ fontSize: "0.62rem", color: analysisResult ? "var(--accent-teal)" : "var(--emerald-couture)", fontWeight: 700 }}>
-            {analysisResult ? (patientAnalysis?.disease || "Diagnostic Assessed") : "Healthy Baseline (Pending Checkup)"}
-          </span>
-        </div>
+        {activeAnalysis ? (
+          <div
+            style={{
+              background: activeAnalysis.isHealthyOrBenign ? "rgba(16, 185, 129, 0.08)" : "rgba(225, 29, 72, 0.08)",
+              border: activeAnalysis.isHealthyOrBenign ? "1px solid rgba(16, 185, 129, 0.25)" : "1px solid rgba(225, 29, 72, 0.25)",
+              borderRadius: "4px",
+              padding: "6px 8px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "3px",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontSize: "0.66rem", fontWeight: 800, color: activeAnalysis.isHealthyOrBenign ? "#059669" : "#DC2626", display: "flex", alignItems: "center", gap: "4px" }}>
+                <Sparkles size={11} /> {activeAnalysis.disease || "Clinical Protocol"}
+              </span>
+              <span style={{ fontSize: "0.60rem", fontWeight: 700, padding: "1px 5px", borderRadius: "3px", background: activeAnalysis.isHealthyOrBenign ? "#ECFDF5" : "#FEF2F2", color: activeAnalysis.isHealthyOrBenign ? "#059669" : "#DC2626" }}>
+                {activeAnalysis.isHealthyOrBenign ? "Optimal / Benign" : "Elevated Risk"}
+              </span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.64rem", color: "var(--text-secondary)" }}>
+              <span>Finding: <strong style={{ color: activeAnalysis.isHealthyOrBenign ? "#059669" : "#DC2626" }}>{activeAnalysis.prediction?.class || "Assessed"}</strong></span>
+              <span>Infiltration: <strong style={{ color: activeAnalysis.isHealthyOrBenign ? "#059669" : "#DC2626" }}>{activeAnalysis.computedRisk ?? Math.round((activeAnalysis.prediction?.confidence || 0.85) * 100)}%</strong></span>
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.65rem" }}>
+            <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>
+              Anatomical Telemetry
+            </span>
+            <span style={{ fontSize: "0.62rem", color: "var(--emerald-couture)", fontWeight: 700 }}>
+              Healthy Baseline (Zero Active Findings)
+            </span>
+          </div>
+        )}
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
           {organList.map((org) => {
@@ -192,7 +224,11 @@ export default function DigitalTwin3D({ patientId, analysisResult = null, onOpen
               <button
                 key={org.id}
                 type="button"
-                onClick={() => setSelectedAnatomy(isSelected ? null : org.id)}
+                onClick={() => {
+                  const next = isSelected ? null : org.id;
+                  setSelectedAnatomy(next);
+                  if (next) setCameraAction({ preset: "focus", trigger: Date.now() });
+                }}
                 style={{
                   display: "inline-flex",
                   alignItems: "center",

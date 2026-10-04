@@ -7,12 +7,14 @@ import HeartDiseaseControls from '../diseases/HeartDiseaseControls';
 import DiabetesControls from '../diseases/DiabetesControls';
 import PneumoniaControls from '../diseases/PneumoniaControls';
 import LiverDiseaseControls from '../diseases/LiverDiseaseControls';
+import ParkinsonsControls from '../diseases/ParkinsonsControls';
+import SkinCancerControls from '../diseases/SkinCancerControls';
 import {
   User, Activity, Pill, Clock, AlertTriangle,
   ChevronDown, ChevronRight, Plus, Trash2, Search,
   Loader2, UserCheck, Stethoscope, Dna, FlaskConical,
   X, Check, ShieldCheck, Heart, Wind, Thermometer,
-  Sparkles, RefreshCw, Scale
+  Sparkles, RefreshCw, Scale, Crosshair
 } from 'lucide-react';
 import { authApi } from '../../../api/auth';
 
@@ -204,12 +206,125 @@ function TelemetryTab() {
 // ── Disease Simulation Tab ─────────────────────────────────────────────────────
 function DiseaseTab() {
   const { t } = useLanguage();
-  const selectedDisease = useTwinStore((s) => s.selectedDisease);
-  const setDisease      = useTwinStore((s) => s.setDisease);
-  const diseases        = Object.values(DISEASE_REGISTRY);
+  const selectedDisease    = useTwinStore((s) => s.selectedDisease);
+  const setDisease         = useTwinStore((s) => s.setDisease);
+  const patientAnalysis    = useTwinStore((s) => s.patientAnalysis);
+  const setSelectedAnatomy = useTwinStore((s) => s.setSelectedAnatomy);
+  const setCameraAction    = useTwinStore((s) => s.setCameraAction);
+  const diseases           = Object.values(DISEASE_REGISTRY);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+      {/* ── 1. Live Diagnostic Analysis Reflection Badge ── */}
+      {patientAnalysis ? (
+        <div
+          className="dt-card"
+          style={{
+            border: patientAnalysis.isHealthyOrBenign ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(239, 68, 68, 0.4)',
+            background: patientAnalysis.isHealthyOrBenign ? 'rgba(16, 185, 129, 0.05)' : 'rgba(239, 68, 68, 0.05)',
+            boxShadow: patientAnalysis.isHealthyOrBenign ? '0 0 12px rgba(16, 185, 129, 0.08)' : '0 0 12px rgba(239, 68, 68, 0.08)'
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Sparkles size={14} color={patientAnalysis.isHealthyOrBenign ? '#10B981' : '#EF4444'} />
+              <span style={{ fontSize: '0.68rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.04em', color: patientAnalysis.isHealthyOrBenign ? '#10B981' : '#EF4444' }}>
+                {t('twin_panels.live_diagnostic_reflection', 'Live Diagnostic Reflection')}
+              </span>
+            </div>
+            <span
+              style={{
+                fontSize: '0.62rem',
+                fontWeight: 800,
+                padding: '2px 8px',
+                borderRadius: '4px',
+                background: patientAnalysis.isHealthyOrBenign ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                color: patientAnalysis.isHealthyOrBenign ? '#10B981' : '#EF4444',
+                border: `1px solid ${patientAnalysis.isHealthyOrBenign ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`
+              }}
+            >
+              {patientAnalysis.isHealthyOrBenign ? t('twin_panels.benign_normal', 'BENIGN / NORMAL') : t('twin_panels.pathology_detected', 'PATHOLOGY DETECTED')}
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.74rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: 'var(--dt-text-muted)' }}>{t('twin_panels.protocol', 'Protocol')}:</span>
+              <strong style={{ color: 'var(--dt-text-primary)', textTransform: 'capitalize' }}>
+                {String(patientAnalysis.disease || 'Clinical Checkup').replace(/_/g, ' ')}
+              </strong>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: 'var(--dt-text-muted)' }}>{t('twin_panels.evaluated_organ', 'Evaluated Organ')}:</span>
+              <strong style={{ color: 'var(--dt-accent-blue)' }}>
+                {patientAnalysis.evaluatedOrgan || 'HEART'}
+              </strong>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: 'var(--dt-text-muted)' }}>{t('twin_panels.model_finding', 'Model Finding')}:</span>
+              <strong style={{ color: patientAnalysis.isHealthyOrBenign ? '#10B981' : '#EF4444' }}>
+                {patientAnalysis.prediction?.class || (patientAnalysis.isHealthyOrBenign ? 'Benign Checkup' : 'Malignant Finding')}
+                {patientAnalysis.prediction?.confidence && ` (${Math.round(patientAnalysis.prediction.confidence * 100)}% conf)`}
+              </strong>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: 'var(--dt-text-muted)' }}>{t('twin_panels.organ_infiltration_risk', 'Organ Infiltration Risk')}:</span>
+              <strong style={{ color: patientAnalysis.isHealthyOrBenign ? '#10B981' : '#EF4444' }}>
+                {patientAnalysis.computedRisk}% {patientAnalysis.isHealthyOrBenign ? '(Baseline Cleared)' : ''}
+              </strong>
+            </div>
+
+            {patientAnalysis.explainability?.clinical_narrative && (
+              <div style={{ marginTop: '4px', padding: '6px 8px', borderRadius: '4px', background: 'var(--dt-bg-surface)', border: '1px solid var(--dt-border-default)', fontSize: '0.68rem', color: 'var(--dt-text-secondary)', lineHeight: 1.4 }}>
+                {patientAnalysis.explainability.clinical_narrative}
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={() => {
+                if (patientAnalysis.evaluatedOrgan) {
+                  setSelectedAnatomy(patientAnalysis.evaluatedOrgan);
+                  setCameraAction({ preset: 'focus', trigger: Date.now() });
+                }
+              }}
+              style={{
+                marginTop: '6px',
+                padding: '6px 10px',
+                borderRadius: '5px',
+                background: patientAnalysis.isHealthyOrBenign ? '#10B981' : 'var(--dt-accent-blue)',
+                color: '#fff',
+                border: 'none',
+                fontWeight: 700,
+                fontSize: '0.70rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                transition: 'opacity 0.15s'
+              }}
+            >
+              <Crosshair size={13} />
+              {t('twin_panels.focus_evaluated_organ', 'Focus 3D View on Evaluated Organ')}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="dt-card" style={{ background: 'rgba(2, 132, 199, 0.03)', border: '1px dashed var(--dt-border-default)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+            <ShieldCheck size={14} color="#10B981" />
+            <span style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--dt-text-primary)' }}>
+              {t('twin_panels.anatomical_baseline', 'Anatomical Baseline (0% Pathology)')}
+            </span>
+          </div>
+          <p style={{ fontSize: '0.68rem', color: 'var(--dt-text-muted)', margin: 0, lineHeight: 1.4 }}>
+            {t('twin_panels.no_active_findings_desc', 'No active diagnostic disease detected. Run an assessment in the diagnostic suite to project live findings onto the 3D twin.')}
+          </p>
+        </div>
+      )}
+
+      {/* ── 2. Disease Protocol Selector ── */}
       <div className="dt-card">
         <SectionHeader icon={Stethoscope} title={t('twin_panels.select_condition_to_simulate', 'Select Condition to Simulate')} color="var(--dt-accent-blue)" />
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -245,7 +360,7 @@ function DiseaseTab() {
         </div>
       </div>
 
-      {/* Disease Controls */}
+      {/* ── 3. Organ Adjustments ── */}
       <div className="dt-card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <label className="dt-label">{t('twin_panels.organ_adjustments', 'Organ Adjustments')}</label>
@@ -255,9 +370,11 @@ function DiseaseTab() {
         </div>
         {selectedDisease === 'BREAST_CANCER' && <BreastCancerControls />}
         {selectedDisease === 'HEART_DISEASE'  && <HeartDiseaseControls />}
-        {selectedDisease === 'DIABETES'        && <DiabetesControls />}
-        {selectedDisease === 'PNEUMONIA'       && <PneumoniaControls />}
-        {selectedDisease === 'LIVER_DISEASE'   && <LiverDiseaseControls />}
+        {selectedDisease === 'DIABETES'       && <DiabetesControls />}
+        {selectedDisease === 'PNEUMONIA'      && <PneumoniaControls />}
+        {selectedDisease === 'LIVER_DISEASE'  && <LiverDiseaseControls />}
+        {selectedDisease === 'PARKINSONS'     && <ParkinsonsControls />}
+        {selectedDisease === 'SKIN_CANCER'    && <SkinCancerControls />}
       </div>
     </div>
   );

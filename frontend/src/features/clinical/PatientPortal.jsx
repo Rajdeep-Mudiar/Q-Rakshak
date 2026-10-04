@@ -487,7 +487,11 @@ export default function PatientPortal({ patientId = null, currentUser = null, on
                 {t("portal.diagnosed_conditions", "Diagnosed Conditions")}
               </div>
               <div style={{ fontSize: "0.82rem", fontWeight: 700, color: "var(--ink-primary)" }}>
-                {(patient?.conditions || []).join(", ") || "Coronary Plaque Risk, Dense Breast Tissue, Mild Dyslipidemia"}
+                {Array.isArray(patient?.conditions) && patient.conditions.length > 0
+                  ? patient.conditions.join(", ")
+                  : (Array.isArray(patient?.medical_history) && patient.medical_history.length > 0
+                      ? patient.medical_history.map(m => typeof m === 'string' ? m : (m.condition || m.name || '')).filter(Boolean).join(", ")
+                      : t("portal.no_conditions", "No chronic conditions recorded."))}
               </div>
             </div>
 
@@ -495,8 +499,10 @@ export default function PatientPortal({ patientId = null, currentUser = null, on
               <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)", textTransform: "uppercase", marginBottom: "4px" }}>
                 {t("portal.known_allergies", "Known Allergies")}
               </div>
-              <div style={{ fontSize: "0.82rem", color: "var(--state-error)", fontWeight: 700 }}>
-                Penicillin (High Severity - Anaphylaxis / Urticaria)
+              <div style={{ fontSize: "0.82rem", color: Array.isArray(patient?.allergies) && patient.allergies.length > 0 ? "var(--state-error)" : "var(--text-muted)", fontWeight: 700 }}>
+                {Array.isArray(patient?.allergies) && patient.allergies.length > 0
+                  ? patient.allergies.map(a => typeof a === 'string' ? a : (a.allergen || a.name || 'Allergy')).filter(Boolean).join(", ")
+                  : t("portal.no_allergies", "No known allergies recorded.")}
               </div>
             </div>
 
@@ -505,7 +511,9 @@ export default function PatientPortal({ patientId = null, currentUser = null, on
                 {t("portal.active_rx", "Active Prescription Regimen (Rx)")}
               </div>
               <div style={{ fontSize: "0.82rem", color: "var(--ink-primary)" }}>
-                Atorvastatin 20mg (Once daily OD - Night)
+                {Array.isArray(patient?.medications) && patient.medications.length > 0
+                  ? patient.medications.map(m => typeof m === 'string' ? m : `${m.name || ''} ${m.dose || ''} ${m.frequency ? `(${m.frequency})` : ''}`.trim()).filter(Boolean).join(", ")
+                  : t("portal.no_medications", "No active medications recorded.")}
               </div>
             </div>
           </div>

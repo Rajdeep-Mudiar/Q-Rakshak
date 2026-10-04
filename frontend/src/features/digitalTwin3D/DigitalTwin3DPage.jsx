@@ -40,8 +40,8 @@ export default function DigitalTwin3DPage({ patientId, result, onExportReport })
 
   // Synchronize incoming diagnosis result into digital twin store
   useEffect(() => {
-    if (result && activePid) {
-      setPatientAnalysis(result, activePid);
+    if (result) {
+      setPatientAnalysis(result, activePid || '');
     }
   }, [result, activePid, setPatientAnalysis]);
 

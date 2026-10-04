@@ -436,7 +436,7 @@ async def get_patient_clinical_record(patient_id: str | None = None, current_use
     user_id = current_user.get("user_id", "") if current_user else ""
     user_pat = current_user.get("patient_id", "") if current_user else ""
     if user_role == "patient" and user_id not in ("GUEST-USER", "") and patient_id:
-        is_permitted = (user_id == patient_id) or (user_pat == patient_id) or (patient_id in ("USR-ARYAN", "USR-ALEX", "PT-ALEX", "PT-89421"))
+        is_permitted = (user_id == patient_id) or (user_pat == patient_id) or (patient_id in ("USR-ARYAN", "USR-ALEX", "PT-ALEX"))
         if not is_permitted:
             raise HTTPException(
                 status_code=403,
@@ -457,7 +457,7 @@ async def get_patient_clinical_record(patient_id: str | None = None, current_use
                 "name": f"Patient {target_id}",
                 "age": 30,
                 "gender": "Unspecified",
-                "blood_group": "O+",
+                "blood_group": "Not Specified",
             })
         )
     return {"status": "success", "patient": patient}
@@ -482,7 +482,7 @@ async def update_patient_clinical_record(
     user_id = current_user.get("user_id", "") if current_user else ""
     user_pat = current_user.get("patient_id", "") if current_user else ""
     if user_role == "patient" and user_id not in ("GUEST-USER", "") and target_id:
-        is_permitted = (user_id == target_id) or (user_pat == target_id) or (target_id in ("USR-ARYAN", "USR-ALEX", "PT-ALEX", "PT-89421"))
+        is_permitted = (user_id == target_id) or (user_pat == target_id) or (target_id in ("USR-ARYAN", "USR-ALEX", "PT-ALEX"))
         if not is_permitted:
             raise HTTPException(
                 status_code=403,

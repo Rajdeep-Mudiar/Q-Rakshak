@@ -673,8 +673,8 @@ async def send_triage_card_email(
         return False
 
     patient_name = card_data.get("name", "Patient")
-    blood_group = card_data.get("blood_group", "O+")
-    emergency_phone = card_data.get("emergency_phone", "+91 98765 43210")
+    blood_group = card_data.get("blood_group") or "Not Specified"
+    emergency_phone = card_data.get("emergency_phone") or "Not Provided"
     emergency_contact_name = card_data.get("emergency_contact_name", "Emergency Contact")
     allergies = card_data.get("allergies", "No known drug allergies (NKDA)")
     active_medications = card_data.get("active_medications", "None Active")

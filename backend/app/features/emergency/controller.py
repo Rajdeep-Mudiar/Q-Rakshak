@@ -80,7 +80,6 @@ async def get_emergency_card_data(patient_id: str):
             "medications": [],
             "emergency_contacts": [],
         }
-    return record
 
     emergency_url = f"{settings.FRONTEND_URL.rstrip('/')}/#triage/{patient_id}"
     qr_base64 = generate_qr_base64_data_uri(emergency_url)
@@ -148,7 +147,7 @@ async def get_emergency_card_data(patient_id: str):
         "card_data": {
             "user_id": patient_id,
             "name": record.get("name", "Patient"),
-            "blood_group": record.get("blood_group", "O+"),
+            "blood_group": record.get("blood_group") or "Not Specified",
             "emergency_phone": contact_phone,
             "emergency_contact_name": contact_name,
             "emergency_contact_relation": contact_relation,

@@ -23,9 +23,9 @@ export default function PrintableMedicalCardSheet({
     .toUpperCase()
     .replace(/\s+/g, '_')
     .replace(/[^A-Z0-9_]/g, '');
-  const patientId = resolvedId || `USR-${patientNameSlug}`;
+  const patientId = resolvedId || (patient.name || patient.username ? `USR-${patientNameSlug}` : '');
   const rawLicense = patient?.license_id || patient?.mrn;
-  const mrn = (rawLicense && rawLicense !== 'PT-REC-89421') ? rawLicense : `MRN-${patientId}-QX`;
+  const mrn = rawLicense || (patientId ? `MRN-${patientId}-QX` : '—');
   const abhaId = patient?.abha_id || patient?.abhaId || '—';
   const currentDate = new Date().toLocaleDateString('en-IN', {
     day: '2-digit',
@@ -94,7 +94,7 @@ export default function PrintableMedicalCardSheet({
             {/* Back Face */}
             {(cardFace === 'dual' || cardFace === 'back') && (
               <div className="print-card-face-wrapper">
-                <div className="print-face-label">BACK FACE • CLINICAL DIRECTIVES & VITALS</div>
+                <div className="print-face-label">BACK FACE • CLINICAL DIRECTIVES & SAFEGUARDS</div>
                 <div className="print-card-scaler">
                   <TriagePhysicalCard
                     patient={patient}

@@ -20,9 +20,9 @@ class CreateUserRequest(BaseModel):
     name: str
     email: str
     secondary_email: str | None = ""
-    emergency_phone: str | None = "+91 98765 43210"
+    emergency_phone: str | None = None
     role: str = "patient"  # patient | admin
-    hospital_affiliation: str | None = "Q-Rakshak Health Network"
+    hospital_affiliation: str | None = None
     license_number: str | None = None
 
 
@@ -62,7 +62,7 @@ async def create_new_user(req: CreateUserRequest, current_user: dict = Depends(g
         "name": req.name,
         "email": req.email,
         "secondary_email": req.secondary_email or "",
-        "emergency_phone": req.emergency_phone or "+91 98765 43210",
+        "emergency_phone": req.emergency_phone or "",
         "role": req.role,
         "hospital_affiliation": req.hospital_affiliation or "Q-RAKSHAK Clinical Network",
         "license_number": req.license_number or f"LIC-{uuid.uuid4().hex[:4].upper()}",

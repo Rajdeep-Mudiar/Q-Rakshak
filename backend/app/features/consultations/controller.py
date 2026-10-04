@@ -298,7 +298,7 @@ class BookingCreateRequest(BaseModel):
     symptoms: str
     duration: str = "3 days"
     existing_medications: list[str] = Field(default_factory=list)
-    emergency_contact: str = "+91 98765 43210"
+    emergency_contact: str = ""
 
 
 class BookingTransitionRequest(BaseModel):

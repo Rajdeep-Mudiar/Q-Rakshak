@@ -1,4 +1,4 @@
-﻿import os
+import os
 import tempfile
 from pathlib import Path
 
@@ -8,6 +8,9 @@ Path(os.environ["QMED_DEMO_DB_PATH"]).unlink(missing_ok=True)
 
 import pytest
 from fastapi.testclient import TestClient
+from backend.app.db.database import init_db
+init_db()
+
 from backend.app.main import app
 
 

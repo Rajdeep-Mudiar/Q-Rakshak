@@ -52,13 +52,53 @@ export default function DiseaseEarlyDetectionTimeline({
     if (d?.earlyDetection?.stages?.[0]?.id) {
       setSelectedStageId(d.earlyDetection.stages[0].id);
     }
-  }, [diseaseId]);
+  }, [diseaseId, t]);
 
   const activeDisease = getLocalizedDiseaseById(activeDiseaseId, t);
   const currentEarlyDet = activeDisease.earlyDetection || earlyDet;
   const stages = currentEarlyDet.stages || [];
+
+  // Auto-align active stage tab to patient's calculated risk score:
+  // <= 30% -> Stage 0 (Pre-Clinical / DCIS / Optimal Lead Time)
+  // 31% - 65% -> Stage I (Early Localized / Intervention Window)
+  // > 65% -> Stage II+ (Invasive Progression / Active Alert)
+  useEffect(() => {
+    if (patientRiskScore !== null && !isNaN(patientRiskScore) && stages.length > 0) {
+      let targetStageId = "stage_0";
+      if (patientRiskScore <= 30) {
+        targetStageId = stages.find((s) => s.id === "stage_0")?.id || stages[0].id;
+      } else if (patientRiskScore <= 65) {
+        targetStageId = stages.find((s) => s.id === "stage_1")?.id || stages[1]?.id || stages[0].id;
+      } else {
+        targetStageId = stages.find((s) => s.id === "stage_2" || s.id === "stage_3")?.id || stages[stages.length - 1]?.id || stages[0].id;
+      }
+      setSelectedStageId(targetStageId);
+    }
+  }, [patientRiskScore, stages]);
+
   const activeStage = stages.find((s) => s.id === selectedStageId) || stages[0] || {};
   const timelineSeries = currentEarlyDet.timelineSeries || [];
+
+  // Dynamic personalized remaining lead time based on patientRiskScore
+  const personalizedLeadTime = React.useMemo(() => {
+    if (patientRiskScore === null || isNaN(patientRiskScore)) {
+      return currentEarlyDet.leadTime || "24 Months";
+    }
+    const rawLead = currentEarlyDet.leadTime || "24 Months";
+    const numMatch = rawLead.match(/\d+/);
+    const unit = rawLead.includes("Hour") ? "Hours" : "Months";
+    const totalVal = numMatch ? parseInt(numMatch[0], 10) : 24;
+
+    if (patientRiskScore <= 30) {
+      return `${totalVal} ${unit} (Optimal Lead Time)`;
+    } else if (patientRiskScore <= 65) {
+      const remaining = Math.max(1, Math.round(totalVal * 0.55));
+      return `${remaining} ${unit} (Active Window)`;
+    } else {
+      const remaining = Math.max(1, Math.round(totalVal * 0.20));
+      return `< ${remaining} ${unit} (Critical Alert)`;
+    }
+  }, [patientRiskScore, currentEarlyDet.leadTime]);
 
   // SVG Chart Geometry
   const svgWidth = 640;
@@ -80,9 +120,29 @@ export default function DiseaseEarlyDetectionTimeline({
   const getX = (t) => padLeft + ((t - minTime) / timeSpan) * chartW;
   const getY = (risk) => padTop + chartH - (Math.max(0, Math.min(100, risk)) / 100) * chartH;
 
-  // Trajectory SVG paths
-  const unmonitoredPoints = timelineSeries.map((p) => ({ x: getX(p.time), y: getY(p.unmonitoredRisk), p }));
-  const quantumPoints = timelineSeries.map((p) => ({ x: getX(p.time), y: getY(p.quantumInterventionRisk), p }));
+  // Dynamic personalized trajectory calibrated directly to patientRiskScore
+  const hasPatientData = patientRiskScore !== null && !isNaN(patientRiskScore);
+
+  const unmonitoredPoints = timelineSeries.map((p) => {
+    if (!hasPatientData || p.time < 0) {
+      return { x: getX(p.time), y: getY(p.unmonitoredRisk), p, risk: p.unmonitoredRisk };
+    }
+    // Projected upward from patient's actual score at present (t=0)
+    const tRatio = maxTime > 0 ? p.time / maxTime : 0;
+    const projRisk = Math.min(99, Math.round(patientRiskScore + (99 - patientRiskScore) * (tRatio * 0.9)));
+    return { x: getX(p.time), y: getY(projRisk), p, risk: projRisk };
+  });
+
+  const quantumPoints = timelineSeries.map((p) => {
+    if (!hasPatientData || p.time < 0) {
+      return { x: getX(p.time), y: getY(p.quantumInterventionRisk), p, risk: p.quantumInterventionRisk };
+    }
+    // Stabilized downward under quantum precision intervention
+    const tRatio = maxTime > 0 ? p.time / maxTime : 0;
+    const targetBaseline = Math.min(22, Math.round(patientRiskScore * 0.35));
+    const projRisk = Math.max(12, Math.round(patientRiskScore - (patientRiskScore - targetBaseline) * tRatio));
+    return { x: getX(p.time), y: getY(projRisk), p, risk: projRisk };
+  });
 
   const unmonitoredPathD = unmonitoredPoints.length > 0
     ? unmonitoredPoints.map((pt, idx) => `${idx === 0 ? "M" : "L"} ${pt.x.toFixed(1)} ${pt.y.toFixed(1)}`).join(" ")
@@ -301,7 +361,7 @@ export default function DiseaseEarlyDetectionTimeline({
               {t("early_detection.lead_time_window", "Lead Time Window")}
             </div>
             <div style={{ fontSize: "1.1rem", fontWeight: 800, color: activeDisease.accentColor, fontFamily: "var(--font-mono)" }}>
-              {currentEarlyDet.leadTime}
+              {personalizedLeadTime}
             </div>
             <div style={{ fontSize: "0.62rem", color: "var(--risk-low, #16A34A)", fontWeight: 600 }}>
               {t("early_detection.pre_clinical_lead", "Pre-clinical lead")}
@@ -351,6 +411,54 @@ export default function DiseaseEarlyDetectionTimeline({
           </div>
         </div>
       </div>
+
+      {/* Live Patient Calibration Banner */}
+      {hasPatientData && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            background: "linear-gradient(90deg, rgba(2, 132, 199, 0.08) 0%, rgba(16, 185, 129, 0.08) 100%)",
+            border: "1px solid rgba(2, 132, 199, 0.25)",
+            borderRadius: "8px",
+            padding: "9px 14px",
+            fontSize: "0.76rem",
+            color: "var(--text-primary, #0F172A)",
+            gap: "10px",
+            flexWrap: "wrap",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span
+              style={{
+                display: "inline-block",
+                width: "8px",
+                height: "8px",
+                borderRadius: "50%",
+                background: "#10B981",
+                boxShadow: "0 0 0 3px rgba(16, 185, 129, 0.25)",
+              }}
+            />
+            <span>
+              <strong>{t("early_detection.live_sync", "Dynamic Calibration Active:")}</strong>{" "}
+              {t("early_detection.calibrated_desc", "Timeline anchored to patient's real checkup score")} (
+              <span
+                style={{
+                  fontWeight: 700,
+                  color: patientRiskScore > 65 ? "#DC2626" : patientRiskScore > 30 ? "#D97706" : "#059669",
+                }}
+              >
+                {patientRiskScore}% Risk
+              </span>
+              )
+            </span>
+          </div>
+          <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", fontWeight: 600 }}>
+            {t("early_detection.trajectory_divergence", "Action Window:")} {personalizedLeadTime}
+          </div>
+        </div>
+      )}
 
       {/* ── 3. INTERACTIVE PROGRESSION & INTERVENTION GRAPH (SVG) ── */}
       <div

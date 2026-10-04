@@ -26,7 +26,7 @@ class RegisterRequest(BaseModel):
     name: str
     email: str
     role: str = "patient"  # patient | doctor | admin
-    emergency_phone: str | None = "+91 98765 43210"
+    emergency_phone: str | None = None
     hospital_affiliation: str | None = "Q-Rakshak"
     license_number: str | None = None
     specialty: str | None = "General Medicine & Clinical AI"
@@ -49,7 +49,7 @@ async def register(req: RegisterRequest):
         "name": req.name,
         "email": req.email,
         "role": req.role,
-        "emergency_phone": req.emergency_phone or "+91 98765 43210",
+        "emergency_phone": req.emergency_phone or "",
         "hospital_affiliation": req.hospital_affiliation or ("Q-Rakshak" if req.role in ("doctor", "clinician") else "Community Hospital"),
         "license_number": req.license_number,
         "specialty": req.specialty or "General Medicine & Clinical AI",
@@ -290,7 +290,7 @@ async def google_verify(req: GoogleVerifyRequest, request: Request):
             "email": google_email,
             "role": target_role,
             "hospital_affiliation": "Google Clinical SSO (Identity Services)",
-            "emergency_phone": "+91 98765 43210",
+            "emergency_phone": "",
         })
         asyncio.create_task(
             send_welcome_email(
@@ -518,7 +518,7 @@ async def google_callback(
             "email": google_email,
             "role": target_role,
             "hospital_affiliation": "Google Clinical SSO",
-            "emergency_phone": "+91 98765 43210",
+            "emergency_phone": "",
         })
         asyncio.create_task(
             send_welcome_email(

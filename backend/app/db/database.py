@@ -457,16 +457,18 @@ def init_database():
         ("DOC-USR-RAJESH", "dr.rajesh", hash_password("doctor123"), "Dr. Rajesh Mehta, MD, DM", "rajesh.mehta@tmh.org", "dr.rajesh@gmail.com", "+91 98222 55667", "doctor", "Tata Memorial Hospital", "MCI-2009-44120"),
         ("DOC-USR-ANANYA", "dr.ananya", hash_password("doctor123"), "Dr. Ananya Sen, MD", "ananya.sen@manipal.health", "dr.ananya@gmail.com", "+91 98333 77889", "doctor", "Manipal Hospital Pulmonology", "MCI-2018-77412"),
         ("DOC-VIKRAM", "dr.vikram", hash_password("doctor123"), "Dr. Vikram Malhotra, MBBS", "vikram.malhotra@gmail.com", "", "+91 98444 88990", "doctor", "Apollo Clinics", "MCI-2023-11045"),
-        ("USR-ARYAN", "dr.aryan", hash_password("clinician123"), "Dr. Aryan Choudhury, MD", "aryan.crores@gmail.com", "aryan@q-rakshak.health", "+91 98765 43210", "doctor", "Q-Rakshak Clinical AI OPD", "MCI-2024-99881"),
-        ("USR-ALEX", "alex.patient", hash_password("patient123"), "Alex Mercer", "alex.patient@egreenquanta.health", "", "+91 98765 43210", "patient", "Community Hospital", "PT-REC-ALEX"),
+        ("USR-ARYAN", "dr.aryan", hash_password("clinician123"), "Dr. Aryan Choudhury, MD", "aryan.crores@gmail.com", "aryan@q-rakshak.health", "", "doctor", "Q-Rakshak Clinical AI OPD", "MCI-2024-99881"),
+        ("USR-ALEX", "alex.patient", hash_password("patient123"), "Alex Mercer", "alex.patient@egreenquanta.health", "", "", "patient", "Community Hospital", "PT-REC-ALEX"),
         ("RES-PRIYA", "priya.qml", hash_password("quantum123"), "Dr. Priya Sharma, PhD", "priya.qml@egreenquanta.health", "", "+91 98555 66778", "researcher", "Centre for Quantum Technologies", "RES-QML-001"),
     ]
 
-    # Migrate legacy DOC-USR-ARYAN to USR-ARYAN
+    # Migrate legacy DOC-USR-ARYAN to USR-ARYAN and scrub dummy phone
     try:
         cursor.execute("UPDATE doctors SET user_id = 'USR-ARYAN' WHERE user_id IN ('DOC-USR-ARYAN', 'DOC_USR_ARYAN');")
         cursor.execute("UPDATE users SET id = 'USR-ARYAN' WHERE id IN ('DOC-USR-ARYAN', 'DOC_USR_ARYAN');")
         cursor.execute("UPDATE users SET id = 'USR-ALEX' WHERE id = 'PT-ALEX';")
+        cursor.execute("UPDATE users SET emergency_phone = '' WHERE emergency_phone LIKE '%98765 43210%' OR emergency_phone LIKE '%9876543210%';")
+        cursor.execute("UPDATE patients SET emergency_contact = '' WHERE emergency_contact LIKE '%98765 43210%' OR emergency_contact LIKE '%9876543210%';")
     except Exception:
         pass
 
@@ -519,11 +521,11 @@ def init_database():
             "respiratory_rate": 16,
             "blood_glucose_mg_dl": 95,
         }),
-        "+91 98765 43210",
+        "",
         json.dumps([]),
         json.dumps([]),
         json.dumps([]),
-        json.dumps([{"name": "Emergency Contact", "phone": "+91 98765 43210", "relation": "Family", "is_primary": True}])
+        json.dumps([])
     ))
 
     # Seed Consent for USR-ALEX

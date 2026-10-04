@@ -1136,6 +1136,11 @@ export default function UnifiedAnalysisPage() {
             disclaimer: "Clinical Decision Support: This AI checkup is for guidance and does not replace your doctor's professional diagnosis.",
           };
           setResult(payload);
+          try {
+            await clinicalApi.saveDiagnosticRecord(payload);
+          } catch (persistErr) {
+            console.warn("Notice: Diagnostic ledger background persistence:", persistErr);
+          }
         } else {
           const isNormal = activeFile?.name?.toLowerCase().includes("normal");
           const payload = {
@@ -1163,6 +1168,11 @@ export default function UnifiedAnalysisPage() {
             disclaimer: "Clinical Decision Support: This AI checkup is for guidance and does not replace your doctor's professional diagnosis.",
           };
           setResult(payload);
+          try {
+            await clinicalApi.saveDiagnosticRecord(payload);
+          } catch (persistErr) {
+            console.warn("Notice: Diagnostic ledger background persistence:", persistErr);
+          }
         }
       } else if (study === "skin") {
         if (!activeFile) {
@@ -1177,7 +1187,7 @@ export default function UnifiedAnalysisPage() {
           const isDanger = String(predClass).toLowerCase().includes("melanoma") || String(predClass).toLowerCase().includes("malignant") || String(predClass).toLowerCase().includes("carcinoma");
           const payload = {
             patient_id: effectivePatientId,
-            disease: "Dermatoscopy (HAM10000)",
+            disease: "Dermatoscopy (Skin Cancer)",
             model_architecture: "QuantumDerma (10-Qubit VQC + DermisNova Backbone)",
             prediction: {
               class: predClass || "Melanocytic Nevus (nv - Benign)",
@@ -1200,11 +1210,16 @@ export default function UnifiedAnalysisPage() {
             disclaimer: "Clinical Decision Support: This AI checkup is for guidance and does not replace your doctor's professional diagnosis.",
           };
           setResult(payload);
+          try {
+            await clinicalApi.saveDiagnosticRecord(payload);
+          } catch (persistErr) {
+            console.warn("Notice: Diagnostic ledger background persistence:", persistErr);
+          }
         } else {
           const isMelanoma = activeFile?.name?.toLowerCase().includes("melanoma");
           const payload = {
             patient_id: effectivePatientId,
-            disease: "Dermatoscopy (HAM10000)",
+            disease: "Dermatoscopy (Skin Cancer)",
             model_architecture: "QuantumDerma (10-Qubit VQC + DermisNova Backbone)",
             prediction: {
               class: isMelanoma ? "Melanoma Lesion (mel - High Risk)" : "Melanocytic Nevus (nv - Benign)",
@@ -1227,6 +1242,11 @@ export default function UnifiedAnalysisPage() {
             disclaimer: "Clinical Decision Support: This AI checkup is for guidance and does not replace your doctor's professional diagnosis.",
           };
           setResult(payload);
+          try {
+            await clinicalApi.saveDiagnosticRecord(payload);
+          } catch (persistErr) {
+            console.warn("Notice: Diagnostic ledger background persistence:", persistErr);
+          }
         }
       } else if (study === "parkinsons") {
         let featureDict = {};

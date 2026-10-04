@@ -107,6 +107,16 @@ const DEFAULT_DISEASE_PARAMS = {
   LIVER_DISEASE: {
     percentage: 0,
     selectedLobe: 'Right Lobe'
+  },
+  PARKINSONS: {
+    percentage: 0,
+    dopaminergicDepletion: 0,
+    selectedRegion: 'Substantia Nigra'
+  },
+  SKIN_CANCER: {
+    percentage: 0,
+    lesionType: 'Melanocytic',
+    selectedZone: 'Epidermis'
   }
 };
 
@@ -487,37 +497,134 @@ export const useTwinStore = create((set, get) => ({
 
   setPatientAnalysis: (analysis, patientId) => {
     if (!analysis) return;
-    const diseaseName = (analysis.disease || '').toUpperCase();
-    let diseaseKey = 'HEART_DISEASE';
-    let involvement = { HEART: Math.round((analysis.prediction?.confidence || 0.85) * 100) };
+    const diseaseName = String(analysis.disease || '').toUpperCase();
+    const pred = analysis.prediction || {};
+    const predClass = String(pred.class || pred.prediction_class || '').toLowerCase();
+    const severity = String(pred.severity || '').toLowerCase();
 
-    if (diseaseName.includes('BREAST') || diseaseName.includes('ONCOLOGY')) {
+    // Determine if the finding is clean / benign / normal
+    const isHealthyOrBenign =
+      predClass.includes('benign') ||
+      predClass.includes('normal') ||
+      predClass.includes('healthy') ||
+      predClass.includes('negative') ||
+      predClass.includes('clear') ||
+      predClass === '0' ||
+      severity === 'safe' ||
+      severity === 'low';
+
+    const rawConfidence = typeof pred.confidence === 'number' ? pred.confidence : 0.85;
+
+    // Genuine computed organ involvement percentage
+    let computedRisk = 0;
+    if (typeof analysis.risk_score === 'number' && !isNaN(analysis.risk_score)) {
+      computedRisk = Math.round(analysis.risk_score);
+    } else if (isHealthyOrBenign) {
+      computedRisk = Math.max(2, Math.min(15, Math.round((1 - rawConfidence) * 100)));
+    } else {
+      computedRisk = Math.max(50, Math.min(99, Math.round(rawConfidence * 100)));
+    }
+
+    let diseaseKey = 'BREAST_CANCER';
+    let primaryTargetOrgan = 'BREAST_LEFT';
+    const involvement = {};
+    const newDiseaseParams = { ...get().diseaseParams };
+
+    if (diseaseName.includes('BREAST') || diseaseName.includes('ONCOLOGY') || diseaseName.includes('WDBC')) {
       diseaseKey = 'BREAST_CANCER';
-      involvement = { BREAST_LEFT: Math.round((analysis.prediction?.confidence || 0.85) * 100) };
+      primaryTargetOrgan = 'BREAST_LEFT';
+      involvement['BREAST_LEFT'] = computedRisk;
+      newDiseaseParams.BREAST_CANCER = {
+        ...newDiseaseParams.BREAST_CANCER,
+        leftPercentage: computedRisk,
+        rightPercentage: 0,
+        lesionEnabled: !isHealthyOrBenign && computedRisk >= 50,
+        lesionRadius: 0.025 + (computedRisk / 100) * 0.02,
+      };
+    } else if (diseaseName.includes('HEART') || diseaseName.includes('CARDIO') || diseaseName.includes('CLEVELAND')) {
+      diseaseKey = 'HEART_DISEASE';
+      primaryTargetOrgan = 'HEART';
+      involvement['HEART'] = computedRisk;
+      if (computedRisk >= 70) {
+        involvement['VASCULAR_SYSTEM'] = Math.round(computedRisk * 0.5);
+      }
+      newDiseaseParams.HEART_DISEASE = {
+        ...newDiseaseParams.HEART_DISEASE,
+        percentage: computedRisk,
+        pulseIntensity: computedRisk > 30,
+      };
     } else if (diseaseName.includes('PNEUM') || diseaseName.includes('LUNG') || diseaseName.includes('CHEST')) {
       diseaseKey = 'PNEUMONIA';
-      involvement = { LUNG_RIGHT: Math.round((analysis.prediction?.confidence || 0.85) * 100), LUNG_LEFT: 25 };
-    } else if (diseaseName.includes('DIABET') || diseaseName.includes('METABOLIC')) {
+      primaryTargetOrgan = 'LUNG_RIGHT';
+      involvement['LUNG_RIGHT'] = computedRisk;
+      newDiseaseParams.PNEUMONIA = {
+        ...newDiseaseParams.PNEUMONIA,
+        rightPercentage: computedRisk,
+        leftPercentage: 0,
+      };
+    } else if (diseaseName.includes('DIABET') || diseaseName.includes('METABOLIC') || diseaseName.includes('PIMA')) {
       diseaseKey = 'DIABETES';
-      involvement = { PANCREAS: Math.round((analysis.prediction?.confidence || 0.85) * 100), KIDNEY_LEFT: 35, KIDNEY_RIGHT: 35 };
-    } else if (diseaseName.includes('LIVER') || diseaseName.includes('HEPATIC')) {
+      primaryTargetOrgan = 'PANCREAS';
+      involvement['PANCREAS'] = computedRisk;
+      if (computedRisk >= 70) {
+        involvement['KIDNEY_LEFT'] = Math.round(computedRisk * 0.45);
+        involvement['KIDNEY_RIGHT'] = Math.round(computedRisk * 0.45);
+      }
+      newDiseaseParams.DIABETES = {
+        ...newDiseaseParams.DIABETES,
+        pancreas: computedRisk,
+        kidneyLeft: involvement['KIDNEY_LEFT'] || 0,
+        kidneyRight: involvement['KIDNEY_RIGHT'] || 0,
+      };
+    } else if (diseaseName.includes('PARKINSON') || diseaseName.includes('NEURO') || diseaseName.includes('VOICE')) {
+      diseaseKey = 'PARKINSONS';
+      primaryTargetOrgan = 'BRAIN';
+      involvement['BRAIN'] = computedRisk;
+      newDiseaseParams.PARKINSONS = {
+        ...newDiseaseParams.PARKINSONS,
+        percentage: computedRisk,
+        dopaminergicDepletion: computedRisk,
+      };
+    } else if (diseaseName.includes('DERMA') || diseaseName.includes('SKIN') || diseaseName.includes('MELANOMA')) {
+      diseaseKey = 'SKIN_CANCER';
+      primaryTargetOrgan = 'SKIN';
+      involvement['SKIN'] = computedRisk;
+      newDiseaseParams.SKIN_CANCER = {
+        ...newDiseaseParams.SKIN_CANCER,
+        percentage: computedRisk,
+      };
+    } else if (diseaseName.includes('LIVER') || diseaseName.includes('HEPAT')) {
       diseaseKey = 'LIVER_DISEASE';
-      involvement = { LIVER: Math.round((analysis.prediction?.confidence || 0.85) * 100) };
-    } else if (diseaseName.includes('DERMA') || diseaseName.includes('SKIN')) {
-      involvement = { SKIN: Math.round((analysis.prediction?.confidence || 0.85) * 100) };
+      primaryTargetOrgan = 'LIVER';
+      involvement['LIVER'] = computedRisk;
+      newDiseaseParams.LIVER_DISEASE = {
+        ...newDiseaseParams.LIVER_DISEASE,
+        percentage: computedRisk,
+      };
+    } else {
+      primaryTargetOrgan = 'HEART';
+      involvement['HEART'] = computedRisk;
     }
 
     set({
       patientMode: 'active',
-      patientAnalysis: analysis,
+      patientAnalysis: {
+        ...analysis,
+        evaluatedOrgan: primaryTargetOrgan,
+        computedRisk,
+        isHealthyOrBenign,
+      },
       selectedDisease: diseaseKey,
+      selectedAnatomy: primaryTargetOrgan,
       involvementMap: involvement,
+      diseaseParams: newDiseaseParams,
+      cameraAction: { preset: 'focus', trigger: Date.now() },
       patient: {
         ...get().patient,
         patientId: patientId || get().patient.patientId,
-        notes: analysis.explainability?.clinical_narrative || get().patient.notes
+        notes: analysis.explainability?.clinical_narrative || get().patient.notes,
       },
-      layers: { ...get().layers, diseaseOverlay: true }
+      layers: { ...get().layers, diseaseOverlay: true },
     });
   },
 
@@ -539,6 +646,10 @@ export const useTwinStore = create((set, get) => ({
       newInvolvement = { LUNG_LEFT: dp.PNEUMONIA.leftPercentage, LUNG_RIGHT: dp.PNEUMONIA.rightPercentage };
     } else if (diseaseId === 'LIVER_DISEASE') {
       newInvolvement = { LIVER: dp.LIVER_DISEASE.percentage };
+    } else if (diseaseId === 'PARKINSONS') {
+      newInvolvement = { BRAIN: dp.PARKINSONS?.percentage || 0 };
+    } else if (diseaseId === 'SKIN_CANCER') {
+      newInvolvement = { SKIN: dp.SKIN_CANCER?.percentage || 0 };
     }
     const firstTarget = disease.targetOrgans[0] || null;
     set({ selectedDisease: diseaseId, involvementMap: newInvolvement, selectedAnatomy: firstTarget });
@@ -574,6 +685,10 @@ export const useTwinStore = create((set, get) => ({
         if (paramKey === 'rightPercentage') updatedInvolvement.LUNG_RIGHT = value;
       } else if (diseaseId === 'LIVER_DISEASE') {
         if (paramKey === 'percentage') updatedInvolvement.LIVER = value;
+      } else if (diseaseId === 'PARKINSONS') {
+        if (paramKey === 'percentage' || paramKey === 'dopaminergicDepletion') updatedInvolvement.BRAIN = value;
+      } else if (diseaseId === 'SKIN_CANCER') {
+        if (paramKey === 'percentage') updatedInvolvement.SKIN = value;
       }
       StorageService.saveTwin({ patient: state.patient, disease: state.selectedDisease, involvement: updatedInvolvement });
       return {
@@ -592,7 +707,13 @@ export const useTwinStore = create((set, get) => ({
   toggleLayer: (key) => set((state) => ({ layers: { ...state.layers, [key]: !state.layers[key] } })),
   setXrayMode: (enabled) => set({ xrayMode: enabled }),
   setXrayIntensity: (intensity) => set({ xrayIntensity: intensity }),
-  setCameraAction: (preset) => set({ cameraAction: { preset, trigger: Date.now() } }),
+  setCameraAction: (action) =>
+    set({
+      cameraAction:
+        typeof action === 'string'
+          ? { preset: action, trigger: Date.now() }
+          : { preset: action?.preset || 'default', trigger: action?.trigger || Date.now() }
+    }),
 
   setReportOpen: (v) => set({ isReportOpen: v }),
   setComparisonOpen: (v) => set({ isComparisonOpen: v }),

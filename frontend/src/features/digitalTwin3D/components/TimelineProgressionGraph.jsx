@@ -23,9 +23,72 @@ export default function TimelineProgressionGraph({
   }
 
   const data = timelineData || {};
-  const threshold = data.threshold || 90.0;
   const history = data.history || [];
   const projections = data.projections || [];
+
+  if (history.length === 0 && projections.length === 0) {
+    return (
+      <div
+        style={{
+          padding: '40px 24px',
+          textAlign: 'center',
+          background: 'var(--dt-bg-surface, #FFFFFF)',
+          border: '1.5px dashed var(--dt-border-default, #E2E8F0)',
+          borderRadius: '10px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '14px',
+        }}
+      >
+        <div
+          style={{
+            width: '52px',
+            height: '52px',
+            borderRadius: '50%',
+            background: 'rgba(2, 132, 199, 0.08)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'var(--dt-accent-blue, #0284C7)',
+          }}
+        >
+          <Clock size={26} />
+        </div>
+        <div>
+          <h4 style={{ fontSize: '0.96rem', fontWeight: 800, color: 'var(--dt-text-primary, #0F172A)', margin: '0 0 6px 0' }}>
+            No Longitudinal Progression Data Recorded
+          </h4>
+          <p style={{ fontSize: '0.80rem', color: 'var(--dt-text-muted, #64748B)', maxWidth: '460px', margin: '0 auto', lineHeight: 1.5 }}>
+            Prospective early detection curves and risk trajectory milestones are calculated strictly from genuine longitudinal checkup screenings. Run a diagnostic assessment to generate your personalized timeline.
+          </p>
+        </div>
+        {onRefresh && (
+          <button
+            type="button"
+            onClick={onRefresh}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '6px',
+              background: 'var(--dt-accent-blue, #0284C7)',
+              color: '#FFFFFF',
+              border: 'none',
+              fontWeight: 700,
+              fontSize: '0.78rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            <RefreshCw size={13} /> Refresh Timeline
+          </button>
+        )}
+      </div>
+    );
+  }
+  const threshold = data.threshold || 90.0;
   const status = data.status || 'NO_EARLY_DISEASE_DETECTED';
   const isEarlyRisk = status === 'EARLY_RISK_DETECTED';
   const heading = data.insight_heading || (isEarlyRisk ? 'Early Disease Trajectory Detected' : 'No early disease detected');

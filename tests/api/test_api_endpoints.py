@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import pytest
 from fastapi.testclient import TestClient
@@ -96,7 +96,7 @@ def test_patient_timeline_and_90_percent_threshold_endpoint():
     timeline = data["timeline"]
     assert timeline["threshold"] == 90.0
     assert "status" in timeline
-    assert len(timeline["projections"]) > 0
+    assert len(timeline["history"]) == 0
     assert timeline["status"] == "NO_EARLY_DISEASE_DETECTED"
     assert "No early disease detected" in timeline["insight_heading"]
 

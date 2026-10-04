@@ -5,6 +5,7 @@ import {
   Volume2, VolumeX, Sliders, Activity
 } from 'lucide-react';
 import { playCountdownTick, startEmergencySiren, stopEmergencySiren } from '../../utils/emergencyAudio.js';
+import { useLanguage } from '../../context/LanguageContext.jsx';
 
 export default function ShakeFeatureGuide({
   onTriggerShake,
@@ -16,6 +17,7 @@ export default function ShakeFeatureGuide({
   sensitivity = 'normal',
   onSensitivityChange,
 }) {
+  const { t } = useLanguage();
   const [isHovered, setIsHovered] = useState(false);
   const [simulating, setSimulating] = useState(false);
   const [soundTesting, setSoundTesting] = useState(false);
@@ -158,10 +160,10 @@ export default function ShakeFeatureGuide({
           </div>
           <div>
             <h3 style={{ fontSize: '0.96rem', fontWeight: 800, margin: 0, color: '#0F172A', letterSpacing: '-0.01em' }}>
-              Motion Sensor SOS • Shake to Emergency Dial
+              {t('shake.header_title', 'Motion Sensor SOS • Shake to Emergency Dial')}
             </h3>
             <span style={{ fontSize: '0.70rem', color: '#64748B' }}>
-              Instant distress trigger for physical emergency response with 5-second auto-dialer
+              {t('shake.header_subtitle', 'Instant distress trigger for physical emergency response with 5-second auto-dialer')}
             </span>
           </div>
         </div>
@@ -191,10 +193,10 @@ export default function ShakeFeatureGuide({
               }}
             />
             {permissionState === 'denied'
-              ? 'Sensor Blocked'
+              ? t('shake.sensor_blocked', 'Sensor Blocked')
               : isSupported
-              ? 'Accelerometer Active'
-              : 'Sensor Ready / Standby'}
+              ? t('shake.sensor_active', 'Accelerometer Active')
+              : t('shake.sensor_waiting', 'Sensor Ready / Standby')}
           </span>
         </div>
       </div>
@@ -316,17 +318,16 @@ export default function ShakeFeatureGuide({
                 letterSpacing: '0.04em',
               }}
             >
-              Hardware Accelerometer Assist • Gravity-Compensated
+              {t('shake.accelerometer_badge', 'Hardware Accelerometer Assist • Gravity-Compensated')}
             </span>
           </div>
 
           <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0F172A', margin: '0 0 6px 0', letterSpacing: '-0.01em' }}>
-            How Emergency Shake Detection Works
+            {t('shake.how_it_works', 'How Emergency Shake Detection Works')}
           </h4>
 
           <p style={{ fontSize: '0.80rem', color: '#475569', lineHeight: 1.55, margin: '0 0 12px 0' }}>
-            In acute trauma, seizure, or severe cardiac events, victims cannot navigate phone touchscreens.
-            Simply <strong>shake your smartphone 2–3 times</strong>: Q-Rakshak sounds an audio alarm beacon and begins a <strong>5-second auto-dial countdown</strong> to reach your next-of-kin or 108 EMS even if you lose consciousness!
+            {t('shake.description', 'In acute trauma, seizure, or severe cardiac events, victims cannot navigate phone touchscreens. Simply shake your smartphone 2–3 times: Q-Rakshak sounds an audio alarm beacon and begins a 5-second auto-dial countdown to reach your next-of-kin or 108 EMS even if you lose consciousness!')}
           </p>
 
           {/* Real-time Dynamic Accelerometer Diagnostics Bar */}
@@ -335,13 +336,13 @@ export default function ShakeFeatureGuide({
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                 <span style={{ fontSize: '0.70rem', color: '#475569', display: 'flex', alignItems: 'center', gap: '5px' }}>
                   <Activity size={12} color="#0284C7" />
-                  <span>Real-Time Kinetic Motion:</span>
+                  <span>{t('shake.live_telemetry', 'Real-Time Kinetic Motion:')}</span>
                   <strong style={{ fontFamily: 'monospace', color: currentMagnitude > effectiveThreshold ? '#DC2626' : '#0F172A' }}>
                     {currentMagnitude.toFixed(1)} m/s²
                   </strong>
                 </span>
                 <span style={{ fontSize: '0.68rem', color: '#64748B', fontFamily: 'monospace' }}>
-                  Target: {effectiveThreshold} m/s²
+                  {t('shake.trigger_threshold', 'Target:')} {effectiveThreshold} m/s²
                 </span>
               </div>
               <div style={{ width: '100%', height: '6px', background: '#E2E8F0', borderRadius: '3px', overflow: 'hidden' }}>
@@ -375,7 +376,7 @@ export default function ShakeFeatureGuide({
               }}
             >
               <Play size={13} />
-              <span>{simulating ? 'Detecting Shake...' : 'Simulate Shake SOS'}</span>
+              <span>{simulating ? t('shake.detecting_shake', 'Detecting Shake...') : t('shake.simulate_test', 'Simulate Shake SOS')}</span>
             </button>
 
             <button
@@ -394,7 +395,7 @@ export default function ShakeFeatureGuide({
               title="Test siren audio beacon volume"
             >
               {soundTesting ? <VolumeX size={13} color="#DC2626" /> : <Volume2 size={13} color="#087F8C" />}
-              <span>{soundTesting ? 'Stop Siren' : 'Test Siren Sound'}</span>
+              <span>{soundTesting ? t('shake.stop_siren', 'Stop Siren') : t('shake.test_siren', 'Test Siren Sound')}</span>
             </button>
 
             {onRequestPermission && permissionState !== 'granted' && (
@@ -413,14 +414,14 @@ export default function ShakeFeatureGuide({
                 }}
               >
                 <Zap size={13} color="#087F8C" />
-                <span>Grant Sensor Access</span>
+                <span>{t('shake.enable_permission', 'Grant Sensor Access')}</span>
               </button>
             )}
 
             {/* Sensitivity Preset Switcher */}
             {onSensitivityChange && (
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#F1F5F9', padding: '3px 8px', borderRadius: '8px' }}>
-                <span style={{ fontSize: '0.66rem', color: '#64748B', fontWeight: 600 }}>Sensitivity:</span>
+                <span style={{ fontSize: '0.66rem', color: '#64748B', fontWeight: 600 }}>{t('shake.sensitivity_label', 'Sensitivity:')}</span>
                 {['high', 'normal', 'low'].map((lvl) => (
                   <button
                     key={lvl}
@@ -439,7 +440,7 @@ export default function ShakeFeatureGuide({
                       textTransform: 'capitalize',
                     }}
                   >
-                    {lvl === 'high' ? 'High (Gentle)' : lvl === 'normal' ? 'Normal' : 'Low (Vigorous)'}
+                    {lvl === 'high' ? t('shake.sens_high', 'High (Gentle)') : lvl === 'normal' ? t('shake.sens_normal', 'Normal') : t('shake.sens_low', 'Low (Vigorous)')}
                   </button>
                 ))}
               </div>
@@ -478,10 +479,10 @@ export default function ShakeFeatureGuide({
             >
               1
             </div>
-            <strong style={{ fontSize: '0.82rem', color: '#0F172A' }}>Dual-Reversal Shake</strong>
+            <strong style={{ fontSize: '0.82rem', color: '#0F172A' }}>{t('shake.step1_title', 'Dual-Reversal Shake')}</strong>
           </div>
           <p style={{ fontSize: '0.72rem', color: '#64748B', margin: 0, lineHeight: 1.45 }}>
-            Rapid kinetic shake in hand. Low-pass filter extracts pure linear acceleration from Earth's 9.8m/s² gravity.
+            {t('shake.step1_desc', 'Rapid kinetic shake in hand. Low-pass filter extracts pure linear acceleration from Earth\'s 9.8m/s² gravity.')}
           </p>
         </div>
 
@@ -513,10 +514,10 @@ export default function ShakeFeatureGuide({
             >
               2
             </div>
-            <strong style={{ fontSize: '0.82rem', color: '#0F172A' }}>Audio Siren & Haptics</strong>
+            <strong style={{ fontSize: '0.82rem', color: '#0F172A' }}>{t('shake.step2_title', 'Audio Siren & Haptics')}</strong>
           </div>
           <p style={{ fontSize: '0.72rem', color: '#64748B', margin: 0, lineHeight: 1.45 }}>
-            Immediate high-audibility Web Audio alarm beacon alerts bystanders and confirms trigger via vibration telemetry.
+            {t('shake.step2_desc', 'Immediate high-audibility Web Audio alarm beacon alerts bystanders and confirms trigger via vibration telemetry.')}
           </p>
         </div>
 
@@ -548,10 +549,10 @@ export default function ShakeFeatureGuide({
             >
               3
             </div>
-            <strong style={{ fontSize: '0.82rem', color: '#0F172A' }}>5s Cancelable Auto-Dial</strong>
+            <strong style={{ fontSize: '0.82rem', color: '#0F172A' }}>{t('shake.step3_title', '5s Cancelable Auto-Dial')}</strong>
           </div>
           <p style={{ fontSize: '0.72rem', color: '#64748B', margin: 0, lineHeight: 1.45 }}>
-            Automated 5-second countdown timer. Auto-dials primary contact or 108 if victim is incapacitated; cancelable with 1 tap.
+            {t('shake.step3_desc', 'Automated 5-second countdown timer. Auto-dials primary contact or 108 if victim is incapacitated; cancelable with 1 tap.')}
           </p>
         </div>
       </div>

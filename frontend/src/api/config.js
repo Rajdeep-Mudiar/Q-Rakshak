@@ -15,16 +15,17 @@ export const EMERGENCY_PORTAL_BASE =
  * code can reach the emergency passport without localhost connection refused errors.
  */
 export function getEmergencyPortalUrl(patientId) {
-  const pid = String(patientId || "PT-89421").trim();
+  const pid = String(patientId || "").trim();
   const envBase = import.meta.env.VITE_EMERGENCY_PORTAL_BASE || import.meta.env.VITE_APP_URL;
+  const suffix = pid ? `/${pid}` : "";
   if (envBase) {
     const clean = envBase.replace(/\/+$/, "");
-    return clean.includes("#triage") ? `${clean}/${pid}` : `${clean}/#triage/${pid}`;
+    return clean.includes("#triage") ? `${clean}${suffix}` : `${clean}/#triage${suffix}`;
   }
   if (typeof window !== "undefined" && window.location.origin) {
-    return `${window.location.origin}/#triage/${pid}`;
+    return `${window.location.origin}/#triage${suffix}`;
   }
-  return `https://q-rakshak.vercel.app/#triage/${pid}`;
+  return `https://q-rakshak.vercel.app/#triage${suffix}`;
 }
 
 // On free-tier platforms like Render, cold starts can take 40-90+ seconds.

@@ -69,6 +69,8 @@ async def get_digital_twin_state(
                 "oncology_skin": risk_score if ("skin" in dis or "derma" in dis) else 0.0,
                 "pulmonary": risk_score if ("pneu" in dis or "lung" in dis) else 0.0,
                 "metabolic": risk_score if ("diabet" in dis) else 0.0,
+                "neurology": risk_score if ("parkinson" in dis or "neuro" in dis or "voice" in dis) else 0.0,
+                "hepatology": risk_score if ("liver" in dis or "hepat" in dis) else 0.0,
             }
             real_visits.append({
                 "visit_id": rec["id"],
@@ -93,6 +95,10 @@ async def get_digital_twin_state(
                         top_biomarkers["oncology_skin"] = fname
                     elif "diabet" in dis:
                         top_biomarkers["metabolic"] = fname
+                    elif "parkinson" in dis or "neuro" in dis:
+                        top_biomarkers["neurology"] = fname
+                    elif "liver" in dis or "hepat" in dis:
+                        top_biomarkers["hepatology"] = fname
 
         if real_visits:
             v = real_visits[visit_index if 0 <= visit_index < len(real_visits) else -1]
@@ -141,6 +147,8 @@ async def get_digital_twin_state(
         "oncology_skin": 0.0,
         "pulmonary": 0.0,
         "metabolic": 0.0,
+        "neurology": 0.0,
+        "hepatology": 0.0,
     }
     baseline_visit = {
         "visit_id": "V-BASELINE",

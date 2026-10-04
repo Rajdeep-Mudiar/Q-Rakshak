@@ -11,11 +11,13 @@ class DigitalTwinEngine:
 
     # Organ system mappings and default baseline prior weights
     ORGAN_WEIGHTS = {
-        "cardiovascular": {"weight": 0.35, "organ": "Heart", "region_id": "heart_region"},
-        "oncology_breast": {"weight": 0.25, "organ": "Breast / Lymph", "region_id": "breast_region"},
-        "oncology_skin": {"weight": 0.15, "organ": "Dermis / Epidermis", "region_id": "skin_region"},
+        "cardiovascular": {"weight": 0.30, "organ": "Heart", "region_id": "heart_region"},
+        "oncology_breast": {"weight": 0.20, "organ": "Breast / Lymph", "region_id": "breast_region"},
+        "oncology_skin": {"weight": 0.10, "organ": "Dermis / Epidermis", "region_id": "skin_region"},
         "pulmonary": {"weight": 0.15, "organ": "Lungs / Airway", "region_id": "lungs_region"},
         "metabolic": {"weight": 0.10, "organ": "Pancreas / Metabolic", "region_id": "pancreas_region"},
+        "neurology": {"weight": 0.15, "organ": "Brain / Neurological", "region_id": "brain_region"},
+        "hepatology": {"weight": 0.10, "organ": "Liver / Hepatic", "region_id": "liver_region"},
     }
 
     def __init__(self):

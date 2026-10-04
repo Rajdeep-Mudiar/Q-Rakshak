@@ -225,7 +225,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
         username: regUsername.trim().toLowerCase(),
         password: regPassword,
         role: regRole,
-        emergency_phone: regPhone || "+91 98765 43210",
+        emergency_phone: regPhone ? regPhone.trim() : "",
         hospital_affiliation: regRole === "doctor" ? "Q-Rakshak" : "Community Healthcare",
         license_number: defaultLicense,
         specialty: regRole === "doctor" ? "General Medicine & Clinical AI" : undefined,

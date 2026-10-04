@@ -96,15 +96,15 @@ export default function PredictionTimeline({
     fetchTimeline();
   }, [fetchTimeline]);
 
-  // When a new prediction is executed above in the cockpit, automatically reload timeline
+  // Auto-reload timeline when new prediction arrives or active patient changes
   useEffect(() => {
-    if (lastPredictionResult && lastPredictionResult.patient_id === patientId) {
+    if (lastPredictionResult) {
       const timer = setTimeout(() => {
         fetchTimeline(true);
-      }, 700);
+      }, 350);
       return () => clearTimeout(timer);
     }
-  }, [lastPredictionResult, patientId, fetchTimeline]);
+  }, [lastPredictionResult, fetchTimeline]);
 
   const toggleDateExpansion = (dateStr) => {
     setExpandedDates((prev) => ({
@@ -112,17 +112,6 @@ export default function PredictionTimeline({
       [dateStr]: !prev[dateStr],
     }));
   };
-
-  const hasHistory =
-    timelineData?.has_history &&
-    Array.isArray(timelineData?.daily_aggregates) &&
-    timelineData.daily_aggregates.length > 0;
-
-  const dailyAggregates = timelineData?.daily_aggregates || [];
-  const trend = timelineData?.trend || {};
-  const earlyWarning = timelineData?.early_warning || {};
-  const weekly = timelineData?.weekly_analysis;
-  const monthly = timelineData?.monthly_analysis;
 
   // Synchronize disease filter when parent cockpit activeStudy changes
   useEffect(() => {
@@ -139,6 +128,106 @@ export default function PredictionTimeline({
       setSelectedDisease(studyMap[activeStudy]);
     }
   }, [activeStudy]);
+
+  // Construct active observation from lastPredictionResult to immediately reflect in timeline
+  const activeObservation = React.useMemo(() => {
+    if (!lastPredictionResult) return null;
+    const pred = lastPredictionResult.prediction || {};
+    const conf = typeof pred.confidence === "number" ? pred.confidence : 0.95;
+    const predClass = pred.class || "Evaluated";
+    const isDanger =
+      pred.severity === "danger" ||
+      String(predClass).toLowerCase().includes("malignant") ||
+      String(predClass).toLowerCase().includes("melanoma") ||
+      String(predClass).toLowerCase().includes("pneumonia") ||
+      String(predClass).toLowerCase().includes("disease") ||
+      String(predClass).toLowerCase().includes("diabetic");
+    const riskScore =
+      lastPredictionResult.risk_score !== undefined && lastPredictionResult.risk_score !== null
+        ? Number(lastPredictionResult.risk_score)
+        : Math.round(isDanger ? conf * 100 : (1 - conf) * 100);
+
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const nowIso = new Date().toISOString();
+
+    return {
+      id: lastPredictionResult.request_id || lastPredictionResult.record_id || `RUN-${Date.now()}`,
+      prediction_id: lastPredictionResult.request_id || lastPredictionResult.record_id || `RUN-${Date.now()}`,
+      date: todayStr,
+      timestamp: nowIso,
+      disease: lastPredictionResult.disease || (activeStudy ? activeStudy.toUpperCase() : "Clinical Protocol"),
+      prediction_class: predClass,
+      confidence: conf,
+      probability: pred.probability || conf,
+      risk_score: riskScore,
+      model: lastPredictionResult.model_architecture || "Quantum Hybrid VQC",
+      model_version: "1.0.0",
+      top_features: lastPredictionResult.explainability?.top_features || [],
+    };
+  }, [lastPredictionResult, activeStudy]);
+
+  const rawDailyAggregates = timelineData?.daily_aggregates || [];
+  const rawHistory = timelineData?.history || [];
+
+  // Seamlessly merge active observation so timeline reflects immediately upon checkup completion
+  const { dailyAggregates, history, hasHistory } = React.useMemo(() => {
+    let mergedHistory = [...rawHistory];
+    let mergedAggregates = [...rawDailyAggregates];
+
+    if (activeObservation) {
+      const alreadyInHistory = mergedHistory.some(
+        (h) => h.id === activeObservation.id || h.prediction_id === activeObservation.prediction_id
+      );
+      if (!alreadyInHistory) {
+        mergedHistory.push(activeObservation);
+      }
+
+      const todayStr = activeObservation.date;
+      const todayAggIdx = mergedAggregates.findIndex((a) => a.date === todayStr);
+
+      if (todayAggIdx >= 0) {
+        const existingAgg = mergedAggregates[todayAggIdx];
+        const existingPreds = existingAgg.predictions || [];
+        const alreadyInDay = existingPreds.some(
+          (p) => p.id === activeObservation.id || p.prediction_id === activeObservation.prediction_id
+        );
+        if (!alreadyInDay) {
+          const updatedPreds = [...existingPreds, activeObservation];
+          const newAvgRisk = Math.round(
+            updatedPreds.reduce((acc, cur) => acc + (cur.risk_score || 50), 0) / updatedPreds.length
+          );
+          mergedAggregates[todayAggIdx] = {
+            ...existingAgg,
+            risk_score: newAvgRisk,
+            count: updatedPreds.length,
+            predictions: updatedPreds,
+          };
+        }
+      } else {
+        mergedAggregates.push({
+          date: todayStr,
+          risk_score: activeObservation.risk_score,
+          count: 1,
+          predictions: [activeObservation],
+        });
+      }
+    }
+
+    const hasAny =
+      (timelineData?.has_history && rawDailyAggregates.length > 0) ||
+      mergedAggregates.length > 0;
+
+    return {
+      dailyAggregates: mergedAggregates,
+      history: mergedHistory,
+      hasHistory: hasAny,
+    };
+  }, [rawDailyAggregates, rawHistory, activeObservation, timelineData?.has_history]);
+
+  const trend = timelineData?.trend || {};
+  const earlyWarning = timelineData?.early_warning || {};
+  const weekly = timelineData?.weekly_analysis;
+  const monthly = timelineData?.monthly_analysis;
 
   const canonicalDiseases = [
     "Breast Oncology (WDBC)",
@@ -248,7 +337,7 @@ export default function PredictionTimeline({
                   letterSpacing: "-0.01em",
                 }}
               >
-                Longitudinal Prediction Timeline & Health Trajectory
+                {t('timeline.longitudinal_title', 'Longitudinal Prediction Timeline & Health Trajectory')}
               </h3>
               <span
                 style={{
@@ -261,7 +350,7 @@ export default function PredictionTimeline({
                   fontFamily: "var(--font-mono, monospace)",
                 }}
               >
-                Patient: {patientId}
+                {t('timeline.patient_label', 'Patient')}: {effectivePatientId || patientId || "PATIENT"}
               </span>
               <span
                 style={{
@@ -274,7 +363,7 @@ export default function PredictionTimeline({
                   border: `1px solid ${selectedDisease === "all" ? "#bfdbfe" : "#fde68a"}`,
                 }}
               >
-                {selectedDisease === "all" ? "Protocol: All Diseases (Combined)" : `Protocol: ${selectedDisease}`}
+                {selectedDisease === "all" ? t('timeline.protocol_all', 'Protocol: All Diseases (Combined)') : `${t('timeline.protocol', 'Protocol')}: ${selectedDisease}`}
               </span>
             </div>
             <p
@@ -284,7 +373,7 @@ export default function PredictionTimeline({
                 margin: "3px 0 0 0",
               }}
             >
-              Calibrated longitudinal tracking of genuine quantum-classical AI predictions across calendar dates with OLS trend analysis.
+              {t('timeline.longitudinal_desc', 'Calibrated longitudinal tracking of genuine quantum-classical AI predictions across calendar dates with OLS trend analysis.')}
             </p>
           </div>
         </div>
@@ -317,7 +406,7 @@ export default function PredictionTimeline({
                 animation: refreshing ? "spin 1s linear infinite" : "none",
               }}
             />
-            <span>{refreshing ? "Refreshing..." : "Refresh Timeline"}</span>
+            <span>{refreshing ? t('common.loading', 'Refreshing...') : t('actions.refresh', 'Refresh Timeline')}</span>
           </button>
         </div>
       </div>
@@ -353,7 +442,7 @@ export default function PredictionTimeline({
               }}
             >
               <Stethoscope size={13} color="#2563eb" />
-              <span>Disease:</span>
+              <span>{t('timeline.disease_label', 'Disease')}:</span>
             </span>
             <select
               value={selectedDisease}
@@ -370,7 +459,7 @@ export default function PredictionTimeline({
               }}
               title="Filter longitudinal timeline by specific disease protocol"
             >
-              <option value="all">All Diseases (Holistic View)</option>
+              <option value="all">{t('timeline.all_diseases_holistic', 'All Diseases (Holistic View)')}</option>
               {availableDiseases.map((d) => (
                 <option key={d} value={d}>
                   {d}
@@ -393,28 +482,38 @@ export default function PredictionTimeline({
                 letterSpacing: "0.04em",
               }}
             >
-              Window:
+              {t('timeline.window_label', 'Window')}:
             </span>
-          {["7 Days", "30 Days", "3 Months", "6 Months", "1 Year", "Custom Range"].map((opt) => (
-            <button
-              key={opt}
-              type="button"
-              onClick={() => setTimeFilter(opt)}
-              style={{
-                fontSize: "0.72rem",
-                fontWeight: timeFilter === opt ? 700 : 500,
-                padding: "4px 10px",
-                borderRadius: "6px",
-                border: timeFilter === opt ? "1px solid #2563eb" : "1px solid #e2e8f0",
-                background: timeFilter === opt ? "#2563eb" : "#ffffff",
-                color: timeFilter === opt ? "#ffffff" : "#475569",
-                cursor: "pointer",
-                transition: "all 0.15s ease",
-              }}
-            >
-              {opt}
-            </button>
-          ))}
+          {["7 Days", "30 Days", "3 Months", "6 Months", "1 Year", "Custom Range"].map((opt) => {
+            const timeFilterKeys = {
+              "7 Days": "timeline.filter_7d",
+              "30 Days": "timeline.filter_30d",
+              "3 Months": "timeline.filter_3m",
+              "6 Months": "timeline.filter_6m",
+              "1 Year": "timeline.filter_1y",
+              "Custom Range": "timeline.filter_custom",
+            };
+            return (
+              <button
+                key={opt}
+                type="button"
+                onClick={() => setTimeFilter(opt)}
+                style={{
+                  fontSize: "0.72rem",
+                  fontWeight: timeFilter === opt ? 700 : 500,
+                  padding: "4px 10px",
+                  borderRadius: "6px",
+                  border: timeFilter === opt ? "1px solid #2563eb" : "1px solid #e2e8f0",
+                  background: timeFilter === opt ? "#2563eb" : "#ffffff",
+                  color: timeFilter === opt ? "#ffffff" : "#475569",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                {t(timeFilterKeys[opt] || opt, opt)}
+              </button>
+            );
+          })}
           </div>
         </div>
 
@@ -430,7 +529,7 @@ export default function PredictionTimeline({
                 letterSpacing: "0.04em",
               }}
             >
-              View:
+              {t('timeline.view_label', 'View')}:
             </span>
             <button
               type="button"
@@ -446,7 +545,7 @@ export default function PredictionTimeline({
                 cursor: "pointer",
               }}
             >
-              Daily Averages
+              {t('timeline.daily_averages', 'Daily Averages')}
             </button>
             <button
               type="button"
@@ -462,7 +561,7 @@ export default function PredictionTimeline({
                 cursor: "pointer",
               }}
             >
-              Individual Runs
+              {t('timeline.individual_runs', 'Individual Runs')}
             </button>
           </div>
         )}
@@ -482,7 +581,7 @@ export default function PredictionTimeline({
           }}
         >
           <label style={{ fontSize: "0.72rem", color: "#1e40af", fontWeight: 600 }}>
-            Start Date:
+            {t('timeline.start_date', 'Start Date')}:
             <input
               type="date"
               value={customStart}
@@ -497,7 +596,7 @@ export default function PredictionTimeline({
             />
           </label>
           <label style={{ fontSize: "0.72rem", color: "#1e40af", fontWeight: 600 }}>
-            End Date:
+            {t('timeline.end_date', 'End Date')}:
             <input
               type="date"
               value={customEnd}
@@ -525,7 +624,7 @@ export default function PredictionTimeline({
               cursor: "pointer",
             }}
           >
-            Apply Filter
+            {t('actions.apply_filter', 'Apply Filter')}
           </button>
         </div>
       )}
