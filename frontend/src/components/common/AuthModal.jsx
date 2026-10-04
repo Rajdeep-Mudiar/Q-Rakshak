@@ -413,7 +413,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   value={regPhone}
                   onChange={(e) => setRegPhone(e.target.value)}
                   autoComplete="tel"
-                  placeholder="+91 98765 43210"
+                  placeholder="+91 98XXX XXXXX"
                   style={{ width: "100%", padding: "8px 10px", border: "1px solid var(--border-default)", fontSize: "0.78rem" }}
                 />
               </div>

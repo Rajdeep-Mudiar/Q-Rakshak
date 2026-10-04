@@ -1052,11 +1052,15 @@ export default function EmergencyCardView({ patientId = null }) {
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.80rem' }}>
                 <span style={{ color: '#64748B' }}>Primary Responder:</span>
-                <strong style={{ color: '#0F172A' }}>{primaryContact.name} ({primaryContact.relation})</strong>
+                <strong style={{ color: '#0F172A' }}>
+                  {primaryContact.phone ? `${primaryContact.name} (${primaryContact.relation})` : 'National EMS Dispatch (108)'}
+                </strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
                 <span style={{ color: '#64748B' }}>Phone:</span>
-                <strong style={{ color: '#0284C7', fontFamily: 'monospace' }}>{primaryContact.phone}</strong>
+                <strong style={{ color: '#0284C7', fontFamily: 'monospace' }}>
+                  {primaryContact.phone || '108 (National Ambulance)'}
+                </strong>
               </div>
             </div>
 
@@ -1064,7 +1068,12 @@ export default function EmergencyCardView({ patientId = null }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <button
                 type="button"
-                onClick={() => handleImmediateDial(primaryContact.phone, primaryContact.name)}
+                onClick={() =>
+                  handleImmediateDial(
+                    primaryContact.phone || '108',
+                    primaryContact.phone ? primaryContact.name : 'National Ambulance'
+                  )
+                }
                 className="triage-pill-btn triage-call-cta"
                 style={{
                   justifyContent: 'center',

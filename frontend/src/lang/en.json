@@ -734,7 +734,7 @@
     "email_label": "Email Address",
     "email_placeholder": "name@hospital.org",
     "phone_label": "Emergency Contact Phone",
-    "phone_placeholder": "+91 98765 43210",
+    "phone_placeholder": "+91 98XXX XXXXX",
     "signing_in": "Authenticating...",
     "registering": "Creating Account...",
     "or_google": "Or continue with Google",

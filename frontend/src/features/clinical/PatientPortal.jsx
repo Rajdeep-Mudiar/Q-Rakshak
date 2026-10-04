@@ -334,10 +334,12 @@ export default function PatientPortal({ patientId = null, currentUser = null, on
                     <td><code style={{ fontWeight: 800 }}>{p.id}</code></td>
                     <td><strong>{p.name}</strong></td>
                     <td>{p.age}y • {p.gender}</td>
-                    <td><span className="step-badge">{p.blood_group || "O+"}</span></td>
+                    <td><span className="step-badge">{p.blood_group || "Not Specified"}</span></td>
                     <td style={{ fontSize: "0.74rem" }}>{(p.conditions || []).join(", ") || "Normal Baseline"}</td>
                     <td style={{ fontSize: "0.74rem", fontFamily: "var(--font-mono)" }}>
-                      {p.baseline_vitals?.blood_pressure || "120/80"} • {p.baseline_vitals?.heart_rate_bpm || 72} BPM
+                      {p.baseline_vitals?.blood_pressure || p.baseline_vitals?.heart_rate_bpm
+                        ? `${p.baseline_vitals?.blood_pressure || "—"}${p.baseline_vitals?.heart_rate_bpm ? ` • ${p.baseline_vitals.heart_rate_bpm} BPM` : ""}`
+                        : "Not Recorded"}
                     </td>
                     <td>
                       <span style={{ color: "var(--state-success)", fontWeight: 700, fontSize: "0.72rem" }}>

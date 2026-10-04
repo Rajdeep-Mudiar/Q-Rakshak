@@ -64,6 +64,7 @@ def setup_cors(app: FastAPI) -> None:
         allow_credentials=allow_credentials,
         allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
         allow_headers=[
+            "*",
             "Authorization",
             "Content-Type",
             "X-API-Key",
@@ -72,6 +73,10 @@ def setup_cors(app: FastAPI) -> None:
             "X-Requested-With",
             "Access-Control-Request-Method",
             "Access-Control-Request-Headers",
+            "Cache-Control",
+            "Pragma",
+            "If-Modified-Since",
+            "If-None-Match",
         ],
         expose_headers=[
             "Content-Disposition",

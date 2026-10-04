@@ -257,7 +257,7 @@ export default function BookingModal({ doctor, initialSlot, onClose, onSuccess, 
                     className="terminal-input"
                     value={emergencyContact}
                     onChange={(e) => setEmergencyContact(e.target.value)}
-                    placeholder="e.g. +91 98765 43210"
+                    placeholder="e.g. +91 98XXX XXXXX"
                     style={{ width: "100%", padding: "8px" }}
                   />
                 </div>

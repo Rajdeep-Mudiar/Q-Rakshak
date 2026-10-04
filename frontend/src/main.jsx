@@ -4,6 +4,7 @@ import UnifiedAnalysisPage from "./features/analysis/UnifiedAnalysisPage.jsx";
 import EmergencyCardView from "./features/clinical/EmergencyCardView.jsx";
 import NotFoundPage from "./components/common/NotFoundPage.jsx";
 import ErrorBoundary from "./components/common/ErrorBoundary.jsx";
+import ConnectivityBanner from "./components/common/ConnectivityBanner.jsx";
 import { LanguageProvider } from "./context/LanguageContext.jsx";
 import "./styles.css";
 
@@ -100,6 +101,7 @@ createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <ErrorBoundary>
       <LanguageProvider>
+        <ConnectivityBanner />
         <AppRouter />
       </LanguageProvider>
     </ErrorBoundary>

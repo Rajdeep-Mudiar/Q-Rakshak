@@ -113,6 +113,27 @@ export default function VirtualConsultationRoom({ booking, isDoctor = false, onL
               setConnectionStatus("DTLS-SRTP 256-Bit Encrypted • Peer Connected");
             } else if (state === "connecting") {
               setConnectionStatus("Establishing DTLS-SRTP Peer Handshake...");
+            } else if (state === "disconnected" || state === "failed") {
+              setConnectionStatus("Re-negotiating ICE connection...");
+              try {
+                if (typeof peerConnection.restartIce === "function") {
+                  peerConnection.restartIce();
+                }
+              } catch (reconnectErr) {
+                console.warn("ICE restart attempt failed:", reconnectErr);
+              }
+            }
+          },
+          onIceConnectionStateChange: (state) => {
+            if (state === "disconnected" || state === "failed") {
+              setConnectionStatus("ICE route interrupted • Re-establishing peer path...");
+              try {
+                if (typeof peerConnection.restartIce === "function") {
+                  peerConnection.restartIce();
+                }
+              } catch (reconnectErr) {
+                console.warn("ICE restart attempt failed:", reconnectErr);
+              }
             }
           },
         });

@@ -238,15 +238,18 @@ export async function getScreenShareStream() {
 /**
  * Setup RTCPeerConnection with resilient Google & Cloudflare STUN infrastructure.
  */
-export function createClinicalPeerConnection({ onTrack, onIceCandidate, onConnectionStateChange } = {}) {
+export function createClinicalPeerConnection({ onTrack, onIceCandidate, onConnectionStateChange, onIceConnectionStateChange } = {}) {
   const config = {
     iceServers: [
-      { urls: "stun:stun.l.google.com:19302" },
-      { urls: "stun:stun1.l.google.com:19302" },
-      { urls: "stun:stun2.l.google.com:19302" },
-      { urls: "stun:stun.cloudflare.com:3478" },
+      { urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"] },
+      { urls: ["stun:stun2.l.google.com:19302", "stun:stun3.l.google.com:19302"] },
+      { urls: ["stun:stun4.l.google.com:19302"] },
+      { urls: ["stun:stun.cloudflare.com:3478"] },
+      { urls: ["stun:openrelay.metered.ca:80"] },
     ],
     iceCandidatePoolSize: 10,
+    bundlePolicy: "max-bundle",
+    rtcpMuxPolicy: "require",
   };
 
   const pc = new RTCPeerConnection(config);
@@ -269,6 +272,12 @@ export function createClinicalPeerConnection({ onTrack, onIceCandidate, onConnec
   if (onConnectionStateChange) {
     pc.onconnectionstatechange = () => {
       onConnectionStateChange(pc.connectionState);
+    };
+  }
+
+  if (onIceConnectionStateChange) {
+    pc.oniceconnectionstatechange = () => {
+      onIceConnectionStateChange(pc.iceConnectionState);
     };
   }
 

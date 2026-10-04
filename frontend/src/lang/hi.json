@@ -734,7 +734,7 @@
     "email_label": "ईमेल पता",
     "email_placeholder": "name@hospital.org",
     "phone_label": "आपातकालीन संपर्क फोन",
-    "phone_placeholder": "+91 98765 43210",
+    "phone_placeholder": "+91 98XXX XXXXX",
     "signing_in": "प्रमाणीकरण जारी है...",
     "registering": "खाता बनाया जा रहा है...",
     "or_google": "या Google के साथ जारी रखें",

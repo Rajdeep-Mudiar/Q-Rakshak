@@ -883,7 +883,7 @@ export default function UserProfilePage({ currentUser, onProfileUpdated, onProfi
                     handleFieldChange("phone", e.target.value);
                   }}
                   onBlur={handleFieldBlur}
-                  placeholder="+91 98765 43210"
+                  placeholder="+91 98XXX XXXXX"
                 />
               </div>
             </div>

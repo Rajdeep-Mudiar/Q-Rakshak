@@ -183,7 +183,7 @@ export default function ProfileSettingsModal({ isOpen, onClose, userId = null, u
                 type="text"
                 value={profile.emergency_phone || ""}
                 onChange={(e) => setProfile({ ...profile, emergency_phone: e.target.value })}
-                placeholder="+91 98765 43210"
+                placeholder="+91 98XXX XXXXX"
                 style={{ width: "100%", padding: "5px 8px", border: "1px solid var(--risk-high)", fontSize: "0.74rem", background: "var(--risk-high-bg)", borderRadius: "var(--radius-sm)" }}
               />
             </div>
