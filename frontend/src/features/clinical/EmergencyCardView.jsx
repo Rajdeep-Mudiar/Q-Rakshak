@@ -2037,7 +2037,7 @@ export default function EmergencyCardView({ patientId = null }) {
               </div>
 
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                <div style={{ display: 'inline-flex', background: '#F1F5F9', padding: '3px', borderRadius: '8px', border: '1px solid #E2E8F0', gap: '2px' }}>
+                <div style={{ display: 'inline-flex', background: '#F1F5F9', padding: '2px', borderRadius: '0px', border: '1px solid #E2E8F0', gap: '2px' }}>
                   <button
                     type="button"
                     onClick={() => setCardTheme('light')}
@@ -2045,12 +2045,12 @@ export default function EmergencyCardView({ patientId = null }) {
                       background: cardTheme === 'light' ? '#FFFFFF' : 'transparent',
                       color: cardTheme === 'light' ? '#0F172A' : '#64748B',
                       border: 0,
-                      borderRadius: '6px',
+                      borderRadius: '0px',
                       padding: '4px 8px',
                       fontSize: '0.68rem',
                       fontWeight: 700,
                       cursor: 'pointer',
-                      boxShadow: cardTheme === 'light' ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
+                      boxShadow: cardTheme === 'light' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
                     }}
                   >
                     {t('emergency.day_white', 'Day White')}
@@ -2062,32 +2062,32 @@ export default function EmergencyCardView({ patientId = null }) {
                       background: cardTheme === 'dark' ? '#0F172A' : 'transparent',
                       color: cardTheme === 'dark' ? '#FFFFFF' : '#64748B',
                       border: 0,
-                      borderRadius: '6px',
+                      borderRadius: '0px',
                       padding: '4px 8px',
                       fontSize: '0.68rem',
                       fontWeight: 700,
                       cursor: 'pointer',
-                      boxShadow: cardTheme === 'dark' ? '0 1px 2px rgba(0,0,0,0.2)' : 'none',
+                      boxShadow: cardTheme === 'dark' ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
                     }}
                   >
                     {t('emergency.matte_black', 'Matte Black')}
                   </button>
                 </div>
 
-                <div style={{ display: 'inline-flex', background: '#F1F5F9', padding: '3px', borderRadius: '8px', border: '1px solid #E2E8F0', gap: '2px' }}>
+                <div style={{ display: 'inline-flex', background: '#F1F5F9', padding: '2px', borderRadius: '0px', border: '1px solid #E2E8F0', gap: '2px' }}>
                   <button
                     type="button"
                     onClick={() => setCardFace('dual')}
                     style={{
                       background: cardFace === 'dual' ? '#FFFFFF' : 'transparent',
-                      color: cardFace === 'dual' ? '#087F8C' : '#64748B',
+                      color: cardFace === 'dual' ? '#0052FF' : '#64748B',
                       border: 0,
-                      borderRadius: '6px',
+                      borderRadius: '0px',
                       padding: '4px 8px',
                       fontSize: '0.68rem',
                       fontWeight: 700,
                       cursor: 'pointer',
-                      boxShadow: cardFace === 'dual' ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
+                      boxShadow: cardFace === 'dual' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
                     }}
                   >
                     {t('emergency.dual_front_back', 'Dual (Front+Back)')}
@@ -2097,14 +2097,14 @@ export default function EmergencyCardView({ patientId = null }) {
                     onClick={() => setCardFace('front')}
                     style={{
                       background: cardFace === 'front' ? '#FFFFFF' : 'transparent',
-                      color: cardFace === 'front' ? '#087F8C' : '#64748B',
+                      color: cardFace === 'front' ? '#0052FF' : '#64748B',
                       border: 0,
-                      borderRadius: '6px',
+                      borderRadius: '0px',
                       padding: '4px 8px',
                       fontSize: '0.68rem',
                       fontWeight: 700,
                       cursor: 'pointer',
-                      boxShadow: cardFace === 'front' ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
+                      boxShadow: cardFace === 'front' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
                     }}
                   >
                     {t('emergency.front_only', 'Front')}
@@ -2114,14 +2114,14 @@ export default function EmergencyCardView({ patientId = null }) {
                     onClick={() => setCardFace('back')}
                     style={{
                       background: cardFace === 'back' ? '#FFFFFF' : 'transparent',
-                      color: cardFace === 'back' ? '#087F8C' : '#64748B',
+                      color: cardFace === 'back' ? '#0052FF' : '#64748B',
                       border: 0,
-                      borderRadius: '6px',
+                      borderRadius: '0px',
                       padding: '4px 8px',
                       fontSize: '0.68rem',
                       fontWeight: 700,
                       cursor: 'pointer',
-                      boxShadow: cardFace === 'back' ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
+                      boxShadow: cardFace === 'back' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
                     }}
                   >
                     {t('emergency.back_only', 'Back')}
@@ -2131,7 +2131,7 @@ export default function EmergencyCardView({ patientId = null }) {
             </div>
 
             {/* Live Document Preview */}
-            <div style={{ background: '#F8FAFC', border: '1.5px dashed #CBD5E1', borderRadius: '12px', padding: '16px', maxHeight: '56vh', overflowY: 'auto' }}>
+            <div style={{ background: '#F8FAFC', border: '1px dashed #CBD5E1', borderRadius: '0px', padding: '16px', maxHeight: '56vh', overflowY: 'auto' }}>
               <div style={{ fontSize: '0.65rem', fontWeight: 800, color: '#64748B', textTransform: 'uppercase', marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
                 <span>{t('emergency.print_preview', 'Print Document Preview')}</span>
                 <span>ISO/IEC 7810 ID-1 • A4 Layout</span>

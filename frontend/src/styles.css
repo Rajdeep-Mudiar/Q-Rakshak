@@ -2074,32 +2074,34 @@ body.high-contrast {
   gap: 10px;
 }
 
-.print-cross-emblem {
-  width: 26px;
-  height: 26px;
-  background: #087F8C;
+.print-header-symbol {
+  width: 28px;
+  height: 28px;
+  background: #0052FF;
   color: #FFFFFF;
-  border-radius: 6px;
+  border-radius: 0px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
-  font-weight: 900;
+  font-size: 0.95rem;
+  font-weight: 800;
+  flex-shrink: 0;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
 
 .print-sheet-title {
-  font-size: 0.90rem;
+  font-size: 0.88rem;
   font-weight: 900;
   letter-spacing: -0.01em;
   margin: 0;
   color: #0F172A;
+  font-family: var(--font-heading);
 }
 
 .print-sheet-subtitle {
-  font-size: 0.62rem;
-  color: #475569;
+  font-size: 0.60rem;
+  color: #64748B;
   margin: 2px 0 0 0;
   font-family: var(--font-mono);
 }
@@ -2109,21 +2111,21 @@ body.high-contrast {
   flex-direction: column;
   align-items: flex-end;
   gap: 1px;
-  font-size: 0.60rem;
+  font-size: 0.58rem;
   font-family: var(--font-mono);
   color: #334155;
 }
 
-/* ── Emergency Wallet Directive Callout Banner ── */
+/* ── Streamlined Emergency First Responder Notice ── */
 .print-wallet-directive-card {
-  background: linear-gradient(135deg, #FEF2F2 0%, #FFF1F2 50%, #F0FDF4 100%);
-  border: 1.5px solid #F87171;
-  border-radius: 10px;
-  padding: 10px 14px;
-  margin-bottom: 12px;
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: 0px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
@@ -2131,55 +2133,33 @@ body.high-contrast {
 .print-directive-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   color: #DC2626;
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   font-weight: 900;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .print-directive-text {
-  font-size: 0.62rem;
+  font-size: 0.60rem;
   color: #1E293B;
-  line-height: 1.45;
+  line-height: 1.4;
   margin: 0;
 }
 
-.print-directive-features {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 2px;
-  border-top: 1px dashed rgba(220, 38, 38, 0.2);
-  padding-top: 6px;
-}
-
-.print-feature-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.56rem;
-  font-family: var(--font-mono);
-  font-weight: 700;
-  color: #334155;
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid #CBD5E1;
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
+/* ── Minimalist Calibration Scale Bar ── */
 .print-calibration-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: #F8FAFC;
-  border: 1px dashed #94A3B8;
-  border-radius: 6px;
+  border: 1px solid #E2E8F0;
+  border-radius: 0px;
   padding: 6px 12px;
-  margin-bottom: 12px;
-  font-size: 0.60rem;
+  margin-bottom: 10px;
+  font-size: 0.58rem;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
@@ -2198,7 +2178,7 @@ body.high-contrast {
 
 .print-scale-ruler {
   width: 50mm;
-  height: 5px;
+  height: 4px;
   background: repeating-linear-gradient(
     90deg,
     #0F172A,
@@ -2207,19 +2187,19 @@ body.high-contrast {
     transparent 2mm
   );
   border: 1px solid #0F172A;
-  border-radius: 2px;
+  border-radius: 0px;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
 
 .print-scale-hint {
-  font-size: 0.55rem;
+  font-size: 0.52rem;
   color: #64748B;
-  font-style: italic;
+  font-family: var(--font-mono);
 }
 
 .print-instructions-callout {
-  font-size: 0.60rem;
+  font-size: 0.58rem;
   color: #334155;
   max-width: 440px;
   line-height: 1.35;
@@ -2228,14 +2208,14 @@ body.high-contrast {
 .print-cards-stage {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-bottom: 12px;
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
 .print-edition-block {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   page-break-inside: avoid !important;
   break-inside: avoid !important;
 }
@@ -2244,16 +2224,16 @@ body.high-contrast {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #0F172A;
-  padding: 0 4px;
+  padding: 0 2px;
 }
 
 .print-edition-standard {
-  font-size: 0.58rem;
+  font-size: 0.54rem;
   color: #64748B;
   font-family: var(--font-mono);
 }
@@ -2263,9 +2243,9 @@ body.high-contrast {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 4px 0 6px 0;
-  color: #64748B;
-  font-size: 0.52rem;
+  margin: 3px 0 4px 0;
+  color: #71717A;
+  font-size: 0.50rem;
   font-family: var(--font-mono);
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -2273,7 +2253,7 @@ body.high-contrast {
 }
 
 .print-cut-header-guide.bottom {
-  margin: 6px 0 0 0;
+  margin: 4px 0 0 0;
 }
 
 .print-cut-scissor-icon {
@@ -2287,14 +2267,14 @@ body.high-contrast {
 
 .print-cut-dots {
   flex: 1;
-  border-bottom: 1.5px dashed #94A3B8;
+  border-bottom: 1px dashed #A1A1AA;
   height: 1px;
 }
 
 .print-cards-cutting-frame {
   position: relative;
-  border: 1.5px dashed #64748B;
-  border-radius: 8px;
+  border: 1px dashed #71717A;
+  border-radius: 0px;
   padding: 10px 14px;
   background: #FFFFFF;
   margin: 0 auto;
@@ -2303,17 +2283,18 @@ body.high-contrast {
   box-sizing: border-box;
 }
 
-.print-corner-mark {
+/* Hairline Precision Registration Brackets */
+.print-corner-bracket {
   position: absolute;
-  font-size: 13px;
-  font-weight: 900;
-  color: #64748B;
-  line-height: 1;
+  width: 8px;
+  height: 8px;
+  border-color: #18181B;
+  border-style: solid;
 }
-.print-corner-mark.top-left { top: -7px; left: -7px; }
-.print-corner-mark.top-right { top: -7px; right: -7px; }
-.print-corner-mark.bottom-left { bottom: -7px; left: -7px; }
-.print-corner-mark.bottom-right { bottom: -7px; right: -7px; }
+.print-corner-bracket.top-left { top: -2px; left: -2px; border-width: 1.5px 0 0 1.5px; }
+.print-corner-bracket.top-right { top: -2px; right: -2px; border-width: 1.5px 1.5px 0 0; }
+.print-corner-bracket.bottom-left { bottom: -2px; left: -2px; border-width: 0 0 1.5px 1.5px; }
+.print-corner-bracket.bottom-right { bottom: -2px; right: -2px; border-width: 0 1.5px 1.5px 0; }
 
 .print-cards-flex-row {
   display: flex;
@@ -2326,11 +2307,11 @@ body.high-contrast {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
 }
 
 .print-face-label {
-  font-size: 0.54rem;
+  font-size: 0.52rem;
   font-weight: 800;
   color: #475569;
   letter-spacing: 0.06em;
@@ -2345,7 +2326,7 @@ body.high-contrast {
   height: 204px;
   position: relative;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: 0px;
   box-sizing: border-box;
   flex-shrink: 0;
   background: transparent;
@@ -2363,6 +2344,7 @@ body.high-contrast {
   transform-origin: top left !important;
   box-shadow: none !important;
   margin: 0 !important;
+  border-radius: 0px !important;
 }
 
 .print-fold-divider {
@@ -2370,31 +2352,31 @@ body.high-contrast {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 3px;
   height: 204px;
-  margin-top: 14px;
+  margin-top: 12px;
   padding: 0 2px;
 }
 
 .print-fold-line {
   flex: 1;
   width: 1px;
-  border-left: 1.5px dashed #94A3B8;
+  border-left: 1px dashed #A1A1AA;
 }
 
 .print-fold-badge {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  font-size: 0.48rem;
+  gap: 1px;
+  font-size: 0.46rem;
   font-weight: 800;
   font-family: var(--font-mono);
   color: #334155;
-  background: #F1F5F9;
-  padding: 4px 6px;
-  border-radius: 5px;
-  border: 1px solid #CBD5E1;
+  background: #F4F4F5;
+  padding: 3px 6px;
+  border-radius: 0px;
+  border: 1px solid #D4D4D8;
   white-space: nowrap;
 }
 
@@ -2405,36 +2387,36 @@ body.high-contrast {
 }
 
 .print-fold-sub {
-  font-size: 0.42rem;
-  color: #64748B;
+  font-size: 0.40rem;
+  color: #71717A;
   letter-spacing: 0.02em;
 }
 
 .print-scissors-icon {
   transform: rotate(90deg);
   color: #DC2626;
-  margin-bottom: 2px;
+  margin-bottom: 1px;
 }
 
 .print-sheet-footer {
-  border-top: 1.5px solid #0F172A;
-  padding-top: 8px;
+  border-top: 1px solid #18181B;
+  padding-top: 6px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .print-helplines-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  gap: 6px;
 }
 
 .print-helpline-cell {
   background: #F8FAFC;
   border: 1px solid #E2E8F0;
-  border-radius: 6px;
-  padding: 5px;
+  border-radius: 0px;
+  padding: 4px 6px;
   text-align: center;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
@@ -2442,7 +2424,7 @@ body.high-contrast {
 
 .print-helpline-num {
   display: block;
-  font-size: 0.92rem;
+  font-size: 0.88rem;
   font-weight: 900;
   color: #0F172A;
   line-height: 1.1;
@@ -2450,30 +2432,30 @@ body.high-contrast {
 }
 
 .print-helpline-desc {
-  font-size: 0.52rem;
+  font-size: 0.50rem;
   color: #64748B;
   text-transform: uppercase;
   font-weight: 700;
 }
 
 .print-legal-notice {
-  font-size: 0.56rem;
+  font-size: 0.54rem;
   color: #475569;
   line-height: 1.35;
 }
 
 .print-legal-notice p {
-  margin: 0 0 3px 0;
+  margin: 0 0 2px 0;
 }
 
 .print-ledger-seal-row {
   display: flex;
   justify-content: space-between;
-  font-size: 0.50rem;
+  font-size: 0.48rem;
   color: #64748B;
   font-family: var(--font-mono);
   border-top: 1px dotted #CBD5E1;
-  padding-top: 3px;
+  padding-top: 2px;
 }
 
 @media print {
@@ -3659,15 +3641,38 @@ body.high-contrast {
   align-items: center;
   gap: 5px;
   padding: 2px 7px;
-  border-radius: 999px;
+  border-radius: 0px;
   border: 1px solid currentColor;
   width: fit-content;
+}
+
+.triage-pass-badge-strip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 6px;
+  border-radius: 0px;
+  border: 1px solid currentColor;
+  width: fit-content;
+  font-size: 0.52rem;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  opacity: 0.85;
+}
+
+.triage-pulse-pip {
+  width: 5px;
+  height: 5px;
+  border-radius: 0px;
+  background: #16A34A;
+  display: inline-block;
 }
 
 .triage-pulse-indicator {
   width: 6px;
   height: 6px;
-  border-radius: 50%;
+  border-radius: 0px;
   background: #16866A;
   display: inline-block;
   box-shadow: 0 0 6px #16866A;
@@ -3678,6 +3683,17 @@ body.high-contrast {
   font-family: var(--font-mono);
   font-weight: 800;
   letter-spacing: 0.05em;
+}
+
+.triage-demographics-row {
+  display: flex;
+  gap: 6px;
+  font-size: 0.52rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: #64748B;
+  margin-top: 3px;
+  text-transform: uppercase;
 }
 
 .triage-blood-tag {
@@ -3929,31 +3945,69 @@ body.high-contrast {
 }
 
 .triage-back-alert-box {
-  background: rgba(220, 38, 38, 0.08);
-  border: 1px solid rgba(220, 38, 38, 0.25);
-  border-radius: 8px;
-  padding: 6px 8px;
-  margin-bottom: 8px;
+  border-radius: 0px;
+  padding: 5px 8px;
+  margin-bottom: 6px;
 }
 
-.triage-dark .triage-back-alert-box {
+.triage-back-alert-box.alert-danger {
+  background: #FEF2F2;
+  border: 1px solid #FCA5A5;
+}
+
+.triage-dark .triage-back-alert-box.alert-danger {
   background: rgba(220, 38, 38, 0.2);
   border-color: rgba(220, 38, 38, 0.5);
 }
 
+.triage-back-alert-box.alert-neutral {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+}
+
+.triage-dark .triage-back-alert-box.alert-neutral {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
 .triage-back-lbl {
-  font-size: 0.52rem;
+  font-size: 0.50rem;
   font-family: var(--font-mono);
   font-weight: 700;
   letter-spacing: 0.04em;
-  opacity: 0.7;
+  opacity: 0.75;
 }
 
 .triage-back-val-danger {
-  font-size: 0.72rem;
+  font-size: 0.70rem;
   font-weight: 800;
   color: #DC2626;
   line-height: 1.25;
+}
+
+.triage-back-val-neutral {
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: #10B981;
+  line-height: 1.25;
+}
+
+.triage-back-condition-box {
+  margin-top: 4px;
+  font-size: 0.50rem;
+  font-family: var(--font-mono);
+  line-height: 1.25;
+  display: flex;
+  gap: 4px;
+}
+
+.triage-back-val-text {
+  font-weight: 700;
+  color: #334155;
+}
+
+.triage-dark .triage-back-val-text {
+  color: #CBD5E1;
 }
 
 .triage-back-vitals-grid {
