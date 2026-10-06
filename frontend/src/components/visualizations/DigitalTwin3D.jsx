@@ -12,7 +12,7 @@ export default function DigitalTwin3D({ patientId, analysisResult = null, onOpen
   const [loadingRecord, setLoadingRecord] = useState(false);
 
   const storedUser = authApi.getStoredUser();
-  const effectivePatientId = patientId || storedUser?.patient_id || storedUser?.user_id || storedUser?.id || "PATIENT";
+  const effectivePatientId = patientId || storedUser?.patient_id || storedUser?.user_id || storedUser?.id || "PT-89421";
 
   const setPatientAnalysis = useTwinStore((state) => state.setPatientAnalysis);
   const patientAnalysis = useTwinStore((state) => state.patientAnalysis);
@@ -29,7 +29,7 @@ export default function DigitalTwin3D({ patientId, analysisResult = null, onOpen
 
   // Load patient baseline record if present without fabricating positive disease findings
   useEffect(() => {
-    if (!analysisResult && !patientAnalysis && effectivePatientId && effectivePatientId !== "PATIENT") {
+    if (!analysisResult && !patientAnalysis && effectivePatientId) {
       let isMounted = true;
       setLoadingRecord(true);
       clinicalApi.getPatientRecord(effectivePatientId)
@@ -77,11 +77,10 @@ export default function DigitalTwin3D({ patientId, analysisResult = null, onOpen
         display: "flex",
         flexDirection: "column",
         gap: "0px",
-        background: "var(--bg-surface)",
-        border: "1px solid var(--border-default)",
+        background: "var(--surface-base, #FFFFFF)",
+        border: "1px solid var(--border-subtle, #E4E4E7)",
         position: "relative",
-        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.03)",
-        borderRadius: "var(--radius-xs)",
+        borderRadius: 0,
         overflow: "hidden",
       }}
     >

@@ -6,6 +6,7 @@ if ($Mode -notin @("production", "demo")) {
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
 $env:QMED_DB_MODE = $Mode
+$env:PYTHONNOUSERSITE = "1"
 
 if (-not (Test-Path ".\.venv\Scripts\Activate.ps1")) {
     Write-Host "Creating Python virtual environment..."

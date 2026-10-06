@@ -331,12 +331,12 @@ export default function EditorialHomePage({
       <section
         ref={heroRef}
         style={{
-          background: "linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)",
-          border: "1px solid #E2E8F0",
-          borderTop: "3px solid #0284C7",
-          borderRadius: "12px",
+          background: "var(--surface-base, #FFFFFF)",
+          border: "1px solid var(--border-hairline, #E4E4E7)",
+          borderTop: "3px solid var(--accent-cobalt, #0052FF)",
+          borderRadius: "0px",
           padding: "clamp(24px, 3.5vw, 36px)",
-          boxShadow: "0 2px 8px rgba(15, 23, 42, 0.04)",
+          boxShadow: "0 1px 2px rgba(0, 0, 0, 0.04)",
           display: "flex",
           flexDirection: "column",
           gap: "20px",
@@ -350,12 +350,13 @@ export default function EditorialHomePage({
                   fontSize: "0.68rem",
                   fontWeight: 700,
                   padding: "3px 8px",
-                  background: "#F0F9FF",
-                  color: "#0284C7",
-                  border: "1px solid #BAE6FD",
-                  borderRadius: "4px",
+                  background: "var(--accent-cobalt-light, #EFF4FF)",
+                  color: "var(--accent-cobalt, #0052FF)",
+                  border: "1px solid #BFDBFE",
+                  borderRadius: "0px",
                   letterSpacing: "0.04em",
                   textTransform: "uppercase",
+                  fontFamily: "var(--font-mono)",
                 }}
               >
                 {t("home.badge_platform", "Clinical Intelligence Platform")}
@@ -365,10 +366,11 @@ export default function EditorialHomePage({
                   fontSize: "0.68rem",
                   fontWeight: 600,
                   padding: "3px 8px",
-                  background: "#F8FAFC",
-                  color: "#475569",
-                  border: "1px solid #E2E8F0",
-                  borderRadius: "4px",
+                  background: "var(--surface-raised, #F4F4F5)",
+                  color: "var(--text-secondary, #52525B)",
+                  border: "1px solid var(--border-hairline, #E4E4E7)",
+                  borderRadius: "0px",
+                  fontFamily: "var(--font-mono)",
                 }}
               >
                 {t("home.badge_spec", "IEEE 830-1998 Spec")}
@@ -378,10 +380,11 @@ export default function EditorialHomePage({
                   fontSize: "0.68rem",
                   fontWeight: 600,
                   padding: "3px 8px",
-                  background: "#ECFDF5",
-                  color: "#059669",
-                  border: "1px solid #A7F3D0",
-                  borderRadius: "4px",
+                  background: "var(--status-safe-bg, #F0FDF4)",
+                  color: "var(--status-safe, #15803D)",
+                  border: "1px solid var(--risk-low-border, #BBF7D0)",
+                  borderRadius: "0px",
+                  fontFamily: "var(--font-mono)",
                 }}
               >
                 {t("home.badge_certified", "HIPAA & ABDM M1-M3 Certified")}
@@ -393,8 +396,8 @@ export default function EditorialHomePage({
                 fontSize: "clamp(1.75rem, 3.2vw, 2.4rem)",
                 fontWeight: 800,
                 lineHeight: 1.2,
-                color: "#0F172A",
-                letterSpacing: "-0.03em",
+                color: "var(--text-primary, #09090B)",
+                letterSpacing: "-0.035em",
                 margin: "0 0 10px 0",
               }}
             >
@@ -405,7 +408,7 @@ export default function EditorialHomePage({
               style={{
                 fontSize: "0.95rem",
                 lineHeight: 1.65,
-                color: "#475569",
+                color: "var(--text-secondary, #52525B)",
                 margin: 0,
                 maxWidth: "680px",
               }}
@@ -422,14 +425,14 @@ export default function EditorialHomePage({
                   alignItems: "center",
                   gap: "8px",
                   padding: "10px 20px",
-                  background: "#0284C7",
+                  background: "var(--accent-cobalt, #0052FF)",
                   color: "#FFFFFF",
-                  border: "none",
-                  borderRadius: "8px",
+                  border: "1px solid var(--accent-cobalt, #0052FF)",
+                  borderRadius: "0px",
                   fontSize: "0.88rem",
                   fontWeight: 700,
                   cursor: "pointer",
-                  boxShadow: "0 2px 6px rgba(2, 132, 199, 0.25)",
+                  boxShadow: "0 1px 2px rgba(0, 82, 255, 0.2)",
                   transition: "background 0.15s ease",
                 }}
               >
@@ -446,17 +449,17 @@ export default function EditorialHomePage({
                   alignItems: "center",
                   gap: "8px",
                   padding: "10px 18px",
-                  background: "#FFFFFF",
-                  color: "#0F172A",
-                  border: "1px solid #CBD5E1",
-                  borderRadius: "8px",
+                  background: "var(--surface-base, #FFFFFF)",
+                  color: "var(--text-primary, #09090B)",
+                  border: "1px solid var(--border-hairline, #E4E4E7)",
+                  borderRadius: "0px",
                   fontSize: "0.88rem",
                   fontWeight: 600,
                   cursor: "pointer",
                   transition: "all 0.15s ease",
                 }}
               >
-                <Cpu size={16} color="#0284C7" />
+                <Cpu size={16} color="var(--accent-cobalt, #0052FF)" />
                 <span>{t("home.view_twin", "Explore 3D Digital Twin")}</span>
               </button>
             </div>
@@ -465,26 +468,26 @@ export default function EditorialHomePage({
           {/* Active Operator Status Box */}
           <div
             style={{
-              background: "#FFFFFF",
-              border: "1px solid #E2E8F0",
-              borderRadius: "10px",
+              background: "var(--surface-raised, #F4F4F5)",
+              border: "1px solid var(--border-hairline, #E4E4E7)",
+              borderRadius: "0px",
               padding: "16px 20px",
               minWidth: "220px",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+              boxShadow: "none",
             }}
           >
-            <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.06em", display: "block" }}>
+            <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "var(--text-muted, #71717A)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", fontFamily: "var(--font-mono)" }}>
               {t("home.active_operator", "Active Clinical Operator")}
             </span>
-            <strong style={{ fontSize: "0.95rem", color: "#0F172A", display: "block", fontWeight: 800, marginTop: "4px" }}>
+            <strong style={{ fontSize: "0.95rem", color: "var(--text-primary, #09090B)", display: "block", fontWeight: 800, marginTop: "4px" }}>
               {currentUser?.name || "Clinical Practitioner"}
             </strong>
             <div style={{ display: "flex", gap: "6px", marginTop: "8px" }}>
-              <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#0284C7", background: "#F0F9FF", border: "1px solid #BAE6FD", padding: "2px 8px", borderRadius: "4px", textTransform: "capitalize" }}>
+              <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--accent-cobalt, #0052FF)", background: "var(--accent-cobalt-light, #EFF4FF)", border: "1px solid #BFDBFE", padding: "2px 8px", borderRadius: "0px", textTransform: "capitalize", fontFamily: "var(--font-mono)" }}>
                 {currentUser?.role || "Patient"}
               </span>
-              <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#059669", background: "#ECFDF5", border: "1px solid #A7F3D0", padding: "2px 8px", borderRadius: "4px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#059669" }} />
+              <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--status-safe, #15803D)", background: "var(--status-safe-bg, #F0FDF4)", border: "1px solid var(--risk-low-border, #BBF7D0)", padding: "2px 8px", borderRadius: "0px", display: "inline-flex", alignItems: "center", gap: "4px", fontFamily: "var(--font-mono)" }}>
+                <span style={{ width: "6px", height: "6px", borderRadius: "0px", background: "var(--status-safe, #15803D)" }} />
                 {t("common.online", "Online")}
               </span>
             </div>
@@ -501,36 +504,38 @@ export default function EditorialHomePage({
         }}
       >
         {[
-          { label: t("home.kpi_diagnostic_accuracy", "Diagnostic Accuracy"), val: "98.4%", sub: t("home.kpi_verified_benchmark", "Verified across benchmark datasets"), badge: t("home.kpi_balanced_mcc", "Balanced MCC 0.96"), color: "#059669" },
-          { label: t("home.kpi_param_efficiency", "Parameter Efficiency"), val: "727×", sub: t("home.kpi_qubits_vs_weights", "48 Quantum Qubits vs 34k weights"), badge: t("home.kpi_zero_overfitting", "Zero Overfitting"), color: "#0284C7" },
-          { label: t("home.kpi_inference_latency", "Inference Latency"), val: "< 15 ms", sub: t("home.kpi_instant_triage", "Instant deterministic triage output"), badge: t("home.kpi_realtime_samd", "Real-Time SaMD"), color: "#0284C7" },
-          { label: t("home.kpi_security_auditing", "Security & Auditing"), val: "100%", sub: t("home.kpi_worm_logs", "WORM immutable cryptographic logs"), badge: t("home.kpi_dpdp_hipaa", "DPDP / HIPAA"), color: "#7C3AED" },
+          { label: t("home.kpi_diagnostic_accuracy", "Diagnostic Accuracy"), val: "98.4%", sub: t("home.kpi_verified_benchmark", "Verified across benchmark datasets"), badge: t("home.kpi_balanced_mcc", "Balanced MCC 0.96"), color: "var(--status-safe, #15803D)" },
+          { label: t("home.kpi_param_efficiency", "Parameter Efficiency"), val: "727×", sub: t("home.kpi_qubits_vs_weights", "48 Quantum Qubits vs 34k weights"), badge: t("home.kpi_zero_overfitting", "Zero Overfitting"), color: "var(--accent-cobalt, #0052FF)" },
+          { label: t("home.kpi_inference_latency", "Inference Latency"), val: "< 15 ms", sub: t("home.kpi_instant_triage", "Instant deterministic triage output"), badge: t("home.kpi_realtime_samd", "Real-Time SaMD"), color: "var(--accent-cobalt, #0052FF)" },
+          { label: t("home.kpi_security_auditing", "Security & Auditing"), val: "100%", sub: t("home.kpi_worm_logs", "WORM immutable cryptographic logs"), badge: t("home.kpi_dpdp_hipaa", "DPDP / HIPAA"), color: "var(--accent-violet, #6366F1)" },
         ].map((kpi, idx) => (
           <div
             key={idx}
+            className="kpi-card"
             style={{
-              background: "#FFFFFF",
-              border: "1px solid #E2E8F0",
-              borderRadius: "10px",
+              background: "var(--surface-base, #FFFFFF)",
+              border: "1px solid var(--border-hairline, #E4E4E7)",
+              borderRadius: "0px",
               padding: "16px 18px",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
+              boxShadow: "none",
               display: "flex",
               flexDirection: "column",
               gap: "4px",
+              transition: "border-color 0.15s ease",
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "0.70rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--text-muted, #71717A)", textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "var(--font-mono)" }}>
                 {kpi.label}
               </span>
-              <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "#0284C7", background: "#F0F9FF", padding: "2px 6px", borderRadius: "4px" }}>
+              <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "var(--accent-cobalt, #0052FF)", background: "var(--accent-cobalt-light, #EFF4FF)", padding: "2px 6px", borderRadius: "0px", fontFamily: "var(--font-mono)" }}>
                 {kpi.badge}
               </span>
             </div>
-            <div style={{ fontSize: "1.65rem", fontWeight: 800, color: "#0F172A", lineHeight: 1.2, margin: "4px 0 2px" }}>
+            <div className="tabular-nums" style={{ fontSize: "1.75rem", fontWeight: 800, color: "var(--text-primary, #09090B)", lineHeight: 1.2, margin: "4px 0 2px" }}>
               {kpi.val}
             </div>
-            <span style={{ fontSize: "0.75rem", color: "#64748B" }}>{kpi.sub}</span>
+            <span style={{ fontSize: "0.75rem", color: "var(--text-secondary, #52525B)" }}>{kpi.sub}</span>
           </div>
         ))}
       </section>
@@ -538,10 +543,10 @@ export default function EditorialHomePage({
       {/* ── 3. Core Capabilities Grid ── */}
       <section style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
         <div>
-          <h2 style={{ fontSize: "1.2rem", fontWeight: 800, color: "#0F172A", margin: "0 0 4px 0", letterSpacing: "-0.02em" }}>
+          <h2 style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--text-primary, #09090B)", margin: "0 0 4px 0", letterSpacing: "-0.03em" }}>
             {t("home.capabilities_title", "Core Clinical Capabilities")}
           </h2>
-          <p style={{ fontSize: "0.85rem", color: "#64748B", margin: 0 }}>
+          <p style={{ fontSize: "0.85rem", color: "var(--text-secondary, #52525B)", margin: 0 }}>
             {t("home.capabilities_desc", "Unified clinical tools bridging diagnostic artificial intelligence with day-to-day patient healthcare workflows.")}
           </p>
         </div>
@@ -560,26 +565,24 @@ export default function EditorialHomePage({
                 key={c.id}
                 onClick={() => handleAction(c.id)}
                 style={{
-                  background: "#FFFFFF",
-                  border: "1px solid #E2E8F0",
-                  borderRadius: "10px",
+                  background: "var(--surface-base, #FFFFFF)",
+                  border: "1px solid var(--border-hairline, #E4E4E7)",
+                  borderRadius: "0px",
                   padding: "20px",
-                  boxShadow: "0 1px 4px rgba(0,0,0,0.03)",
+                  boxShadow: "none",
                   cursor: "pointer",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between",
                   gap: "14px",
-                  transition: "all 0.18s ease",
+                  transition: "border-color 0.18s ease, transform 0.18s ease",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = "#CBD5E1";
-                  e.currentTarget.style.boxShadow = "0 6px 16px rgba(15, 23, 42, 0.06)";
+                  e.currentTarget.style.borderColor = "var(--border-focus, #18181B)";
                   e.currentTarget.style.transform = "translateY(-2px)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = "#E2E8F0";
-                  e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.03)";
+                  e.currentTarget.style.borderColor = "var(--border-hairline, #E4E4E7)";
                   e.currentTarget.style.transform = "translateY(0)";
                 }}
               >
@@ -589,34 +592,34 @@ export default function EditorialHomePage({
                       style={{
                         width: "36px",
                         height: "36px",
-                        borderRadius: "8px",
-                        background: c.bg,
-                        border: `1px solid ${c.border}`,
+                        borderRadius: "0px",
+                        background: "var(--surface-raised, #F4F4F5)",
+                        border: "1px solid var(--border-hairline, #E4E4E7)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                       }}
                     >
-                      <Icon size={18} color={c.color} />
+                      <Icon size={18} color="var(--accent-cobalt, #0052FF)" />
                     </div>
-                    <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#64748B", background: "#F8FAFC", border: "1px solid #E2E8F0", padding: "2px 8px", borderRadius: "4px" }}>
+                    <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--text-secondary, #52525B)", background: "var(--surface-raised, #F4F4F5)", border: "1px solid var(--border-hairline, #E4E4E7)", padding: "2px 8px", borderRadius: "0px", fontFamily: "var(--font-mono)" }}>
                       {c.badge}
                     </span>
                   </div>
 
-                  <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: "0.05em", display: "block" }}>
+                  <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--text-muted, #71717A)", textTransform: "uppercase", letterSpacing: "0.06em", display: "block", fontFamily: "var(--font-mono)" }}>
                     {c.category}
                   </span>
-                  <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0F172A", margin: "2px 0 6px 0" }}>
+                  <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text-primary, #09090B)", margin: "2px 0 6px 0", letterSpacing: "-0.02em" }}>
                     {c.title}
                   </h3>
-                  <p style={{ fontSize: "0.82rem", color: "#475569", lineHeight: 1.5, margin: 0 }}>
+                  <p style={{ fontSize: "0.82rem", color: "var(--text-secondary, #52525B)", lineHeight: 1.55, margin: 0 }}>
                     {c.desc}
                   </p>
                 </div>
 
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.78rem", fontWeight: 700, color: "#0284C7", paddingTop: "8px", borderTop: "1px solid #F1F5F9" }}>
-                  <span>{t("home.open_workspace", "Open Workspace")}</span>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.78rem", fontWeight: 700, color: "var(--accent-cobalt, #0052FF)", paddingTop: "8px", borderTop: "1px solid var(--border-hairline, #E4E4E7)", fontFamily: "var(--font-mono)" }}>
+                  <span>{t("home.open_workspace", "OPEN WORKSPACE")}</span>
                   <ChevronRight size={14} />
                 </div>
               </div>
@@ -629,10 +632,10 @@ export default function EditorialHomePage({
       <section style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
           <div>
-            <h2 style={{ fontSize: "1.2rem", fontWeight: 800, color: "#0F172A", margin: "0 0 4px 0", letterSpacing: "-0.02em" }}>
+            <h2 style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--text-primary, #09090B)", margin: "0 0 4px 0", letterSpacing: "-0.03em" }}>
               {t("home_benchmarks.diseases_preview_title", "Supported Disease Screening Modules")}
             </h2>
-            <p style={{ fontSize: "0.85rem", color: "#64748B", margin: 0 }}>
+            <p style={{ fontSize: "0.85rem", color: "var(--text-secondary, #52525B)", margin: 0 }}>
               {t("home_benchmarks.diseases_preview_subtitle", "Calibrated machine learning and quantum circuits optimized for distinct clinical modalities.")}
             </p>
           </div>
@@ -644,16 +647,17 @@ export default function EditorialHomePage({
               alignItems: "center",
               gap: "6px",
               padding: "7px 14px",
-              background: "#F8FAFC",
-              color: "#0284C7",
-              border: "1px solid #CBD5E1",
-              borderRadius: "6px",
+              background: "var(--surface-raised, #F4F4F5)",
+              color: "var(--accent-cobalt, #0052FF)",
+              border: "1px solid var(--border-hairline, #E4E4E7)",
+              borderRadius: "0px",
               fontSize: "0.78rem",
               fontWeight: 700,
               cursor: "pointer",
+              fontFamily: "var(--font-mono)",
             }}
           >
-            <span>{t("home_benchmarks.view_all_checkups", "View All Checkups")}</span>
+            <span>{t("home_benchmarks.view_all_checkups", "VIEW ALL CHECKUPS")}</span>
             <ArrowRight size={13} />
           </button>
         </div>
@@ -675,37 +679,37 @@ export default function EditorialHomePage({
                   else handleAction("disease_intro");
                 }}
                 style={{
-                  background: "#FFFFFF",
-                  border: "1px solid #E2E8F0",
-                  borderRadius: "8px",
+                  background: "var(--surface-base, #FFFFFF)",
+                  border: "1px solid var(--border-hairline, #E4E4E7)",
+                  borderRadius: "0px",
                   padding: "14px 16px",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.03)",
+                  boxShadow: "none",
                   cursor: "pointer",
                   display: "flex",
                   flexDirection: "column",
                   gap: "8px",
-                  transition: "all 0.15s ease",
+                  transition: "border-color 0.15s ease, transform 0.15s ease",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = "#0284C7";
+                  e.currentTarget.style.borderColor = "var(--border-focus, #18181B)";
                   e.currentTarget.style.transform = "translateY(-1px)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = "#E2E8F0";
+                  e.currentTarget.style.borderColor = "var(--border-hairline, #E4E4E7)";
                   e.currentTarget.style.transform = "translateY(0)";
                 }}
               >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#64748B", textTransform: "uppercase" }}>
+                  <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--text-muted, #71717A)", textTransform: "uppercase", fontFamily: "var(--font-mono)" }}>
                     {locD.category}
                   </span>
-                  <span style={{ fontSize: "0.65rem", fontWeight: 700, color: "#0284C7", background: "#F0F9FF", border: "1px solid #BAE6FD", padding: "1px 6px", borderRadius: "4px" }}>
+                  <span className="tabular-nums" style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--accent-cobalt, #0052FF)", background: "var(--accent-cobalt-light, #EFF4FF)", border: "1px solid #BFDBFE", padding: "1px 6px", borderRadius: "0px", fontFamily: "var(--font-mono)" }}>
                     {locD.accuracy || d.accuracy} {t("disease_intro.acc_label", "Acc")}
                   </span>
                 </div>
                 <div>
-                  <strong style={{ fontSize: "0.92rem", color: "#0F172A", display: "block" }}>{locD.name}</strong>
-                  <span style={{ fontSize: "0.74rem", color: "#64748B", marginTop: "2px", display: "block" }}>{locD.modelArchitecture || d.model}</span>
+                  <strong style={{ fontSize: "0.92rem", color: "var(--text-primary, #09090B)", display: "block" }}>{locD.name}</strong>
+                  <span style={{ fontSize: "0.74rem", color: "var(--text-secondary, #52525B)", marginTop: "2px", display: "block", fontFamily: "var(--font-mono)" }}>{locD.modelArchitecture || d.model}</span>
                 </div>
               </div>
             );
@@ -715,12 +719,12 @@ export default function EditorialHomePage({
 
       {/* ── 5. Audited Benchmark Matrix ── */}
       <section style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", background: "#FFFFFF", padding: "14px 18px", borderRadius: "10px", border: "1px solid #E2E8F0" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px", background: "var(--surface-base, #FFFFFF)", padding: "14px 18px", borderRadius: "0px", border: "1px solid var(--border-hairline, #E4E4E7)" }}>
           <div>
-            <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "#0F172A", margin: "0 0 2px 0" }}>
+            <h3 style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--text-primary, #09090B)", margin: "0 0 2px 0", letterSpacing: "-0.02em" }}>
               {t("home_benchmarks.benchmark_matrix_title", "Mathematical Accuracy & Benchmark Matrix")}
             </h3>
-            <p style={{ fontSize: "0.78rem", color: "#64748B", margin: 0 }}>
+            <p style={{ fontSize: "0.78rem", color: "var(--text-secondary, #52525B)", margin: 0 }}>
               {t("home_benchmarks.benchmark_matrix_subtitle", "Rigorous 5-seed patient-stratified comparison of Quantum AI against Classical Machine Learning controls.")}
             </p>
           </div>
@@ -730,14 +734,15 @@ export default function EditorialHomePage({
               type="button"
               onClick={() => setActiveBenchmarkTab("ablations")}
               style={{
-                padding: "6px 12px",
-                borderRadius: "6px",
+                padding: "6px 14px",
+                borderRadius: "0px",
                 fontSize: "0.74rem",
                 fontWeight: 700,
                 cursor: "pointer",
-                border: activeBenchmarkTab === "ablations" ? "1.5px solid #0284C7" : "1px solid #CBD5E1",
-                background: activeBenchmarkTab === "ablations" ? "#F0F9FF" : "#FFFFFF",
-                color: activeBenchmarkTab === "ablations" ? "#0284C7" : "#475569",
+                border: activeBenchmarkTab === "ablations" ? "1px solid var(--accent-cobalt, #0052FF)" : "1px solid var(--border-hairline, #E4E4E7)",
+                background: activeBenchmarkTab === "ablations" ? "var(--accent-cobalt, #0052FF)" : "var(--surface-base, #FFFFFF)",
+                color: activeBenchmarkTab === "ablations" ? "#FFFFFF" : "var(--text-secondary, #52525B)",
+                fontFamily: "var(--font-mono)",
               }}
             >
               {t("home_benchmarks.tab_architectures", "Architectures (A–E)")}
@@ -746,14 +751,15 @@ export default function EditorialHomePage({
               type="button"
               onClick={() => setActiveBenchmarkTab("diseases")}
               style={{
-                padding: "6px 12px",
-                borderRadius: "6px",
+                padding: "6px 14px",
+                borderRadius: "0px",
                 fontSize: "0.74rem",
                 fontWeight: 700,
                 cursor: "pointer",
-                border: activeBenchmarkTab === "diseases" ? "1.5px solid #0284C7" : "1px solid #CBD5E1",
-                background: activeBenchmarkTab === "diseases" ? "#F0F9FF" : "#FFFFFF",
-                color: activeBenchmarkTab === "diseases" ? "#0284C7" : "#475569",
+                border: activeBenchmarkTab === "diseases" ? "1px solid var(--accent-cobalt, #0052FF)" : "1px solid var(--border-hairline, #E4E4E7)",
+                background: activeBenchmarkTab === "diseases" ? "var(--accent-cobalt, #0052FF)" : "var(--surface-base, #FFFFFF)",
+                color: activeBenchmarkTab === "diseases" ? "#FFFFFF" : "var(--text-secondary, #52525B)",
+                fontFamily: "var(--font-mono)",
               }}
             >
               {t("home_benchmarks.tab_cohorts", "Cross-Disease Cohorts")}
@@ -761,12 +767,12 @@ export default function EditorialHomePage({
           </div>
         </div>
 
-        <div style={{ background: "#FFFFFF", borderRadius: "10px", border: "1px solid #E2E8F0", overflowX: "auto", boxShadow: "0 1px 3px rgba(0,0,0,0.03)" }}>
+        <div style={{ background: "var(--surface-base, #FFFFFF)", borderRadius: "0px", border: "1px solid var(--border-hairline, #E4E4E7)", overflowX: "auto", boxShadow: "none" }}>
           {activeBenchmarkTab === "ablations" ? (
             <table style={{ width: "100%", minWidth: "700px", borderCollapse: "collapse", fontSize: "0.80rem", textAlign: "left" }}>
               <thead>
-                <tr style={{ background: "#F8FAFC", borderBottom: "1px solid #E2E8F0", color: "#64748B" }}>
-                  <th style={{ padding: "10px 14px", width: "40px" }}>ID</th>
+                <tr style={{ background: "var(--surface-raised, #F4F4F5)", borderBottom: "1px solid var(--border-hairline, #E4E4E7)", color: "var(--text-muted, #71717A)" }}>
+                  <th style={{ padding: "10px 14px", width: "40px", fontFamily: "var(--font-mono)" }}>ID</th>
                   <th style={{ padding: "10px 14px" }}>{t("disease_intro.table_architecture", "Architecture")}</th>
                   <th style={{ padding: "10px 14px" }}>{t("common.type", "Type")}</th>
                   <th style={{ padding: "10px 14px" }}>AUROC</th>
@@ -782,26 +788,26 @@ export default function EditorialHomePage({
                   <tr
                     key={row.id}
                     style={{
-                      borderBottom: "1px solid #F1F5F9",
-                      background: row.id === "E" ? "#F0FDF4" : idx % 2 === 0 ? "#FFFFFF" : "#F8FAFC",
+                      borderBottom: "1px solid var(--border-subtle, #F4F4F5)",
+                      background: row.id === "E" ? "var(--status-safe-bg, #F0FDF4)" : idx % 2 === 0 ? "var(--surface-base, #FFFFFF)" : "var(--surface-raised, #F4F4F5)",
                     }}
                   >
-                    <td style={{ padding: "10px 14px", fontWeight: 700, fontFamily: "monospace" }}>{row.id}</td>
+                    <td style={{ padding: "10px 14px", fontWeight: 700, fontFamily: "var(--font-mono)" }}>{row.id}</td>
                     <td style={{ padding: "10px 14px" }}>
-                      <strong style={{ color: "#0F172A", display: "block" }}>{row.name}</strong>
-                      <span style={{ fontSize: "0.72rem", color: "#64748B" }}>{row.impl}</span>
+                      <strong style={{ color: "var(--text-primary, #09090B)", display: "block" }}>{row.name}</strong>
+                      <span style={{ fontSize: "0.72rem", color: "var(--text-muted, #71717A)", fontFamily: "var(--font-mono)" }}>{row.impl}</span>
                     </td>
                     <td style={{ padding: "10px 14px" }}>
-                      <span style={{ fontSize: "0.70rem", padding: "2px 6px", borderRadius: "4px", background: "#F0F9FF", color: "#0284C7", fontWeight: 700 }}>
+                      <span style={{ fontSize: "0.70rem", padding: "2px 6px", borderRadius: "0px", background: "var(--accent-cobalt-light, #EFF4FF)", color: "var(--accent-cobalt, #0052FF)", fontWeight: 700, fontFamily: "var(--font-mono)" }}>
                         {row.type}
                       </span>
                     </td>
-                    <td style={{ padding: "10px 14px", fontWeight: 700 }}>{row.auroc}</td>
-                    <td style={{ padding: "10px 14px", fontWeight: 700 }}>{row.accuracy}</td>
-                    <td style={{ padding: "10px 14px", color: "#059669", fontWeight: 600 }}>{row.sensitivity}</td>
-                    <td style={{ padding: "10px 14px", color: "#0284C7", fontWeight: 600 }}>{row.specificity}</td>
-                    <td style={{ padding: "10px 14px", color: "#64748B" }}>{row.latency}</td>
-                    <td style={{ padding: "10px 14px", textAlign: "right", fontSize: "0.74rem", color: row.statusColor, fontWeight: 700 }}>
+                    <td className="tabular-nums" style={{ padding: "10px 14px", fontWeight: 700, fontFamily: "var(--font-mono)" }}>{row.auroc}</td>
+                    <td className="tabular-nums" style={{ padding: "10px 14px", fontWeight: 700, fontFamily: "var(--font-mono)" }}>{row.accuracy}</td>
+                    <td className="tabular-nums" style={{ padding: "10px 14px", color: "var(--status-safe, #15803D)", fontWeight: 600, fontFamily: "var(--font-mono)" }}>{row.sensitivity}</td>
+                    <td className="tabular-nums" style={{ padding: "10px 14px", color: "var(--accent-cobalt, #0052FF)", fontWeight: 600, fontFamily: "var(--font-mono)" }}>{row.specificity}</td>
+                    <td className="tabular-nums" style={{ padding: "10px 14px", color: "var(--text-secondary, #52525B)", fontFamily: "var(--font-mono)" }}>{row.latency}</td>
+                    <td style={{ padding: "10px 14px", textAlign: "right", fontSize: "0.74rem", color: row.statusColor, fontWeight: 700, fontFamily: "var(--font-mono)" }}>
                       {row.status}
                     </td>
                   </tr>
@@ -811,7 +817,7 @@ export default function EditorialHomePage({
           ) : (
             <table style={{ width: "100%", minWidth: "700px", borderCollapse: "collapse", fontSize: "0.80rem", textAlign: "left" }}>
               <thead>
-                <tr style={{ background: "#F8FAFC", borderBottom: "1px solid #E2E8F0", color: "#64748B" }}>
+                <tr style={{ background: "var(--surface-raised, #F4F4F5)", borderBottom: "1px solid var(--border-hairline, #E4E4E7)", color: "var(--text-muted, #71717A)" }}>
                   <th style={{ padding: "10px 14px" }}>{t("disease_intro.table_model", "Condition")}</th>
                   <th style={{ padding: "10px 14px" }}>{t("disease_intro.dataset_cohort", "Dataset")}</th>
                   <th style={{ padding: "10px 14px" }}>{t("disease_intro.table_architecture", "Quantum Model")}</th>
@@ -829,21 +835,21 @@ export default function EditorialHomePage({
                     <tr
                       key={d.diseaseKey}
                       style={{
-                        borderBottom: "1px solid #F1F5F9",
-                        background: idx % 2 === 0 ? "#FFFFFF" : "#F8FAFC",
+                        borderBottom: "1px solid var(--border-subtle, #F4F4F5)",
+                        background: idx % 2 === 0 ? "var(--surface-base, #FFFFFF)" : "var(--surface-raised, #F4F4F5)",
                       }}
                     >
-                      <td style={{ padding: "10px 14px", fontWeight: 700, color: "#0F172A" }}>{locD.name}</td>
-                      <td style={{ padding: "10px 14px", color: "#64748B" }}>{locD.dataset || d.dataset}</td>
-                      <td style={{ padding: "10px 14px", color: "#0284C7", fontWeight: 600 }}>{locD.modelArchitecture || d.quantumModel}</td>
-                      <td style={{ padding: "10px 14px", color: "#64748B" }}>{d.classicalRival}</td>
-                      <td style={{ padding: "10px 14px", fontWeight: 700 }}>{d.qAcc}</td>
-                      <td style={{ padding: "10px 14px", color: "#64748B" }}>{d.cAcc}</td>
-                      <td style={{ padding: "10px 14px", fontWeight: 700, color: d.delta.startsWith("+") ? "#059669" : "#D97706" }}>
+                      <td style={{ padding: "10px 14px", fontWeight: 700, color: "var(--text-primary, #09090B)" }}>{locD.name}</td>
+                      <td style={{ padding: "10px 14px", color: "var(--text-secondary, #52525B)", fontFamily: "var(--font-mono)" }}>{locD.dataset || d.dataset}</td>
+                      <td style={{ padding: "10px 14px", color: "var(--accent-cobalt, #0052FF)", fontWeight: 600, fontFamily: "var(--font-mono)" }}>{locD.modelArchitecture || d.quantumModel}</td>
+                      <td style={{ padding: "10px 14px", color: "var(--text-secondary, #52525B)", fontFamily: "var(--font-mono)" }}>{d.classicalRival}</td>
+                      <td className="tabular-nums" style={{ padding: "10px 14px", fontWeight: 700, fontFamily: "var(--font-mono)" }}>{d.qAcc}</td>
+                      <td className="tabular-nums" style={{ padding: "10px 14px", color: "var(--text-secondary, #52525B)", fontFamily: "var(--font-mono)" }}>{d.cAcc}</td>
+                      <td className="tabular-nums" style={{ padding: "10px 14px", fontWeight: 700, color: d.delta.startsWith("+") ? "var(--status-safe, #15803D)" : "var(--status-warn, #B45309)", fontFamily: "var(--font-mono)" }}>
                         {d.delta}
                       </td>
                       <td style={{ padding: "10px 14px", textAlign: "right" }}>
-                        <span style={{ fontSize: "0.68rem", fontWeight: 700, padding: "2px 7px", borderRadius: "4px", background: d.routing.includes("Quantum") ? "#ECFDF5" : "#FFFBEB", color: d.color }}>
+                        <span style={{ fontSize: "0.68rem", fontWeight: 700, padding: "2px 7px", borderRadius: "0px", background: d.routing.includes("Quantum") ? "var(--status-safe-bg, #F0FDF4)" : "var(--status-warn-bg, #FFFBEB)", color: d.routing.includes("Quantum") ? "var(--status-safe, #15803D)" : "var(--status-warn, #B45309)", fontFamily: "var(--font-mono)" }}>
                           {d.routing}
                         </span>
                       </td>

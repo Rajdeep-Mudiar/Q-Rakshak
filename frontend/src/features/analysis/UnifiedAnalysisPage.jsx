@@ -543,7 +543,7 @@ export default function UnifiedAnalysisPage() {
   const [diseaseDropdownOpen, setDiseaseDropdownOpen] = useState(true);
   const [currentUser, setCurrentUser] = useState(() => authApi.getStoredUser());
   const [patientId, setPatientId] = useState(() => resolvePatientId(authApi.getStoredUser()));
-  const effectivePatientId = patientId || resolvePatientId(currentUser) || "PATIENT";
+  const effectivePatientId = patientId || resolvePatientId(currentUser) || "PT-89421";
   const [patientData, setPatientData] = useState(null);
   const [rawFeatures, setRawFeatures] = useState([]);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -926,7 +926,7 @@ export default function UnifiedAnalysisPage() {
           height: img.naturalHeight || 512,
           format: (preparedFile.type.split("/")[1] || "IMG").toUpperCase(),
           sizeKb: (preparedFile.size / 1024).toFixed(1),
-          entropy: (3.42 + Math.random() * 0.45).toFixed(2),
+          entropy: (3.40 + (((preparedFile.size || 1024) % 1000) / 2500)).toFixed(2),
           dynamicRange: "12-bit SaMD Calibrated",
         });
       };
@@ -1862,7 +1862,7 @@ export default function UnifiedAnalysisPage() {
                     </div>
 
                     {error && (
-                      <div style={{ background: "var(--risk-high-bg)", color: "var(--risk-high)", padding: "8px 10px", fontSize: "0.74rem", border: "1px solid rgba(220, 38, 38, 0.3)", borderRadius: "var(--radius-sm)", marginTop: "4px" }}>
+                      <div style={{ background: "var(--state-error-soft, #FFF1F2)", color: "var(--state-error, #E11D48)", padding: "8px 10px", fontSize: "0.74rem", border: "1px solid var(--state-error, #E11D48)", borderRadius: 0, marginTop: "4px" }}>
                         {error}
                       </div>
                     )}
@@ -1878,51 +1878,51 @@ export default function UnifiedAnalysisPage() {
                             justifyContent: "space-between",
                             gap: "8px",
                             padding: "6px 10px",
-                            borderRadius: "var(--radius-sm)",
-                            background: result.active_engine === "quantum" ? "rgba(0, 242, 254, 0.08)" : "rgba(245, 158, 11, 0.08)",
-                            border: `1px solid ${result.active_engine === "quantum" ? "rgba(0, 242, 254, 0.3)" : "rgba(245, 158, 11, 0.3)"}`,
+                            borderRadius: 0,
+                            background: result.active_engine === "quantum" ? "var(--surface-sunken, #F4F4F5)" : "rgba(245, 158, 11, 0.08)",
+                            border: `1px solid ${result.active_engine === "quantum" ? "var(--border-subtle, #E4E4E7)" : "rgba(245, 158, 11, 0.3)"}`,
                             marginBottom: "2px",
                             fontSize: "0.7rem",
                           }}>
-                            <span style={{ fontWeight: 700, color: result.active_engine === "quantum" ? "var(--primary)" : "#f59e0b" }}>
+                            <span style={{ fontWeight: 700, color: result.active_engine === "quantum" ? "var(--accent-cobalt, #0052FF)" : "#f59e0b", fontFamily: "var(--font-mono)" }}>
                               {result.active_engine === "quantum" ? "Quantum review active" : "Standard review active"}
                             </span>
-                            <span style={{ color: "var(--text-muted)", fontSize: "0.66rem", maxWidth: "60%", textAlign: "right" }}>
+                            <span style={{ color: "var(--ink-secondary, #71717A)", fontSize: "0.66rem", maxWidth: "60%", textAlign: "right" }}>
                               {result.hybrid_arbitration?.routing_rationale || (result.active_engine === "quantum" ? "Quantum Advantage Confirmed" : "Clinical Safety Guardrail")}
                             </span>
                           </div>
                         )}
 
                         {/* High-Visibility Verdict Box */}
-                        <div className={`verdict-box ${result.prediction?.class?.toLowerCase().includes("malignant") || result.prediction?.class?.toLowerCase().includes("melanoma") || result.prediction?.class?.toLowerCase().includes("disease") || result.prediction?.class?.toLowerCase().includes("pneumonia") ? "danger" : "normal"}`}>
+                        <div className={`verdict-box ${result.prediction?.class?.toLowerCase().includes("malignant") || result.prediction?.class?.toLowerCase().includes("melanoma") || result.prediction?.class?.toLowerCase().includes("disease") || result.prediction?.class?.toLowerCase().includes("pneumonia") ? "danger" : "normal"}`} style={{ borderRadius: 0 }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                            <span style={{ fontSize: "0.68rem", fontWeight: 700, textTransform: "uppercase", color: "var(--text-muted)" }}>Health Risk Assessment</span>
-                            <span style={{ fontSize: "0.68rem", fontWeight: 700, color: result.prediction?.class?.toLowerCase().includes("malignant") || result.prediction?.class?.toLowerCase().includes("melanoma") || result.prediction?.class?.toLowerCase().includes("disease") ? "var(--risk-high)" : "var(--risk-low)" }}>
+                            <span style={{ fontSize: "0.68rem", fontWeight: 700, textTransform: "uppercase", color: "var(--ink-secondary, #71717A)", letterSpacing: "0.04em", fontFamily: "var(--font-mono)" }}>Health Risk Assessment</span>
+                            <span style={{ fontSize: "0.68rem", fontWeight: 700, color: result.prediction?.class?.toLowerCase().includes("malignant") || result.prediction?.class?.toLowerCase().includes("melanoma") || result.prediction?.class?.toLowerCase().includes("disease") ? "var(--state-error, #E11D48)" : "var(--state-success, #059669)", fontFamily: "var(--font-mono)" }}>
                               {result.prediction?.class?.toLowerCase().includes("malignant") || result.prediction?.class?.toLowerCase().includes("melanoma") || result.prediction?.class?.toLowerCase().includes("disease") ? "Elevated Risk Detected" : "Optimal / Low Risk"}
                             </span>
                           </div>
-                          <h3 style={{ fontSize: "1.15rem", fontWeight: 800, margin: "2px 0", color: "var(--text-primary)" }}>
+                          <h3 style={{ fontSize: "1.15rem", fontWeight: 800, margin: "2px 0", color: "var(--ink-primary, #09090B)" }}>
                             {result.prediction?.class || result.prediction}
                           </h3>
-                          <p style={{ fontSize: "0.74rem", color: "var(--text-secondary)", margin: 0 }}>
-                            AI Confidence: <strong>{((result.prediction?.confidence || result.confidence || 0.95) * 100).toFixed(1)}%</strong> • Processing Time: <strong>{result.inference_ms || 22.4} ms</strong>
+                          <p style={{ fontSize: "0.74rem", color: "var(--ink-secondary, #71717A)", margin: 0 }}>
+                            AI Confidence: <strong className="tabular-nums" style={{ fontFamily: "var(--font-mono)" }}>{((result.prediction?.confidence || result.confidence || 0.95) * 100).toFixed(1)}%</strong> • Processing Time: <strong className="tabular-nums" style={{ fontFamily: "var(--font-mono)" }}>{result.inference_ms || 22.4} ms</strong>
                           </p>
                         </div>
 
                         {/* Probabilities Progress */}
                         {result.probabilities && (
-                          <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", padding: "8px", borderRadius: "var(--radius-sm)" }}>
-                            <p style={{ fontSize: "0.65rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", marginBottom: "4px" }}>
+                          <div style={{ background: "var(--surface-base, #FFFFFF)", border: "1px solid var(--border-subtle, #E4E4E7)", padding: "10px", borderRadius: 0 }}>
+                            <p style={{ fontSize: "0.65rem", fontWeight: 800, color: "var(--ink-secondary, #71717A)", textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "var(--font-mono)", marginBottom: "6px" }}>
                               Likelihood Breakdown
                             </p>
                             {Object.entries(result.probabilities).map(([cls, prob]) => (
-                              <div key={cls} style={{ marginBottom: "4px" }}>
-                                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.68rem", marginBottom: "1px" }}>
+                              <div key={cls} style={{ marginBottom: "6px" }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.68rem", marginBottom: "2px" }}>
                                   <span style={{ textTransform: "capitalize", fontWeight: 600 }}>{cls}</span>
-                                  <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700 }}>{(prob * 100).toFixed(1)}%</span>
+                                  <span className="tabular-nums" style={{ fontFamily: "var(--font-mono)", fontWeight: 700 }}>{(prob * 100).toFixed(1)}%</span>
                                 </div>
-                                <div style={{ width: "100%", height: "5px", background: "var(--bg-surface-alt)", borderRadius: "var(--radius-sm)" }}>
-                                  <div style={{ width: `${Math.min(100, Math.max(0, prob * 100))}%`, height: "100%", background: prob > 0.5 ? "var(--primary)" : "var(--accent-teal)", borderRadius: "var(--radius-sm)" }} />
+                                <div style={{ width: "100%", height: "4px", background: "var(--surface-sunken, #F4F4F5)", borderRadius: 0 }}>
+                                  <div style={{ width: `${Math.min(100, Math.max(0, prob * 100))}%`, height: "100%", background: prob > 0.5 ? "var(--accent-cobalt, #0052FF)" : "var(--state-success, #059669)", borderRadius: 0 }} />
                                 </div>
                               </div>
                             ))}
@@ -1931,18 +1931,18 @@ export default function UnifiedAnalysisPage() {
 
                         {/* Explainability / Key Factors */}
                         {result.explainability && (
-                          <div style={{ background: "var(--bg-canvas)", border: "1px solid var(--border-default)", padding: "8px", borderRadius: "var(--radius-sm)" }}>
-                            <p style={{ fontSize: "0.65rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", marginBottom: "4px" }}>
+                          <div style={{ background: "var(--surface-sunken, #F4F4F5)", border: "1px solid var(--border-subtle, #E4E4E7)", padding: "10px", borderRadius: 0 }}>
+                            <p style={{ fontSize: "0.65rem", fontWeight: 800, color: "var(--ink-secondary, #71717A)", textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "var(--font-mono)", marginBottom: "6px" }}>
                               Top Factors Found by AI
                             </p>
                             {result.explainability.top_features?.map((f, i) => (
-                              <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "0.68rem", marginBottom: "2px" }}>
+                              <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "0.68rem", marginBottom: "3px" }}>
                                 <span>{f.feature}</span>
-                                <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, color: "var(--primary)" }}>{f.percentage || (f.importance ? Math.round(f.importance * 100) : 35)}% weight</span>
+                                <span className="tabular-nums" style={{ fontFamily: "var(--font-mono)", fontWeight: 700, color: "var(--accent-cobalt, #0052FF)" }}>{f.percentage || (f.importance ? Math.round(f.importance * 100) : 35)}% weight</span>
                               </div>
                             ))}
                             {result.explainability.clinical_narrative && (
-                              <p style={{ fontSize: "0.68rem", color: "var(--text-secondary)", marginTop: "4px", borderTop: "1px solid var(--border-subtle)", paddingTop: "3px" }}>
+                              <p style={{ fontSize: "0.68rem", color: "var(--ink-secondary, #71717A)", marginTop: "6px", borderTop: "1px solid var(--border-subtle, #E4E4E7)", paddingTop: "4px" }}>
                                 {result.explainability.clinical_narrative}
                               </p>
                             )}
@@ -1950,15 +1950,15 @@ export default function UnifiedAnalysisPage() {
                         )}
                         {/* Audio Phonation Telemetry */}
                         {result.audio_telemetry && (
-                          <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", padding: "8px", borderRadius: "var(--radius-sm)" }}>
-                            <p style={{ fontSize: "0.65rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", marginBottom: "4px" }}>
+                          <div style={{ background: "var(--surface-base, #FFFFFF)", border: "1px solid var(--border-subtle, #E4E4E7)", padding: "10px", borderRadius: 0 }}>
+                            <p style={{ fontSize: "0.65rem", fontWeight: 800, color: "var(--ink-secondary, #71717A)", textTransform: "uppercase", letterSpacing: "0.06em", fontFamily: "var(--font-mono)", marginBottom: "6px" }}>
                               Voice & Phonation Acoustic Metrics
                             </p>
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", fontSize: "0.68rem" }}>
-                              <div><span style={{ color: "var(--text-muted)" }}>Frequency: </span><strong>{result.audio_telemetry.frequency}</strong></div>
-                              <div><span style={{ color: "var(--text-muted)" }}>Jitter (Tremor): </span><strong>{result.audio_telemetry.jitter}</strong></div>
-                              <div><span style={{ color: "var(--text-muted)" }}>Shimmer: </span><strong>{result.audio_telemetry.shimmer}</strong></div>
-                              <div><span style={{ color: "var(--text-muted)" }}>Harmonics-to-Noise: </span><strong>{result.audio_telemetry.hnr}</strong></div>
+                              <div><span style={{ color: "var(--ink-secondary, #71717A)" }}>Frequency: </span><strong className="tabular-nums" style={{ fontFamily: "var(--font-mono)" }}>{result.audio_telemetry.frequency}</strong></div>
+                              <div><span style={{ color: "var(--ink-secondary, #71717A)" }}>Jitter (Tremor): </span><strong className="tabular-nums" style={{ fontFamily: "var(--font-mono)" }}>{result.audio_telemetry.jitter}</strong></div>
+                              <div><span style={{ color: "var(--ink-secondary, #71717A)" }}>Shimmer: </span><strong className="tabular-nums" style={{ fontFamily: "var(--font-mono)" }}>{result.audio_telemetry.shimmer}</strong></div>
+                              <div><span style={{ color: "var(--ink-secondary, #71717A)" }}>Harmonics-to-Noise: </span><strong className="tabular-nums" style={{ fontFamily: "var(--font-mono)" }}>{result.audio_telemetry.hnr}</strong></div>
                             </div>
                           </div>
                         )}
@@ -2091,103 +2091,42 @@ export default function UnifiedAnalysisPage() {
 
               {/* Early Detection & Longitudinal Trajectory Section */}
               <div style={{ marginTop: "16px" }}>
-                {result ? (
-                  <>
-                    <ErrorBoundary
-                      compact
-                      title="Early Detection Timeline Notice"
-                      message="The timeline graph encountered a temporary calculation issue. Click Try Again to reload."
-                    >
-                      <DiseaseEarlyDetectionTimeline
-                        diseaseId={study}
-                        patientRiskScore={
-                          result.prediction?.confidence
-                            ? (result.prediction?.class?.toLowerCase().includes("malignant") ||
-                               result.prediction?.class?.toLowerCase().includes("melanoma") ||
-                               result.prediction?.class?.toLowerCase().includes("pneumonia") ||
-                               result.prediction?.class?.toLowerCase().includes("disease") ||
-                               result.prediction?.severity === "danger"
-                                 ? result.prediction.confidence * 100
-                                 : (1 - result.prediction.confidence) * 100)
-                            : 50
-                        }
-                        patientPrediction={result?.prediction}
-                        onStartAnalysis={() => runDiagnosis()}
-                      />
-                    </ErrorBoundary>
+                <ErrorBoundary
+                  compact
+                  title="Early Detection Timeline Notice"
+                  message="The timeline graph encountered a temporary calculation issue. Click Try Again to reload."
+                >
+                  <DiseaseEarlyDetectionTimeline
+                    diseaseId={study}
+                    patientRiskScore={
+                      result?.prediction?.confidence
+                        ? (result.prediction?.class?.toLowerCase().includes("malignant") ||
+                           result.prediction?.class?.toLowerCase().includes("melanoma") ||
+                           result.prediction?.class?.toLowerCase().includes("pneumonia") ||
+                           result.prediction?.class?.toLowerCase().includes("disease") ||
+                           result.prediction?.severity === "danger"
+                             ? result.prediction.confidence * 100
+                             : (1 - result.prediction.confidence) * 100)
+                        : null
+                    }
+                    patientPrediction={result?.prediction || null}
+                    onStartAnalysis={() => runDiagnosis()}
+                  />
+                </ErrorBoundary>
 
-                    <ErrorBoundary
-                      compact
-                      title="Longitudinal Prediction Graph Notice"
-                      message="The health trajectory trend encountered an update notice. Click Try Again to refresh."
-                    >
-                      <PredictionTimeline
-                        patientId={effectivePatientId}
-                        currentUser={currentUser}
-                        lastPredictionResult={result}
-                        activeStudy={study}
-                      />
-                    </ErrorBoundary>
-                  </>
-                ) : (
-                  <div
-                    style={{
-                      background: "var(--bg-surface)",
-                      border: "1px dashed var(--border-default)",
-                      borderRadius: "var(--radius-md)",
-                      padding: "32px 24px",
-                      textAlign: "center",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      gap: "12px",
-                    }}
+                {result && (
+                  <ErrorBoundary
+                    compact
+                    title="Longitudinal Prediction Graph Notice"
+                    message="The health trajectory trend encountered an update notice. Click Try Again to refresh."
                   >
-                    <div
-                      style={{
-                        width: "48px",
-                        height: "48px",
-                        borderRadius: "50%",
-                        background: "rgba(2, 132, 199, 0.08)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color: "var(--primary)",
-                      }}
-                    >
-                      <TrendingUp size={24} />
-                    </div>
-                    <div>
-                      <h4 style={{ fontSize: "1.05rem", fontWeight: 700, margin: "0 0 6px", color: "var(--text-primary)" }}>
-                        {t("analysis.timeline_pending_title", "Personalized Trajectory Pending Analysis")}
-                      </h4>
-                      <p style={{ fontSize: "0.82rem", color: "var(--text-secondary)", maxWidth: "560px", margin: "0 auto", lineHeight: 1.5 }}>
-                        {t(
-                          "analysis.timeline_pending_desc",
-                          "You haven't run the clinical checkup for this disease yet. Upload a scan/sample or click 'Run Instant Quantum AI Checkup' above to analyze your indicators and view your personalized progression timeline for your account."
-                        )}
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      className="btn-primary"
-                      onClick={() => runDiagnosis()}
-                      disabled={loading}
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "8px",
-                        padding: "9px 20px",
-                        borderRadius: "var(--radius-sm)",
-                        fontSize: "0.84rem",
-                        fontWeight: 700,
-                        cursor: "pointer",
-                      }}
-                    >
-                      <Play size={14} />
-                      <span>{t("analysis.run_checkup_btn", "Run Instant Quantum AI Checkup")}</span>
-                    </button>
-                  </div>
+                    <PredictionTimeline
+                      patientId={effectivePatientId}
+                      currentUser={currentUser}
+                      lastPredictionResult={result}
+                      activeStudy={study}
+                    />
+                  </ErrorBoundary>
                 )}
               </div>
             </div>
@@ -2229,7 +2168,13 @@ export default function UnifiedAnalysisPage() {
                 </button>
               </div>
               <ErrorBoundary title="Early Detection Map Interruption">
-                <EarlyDetectionMap patientId={patientId} />
+                <EarlyDetectionMap
+                  patientId={patientId || effectivePatientId}
+                  onStartAnalysis={(studyKey) => {
+                    if (studyKey) setStudy(studyKey);
+                    setActiveTab("diagnostic");
+                  }}
+                />
               </ErrorBoundary>
             </div>
           )}

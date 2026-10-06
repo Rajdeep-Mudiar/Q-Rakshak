@@ -1380,10 +1380,14 @@ export const DISEASE_LIST = Object.values(DISEASE_REGISTRY);
 
 export function getDiseaseById(id) {
   if (!id) return DISEASE_REGISTRY.breast_cancer;
+  const cleanId = String(id).toLowerCase().replace(/[-_]/g, "");
   // Handle aliases
-  if (id === "skin_cancer") return DISEASE_REGISTRY.skin;
-  if (id === "heart_disease") return DISEASE_REGISTRY.heart;
-  if (id === "parkinson") return DISEASE_REGISTRY.parkinsons;
+  if (cleanId === "skincancer" || cleanId === "skin" || cleanId === "melanoma" || cleanId === "derma") return DISEASE_REGISTRY.skin;
+  if (cleanId === "heartdisease" || cleanId === "heart" || cleanId === "cardiovascular" || cleanId === "cardio" || cleanId === "cleveland") return DISEASE_REGISTRY.heart;
+  if (cleanId === "parkinson" || cleanId === "parkinsons" || cleanId === "neuro") return DISEASE_REGISTRY.parkinsons;
+  if (cleanId === "pneumonia" || cleanId === "pneu" || cleanId === "lung") return DISEASE_REGISTRY.pneumonia;
+  if (cleanId === "breastcancer" || cleanId === "breast" || cleanId === "wdbc") return DISEASE_REGISTRY.breast_cancer;
+  if (cleanId === "diabetes" || cleanId === "diabetic" || cleanId === "pima" || cleanId === "metabolic") return DISEASE_REGISTRY.diabetes;
   return DISEASE_REGISTRY[id] || DISEASE_REGISTRY.breast_cancer;
 }
 

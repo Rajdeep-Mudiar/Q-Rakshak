@@ -33,8 +33,8 @@ export default function TimelineProgressionGraph({
           padding: '40px 24px',
           textAlign: 'center',
           background: 'var(--dt-bg-surface, #FFFFFF)',
-          border: '1.5px dashed var(--dt-border-default, #E2E8F0)',
-          borderRadius: '10px',
+          border: '1px dashed var(--dt-border-default, #E2E8F0)',
+          borderRadius: '0px',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -44,17 +44,17 @@ export default function TimelineProgressionGraph({
       >
         <div
           style={{
-            width: '52px',
-            height: '52px',
-            borderRadius: '50%',
-            background: 'rgba(2, 132, 199, 0.08)',
+            width: '48px',
+            height: '48px',
+            borderRadius: '0px',
+            background: 'rgba(0, 82, 255, 0.08)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: 'var(--dt-accent-blue, #0284C7)',
+            color: '#0052FF',
           }}
         >
-          <Clock size={26} />
+          <Clock size={24} />
         </div>
         <div>
           <h4 style={{ fontSize: '0.96rem', fontWeight: 800, color: 'var(--dt-text-primary, #0F172A)', margin: '0 0 6px 0' }}>
@@ -70,8 +70,8 @@ export default function TimelineProgressionGraph({
             onClick={onRefresh}
             style={{
               padding: '8px 16px',
-              borderRadius: '6px',
-              background: 'var(--dt-accent-blue, #0284C7)',
+              borderRadius: '0px',
+              background: '#0052FF',
               color: '#FFFFFF',
               border: 'none',
               fontWeight: 700,
@@ -132,9 +132,9 @@ export default function TimelineProgressionGraph({
       <div
         style={{
           padding: '14px 16px',
-          borderRadius: '10px',
-          background: isEarlyRisk ? 'linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%)' : 'linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%)',
-          border: `1px solid ${isEarlyRisk ? '#FECDD3' : '#A7F3D0'}`,
+          borderRadius: '0px',
+          background: isEarlyRisk ? '#FFF1F2' : '#F0FDF4',
+          border: `1px solid ${isEarlyRisk ? '#FECDD3' : '#BBF7D0'}`,
           display: 'flex',
           gap: '12px',
           alignItems: 'flex-start',
@@ -142,19 +142,18 @@ export default function TimelineProgressionGraph({
       >
         <div
           style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
+            width: '32px',
+            height: '32px',
+            borderRadius: '0px',
             background: isEarlyRisk ? '#E11D48' : '#059669',
             color: '#FFFFFF',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
-            boxShadow: isEarlyRisk ? '0 4px 12px rgba(225, 29, 72, 0.25)' : '0 4px 12px rgba(5, 150, 105, 0.25)',
           }}
         >
-          {isEarlyRisk ? <AlertTriangle size={18} /> : <ShieldCheck size={20} />}
+          {isEarlyRisk ? <AlertTriangle size={16} /> : <ShieldCheck size={18} />}
         </div>
 
         <div style={{ flex: 1 }}>
@@ -180,7 +179,7 @@ export default function TimelineProgressionGraph({
                   fontFamily: 'var(--dt-font-mono)',
                   fontWeight: 800,
                   padding: '3px 8px',
-                  borderRadius: '4px',
+                  borderRadius: '0px',
                   background: '#BE123C',
                   color: '#FFFFFF',
                   letterSpacing: '0.02em',
@@ -197,7 +196,7 @@ export default function TimelineProgressionGraph({
                   fontFamily: 'var(--dt-font-mono)',
                   fontWeight: 800,
                   padding: '3px 8px',
-                  borderRadius: '4px',
+                  borderRadius: '0px',
                   background: '#047857',
                   color: '#FFFFFF',
                   letterSpacing: '0.02em',
@@ -226,14 +225,14 @@ export default function TimelineProgressionGraph({
         style={{
           background: 'var(--dt-bg-surface, #FFFFFF)',
           border: '1px solid var(--dt-border-default, #E2E8F0)',
-          borderRadius: '10px',
+          borderRadius: '0px',
           padding: '14px 16px',
           boxShadow: '0 2px 10px rgba(0, 0, 0, 0.04)',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <TrendingUp size={16} color="var(--dt-accent-blue, #2563EB)" />
+            <TrendingUp size={16} color="#0052FF" />
             <span style={{ fontSize: '0.80rem', fontWeight: 800, color: 'var(--dt-text-primary, #0F172A)' }}>
               Longitudinal Risk Trajectory &amp; 90% Threshold Line
             </span>
@@ -241,7 +240,7 @@ export default function TimelineProgressionGraph({
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.66rem', color: 'var(--dt-text-muted)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#2563EB' }} />
+              <span style={{ width: '6px', height: '6px', borderRadius: '0px', background: '#0052FF' }} />
               <span>Evaluated Tests</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -340,7 +339,7 @@ export default function TimelineProgressionGraph({
               y={thresholdY - 10}
               width="90"
               height="18"
-              rx="4"
+              rx="0"
               fill="#DC2626"
             />
             <text
@@ -398,7 +397,7 @@ export default function TimelineProgressionGraph({
                       cy={cy}
                       r="9"
                       fill="none"
-                      stroke="var(--dt-accent-blue, #2563EB)"
+                      stroke="#0052FF"
                       strokeWidth="1.5"
                     />
                   )}
@@ -416,7 +415,7 @@ export default function TimelineProgressionGraph({
                     cx={cx}
                     cy={cy}
                     r="5.5"
-                    fill="#2563EB"
+                    fill="#0052FF"
                     stroke="#FFFFFF"
                     strokeWidth="2"
                   />
@@ -432,7 +431,7 @@ export default function TimelineProgressionGraph({
             style={{
               marginTop: '8px',
               padding: '8px 12px',
-              borderRadius: '6px',
+              borderRadius: '0px',
               background: 'var(--dt-bg-card-hover, #F1F5F9)',
               border: '1px solid var(--dt-border-default, #E2E8F0)',
               display: 'flex',
@@ -443,7 +442,7 @@ export default function TimelineProgressionGraph({
           >
             <div>
               <strong style={{ color: 'var(--dt-text-primary)' }}>{hoveredPoint.milestone} ({hoveredPoint.date}):</strong>{' '}
-              <span style={{ color: hoveredPoint.projected_risk >= threshold ? '#DC2626' : 'var(--dt-accent-blue)' }}>
+              <span style={{ color: hoveredPoint.projected_risk >= threshold ? '#DC2626' : '#0052FF' }}>
                 {hoveredPoint.projected_risk}% Risk
               </span>
             </div>
@@ -459,7 +458,7 @@ export default function TimelineProgressionGraph({
         style={{
           background: 'var(--dt-bg-surface, #FFFFFF)',
           border: '1px solid var(--dt-border-default, #E2E8F0)',
-          borderRadius: '10px',
+          borderRadius: '0px',
           overflow: 'hidden',
           boxShadow: '0 2px 10px rgba(0, 0, 0, 0.04)',
         }}
@@ -475,7 +474,7 @@ export default function TimelineProgressionGraph({
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Calendar size={14} color="var(--dt-accent-blue, #2563EB)" />
+            <Calendar size={14} color="#0052FF" />
             <strong style={{ fontSize: '0.76rem', color: 'var(--dt-text-primary)' }}>
               Projected Everyday &amp; Milestone Reports
             </strong>
@@ -505,7 +504,7 @@ export default function TimelineProgressionGraph({
                     key={p.day}
                     style={{
                       borderBottom: '1px solid var(--dt-border-default)',
-                      background: isSelected ? 'var(--dt-accent-blue-soft, #EFF6FF)' : 'transparent',
+                      background: isSelected ? 'rgba(0, 82, 255, 0.08)' : 'transparent',
                       transition: 'background 0.12s ease',
                     }}
                   >
@@ -520,7 +519,7 @@ export default function TimelineProgressionGraph({
                         style={{
                           display: 'inline-block',
                           padding: '2px 7px',
-                          borderRadius: '4px',
+                          borderRadius: '0px',
                           fontSize: '0.66rem',
                           fontWeight: 800,
                           fontFamily: 'var(--dt-font-mono)',
@@ -541,8 +540,8 @@ export default function TimelineProgressionGraph({
                         onClick={() => onSelectMilestone && onSelectMilestone(p)}
                         style={{
                           padding: '4px 8px',
-                          borderRadius: '4px',
-                          background: isSelected ? '#2563EB' : 'var(--dt-bg-card)',
+                          borderRadius: '0px',
+                          background: isSelected ? '#0052FF' : 'var(--dt-bg-card)',
                           color: isSelected ? '#FFFFFF' : 'var(--dt-text-primary)',
                           border: '1px solid var(--dt-border-default)',
                           fontSize: '0.64rem',

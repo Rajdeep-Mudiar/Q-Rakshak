@@ -1,18 +1,25 @@
 import { useState, useEffect, useRef } from "react";
 import { Compass, ShieldAlert, CheckCircle2, ChevronRight, Activity } from "lucide-react";
 import { earlyDetectionApi } from "../../api/earlyDetection";
+import { clinicalApi } from "../../api/clinical";
+import { authApi } from "../../api/auth";
 import { animateEntrance, animateCardStagger } from "../../utils/motion";
 import SquareLoader from "../common/SquareLoader.jsx";
 import DiseaseEarlyDetectionTimeline from "../../features/analysis/components/DiseaseEarlyDetectionTimeline.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { getLocalizedDiseaseById } from "../../data/diseaseRegistry.js";
 
-export default function EarlyDetectionMap({ patientId = null }) {
+export default function EarlyDetectionMap({ patientId = null, onStartAnalysis = null }) {
   const { t } = useLanguage();
   const containerRef = useRef(null);
   const [selectedDisease, setSelectedDisease] = useState("breast_cancer");
   const [pathway, setPathway] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [patientRiskScore, setPatientRiskScore] = useState(null);
+  const [patientPrediction, setPatientPrediction] = useState(null);
+
+  const storedUser = authApi.getStoredUser?.() || null;
+  const effectivePid = patientId || storedUser?.patient_id || storedUser?.user_id || storedUser?.id || "PT-89421";
 
   const activeDisease = getLocalizedDiseaseById(selectedDisease, t);
   const currentEarlyDet = activeDisease.earlyDetection || {};
@@ -24,10 +31,34 @@ export default function EarlyDetectionMap({ patientId = null }) {
       .catch(() => {})
       .finally(() => setLoading(false));
 
+    // Fetch existing patient timeline for this disease protocol to calibrate personal curve
+    if (effectivePid) {
+      clinicalApi.getPatientTimeline(effectivePid, "1 Year", null, null, selectedDisease)
+        .then((res) => {
+          const hist = res?.timeline?.history || [];
+          if (hist.length > 0) {
+            const latest = hist[hist.length - 1];
+            setPatientRiskScore(latest.risk_score ?? null);
+            setPatientPrediction({
+              class: latest.prediction_class,
+              confidence: latest.confidence,
+              probability: latest.probability,
+            });
+          } else {
+            setPatientRiskScore(null);
+            setPatientPrediction(null);
+          }
+        })
+        .catch(() => {
+          setPatientRiskScore(null);
+          setPatientPrediction(null);
+        });
+    }
+
     if (containerRef.current) {
       animateEntrance(containerRef.current, { y: 15, duration: 0.35 });
     }
-  }, [selectedDisease]);
+  }, [selectedDisease, effectivePid]);
 
   const stages = currentEarlyDet.stages && currentEarlyDet.stages.length > 0 
     ? currentEarlyDet.stages 
@@ -55,10 +86,10 @@ export default function EarlyDetectionMap({ patientId = null }) {
             className={`btn-secondary ${selectedDisease === d.key ? "active" : ""}`}
             style={{
               padding: "7px 14px",
-              borderRadius: "var(--radius-sm)",
-              background: selectedDisease === d.key ? "var(--primary)" : "var(--bg-surface)",
-              color: selectedDisease === d.key ? "#fff" : "var(--text-secondary)",
-              borderColor: selectedDisease === d.key ? "var(--primary)" : "var(--border-default)",
+              borderRadius: "0px",
+              background: selectedDisease === d.key ? "#0052FF" : "var(--bg-surface)",
+              color: selectedDisease === d.key ? "#FFFFFF" : "var(--text-secondary)",
+              borderColor: selectedDisease === d.key ? "#0052FF" : "var(--border-default)",
               fontWeight: selectedDisease === d.key ? 700 : 500,
               fontSize: "0.78rem",
               cursor: "pointer",
@@ -74,12 +105,15 @@ export default function EarlyDetectionMap({ patientId = null }) {
       {/* ── Interactive Early Detection Timeline Graph for Selected Disease ── */}
       <DiseaseEarlyDetectionTimeline
         diseaseId={selectedDisease}
+        patientRiskScore={patientRiskScore}
+        patientPrediction={patientPrediction}
         showDiseaseSelector={false}
+        onStartAnalysis={onStartAnalysis}
       />
 
       {/* Pathway Header KPI */}
       <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "10px" }}>
-        <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", padding: "12px 14px" }}>
+        <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "0px", padding: "12px 14px" }}>
           <p style={{ fontSize: "0.64rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>
             {t("early_detection.target_disease_organ", "Target Disease & Organ System")}
           </p>
@@ -91,7 +125,7 @@ export default function EarlyDetectionMap({ patientId = null }) {
           </p>
         </div>
 
-        <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", padding: "12px 14px" }}>
+        <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "0px", padding: "12px 14px" }}>
           <p style={{ fontSize: "0.64rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>
             {t("early_detection.lead_time_window", "Early Detection Window")}
           </p>
@@ -103,7 +137,7 @@ export default function EarlyDetectionMap({ patientId = null }) {
           </p>
         </div>
 
-        <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "var(--radius-sm)", padding: "12px 14px" }}>
+        <div style={{ background: "var(--bg-surface)", border: "1px solid var(--border-default)", borderRadius: "0px", padding: "12px 14px" }}>
           <p style={{ fontSize: "0.64rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>
             {t("early_detection.sensitivity_gain", "Quantum Sensitivity Gain")}
           </p>
@@ -117,7 +151,7 @@ export default function EarlyDetectionMap({ patientId = null }) {
       </div>
 
       {/* Sequential Trajectory Progression Cards */}
-      <div className="card-panel" style={{ borderRadius: "var(--radius-md)" }}>
+      <div className="card-panel" style={{ borderRadius: "0px" }}>
         <div className="card-header">
           <span className="card-title">
             <Compass size={15} color="var(--primary)" /> {t("early_detection.progression_trajectory_title", "Multi-Stage Progression Trajectory & Cellular Biomarkers")}
@@ -136,7 +170,7 @@ export default function EarlyDetectionMap({ patientId = null }) {
                 style={{
                   background: "var(--bg-canvas)",
                   border: "1px solid var(--border-default)",
-                  borderRadius: "var(--radius-sm)",
+                  borderRadius: "0px",
                   padding: "12px",
                   display: "flex",
                   flexDirection: "column",
@@ -149,7 +183,7 @@ export default function EarlyDetectionMap({ patientId = null }) {
                     fontSize: "0.68rem",
                     fontWeight: 700,
                     padding: "2px 6px",
-                    borderRadius: "var(--radius-xs)",
+                    borderRadius: "0px",
                     background: riskVal > 60 ? "var(--state-error-bg)" : (riskVal > 30 ? "var(--state-warning-bg)" : "var(--state-success-bg)"),
                     color: riskVal > 60 ? "var(--state-error)" : (riskVal > 30 ? "var(--state-warning)" : "var(--state-success)"),
                     border: "1px solid var(--border-default)",
@@ -185,7 +219,7 @@ export default function EarlyDetectionMap({ patientId = null }) {
                   </p>
                 </div>
 
-                <div style={{ marginTop: "auto", background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-xs)", padding: "8px" }}>
+                <div style={{ marginTop: "auto", background: "var(--bg-surface)", border: "1px solid var(--border-subtle)", borderRadius: "0px", padding: "8px" }}>
                   <p style={{ fontSize: "0.64rem", fontWeight: 700, color: "var(--primary)", textTransform: "uppercase", margin: "0 0 2px" }}>
                     {t("early_detection.recommended_protocol", "Recommended Protocol:")}
                   </p>

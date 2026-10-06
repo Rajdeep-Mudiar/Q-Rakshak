@@ -108,9 +108,10 @@ def get_trained_module(disease: str):
 @router.post("/diagnose", dependencies=[Depends(check_inference_rate_limit)])
 async def run_clinical_diagnosis(
     req: DiagnosticRequest,
-    current_user: dict[str, Any] = Depends(get_optional_user if settings.IS_DEMO else get_current_user),
+    current_user: dict[str, Any] = Depends(get_optional_user),
 ):
     """Executes hybrid quantum-classical clinical diagnostic pipeline with explainability and fallback."""
+    current_user = current_user or {}
     user_role = current_user.get("role", "patient")
     user_id = current_user.get("user_id", "")
     if user_role == "patient" and user_id not in ("GUEST-USER", "") and user_id:

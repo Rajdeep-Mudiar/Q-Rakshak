@@ -1,29 +1,29 @@
-/* ── Q-RAKSHAK 3D DIGITAL HEALTH TWIN MODERN LIGHT CLINICAL STUDIO ─────────
-   Light Clinical Studio Palette • High Contrast Dark Text • Modern Ergonomic Cards
+/* ── Q-RAKSHAK 3D DIGITAL HEALTH TWIN ARCHITECTURAL PRECISION LIGHT ────────
+   Harmonized Porcelain & Electric Cobalt • 0px Sharp Precision • High Contrast
 ───────────────────────────────────────────────────────────────────────────── */
 
 :root {
-  --dt-bg-canvas: #F8FAFC;
-  --dt-bg-surface: #FFFFFF;
-  --dt-bg-card: #FFFFFF;
-  --dt-bg-card-hover: #F1F5F9;
+  --dt-bg-canvas: var(--canvas-bg, #FBFBFB);
+  --dt-bg-surface: var(--surface-base, #FFFFFF);
+  --dt-bg-card: var(--surface-base, #FFFFFF);
+  --dt-bg-card-hover: var(--surface-raised, #F4F4F5);
   --dt-bg-input: #FFFFFF;
-  --dt-border-subtle: #E2E8F0;
-  --dt-border-default: #CBD5E1;
-  --dt-border-hover: #94A3B8;
-  --dt-accent-blue: #025997;
-  --dt-accent-blue-soft: #E0F2FE;
-  --dt-gold: #9B713E;
-  --dt-gold-light: #F4E7D1;
-  --dt-gold-glow: rgba(155, 113, 62, 0.16);
-  --dt-teal: #765A43;
-  --dt-teal-glow: #765A43;
-  --dt-text-primary: #0F172A;
-  --dt-text-secondary: #334155;
-  --dt-text-muted: #64748B;
-  --dt-font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --dt-font-mono: "JetBrains Mono", monospace;
-  --dt-font-serif: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  --dt-border-subtle: var(--border-subtle, #F4F4F5);
+  --dt-border-default: var(--border-hairline, #E4E4E7);
+  --dt-border-hover: var(--border-focus, #18181B);
+  --dt-accent-blue: var(--accent-cobalt, #0052FF);
+  --dt-accent-blue-soft: var(--accent-cobalt-light, #EFF4FF);
+  --dt-gold: var(--accent-cobalt, #0052FF);
+  --dt-gold-light: #EFF4FF;
+  --dt-gold-glow: rgba(0, 82, 255, 0.12);
+  --dt-teal: #0D9488;
+  --dt-teal-glow: rgba(13, 148, 136, 0.15);
+  --dt-text-primary: var(--text-primary, #09090B);
+  --dt-text-secondary: var(--text-secondary, #52525B);
+  --dt-text-muted: var(--text-muted, #71717A);
+  --dt-font-sans: var(--font-sans, "Plus Jakarta Sans", sans-serif);
+  --dt-font-mono: var(--font-mono, "JetBrains Mono", monospace);
+  --dt-font-serif: var(--font-sans, "Plus Jakarta Sans", sans-serif);
 }
 
 /* ── Full Studio Layout ─────────────────────────────────────────────────── */
@@ -70,7 +70,7 @@
 .dt-topbar-icon-box {
   width: 34px;
   height: 34px;
-  border-radius: 8px;
+  border-radius: 0;
   background: var(--dt-accent-blue-soft);
   border: 1px solid rgba(37, 99, 235, 0.2);
   display: flex;
@@ -100,7 +100,7 @@
   font-size: 0.60rem;
   font-weight: 700;
   padding: 2px 7px;
-  border-radius: 4px;
+  border-radius: 0;
   background: var(--dt-accent-blue-soft);
   border: 1px solid rgba(37, 99, 235, 0.25);
   color: var(--dt-accent-blue);
@@ -126,7 +126,7 @@
   align-items: center;
   gap: 6px;
   padding: 7px 12px;
-  border-radius: 6px;
+  border-radius: 0;
   background: var(--dt-bg-surface);
   border: 1px solid var(--dt-border-default);
   color: var(--dt-text-secondary);
@@ -150,7 +150,7 @@
   border: 1px solid var(--dt-text-primary);
   font-weight: 700;
   padding: 7px 14px;
-  border-radius: 6px;
+  border-radius: 0;
   font-family: var(--dt-font-sans);
   font-size: 0.72rem;
   display: inline-flex;
@@ -201,7 +201,7 @@
 .dt-patient-badge {
   width: 34px;
   height: 34px;
-  border-radius: 8px;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -262,7 +262,7 @@
 .dt-card {
   background: var(--dt-bg-card);
   border: 1px solid var(--dt-border-default);
-  border-radius: 8px;
+  border-radius: 0;
   padding: 14px;
   display: flex;
   flex-direction: column;
@@ -314,7 +314,7 @@
   width: 100%;
   background: var(--dt-bg-input);
   border: 1px solid var(--dt-border-default);
-  border-radius: 6px;
+  border-radius: 0;
   padding: 8px 10px;
   font-family: var(--dt-font-sans);
   font-size: 0.76rem;
@@ -359,13 +359,13 @@
   gap: 4px;
   background: var(--dt-bg-card-hover);
   padding: 3px;
-  border-radius: 6px;
+  border-radius: 0;
   border: 1px solid var(--dt-border-default);
 }
 
 .dt-segmented-btn {
   padding: 5px 8px;
-  border-radius: 4px;
+  border-radius: 0;
   border: 1px solid transparent;
   background: transparent;
   color: var(--dt-text-muted);
@@ -401,7 +401,7 @@
   align-items: center;
   gap: 5px;
   padding: 5px 9px;
-  border-radius: 6px;
+  border-radius: 0;
   background: var(--dt-bg-surface);
   border: 1px solid var(--dt-border-default);
   color: var(--dt-text-secondary);
@@ -455,19 +455,19 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  background: rgba(15, 23, 42, 0.82);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.14);
   padding: 4px 6px;
-  border-radius: 8px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  border-radius: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
   pointer-events: auto;
 }
 
 .dt-hud-btn {
   padding: 5px 9px;
-  border-radius: 5px;
+  border-radius: 0;
   border: none;
   background: transparent;
   color: #CBD5E1;
@@ -493,14 +493,14 @@
   bottom: 16px;
   left: 16px;
   background: rgba(15, 23, 42, 0.9);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 8px;
+  border-radius: 0;
   padding: 8px 12px;
   display: flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
   pointer-events: none;
   z-index: 15;
 }
@@ -530,7 +530,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: 0;
   background: var(--dt-bg-surface);
   border: 1px solid var(--dt-border-default);
   color: var(--dt-text-primary);
@@ -567,7 +567,7 @@
   -webkit-appearance: none;
   width: 100%;
   height: 6px;
-  border-radius: 4px;
+  border-radius: 0;
   background: #E2E8F0;
   outline: none;
   cursor: pointer;
@@ -575,18 +575,18 @@
 
 .dt-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 0;
   background: var(--dt-accent-blue);
-  border: 2px solid #FFFFFF;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  border: 1px solid #FFFFFF;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
   cursor: pointer;
   transition: transform 0.12s ease;
 }
 
 .dt-range-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
+  transform: scale(1.15);
 }
 
 /* ── Bottom Telemetry Footer ─────────────────────────────────────────────── */
@@ -618,15 +618,15 @@
   align-items: center;
   gap: 5px;
   padding: 2px 7px;
-  border-radius: 4px;
+  border-radius: 0;
   background: var(--dt-bg-card);
   border: 1px solid var(--dt-border-default);
 }
 
 .dt-legend-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 0;
 }
 
 /* ── Mobile Responsiveness for 3D Digital Twin ── */

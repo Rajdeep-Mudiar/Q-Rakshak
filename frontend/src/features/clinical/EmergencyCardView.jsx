@@ -49,7 +49,7 @@ export default function EmergencyCardView({ patientId = null }) {
   const [patientDropdownOpen, setPatientDropdownOpen] = useState(false);
   const patientDropdownRef = useRef(null);
 
-  const effectivePatientId = selectedPatientId || patientId || (patientRoster[0]?.id) || storedUser?.patient_id || storedUser?.user_id || storedUser?.id || '';
+  const effectivePatientId = selectedPatientId || patientId || (patientRoster[0]?.id) || storedUser?.patient_id || storedUser?.user_id || storedUser?.id || 'PT-89421';
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
@@ -410,12 +410,12 @@ export default function EmergencyCardView({ patientId = null }) {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#F8FAFC', flexDirection: 'column', gap: '14px', fontFamily: 'var(--font-sans, -apple-system, BlinkMacSystemFont, sans-serif)' }}>
-        <div style={{ width: '42px', height: '42px', borderRadius: '50%', border: '3px solid #E2E8F0', borderTopColor: '#0EA5E9', animation: 'spin 0.8s linear infinite' }} />
-        <h2 style={{ fontSize: '0.92rem', fontWeight: 800, letterSpacing: '0.04em', color: '#0F172A', margin: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--canvas-bg, #FBFBFB)', flexDirection: 'column', gap: '14px', fontFamily: 'var(--font-sans, "Plus Jakarta Sans", sans-serif)' }}>
+        <div style={{ width: '32px', height: '32px', border: '2px solid #E4E4E7', borderTopColor: '#0052FF', animation: 'spin 0.8s linear infinite', borderRadius: 0 }} />
+        <h2 style={{ fontSize: '0.92rem', fontWeight: 700, letterSpacing: '0.04em', color: 'var(--ink-primary, #09090B)', margin: 0, fontFamily: 'var(--font-mono)' }}>
           Retrieving Clinical Emergency Passport...
         </h2>
-        <span style={{ fontSize: '0.74rem', color: '#64748B', fontFamily: 'monospace' }}>
+        <span style={{ fontSize: '0.74rem', color: 'var(--ink-secondary, #71717A)', fontFamily: 'var(--font-mono)' }}>
           Verifying patient record & WORM cryptographic seal
         </span>
       </div>
@@ -424,14 +424,14 @@ export default function EmergencyCardView({ patientId = null }) {
 
   if (error && !data) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '24px', background: '#F8FAFC', fontFamily: 'var(--font-sans, sans-serif)' }}>
-        <div style={{ maxWidth: '440px', width: '100%', textAlign: 'center', padding: '36px 28px', background: '#FFFFFF', borderRadius: '20px', border: '1px solid #E2E8F0', boxShadow: '0 10px 30px -5px rgba(15, 23, 42, 0.05)' }}>
-          <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#FEF2F2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px auto', color: '#DC2626' }}>
-            <AlertOctagon size={28} />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '24px', background: 'var(--canvas-bg, #FBFBFB)', fontFamily: 'var(--font-sans, sans-serif)' }}>
+        <div style={{ maxWidth: '440px', width: '100%', textAlign: 'center', padding: '36px 28px', background: '#FFFFFF', borderRadius: 0, border: '1px solid #E4E4E7', boxShadow: 'none' }}>
+          <div style={{ width: '48px', height: '48px', borderRadius: 0, background: '#FFF1F2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px auto', color: '#DC2626' }}>
+            <AlertOctagon size={24} />
           </div>
-          <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0F172A', margin: '0 0 8px 0' }}>Emergency Record Unavailable</h2>
-          <p style={{ fontSize: '0.82rem', color: '#64748B', lineHeight: 1.5, margin: '0 0 16px 0' }}>{error}</p>
-          <span style={{ fontSize: '0.72rem', fontFamily: 'monospace', background: '#F1F5F9', padding: '4px 10px', borderRadius: '6px', color: '#475569' }}>
+          <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#09090B', margin: '0 0 8px 0' }}>Emergency Record Unavailable</h2>
+          <p style={{ fontSize: '0.82rem', color: '#71717A', lineHeight: 1.5, margin: '0 0 16px 0' }}>{error}</p>
+          <span style={{ fontSize: '0.72rem', fontFamily: 'var(--font-mono)', background: '#F4F4F5', padding: '4px 10px', borderRadius: 0, color: '#09090B', border: '1px solid #E4E4E7' }}>
             Patient ID: {effectivePatientId || patientId || '—'}
           </span>
         </div>
@@ -444,36 +444,32 @@ export default function EmergencyCardView({ patientId = null }) {
       style={{
         minHeight: '100vh',
         width: '100%',
-        backgroundColor: '#F8FAFC',
-        backgroundImage: `
-          radial-gradient(circle at 10% 10%, rgba(14, 165, 233, 0.04) 0%, transparent 40%),
-          radial-gradient(circle at 90% 90%, rgba(16, 185, 129, 0.04) 0%, transparent 40%)
-        `,
-        color: '#0F172A',
-        fontFamily: 'var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif)',
+        backgroundColor: '#FBFBFB',
+        color: '#09090B',
+        fontFamily: 'var(--font-sans, "Plus Jakarta Sans", sans-serif)',
         padding: 0,
         margin: 0,
         boxSizing: 'border-box',
+        borderRadius: 0,
       }}
     >
       <style>{`
         .triage-sexy-card {
           background: #FFFFFF;
-          border: 1px solid #E2E8F0;
-          border-radius: 18px;
+          border: 1px solid #E4E4E7;
+          border-radius: 0;
           padding: 22px 24px;
-          box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.02);
-          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: border-color 0.15s ease;
         }
         .triage-sexy-card:hover {
-          box-shadow: 0 10px 30px -4px rgba(15, 23, 42, 0.07);
+          border-color: #18181B;
         }
         .triage-hero-banner {
           background: #FFFFFF;
-          border: 1px solid #E2E8F0;
-          border-radius: 20px;
+          border: 1px solid #E4E4E7;
+          border-left: 4px solid #0052FF;
+          border-radius: 0;
           padding: clamp(16px, 3vw, 32px);
-          box-shadow: 0 10px 35px -5px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.02);
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -487,57 +483,51 @@ export default function EmergencyCardView({ patientId = null }) {
           align-items: center;
           gap: 6px;
           padding: 8px 14px;
-          border-radius: 10px;
+          border-radius: 0;
           font-size: 0.76rem;
           font-weight: 700;
           cursor: pointer;
-          transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: all 0.15s ease;
           text-decoration: none;
-          min-height: 40px;
+          min-height: 38px;
           box-sizing: border-box;
+          font-family: var(--font-mono);
         }
         .triage-call-cta {
-          background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+          background: #DC2626;
           color: #FFFFFF;
-          border: none;
-          box-shadow: 0 4px 14px rgba(220, 38, 38, 0.28);
+          border: 1px solid #DC2626;
         }
         .triage-call-cta:hover {
-          transform: translateY(-1.5px);
-          box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
-          filter: brightness(1.05);
-        }
-        .triage-call-cta:active {
-          transform: translateY(0);
+          background: #B91C1C;
+          border-color: #B91C1C;
         }
         .triage-outline-btn {
           background: #FFFFFF;
-          color: #334155;
-          border: 1px solid #CBD5E1;
+          color: #09090B;
+          border: 1px solid #E4E4E7;
         }
         .triage-outline-btn:hover {
-          background: #F8FAFC;
-          border-color: #94A3B8;
-          color: #0F172A;
+          background: #F4F4F5;
+          border-color: #18181B;
+          color: #09090B;
         }
         .triage-speed-card {
           background: #FFFFFF;
-          border: 1px solid #E2E8F0;
-          border-radius: 12px;
+          border: 1px solid #E4E4E7;
+          border-radius: 0;
           padding: 12px 14px;
           display: flex;
           align-items: center;
           justify-content: space-between;
           text-decoration: none;
           color: inherit;
-          transition: all 0.18s ease;
+          transition: border-color 0.15s ease;
           min-height: 44px;
         }
         .triage-speed-card:hover {
-          border-color: #0284C7;
-          background: #F0F9FF;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(2, 132, 199, 0.08);
+          border-color: #0052FF;
+          background: #F4F4F5;
         }
 
         .triage-clinical-grid {

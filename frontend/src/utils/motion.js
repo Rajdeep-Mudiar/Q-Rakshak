@@ -249,4 +249,64 @@ export function animateSuccessPop(targetRef) {
 
 export const animateMetricCount = animateCounter;
 
+/**
+ * Architectural Shutter Reveal for crisp planar card and panel entrances
+ * @param {HTMLElement | string | Array} target - Target element(s)
+ * @param {Object} options - Custom overrides
+ */
+export function animateShutterEntrance(target, options = {}) {
+  if (!target || isReducedMotion()) return null;
+
+  return gsap.fromTo(
+    target,
+    {
+      opacity: 0,
+      y: options.y ?? 10,
+    },
+    {
+      opacity: 1,
+      y: 0,
+      duration: options.duration ?? 0.32,
+      stagger: options.stagger ?? 0.04,
+      ease: options.ease ?? "power2.out",
+      clearProps: "transform",
+      ...options,
+    }
+  );
+}
+
+/**
+ * Tactile Architectural Card Hover with razor-sharp hairline border darken and micro-lift
+ * @param {HTMLElement} targetRef - Target element
+ */
+export function animateArchitecturalHover(targetRef) {
+  if (!targetRef || isReducedMotion()) return () => {};
+
+  const onEnter = () => {
+    gsap.to(targetRef, {
+      y: -2,
+      borderColor: "#18181B",
+      duration: 0.18,
+      ease: "power2.out",
+    });
+  };
+
+  const onLeave = () => {
+    gsap.to(targetRef, {
+      y: 0,
+      borderColor: "#E4E4E7",
+      duration: 0.18,
+      ease: "power2.out",
+    });
+  };
+
+  targetRef.addEventListener("mouseenter", onEnter);
+  targetRef.addEventListener("mouseleave", onLeave);
+
+  return () => {
+    targetRef.removeEventListener("mouseenter", onEnter);
+    targetRef.removeEventListener("mouseleave", onLeave);
+  };
+}
+
 

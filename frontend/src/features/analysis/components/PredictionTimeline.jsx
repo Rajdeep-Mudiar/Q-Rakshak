@@ -291,7 +291,7 @@ export default function PredictionTimeline({
         marginTop: "16px",
         background: "#ffffff",
         border: "1px solid #e2e8f0",
-        borderRadius: "12px",
+        borderRadius: "0px",
         boxShadow: "0 1px 3px 0 rgba(15, 23, 42, 0.05)",
         padding: "20px",
         display: "flex",
@@ -316,7 +316,7 @@ export default function PredictionTimeline({
             style={{
               width: "36px",
               height: "36px",
-              borderRadius: "8px",
+              borderRadius: "0px",
               background: "#eff6ff",
               color: "#2563eb",
               display: "flex",
@@ -344,7 +344,7 @@ export default function PredictionTimeline({
                   fontSize: "0.68rem",
                   fontWeight: 700,
                   padding: "2px 8px",
-                  borderRadius: "999px",
+                  borderRadius: "0px",
                   background: hasHistory ? "#dbeafe" : "#f1f5f9",
                   color: hasHistory ? "#1d4ed8" : "#64748b",
                   fontFamily: "var(--font-mono, monospace)",
@@ -357,7 +357,7 @@ export default function PredictionTimeline({
                   fontSize: "0.68rem",
                   fontWeight: 700,
                   padding: "2px 8px",
-                  borderRadius: "999px",
+                  borderRadius: "0px",
                   background: selectedDisease === "all" ? "#eff6ff" : "#fef3c7",
                   color: selectedDisease === "all" ? "#1d4ed8" : "#b45309",
                   border: `1px solid ${selectedDisease === "all" ? "#bfdbfe" : "#fde68a"}`,
@@ -391,7 +391,7 @@ export default function PredictionTimeline({
               background: "#f8fafc",
               border: "1px solid #e2e8f0",
               color: "#334155",
-              borderRadius: "6px",
+              borderRadius: "0px",
               padding: "6px 12px",
               fontSize: "0.75rem",
               fontWeight: 600,
@@ -421,7 +421,7 @@ export default function PredictionTimeline({
           gap: "10px",
           background: "#f8fafc",
           padding: "8px 12px",
-          borderRadius: "8px",
+          borderRadius: "0px",
           border: "1px solid #edf2f7",
         }}
       >
@@ -451,7 +451,7 @@ export default function PredictionTimeline({
                 fontSize: "0.72rem",
                 fontWeight: 600,
                 padding: "4px 8px",
-                borderRadius: "6px",
+                borderRadius: "0px",
                 border: "1px solid #cbd5e1",
                 background: "#ffffff",
                 color: "#0f172a",
@@ -502,7 +502,7 @@ export default function PredictionTimeline({
                   fontSize: "0.72rem",
                   fontWeight: timeFilter === opt ? 700 : 500,
                   padding: "4px 10px",
-                  borderRadius: "6px",
+                  borderRadius: "0px",
                   border: timeFilter === opt ? "1px solid #2563eb" : "1px solid #e2e8f0",
                   background: timeFilter === opt ? "#2563eb" : "#ffffff",
                   color: timeFilter === opt ? "#ffffff" : "#475569",
@@ -538,7 +538,7 @@ export default function PredictionTimeline({
                 fontSize: "0.72rem",
                 fontWeight: viewMode === "aggregated" ? 700 : 500,
                 padding: "4px 10px",
-                borderRadius: "6px",
+                borderRadius: "0px",
                 border: viewMode === "aggregated" ? "1px solid #0f172a" : "1px solid #e2e8f0",
                 background: viewMode === "aggregated" ? "#0f172a" : "#ffffff",
                 color: viewMode === "aggregated" ? "#ffffff" : "#475569",
@@ -554,7 +554,7 @@ export default function PredictionTimeline({
                 fontSize: "0.72rem",
                 fontWeight: viewMode === "all_runs" ? 700 : 500,
                 padding: "4px 10px",
-                borderRadius: "6px",
+                borderRadius: "0px",
                 border: viewMode === "all_runs" ? "1px solid #0f172a" : "1px solid #e2e8f0",
                 background: viewMode === "all_runs" ? "#0f172a" : "#ffffff",
                 color: viewMode === "all_runs" ? "#ffffff" : "#475569",
@@ -576,7 +576,7 @@ export default function PredictionTimeline({
             gap: "12px",
             padding: "10px 14px",
             background: "#eff6ff",
-            borderRadius: "8px",
+            borderRadius: "0px",
             border: "1px solid #bfdbfe",
           }}
         >
@@ -589,7 +589,7 @@ export default function PredictionTimeline({
               style={{
                 marginLeft: "6px",
                 padding: "4px 8px",
-                borderRadius: "4px",
+                borderRadius: "0px",
                 border: "1px solid #93c5fd",
                 fontSize: "0.72rem",
               }}
@@ -604,7 +604,7 @@ export default function PredictionTimeline({
               style={{
                 marginLeft: "6px",
                 padding: "4px 8px",
-                borderRadius: "4px",
+                borderRadius: "0px",
                 border: "1px solid #93c5fd",
                 fontSize: "0.72rem",
               }}
@@ -617,7 +617,7 @@ export default function PredictionTimeline({
               padding: "4px 12px",
               background: "#2563eb",
               color: "#ffffff",
-              borderRadius: "4px",
+              borderRadius: "0px",
               border: 0,
               fontSize: "0.72rem",
               fontWeight: 700,
@@ -637,7 +637,7 @@ export default function PredictionTimeline({
             border: "1px solid #fecaca",
             color: "#991b1b",
             padding: "12px 16px",
-            borderRadius: "8px",
+            borderRadius: "0px",
             fontSize: "0.78rem",
             display: "flex",
             alignItems: "center",
@@ -676,7 +676,7 @@ export default function PredictionTimeline({
             padding: "36px 20px",
             background: "#f8fafc",
             border: "1.5px dashed #cbd5e1",
-            borderRadius: "10px",
+            borderRadius: "0px",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -689,7 +689,7 @@ export default function PredictionTimeline({
             style={{
               width: "48px",
               height: "48px",
-              borderRadius: "50%",
+              borderRadius: "0px",
               background: "#e2e8f0",
               color: "#475569",
               display: "flex",
@@ -743,7 +743,7 @@ export default function PredictionTimeline({
                 color: "#1d4ed8",
                 border: "1px solid #bfdbfe",
                 padding: "6px 14px",
-                borderRadius: "6px",
+                borderRadius: "0px",
                 fontSize: "0.72rem",
                 fontWeight: 700,
                 cursor: "pointer",
@@ -761,7 +761,7 @@ export default function PredictionTimeline({
               background: "#eff6ff",
               color: "#1d4ed8",
               padding: "6px 14px",
-              borderRadius: "999px",
+              borderRadius: "0px",
               fontSize: "0.72rem",
               fontWeight: 600,
               marginTop: "4px",
@@ -789,7 +789,7 @@ export default function PredictionTimeline({
               style={{
                 background: "#f8fafc",
                 border: "1px solid #e2e8f0",
-                borderRadius: "8px",
+                borderRadius: "0px",
                 padding: "14px",
                 display: "flex",
                 flexDirection: "column",
@@ -815,7 +815,7 @@ export default function PredictionTimeline({
                     fontSize: "0.68rem",
                     fontWeight: 700,
                     padding: "2px 6px",
-                    borderRadius: "4px",
+                    borderRadius: "0px",
                     background:
                       dailyAggregates[dailyAggregates.length - 1].risk_score >= 70
                         ? "#fee2e2"
@@ -847,7 +847,7 @@ export default function PredictionTimeline({
               style={{
                 background: "#f8fafc",
                 border: "1px solid #e2e8f0",
-                borderRadius: "8px",
+                borderRadius: "0px",
                 padding: "14px",
                 display: "flex",
                 flexDirection: "column",
@@ -904,7 +904,7 @@ export default function PredictionTimeline({
               style={{
                 background: "#f8fafc",
                 border: "1px solid #e2e8f0",
-                borderRadius: "8px",
+                borderRadius: "0px",
                 padding: "14px",
                 display: "flex",
                 flexDirection: "column",
@@ -952,7 +952,7 @@ export default function PredictionTimeline({
               style={{
                 background: "#f8fafc",
                 border: "1px solid #e2e8f0",
-                borderRadius: "8px",
+                borderRadius: "0px",
                 padding: "14px",
                 display: "flex",
                 flexDirection: "column",
@@ -1005,7 +1005,7 @@ export default function PredictionTimeline({
               borderTop: "1px solid #f1f5f9",
               borderRight: "1px solid #f1f5f9",
               borderBottom: "1px solid #f1f5f9",
-              borderRadius: "6px",
+              borderRadius: "0px",
               padding: "14px 18px",
               display: "flex",
               alignItems: "flex-start",
@@ -1041,7 +1041,7 @@ export default function PredictionTimeline({
                     fontSize: "0.65rem",
                     fontWeight: 700,
                     padding: "1px 6px",
-                    borderRadius: "4px",
+                    borderRadius: "0px",
                     background: "#ffffff",
                     border: "1px solid rgba(0,0,0,0.1)",
                     color: "#475569",
@@ -1089,7 +1089,7 @@ export default function PredictionTimeline({
                   style={{
                     background: weekly.is_elevated_jump ? "#fff7ed" : "#f8fafc",
                     border: `1px solid ${weekly.is_elevated_jump ? "#fed7aa" : "#e2e8f0"}`,
-                    borderRadius: "8px",
+                    borderRadius: "0px",
                     padding: "12px 14px",
                     display: "flex",
                     flexDirection: "column",
@@ -1131,7 +1131,7 @@ export default function PredictionTimeline({
                   style={{
                     background: monthly.is_elevated_jump ? "#fff7ed" : "#f8fafc",
                     border: `1px solid ${monthly.is_elevated_jump ? "#fed7aa" : "#e2e8f0"}`,
-                    borderRadius: "8px",
+                    borderRadius: "0px",
                     padding: "12px 14px",
                     display: "flex",
                     flexDirection: "column",
@@ -1178,7 +1178,7 @@ export default function PredictionTimeline({
                 border: "1px solid #bae6fd",
                 color: "#0369a1",
                 padding: "10px 14px",
-                borderRadius: "6px",
+                borderRadius: "0px",
                 fontSize: "0.72rem",
                 display: "flex",
                 alignItems: "center",
@@ -1195,7 +1195,7 @@ export default function PredictionTimeline({
             style={{
               background: "#ffffff",
               border: "1px solid #e2e8f0",
-              borderRadius: "8px",
+              borderRadius: "0px",
               padding: "16px",
               display: "flex",
               flexDirection: "column",
@@ -1230,7 +1230,7 @@ export default function PredictionTimeline({
                     background: "#f1f5f9",
                     color: "#475569",
                     padding: "3px 8px",
-                    borderRadius: "4px",
+                    borderRadius: "0px",
                   }}
                 >
                   Single observation — minimum 2 distinct dates required for OLS slope
@@ -1289,7 +1289,7 @@ export default function PredictionTimeline({
                               background: "#0f172a",
                               color: "#ffffff",
                               padding: "8px 12px",
-                              borderRadius: "6px",
+                              borderRadius: "0px",
                               fontSize: "0.72rem",
                               boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
                             }}
@@ -1317,6 +1317,21 @@ export default function PredictionTimeline({
                       return null;
                     }}
                   />
+                  {/* Baseline Reference Line for Single Observation */}
+                  {dailyAggregates.length === 1 && (
+                    <ReferenceLine
+                      y={dailyAggregates[0].risk_score}
+                      label={{
+                        value: `Baseline Score: ${dailyAggregates[0].risk_score}%`,
+                        position: "insideBottomLeft",
+                        fill: "#0052FF",
+                        fontSize: 10,
+                        fontWeight: 700,
+                      }}
+                      stroke="#0052FF"
+                      strokeDasharray="3 3"
+                    />
+                  )}
                   {/* Critical 90% Threshold Line */}
                   <ReferenceLine
                     y={90}
@@ -1334,10 +1349,10 @@ export default function PredictionTimeline({
                     type="monotone"
                     dataKey="risk_score"
                     name="Risk Score"
-                    stroke="#2563eb"
+                    stroke="#0052FF"
                     strokeWidth={2.5}
-                    dot={{ fill: "#2563eb", r: 4, strokeWidth: 1, stroke: "#ffffff" }}
-                    activeDot={{ r: 6, fill: "#1d4ed8" }}
+                    dot={{ fill: "#0052FF", r: 4, strokeWidth: 1, stroke: "#ffffff" }}
+                    activeDot={{ r: 6, fill: "#003ECC" }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -1349,7 +1364,7 @@ export default function PredictionTimeline({
             style={{
               background: "#ffffff",
               border: "1px solid #e2e8f0",
-              borderRadius: "8px",
+              borderRadius: "0px",
               padding: "16px",
               display: "flex",
               flexDirection: "column",
@@ -1372,7 +1387,7 @@ export default function PredictionTimeline({
                   color: "#475569",
                   background: "#f1f5f9",
                   padding: "2px 8px",
-                  borderRadius: "4px",
+                  borderRadius: "0px",
                 }}
               >
                 {dailyAggregates.length} calendar {dailyAggregates.length === 1 ? "day" : "days"} recorded
@@ -1387,7 +1402,7 @@ export default function PredictionTimeline({
                     key={da.date}
                     style={{
                       border: "1px solid #e2e8f0",
-                      borderRadius: "6px",
+                      borderRadius: "0px",
                       overflow: "hidden",
                       transition: "all 0.15s ease",
                     }}
@@ -1418,7 +1433,7 @@ export default function PredictionTimeline({
                             fontSize: "0.68rem",
                             fontWeight: 600,
                             padding: "2px 8px",
-                            borderRadius: "999px",
+                            borderRadius: "0px",
                             background: "#eff6ff",
                             color: "#1d4ed8",
                           }}
@@ -1434,7 +1449,7 @@ export default function PredictionTimeline({
                               color: "#64748b",
                               background: "#f1f5f9",
                               padding: "1px 6px",
-                              borderRadius: "4px",
+                              borderRadius: "0px",
                             }}
                           >
                             {dis}
@@ -1500,7 +1515,7 @@ export default function PredictionTimeline({
                                   <span
                                     style={{
                                       padding: "2px 6px",
-                                      borderRadius: "4px",
+                                      borderRadius: "0px",
                                       fontSize: "0.68rem",
                                       fontWeight: 700,
                                       background:

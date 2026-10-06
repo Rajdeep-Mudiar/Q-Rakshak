@@ -1,98 +1,111 @@
-/* ── Q-RAKSHAK Modern Hospital Design System ────────────────────────
-   Edition: 2026 // Hospital Portal & Patient Care
-   Visual Character: Clean Medical Center • Trustworthy Blues • Accessible
-   Crisp Typography • Ergonomic Radii • Soft Drop Shadows • Clean Borders
+/* ── Q-RAKSHAK Architectural Swiss-Precision Light Design System ─────────
+   Visual Character: Razor-Sharp Modernist Editorial • Pure Luminous Porcelain
+   Zero Border Radius • Hairline Structural Steel • Electric Cobalt Accents
+   Disciplined Optical Grid • Tabular Telemetry • Orchestrated GSAP Motion
 ───────────────────────────────────────────────────────────────────────────── */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
 
 :root {
-  /* ── Typography Tokens (Inter & Manrope Human Healthcare Stack) ── */
-  --font-sans: "Inter", "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-display: "Manrope", "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-serif: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  /* ── Typography Tokens ── */
+  --font-sans: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, sans-serif;
+  --font-serif: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  /* ── QRakshak Light Medical Technology Palette ── */
-  --bg-canvas: #F8FAFC;              /* Medical White (Main page background) */
-  --bg-surface: #FFFFFF;             /* Pure White (Cards, forms, containers) */
-  --bg-surface-alt: #F1F5F9;         /* Soft Blue Gray (Secondary sections, subtle separation) */
-  --bg-surface-hover: #E2E8F0;       /* Cool Slate hover */
-  --bg-surface-dark: #17212B;        /* Medical Charcoal anchor */
-  --bg-card-blue: #F0F7FA;          /* Soft clinical blue-gray */
-  --bg-card-sky: #F8FAFC;           /* Medical White card bg */
-  --bg-card-emerald: #F0FDF4;       /* Clinical Green soft tint */
-  --bg-card-rose: #FEF2F2;          /* Clinical Red soft tint */
+  /* ── Architectural Swiss-Precision Light Palette ── */
+  --canvas-bg: #FBFBFB;              /* Pure architectural porcelain */
+  --surface-base: #FFFFFF;           /* Pristine ceramic white */
+  --surface-raised: #F4F4F5;         /* Crisp stone white / secondary */
+  --surface-hover: #ECECEE;          /* Tactile hover state */
+  --surface-dark: #18181B;           /* Structural obsidian */
 
-  /* ── Medical Identity & Accent Tokens ── */
-  --primary: #087F8C;                /* Medical Teal (Primary buttons, active states, key accents) */
-  --primary-hover: #075E66;          /* Deep Teal (Hover states, high-emphasis UI) */
-  --primary-dark: #075E66;           /* Deep Teal */
-  --primary-soft: #EBF8FA;           /* Very light medical teal */
-  --primary-light: #D0EFF2;          /* Light teal tint */
-  --primary-glow: rgba(8, 127, 140, 0.14);
-  --primary-gradient: linear-gradient(135deg, #087F8C 0%, #075E66 100%);
+  /* Aliases for backwards compatibility */
+  --bg-canvas: var(--canvas-bg);
+  --bg-surface: var(--surface-base);
+  --bg-surface-alt: var(--surface-raised);
+  --bg-surface-hover: var(--surface-hover);
+  --bg-surface-dark: var(--surface-dark);
+  --bg-card-blue: #F0F4FF;
+  --bg-card-sky: var(--canvas-bg);
+  --bg-card-emerald: #F0FDF4;
+  --bg-card-rose: #FEF2F2;
+
+  /* ── Identity & Accent: Electric Cobalt Precision ── */
+  --accent-cobalt: #0052FF;
+  --accent-cobalt-hover: #0043D6;
+  --accent-cobalt-light: #EFF4FF;
   
-  --secondary: #3B82B6;              /* Soft Blue (Secondary actions, info states, charts) */
-  --accent-blue: #3B82B6;            /* Soft Blue */
-  --accent-blue-soft: #F0F6FA;
-  --accent-blue-hover: #2D6A96;
-  --accent-teal: #087F8C;            /* Medical Teal */
-  --accent-violet: #6366F1;          /* Subtle supporting violet */
+  --primary: #0052FF;
+  --primary-hover: #0043D6;
+  --primary-dark: #0036AD;
+  --primary-soft: #EFF4FF;
+  --primary-light: #DBEAFE;
+  --primary-glow: rgba(0, 82, 255, 0.12);
+  --primary-gradient: linear-gradient(135deg, #0052FF 0%, #0036AD 100%);
+  
+  --secondary: #18181B;
+  --accent-blue: #0052FF;
+  --accent-blue-soft: #EFF4FF;
+  --accent-blue-hover: #0043D6;
+  --accent-teal: #0D9488;
+  --accent-violet: #6366F1;
   --accent-violet-soft: #F5F7FF;
-  --background: var(--bg-canvas);
-  --surface-secondary: #F8FAFC;
+  --background: var(--canvas-bg);
+  --surface-secondary: var(--surface-raised);
 
-  /* Status Colors (Semantic clinical states) */
-  --risk-low: #16866A;               /* Clinical Green */
+  /* ── High-Contrast Flat Status Tokens ── */
+  --risk-low: #15803D;
   --risk-low-bg: #F0FDF4;
   --risk-low-border: #BBF7D0;
-  --risk-mid: #C78A18;               /* Medical Amber */
+  --risk-mid: #B45309;
   --risk-mid-bg: #FFFBEB;
   --risk-mid-border: #FDE68A;
-  --risk-high: #C94C4C;              /* Clinical Red */
+  --risk-high: #DC2626;
   --risk-high-bg: #FEF2F2;
   --risk-high-border: #FECACA;
 
   /* Semantic Aliases */
-  --success: #16866A;
-  --warning: #C78A18;
-  --error: #C94C4C;
+  --success: #15803D;
+  --warning: #B45309;
+  --error: #DC2626;
 
-  /* ── Readable Healthcare Typography Colors ── */
-  --text-primary: #17212B;           /* Medical Charcoal (Headings, primary body text) */
-  --text-secondary: #52616B;         /* Slate Gray (Secondary text, descriptions, metadata) */
-  --text-muted: #7B8794;             /* Helper labels, placeholders */
-  --text-light: #9AA5B1;             /* Subtle tertiary */
-  --text-inverse: #FFFFFF;           /* White on dark */
-  --ink-primary: #17212B;            /* Medical Charcoal */
-  --ink-secondary: #52616B;          /* Slate Gray */
-  --ink-muted: #7B8794;
+  /* ── Typography Colors: Deep Obsidian & Zinc ── */
+  --text-primary: #09090B;
+  --text-secondary: #52525B;
+  --text-muted: #71717A;
+  --text-light: #A1A1AA;
+  --text-inverse: #FFFFFF;
+  --ink-primary: #09090B;
+  --ink-secondary: #52525B;
+  --ink-muted: #71717A;
 
-  /* ── Precision Cool Gray Borders ── */
-  --border-subtle: #F1F5F9;
-  --border-default: #D9E2EC;          /* Cool Gray Border */
-  --border-light-blue: #D9E2EC;
-  --border-hover: #BAC7D5;
-  --border-active: #087F8C;
+  /* ── Structural Hairline Borders ── */
+  --border-subtle: #F4F4F5;
+  --border-default: #E4E4E7;
+  --border-light-blue: #E4E4E7;
+  --border-hover: #18181B;
+  --border-active: #0052FF;
+  --border-hairline: #E4E4E7;
+  --border-focus: #18181B;
 
-  /* ── Standardized Clinical Precision Radii ── */
-  --radius-xs: 2px;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 10px;
-  --radius-pill: 999px;
+  /* ── Zero-Radius Architectural Standard (0px Mandate) ── */
+  --radius-xs: 0px !important;
+  --radius-sm: 0px !important;
+  --radius-md: 0px !important;
+  --radius-lg: 0px !important;
+  --radius-xl: 0px !important;
+  --radius-pill: 0px !important;
 
-  /* ── Restrained Hospital Shadows ── */
-  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
-  --shadow-card: 0 4px 16px rgba(15, 23, 42, 0.06);
-  --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.06);
-  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.08);
-  --shadow-modal: 0 20px 40px -8px rgba(15, 23, 42, 0.16);
-  --shadow-glow: 0 0 16px rgba(8, 127, 140, 0.12);
+  /* ── Restrained Architectural Elevation ── */
+  --shadow-sm: none;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-modal: 0 12px 32px rgba(0, 0, 0, 0.12);
+  --shadow-glow: none;
 
-  /* ── Publication Fluid Typography Tokens (320px to 4K) ── */
+  /* ── Publication Fluid Typography Tokens ── */
   --text-hero-fluid: clamp(1.85rem, 5vw, 3.8rem);
   --text-h1-fluid: clamp(1.5rem, 4vw, 2.5rem);
   --text-h2-fluid: clamp(1.2rem, 3vw, 1.85rem);
@@ -100,11 +113,12 @@
   --text-body-fluid: clamp(0.84rem, 1.5vw, 0.95rem);
 }
 
-/* ── Reset & Baseline ──────────────────────────────────────────────────────── */
+/* ── Universal Reset & 0px Strict Enforcement ──────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  border-radius: 0px !important;
 }
 
 html, body, #root {
@@ -112,29 +126,36 @@ html, body, #root {
   width: 100%;
   overflow-x: hidden;
   overflow-y: auto;
-  background-color: var(--bg-canvas);
+  background-color: var(--canvas-bg);
   color: var(--text-primary);
   font-family: var(--font-sans);
   line-height: 1.5;
-  letter-spacing: -0.011em;
+  letter-spacing: -0.012em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ── Custom Elegant Scrollbars ─────────────────────────────────────────────── */
+/* ── High-Precision Tabular Numbers Utility ─────────────────────────────────── */
+.tabular-nums, .mono-data, .metric-val, code, pre, .stat-value, [data-tabular] {
+  font-family: var(--font-mono) !important;
+  font-variant-numeric: tabular-nums !important;
+  font-feature-settings: "tnum" 1, "zero" 1 !important;
+}
+
+/* ── Custom Architectural Scrollbars (0px Flat) ────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-surface-alt);
+  background: var(--surface-raised);
 }
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 999px;
+  background: #D4D4D8;
+  border-radius: 0px !important;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #A1A1AA;
 }
 
 /* ── App Shell Layout ──────────────────────────────────────────────────────── */
@@ -340,19 +361,20 @@ html, body, #root {
 }
 
 .nav-btn:hover {
-  background: var(--bg-surface-alt);
-  color: var(--ink-primary);
+  background: var(--surface-raised);
+  color: var(--text-primary);
 }
 
 .nav-btn.active {
-  background: var(--primary-soft);
-  color: var(--primary);
+  background: var(--accent-cobalt-light);
+  color: var(--accent-cobalt);
   font-weight: 700;
-  border-color: rgba(8, 127, 140, 0.22);
+  border-left: 3px solid var(--accent-cobalt);
+  border-radius: 0px !important;
 }
 
 .nav-btn.active svg {
-  color: var(--primary);
+  color: var(--accent-cobalt);
 }
 
 .sidebar-footer {
@@ -2652,14 +2674,14 @@ body.high-contrast {
     background: #FFFFFF !important;
     color: #17212B !important;
     border: 2px solid #17212B !important;
-    border-radius: 18px !important;
+    border-radius: 0px !important;
   }
 
   .triage-card-shell.triage-light .triage-inner-frame {
     background: #FFFFFF !important;
     border: 1.75px solid #17212B !important;
     color: #17212B !important;
-    border-radius: 14px !important;
+    border-radius: 0px !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
@@ -2668,7 +2690,7 @@ body.high-contrast {
     background: #1E232B !important;
     color: #F1F5F9 !important;
     border: 1.5px solid #3E4756 !important;
-    border-radius: 18px !important;
+    border-radius: 0px !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
@@ -2677,7 +2699,7 @@ body.high-contrast {
     background: #242A33 !important;
     border: 1px solid #374151 !important;
     color: #F1F5F9 !important;
-    border-radius: 14px !important;
+    border-radius: 0px !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
@@ -4271,22 +4293,22 @@ body.high-contrast {
 .emergency-qr-panel,
 .modal-content,
 .cockpit-col {
-  border-radius: 14px !important;
+  border-radius: 0px !important;
   border: 1px solid var(--border-default) !important;
   box-shadow: var(--shadow-card);
 }
 
-/* Form Inputs & Selects: 9px radius, 46px height */
+/* Form Inputs & Selects: 0px sharp Swiss precision */
 input:not([type="checkbox"]):not([type="radio"]),
 select,
 textarea,
 .input-control,
 .select-control {
-  border-radius: 9px !important;
+  border-radius: 0px !important;
   border: 1px solid var(--border-default);
 }
 
-/* Primary and Secondary Interactive Buttons: 9px radius */
+/* Primary and Secondary Interactive Buttons: 0px sharp Swiss precision */
 .btn-primary,
 .btn-secondary,
 .btn-accent,
@@ -4297,21 +4319,21 @@ textarea,
 .apple-btn-accent,
 .emergency-call-btn,
 .emergency-btn-secondary {
-  border-radius: 9px !important;
+  border-radius: 0px !important;
 }
 
-/* Badges & Status Chips: 6px-8px or pill */
+/* Badges & Status Chips: 0px sharp rectangular */
 .step-badge,
 .step-chip,
 .emergency-badge-donor,
 .emergency-badge-allergy,
 .emergency-badge-permanent {
-  border-radius: 6px !important;
+  border-radius: 0px !important;
 }
 
 .pill-badge,
 .user-role-pill {
-  border-radius: 999px !important;
+  border-radius: 0px !important;
 }
 
 /* ── Background Visual Language: Subtle Scientific & Medical Line-Art ────── */
@@ -4934,7 +4956,7 @@ html, body {
     width: 100vw !important;
     max-width: 100vw !important;
     border-left: none !important;
-    border-radius: 16px 16px 0 0 !important;
+    border-radius: 0px !important;
   }
 
   /* Consultation WebRTC video stacking */
@@ -5028,11 +5050,11 @@ html, body {
     max-width: 100% !important;
     min-height: 240px !important;
     padding: 8px !important;
-    border-radius: 16px !important;
+    border-radius: 0px !important;
   }
   .triage-inner-frame {
     padding: 7px 9px !important;
-    border-radius: 10px !important;
+    border-radius: 0px !important;
   }
   .triage-headline-name {
     font-size: 1.05rem !important;
@@ -5229,5 +5251,21 @@ html, body {
   background: var(--primary-soft);
   color: var(--primary);
   font-weight: 700;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ARCHITECTURAL SWISS-PRECISION LIGHT: ABSOLUTE ZERO-RADIUS UNIVERSAL LOCK
+   Ensures 0px border-radius across all DOM elements, components, and pseudo-elements.
+   ═══════════════════════════════════════════════════════════════════════════ */
+*, *::before, *::after,
+div, section, article, aside, header, footer, main, nav,
+button, a, input, select, textarea,
+.card-panel, .apple-card, .cockpit-col, .verdict-box,
+.step-badge, .step-chip, .pill-badge, .user-role-pill,
+.triage-card-shell, .triage-inner-frame, .triage-bottom-frame,
+.modal-content, .model-doc-drawer, .modal-responsive-sheet,
+.digital-twin-pure-workspace, .dt-card, .dt-topbar-icon-box,
+.btn-primary, .btn-secondary, .btn-accent, .btn-danger, .btn-ghost {
+  border-radius: 0px !important;
 }
 

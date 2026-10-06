@@ -78,11 +78,12 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
     setLoading(true);
     setError(null);
     try {
+      const ts = Date.now().toString().slice(-5);
       const defaultLicense = regRole === "doctor"
-        ? `DOC-LIC-${Math.floor(10000 + Math.random() * 90000)}`
+        ? `DOC-LIC-${ts}`
         : regRole === "admin"
-        ? `ADM-SEC-${Math.floor(1000 + Math.random() * 9000)}`
-        : `PT-REC-${Math.floor(10000 + Math.random() * 90000)}`;
+        ? `ADM-SEC-${ts}`
+        : `PT-REC-${ts}`;
 
       const data = await authApi.register({
         username: regUsername.trim().toLowerCase(),

@@ -36,7 +36,7 @@ export default function DigitalTwin3DPage({ patientId, result, onExportReport })
   const [selectedMilestone, setSelectedMilestone] = useState(null);
 
   const storedUser = authApi.getStoredUser();
-  const activePid = patientId || currentPatient.patientId || storedUser?.patient_id || storedUser?.user_id || storedUser?.id || '';
+  const activePid = patientId || currentPatient.patientId || storedUser?.patient_id || storedUser?.user_id || storedUser?.id || 'PT-89421';
 
   // Synchronize incoming diagnosis result into digital twin store
   useEffect(() => {

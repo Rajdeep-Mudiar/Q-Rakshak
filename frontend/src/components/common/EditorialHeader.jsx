@@ -80,18 +80,17 @@ export default function EditorialHeader({
           onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
           aria-label="Toggle Navigation Drawer"
           style={{
-            background: "var(--bg-surface-alt)",
-            border: "1px solid var(--border-default)",
-            borderRadius: "8px",
+            background: "var(--surface-sunken, #F4F4F5)",
+            border: "1px solid var(--border-subtle, #E4E4E7)",
+            borderRadius: 0,
             padding: "8px",
             minWidth: "40px",
             minHeight: "40px",
             cursor: "pointer",
-            color: "var(--ink-primary)",
+            color: "var(--ink-primary, #09090B)",
             display: "none",
             alignItems: "center",
             justifyContent: "center",
-            boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
           }}
         >
           {mobileSidebarOpen ? <X size={20} /> : <Menu size={20} />}
@@ -117,7 +116,7 @@ export default function EditorialHeader({
               fontSize: "1.15rem",
               fontWeight: 700,
               letterSpacing: "-0.02em",
-              color: "var(--text-primary)",
+              color: "var(--ink-primary, #09090B)",
             }}
           >
             QRakshak
@@ -125,12 +124,15 @@ export default function EditorialHeader({
           <span
             style={{
               fontSize: "0.68rem",
-              color: "var(--primary-dark)",
-              background: "var(--primary-soft)",
+              color: "var(--accent-cobalt, #0052FF)",
+              background: "var(--surface-sunken, #F4F4F5)",
+              border: "1px solid var(--border-subtle, #E4E4E7)",
               padding: "2px 8px",
-              borderRadius: "6px",
-              fontWeight: 600,
-              letterSpacing: "0.02em",
+              borderRadius: 0,
+              fontWeight: 700,
+              letterSpacing: "0.04em",
+              textTransform: "uppercase",
+              fontFamily: "var(--font-mono)",
             }}
           >
             {t("header.clinical_platform", "Clinical Platform")}
@@ -142,7 +144,7 @@ export default function EditorialHeader({
           style={{
             width: "1px",
             height: "18px",
-            background: "var(--border-default)",
+            background: "var(--border-subtle, #E4E4E7)",
           }}
         />
 
@@ -155,21 +157,21 @@ export default function EditorialHeader({
             gap: "8px",
             fontFamily: "var(--font-mono)",
             fontSize: "0.66rem",
-            color: "var(--text-secondary)",
+            color: "var(--ink-secondary, #71717A)",
           }}
         >
           <span
             style={{
               display: "inline-block",
-              width: "7px",
-              height: "7px",
-              borderRadius: "50%",
-              background: "var(--risk-low)",
+              width: "6px",
+              height: "6px",
+              borderRadius: 0,
+              background: "var(--state-success, #059669)",
             }}
           />
-          <span style={{ fontWeight: 600 }}>{t("header.system_ready", "SYSTEM READY")}</span>
-          <span style={{ color: "var(--border-hover)" }}>•</span>
-          <span>{timeString}</span>
+          <span style={{ fontWeight: 700, letterSpacing: "0.04em" }}>{t("header.system_ready", "SYSTEM READY")}</span>
+          <span style={{ color: "var(--border-subtle, #E4E4E7)" }}>•</span>
+          <span className="tabular-nums">{timeString}</span>
         </div>
 
         {/* Quick Disease Selector Dropdown */}
@@ -207,7 +209,7 @@ export default function EditorialHeader({
                     }}
                   >
                     <span style={{ fontWeight: 600 }}>{locD.name || d.name}</span>
-                    <span style={{ fontSize: "0.62rem", color: d.accentColor, background: d.accentBg, padding: "2px 6px", borderRadius: "4px", fontWeight: 700 }}>
+                    <span style={{ fontSize: "0.62rem", color: d.accentColor, background: d.accentBg, padding: "2px 6px", borderRadius: 0, fontWeight: 700, fontFamily: "var(--font-mono)" }}>
                       {locD.category || d.category}
                     </span>
                   </button>
@@ -229,14 +231,14 @@ export default function EditorialHeader({
             }}
             title="Explore Platform Features"
           >
-            <Sparkles size={13} color="var(--accent-violet)" />
+            <Sparkles size={13} color="var(--accent-cobalt, #0052FF)" />
             <span>{t("header.modules", "Modules")}</span>
-            <ChevronDown size={12} color="var(--text-muted)" style={{ transform: moduleMenuOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.15s ease" }} />
+            <ChevronDown size={12} color="var(--ink-secondary, #71717A)" style={{ transform: moduleMenuOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.15s ease" }} />
           </button>
 
           {moduleMenuOpen && (
             <div className="header-dropdown-menu">
-              <div style={{ padding: "6px 8px", borderBottom: "1px solid var(--border-default)", fontSize: "0.64rem", fontWeight: 800, textTransform: "uppercase", color: "var(--text-muted)", letterSpacing: "0.06em" }}>
+              <div style={{ padding: "6px 8px", borderBottom: "1px solid var(--border-subtle, #E4E4E7)", fontSize: "0.64rem", fontWeight: 800, textTransform: "uppercase", color: "var(--ink-secondary, #71717A)", letterSpacing: "0.06em", fontFamily: "var(--font-mono)" }}>
                 {t("header.platform_modules", "Platform Modules")}
               </div>
               {Object.values(FEATURE_INTRO_REGISTRY).map((f) => (
@@ -250,7 +252,7 @@ export default function EditorialHeader({
                   }}
                 >
                   <span style={{ fontWeight: 600 }}>{(f?.title || f?.id || "Module").split("&")[0].trim()}</span>
-                  <span style={{ fontSize: "0.62rem", color: f.accentColor || "var(--primary)", background: f.accentBg || "var(--primary-soft)", padding: "2px 6px", borderRadius: "4px", fontWeight: 700 }}>
+                  <span style={{ fontSize: "0.62rem", color: f.accentColor || "var(--accent-cobalt, #0052FF)", background: f.accentBg || "var(--surface-sunken, #F4F4F5)", padding: "2px 6px", borderRadius: 0, fontWeight: 700, fontFamily: "var(--font-mono)" }}>
                     Intro
                   </span>
                 </button>
@@ -269,16 +271,17 @@ export default function EditorialHeader({
             gap: "6px",
             fontSize: "0.72rem",
             fontWeight: 700,
-            color: "var(--primary-dark, #0284C7)",
-            background: "var(--primary-soft, #F0F9FF)",
-            border: "1px solid var(--border-default, #CBD5E1)",
-            borderRadius: "6px",
+            color: "var(--accent-cobalt, #0052FF)",
+            background: "var(--surface-sunken, #F4F4F5)",
+            border: "1px solid var(--border-subtle, #E4E4E7)",
+            borderRadius: 0,
             padding: "5px 10px",
             transition: "all 0.15s ease",
+            fontFamily: "var(--font-mono)",
           }}
           title="Open Classical vs Quantum Model Accuracy Benchmarks (#CLASSICALvsQUANTUMN)"
         >
-          <Cpu size={13} color="var(--primary, #0284C7)" />
+          <Cpu size={13} color="var(--accent-cobalt, #0052FF)" />
           <span>Classical vs Quantum</span>
         </a>
       </div>
@@ -299,18 +302,18 @@ export default function EditorialHeader({
               alignItems: "center",
               gap: "6px",
               padding: "5px 10px",
-              background: langMenuOpen ? "var(--primary-soft, rgba(14, 165, 233, 0.1))" : "var(--bg-surface)",
-              color: "var(--text-primary)",
-              border: "1px solid var(--border-default)",
-              borderRadius: "8px",
+              background: langMenuOpen ? "var(--surface-sunken, #F4F4F5)" : "var(--surface-base, #FFFFFF)",
+              color: "var(--ink-primary, #09090B)",
+              border: "1px solid var(--border-subtle, #E4E4E7)",
+              borderRadius: 0,
               fontSize: "0.76rem",
-              fontWeight: 600,
+              fontWeight: 700,
               cursor: "pointer",
               transition: "all 0.15s ease",
             }}
           >
-            <Languages size={15} color="var(--primary, #0EA5E9)" />
-            <span style={{ fontFamily: "var(--font-sans, inherit)", fontWeight: 700 }}>
+            <Languages size={15} color="var(--accent-cobalt, #0052FF)" />
+            <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700 }}>
               {currentLangConfig?.shortBadge || "EN"}
             </span>
             <ChevronDown
@@ -329,12 +332,12 @@ export default function EditorialHeader({
                 position: "absolute",
                 top: "100%",
                 right: 0,
-                marginTop: "6px",
+                marginTop: "4px",
                 width: "190px",
-                background: "var(--bg-surface, #FFFFFF)",
-                border: "1px solid var(--border-default, #E2E8F0)",
-                borderRadius: "10px",
-                boxShadow: "0 8px 24px rgba(15, 23, 42, 0.12)",
+                background: "var(--surface-base, #FFFFFF)",
+                border: "1px solid var(--border-subtle, #E4E4E7)",
+                borderRadius: 0,
+                boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.08)",
                 padding: "6px",
                 zIndex: 120,
               }}
@@ -345,9 +348,9 @@ export default function EditorialHeader({
                   fontSize: "0.62rem",
                   textTransform: "uppercase",
                   letterSpacing: "0.08em",
-                  color: "var(--text-muted, #64748B)",
+                  color: "var(--ink-secondary, #71717A)",
                   fontWeight: 700,
-                  fontFamily: "var(--font-mono, monospace)",
+                  fontFamily: "var(--font-mono)",
                 }}
               >
                 {t("header.language", "Language / भाषा")}
@@ -369,10 +372,10 @@ export default function EditorialHeader({
                       justifyContent: "space-between",
                       width: "100%",
                       padding: "8px 10px",
-                      background: isSelected ? "var(--primary-soft, rgba(14, 165, 233, 0.08))" : "transparent",
-                      color: isSelected ? "var(--primary, #0EA5E9)" : "var(--text-primary, #0F172A)",
+                      background: isSelected ? "var(--surface-sunken, #F4F4F5)" : "transparent",
+                      color: isSelected ? "var(--accent-cobalt, #0052FF)" : "var(--ink-primary, #09090B)",
                       border: "none",
-                      borderRadius: "6px",
+                      borderRadius: 0,
                       cursor: "pointer",
                       fontSize: "0.78rem",
                       fontWeight: isSelected ? 700 : 500,
@@ -387,11 +390,11 @@ export default function EditorialHeader({
                     <span
                       style={{
                         fontSize: "0.65rem",
-                        fontFamily: "var(--font-mono, monospace)",
+                        fontFamily: "var(--font-mono)",
                         padding: "2px 5px",
-                        borderRadius: "4px",
-                        background: isSelected ? "var(--primary, #0EA5E9)" : "var(--border-subtle, #F1F5F9)",
-                        color: isSelected ? "#FFFFFF" : "var(--text-muted, #64748B)",
+                        borderRadius: 0,
+                        background: isSelected ? "var(--accent-cobalt, #0052FF)" : "var(--surface-sunken, #F4F4F5)",
+                        color: isSelected ? "#FFFFFF" : "var(--ink-secondary, #71717A)",
                         fontWeight: 700,
                       }}
                     >
@@ -414,9 +417,9 @@ export default function EditorialHeader({
               alignItems: "center",
               gap: "8px",
               padding: "4px 10px",
-              background: "var(--bg-surface-alt)",
-              border: "1px solid var(--border-default)",
-              borderRadius: "var(--radius-sm)",
+              background: "var(--surface-sunken, #F4F4F5)",
+              border: "1px solid var(--border-subtle, #E4E4E7)",
+              borderRadius: 0,
               cursor: "pointer",
               transition: "all 0.15s ease",
             }}
@@ -427,7 +430,7 @@ export default function EditorialHeader({
                   fontFamily: "var(--font-sans)",
                   fontSize: "0.76rem",
                   fontWeight: 700,
-                  color: "var(--ink-primary)",
+                  color: "var(--ink-primary, #09090B)",
                   lineHeight: 1.1,
                 }}
               >
@@ -437,7 +440,7 @@ export default function EditorialHeader({
                 style={{
                   fontFamily: "var(--font-mono)",
                   fontSize: "0.58rem",
-                  color: "var(--accent-blue)",
+                  color: "var(--accent-cobalt, #0052FF)",
                   textTransform: "uppercase",
                   letterSpacing: "0.06em",
                   fontWeight: 700,
@@ -456,12 +459,12 @@ export default function EditorialHeader({
                 position: "absolute",
                 top: "100%",
                 right: 0,
-                marginTop: "6px",
+                marginTop: "4px",
                 width: "230px",
-                background: "var(--bg-surface)",
-                border: "1px solid var(--border-default)",
-                borderRadius: "var(--radius-xs)",
-                boxShadow: "var(--shadow-md)",
+                background: "var(--surface-base, #FFFFFF)",
+                border: "1px solid var(--border-subtle, #E4E4E7)",
+                borderRadius: 0,
+                boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.08)",
                 padding: "8px",
                 zIndex: 100,
               }}
@@ -511,14 +514,14 @@ export default function EditorialHeader({
                   cursor: "pointer",
                   fontSize: "0.76rem",
                   textAlign: "left",
-                  color: "var(--text-primary)",
-                  borderRadius: "var(--radius-xs)",
+                  color: "var(--ink-primary, #09090B)",
+                  borderRadius: 0,
                 }}
               >
                 <span>{t("header.profile_identity", "Profile & Identity")}</span>
               </button>
 
-              <div style={{ height: "1px", background: "var(--border-subtle)", margin: "4px 0" }} />
+              <div style={{ height: "1px", background: "var(--border-subtle, #E4E4E7)", margin: "4px 0" }} />
 
               <button
                 type="button"
@@ -537,8 +540,8 @@ export default function EditorialHeader({
                   cursor: "pointer",
                   fontSize: "0.76rem",
                   textAlign: "left",
-                  color: "var(--risk-high)",
-                  borderRadius: "var(--radius-xs)",
+                  color: "var(--state-error, #E11D48)",
+                  borderRadius: 0,
                 }}
                 title="Log out to switch role or account"
               >

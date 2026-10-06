@@ -14,7 +14,7 @@ export const StorageService = {
   saveTwin: (twinData) => {
     try {
       const twins = StorageService.getTwins();
-      const id = twinData.id || `DT-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      const id = twinData.id || `DT-${Date.now().toString(36).toUpperCase()}`;
       const record = { ...twinData, id, updatedAt: new Date().toISOString() };
       twins[id] = record;
       localStorage.setItem(STORAGE_KEYS.TWINS, JSON.stringify(twins));
@@ -39,7 +39,7 @@ export const StorageService = {
   saveReport: (reportData) => {
     try {
       const reports = StorageService.getReports();
-      const id = reportData.id || `RPT-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      const id = reportData.id || `RPT-${Date.now().toString(36).toUpperCase()}`;
       const record = { ...reportData, id, createdAt: new Date().toISOString() };
       reports[id] = record;
       localStorage.setItem(STORAGE_KEYS.REPORTS, JSON.stringify(reports));

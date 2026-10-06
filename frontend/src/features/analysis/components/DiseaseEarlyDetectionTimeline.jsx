@@ -171,76 +171,13 @@ export default function DiseaseEarlyDetectionTimeline({
   const clinicalThresholdY = getY(clinicalThresholdVal);
   const qmlThresholdY = getY(qmlThresholdVal);
 
-  if (patientRiskScore === null && patientPrediction === null) {
-    return (
-      <div
-        className="disease-early-timeline-card"
-        style={{
-          background: "var(--bg-surface, #FFFFFF)",
-          border: "1px solid var(--border-default, #E2E8F0)",
-          borderRadius: "var(--radius-md, 6px)",
-          padding: "36px 24px",
-          textAlign: "center",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "14px",
-        }}
-      >
-        <div
-          style={{
-            width: "48px",
-            height: "48px",
-            borderRadius: "50%",
-            background: "var(--primary-soft, #E0F2FE)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "var(--primary, #0284C7)",
-          }}
-        >
-          <Activity size={24} />
-        </div>
-        <div>
-          <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text-primary, #0F172A)", margin: "0 0 6px" }}>
-            {t("early_detection.no_analysis_title", "No Clinical Analysis Performed Yet")}
-          </h3>
-          <p style={{ fontSize: "0.85rem", color: "var(--text-secondary, #64748B)", maxWidth: "480px", margin: "0 auto", lineHeight: 1.5 }}>
-            {t("early_detection.no_analysis_desc", "Personal longitudinal early detection curves and risk trajectories are only generated after completing a verified diagnostic screening. Run an instant checkup to establish your baseline.")}
-          </p>
-        </div>
-        {onStartAnalysis && (
-          <button
-            type="button"
-            className="btn-primary"
-            onClick={onStartAnalysis}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "10px 20px",
-              fontSize: "0.85rem",
-              fontWeight: 600,
-              borderRadius: "var(--radius-sm, 4px)",
-              cursor: "pointer",
-            }}
-          >
-            <Activity size={16} />
-            <span>{t("actions.run_checkup", "Run Instant Quantum AI Checkup")}</span>
-          </button>
-        )}
-      </div>
-    );
-  }
-
   return (
     <div
       className="disease-early-timeline-card"
       style={{
         background: "var(--bg-surface, #FFFFFF)",
         border: "1px solid var(--border-default, #E2E8F0)",
-        borderRadius: "var(--radius-lg, 12px)",
+        borderRadius: "0px",
         boxShadow: "var(--shadow-card, 0 2px 8px rgba(0,0,0,0.04))",
         padding: "20px",
         display: "flex",
@@ -266,7 +203,7 @@ export default function DiseaseEarlyDetectionTimeline({
               style={{
                 fontSize: "0.74rem",
                 padding: "5px 12px",
-                borderRadius: "var(--radius-pill, 9999px)",
+                borderRadius: "0px",
                 border: d.id === activeDiseaseId ? `1px solid ${d.accentColor}` : "1px solid var(--border-default, #E2E8F0)",
                 background: d.id === activeDiseaseId ? d.accentColor : "transparent",
                 color: d.id === activeDiseaseId ? "#FFFFFF" : "var(--text-primary, #0F172A)",
@@ -292,9 +229,9 @@ export default function DiseaseEarlyDetectionTimeline({
                 textTransform: "uppercase",
                 letterSpacing: "0.06em",
                 color: activeDisease.accentColor,
-                background: activeDisease.accentBg || "rgba(0, 242, 254, 0.1)",
+                background: activeDisease.accentBg || "rgba(0, 82, 255, 0.08)",
                 padding: "3px 8px",
-                borderRadius: "4px",
+                borderRadius: "0px",
               }}
             >
               {t("early_detection.pathway_badge", "Early Detection Pathway")}
@@ -310,7 +247,7 @@ export default function DiseaseEarlyDetectionTimeline({
                   background: "#ECFDF5",
                   border: "1px solid #A7F3D0",
                   padding: "2px 7px",
-                  borderRadius: "4px",
+                  borderRadius: "0px",
                 }}
               >
                 {t("early_detection.personalized_assessment", "Personalized Assessment")}
@@ -326,7 +263,7 @@ export default function DiseaseEarlyDetectionTimeline({
                   background: "#F1F5F9",
                   border: "1px solid #CBD5E1",
                   padding: "2px 7px",
-                  borderRadius: "4px",
+                  borderRadius: "0px",
                 }}
               >
                 {t("early_detection.population_model", "Reference Population Model")}
@@ -352,7 +289,7 @@ export default function DiseaseEarlyDetectionTimeline({
             style={{
               background: "var(--bg-canvas, #F8FAFC)",
               border: "1px solid var(--border-default, #E2E8F0)",
-              borderRadius: "8px",
+              borderRadius: "0px",
               padding: "8px 12px",
               minWidth: "110px",
             }}
@@ -373,7 +310,7 @@ export default function DiseaseEarlyDetectionTimeline({
             style={{
               background: "var(--bg-canvas, #F8FAFC)",
               border: "1px solid var(--border-default, #E2E8F0)",
-              borderRadius: "8px",
+              borderRadius: "0px",
               padding: "8px 12px",
               minWidth: "120px",
             }}
@@ -394,7 +331,7 @@ export default function DiseaseEarlyDetectionTimeline({
             style={{
               background: "var(--bg-canvas, #F8FAFC)",
               border: "1px solid var(--border-default, #E2E8F0)",
-              borderRadius: "8px",
+              borderRadius: "0px",
               padding: "8px 12px",
               minWidth: "120px",
             }}
@@ -402,7 +339,7 @@ export default function DiseaseEarlyDetectionTimeline({
             <div style={{ fontSize: "0.64rem", color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase" }}>
               {t("early_detection.sensitivity_gain", "Sensitivity Gain")}
             </div>
-            <div style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--primary, #0284C7)", fontFamily: "var(--font-mono)" }}>
+            <div style={{ fontSize: "1.05rem", fontWeight: 800, color: "#0052FF", fontFamily: "var(--font-mono)" }}>
               {currentEarlyDet.sensitivityGain?.split(" ")[0] || "+4.2%"}
             </div>
             <div style={{ fontSize: "0.62rem", color: "var(--text-secondary)", fontWeight: 500 }}>
@@ -413,15 +350,15 @@ export default function DiseaseEarlyDetectionTimeline({
       </div>
 
       {/* Live Patient Calibration Banner */}
-      {hasPatientData && (
+      {hasPatientData ? (
         <div
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            background: "linear-gradient(90deg, rgba(2, 132, 199, 0.08) 0%, rgba(16, 185, 129, 0.08) 100%)",
-            border: "1px solid rgba(2, 132, 199, 0.25)",
-            borderRadius: "8px",
+            background: "#F0FDF4",
+            border: "1px solid #BBF7D0",
+            borderRadius: "0px",
             padding: "9px 14px",
             fontSize: "0.76rem",
             color: "var(--text-primary, #0F172A)",
@@ -433,11 +370,10 @@ export default function DiseaseEarlyDetectionTimeline({
             <span
               style={{
                 display: "inline-block",
-                width: "8px",
-                height: "8px",
-                borderRadius: "50%",
+                width: "6px",
+                height: "6px",
+                borderRadius: "0px",
                 background: "#10B981",
-                boxShadow: "0 0 0 3px rgba(16, 185, 129, 0.25)",
               }}
             />
             <span>
@@ -458,6 +394,60 @@ export default function DiseaseEarlyDetectionTimeline({
             {t("early_detection.trajectory_divergence", "Action Window:")} {personalizedLeadTime}
           </div>
         </div>
+      ) : (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            background: "#F8FAFC",
+            border: "1px solid #E2E8F0",
+            borderRadius: "0px",
+            padding: "9px 14px",
+            fontSize: "0.76rem",
+            color: "var(--text-primary, #0F172A)",
+            gap: "10px",
+            flexWrap: "wrap",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span
+              style={{
+                display: "inline-block",
+                width: "6px",
+                height: "6px",
+                borderRadius: "0px",
+                background: "#0052FF",
+              }}
+            />
+            <span>
+              <strong>{t("early_detection.population_model_title", "Reference Population Trajectory:")}</strong>{" "}
+              {t("early_detection.population_model_desc", "Pre-clinical progression modeled from multi-cohort clinical trials. Run a checkup to calibrate your personalized curve.")}
+            </span>
+          </div>
+          {onStartAnalysis && (
+            <button
+              type="button"
+              onClick={() => onStartAnalysis(activeDisease.studyKey || activeDiseaseId)}
+              style={{
+                background: "#0052FF",
+                color: "#FFFFFF",
+                border: "none",
+                borderRadius: "0px",
+                padding: "5px 12px",
+                fontSize: "0.72rem",
+                fontWeight: 700,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "5px",
+              }}
+            >
+              <Activity size={12} />
+              <span>{t("actions.calibrate_checkup", "Calibrate Trajectory")}</span>
+            </button>
+          )}
+        </div>
       )}
 
       {/* ── 3. INTERACTIVE PROGRESSION & INTERVENTION GRAPH (SVG) ── */}
@@ -465,7 +455,7 @@ export default function DiseaseEarlyDetectionTimeline({
         style={{
           background: "var(--bg-canvas, #F8FAFC)",
           border: "1px solid var(--border-default, #E2E8F0)",
-          borderRadius: "10px",
+          borderRadius: "0px",
           padding: "16px 12px 10px",
           position: "relative",
         }}
@@ -474,13 +464,13 @@ export default function DiseaseEarlyDetectionTimeline({
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px", paddingBottom: "8px", fontSize: "0.72rem" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <span style={{ width: "12px", height: "3px", background: "#DC2626", borderRadius: "2px" }} />
+              <span style={{ width: "12px", height: "3px", background: "#DC2626", borderRadius: "0px" }} />
               <strong style={{ color: "#DC2626" }}>{t("early_detection.unmonitored_progression", "Unmonitored Progression")}</strong>
               <span style={{ color: "var(--text-muted)", fontSize: "0.66rem" }}>(Crosses severe threshold)</span>
             </div>
 
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <span style={{ width: "12px", height: "3px", background: "#16A34A", borderRadius: "2px" }} />
+              <span style={{ width: "12px", height: "3px", background: "#16A34A", borderRadius: "0px" }} />
               <strong style={{ color: "#16A34A" }}>{t("early_detection.quantum_intervention", "Quantum Early Intervention")}</strong>
               <span style={{ color: "var(--text-muted)", fontSize: "0.66rem" }}>(Intercepted & stabilized)</span>
             </div>
@@ -491,8 +481,8 @@ export default function DiseaseEarlyDetectionTimeline({
               <span style={{ width: "8px", height: "1px", borderTop: "2px dashed #D97706" }} />
               <span>{t("early_detection.standard_threshold", `Standard Symptom Threshold (${clinicalThresholdVal}%)`)}</span>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "4px", color: "var(--primary, #0284C7)", fontSize: "0.68rem", fontWeight: 600 }}>
-              <span style={{ width: "8px", height: "1px", borderTop: "2px dashed var(--primary, #0284C7)" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: "4px", color: "var(--primary, #0052FF)", fontSize: "0.68rem", fontWeight: 600 }}>
+              <span style={{ width: "8px", height: "1px", borderTop: "2px dashed var(--primary, #0052FF)" }} />
               <span>{t("early_detection.quantum_horizon", `Quantum Detection Horizon (${qmlThresholdVal}%)`)}</span>
             </div>
           </div>
@@ -506,8 +496,8 @@ export default function DiseaseEarlyDetectionTimeline({
           <defs>
             {/* Shading for Early Detection Opportunity Window */}
             <linearGradient id={`windowGrad-${activeDiseaseId}`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="var(--primary, #0284C7)" stopOpacity="0.10" />
-              <stop offset="100%" stopColor="var(--primary, #0284C7)" stopOpacity="0.02" />
+              <stop offset="0%" stopColor="var(--primary, #0052FF)" stopOpacity="0.10" />
+              <stop offset="100%" stopColor="var(--primary, #0052FF)" stopOpacity="0.02" />
             </linearGradient>
 
             {/* Shading for Risk Divergence Zone */}
@@ -555,14 +545,14 @@ export default function DiseaseEarlyDetectionTimeline({
                 width={windowW}
                 height={chartH}
                 fill={`url(#windowGrad-${activeDiseaseId})`}
-                rx="4"
+                rx="0"
               />
               <line
                 x1={windowX1}
                 y1={padTop}
                 x2={windowX1}
                 y2={padTop + chartH}
-                stroke="var(--primary, #0284C7)"
+                stroke="var(--primary, #0052FF)"
                 strokeWidth="1.5"
                 strokeDasharray="3,3"
                 opacity="0.6"
@@ -573,7 +563,7 @@ export default function DiseaseEarlyDetectionTimeline({
                 textAnchor="middle"
                 fontSize="9"
                 fontWeight="700"
-                fill="var(--primary, #0284C7)"
+                fill="var(--primary, #0052FF)"
                 letterSpacing="0.04em"
               >
                 {t("early_detection.window_label", `EARLY DETECTION WINDOW (${currentEarlyDet.leadTime?.toUpperCase()})`, { months: currentEarlyDet.leadTime?.toUpperCase() })}
@@ -599,7 +589,7 @@ export default function DiseaseEarlyDetectionTimeline({
             y1={qmlThresholdY}
             x2={svgWidth - padRight}
             y2={qmlThresholdY}
-            stroke="var(--primary, #0284C7)"
+            stroke="var(--primary, #0052FF)"
             strokeWidth="1.5"
             strokeDasharray="4,4"
             opacity="0.8"
@@ -773,7 +763,7 @@ export default function DiseaseEarlyDetectionTimeline({
               background: "#0F172A",
               color: "#FFFFFF",
               padding: "8px 12px",
-              borderRadius: "6px",
+              borderRadius: "0px",
               boxShadow: "0 8px 20px rgba(0,0,0,0.3)",
               fontSize: "0.72rem",
               pointerEvents: "none",
@@ -781,7 +771,7 @@ export default function DiseaseEarlyDetectionTimeline({
               maxWidth: "220px",
             }}
           >
-            <div style={{ fontWeight: 800, color: "var(--primary, #38BDF8)", marginBottom: "2px" }}>
+            <div style={{ fontWeight: 800, color: "#38BDF8", marginBottom: "2px" }}>
               {hoveredPoint.stage}
             </div>
             <div style={{ fontSize: "0.68rem", color: "#CBD5E1" }}>
@@ -809,7 +799,7 @@ export default function DiseaseEarlyDetectionTimeline({
                 alignItems: "flex-start",
                 gap: "3px",
                 padding: "10px 14px",
-                borderRadius: "8px",
+                borderRadius: "0px",
                 border: isSelected ? `2px solid ${stg.badgeColor || "var(--primary)"}` : "1px solid var(--border-default, #E2E8F0)",
                 background: isSelected ? "var(--bg-surface, #FFFFFF)" : "var(--bg-canvas, #F8FAFC)",
                 boxShadow: isSelected ? "0 4px 12px rgba(0,0,0,0.06)" : "none",
@@ -858,7 +848,7 @@ export default function DiseaseEarlyDetectionTimeline({
           style={{
             background: "var(--bg-canvas, #F8FAFC)",
             border: `1px solid ${activeStage.badgeColor || "var(--border-default)"}44`,
-            borderRadius: "10px",
+            borderRadius: "0px",
             padding: "16px",
             display: "flex",
             flexDirection: "column",
@@ -869,9 +859,9 @@ export default function DiseaseEarlyDetectionTimeline({
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <div
                 style={{
-                  width: "28px",
-                  height: "28px",
-                  borderRadius: "50%",
+                  width: "24px",
+                  height: "24px",
+                  borderRadius: "0px",
                   background: activeStage.badgeColor || "var(--primary)",
                   color: "#FFFFFF",
                   display: "flex",
@@ -898,7 +888,7 @@ export default function DiseaseEarlyDetectionTimeline({
                 fontSize: "0.72rem",
                 fontWeight: 700,
                 padding: "4px 10px",
-                borderRadius: "var(--radius-pill, 9999px)",
+                borderRadius: "0px",
                 background: `${activeStage.badgeColor || "var(--primary)"}22`,
                 color: activeStage.badgeColor || "var(--primary)",
               }}
@@ -914,7 +904,7 @@ export default function DiseaseEarlyDetectionTimeline({
               style={{
                 background: "var(--bg-surface, #FFFFFF)",
                 border: "1px solid var(--border-default, #E2E8F0)",
-                borderRadius: "8px",
+                borderRadius: "0px",
                 padding: "12px",
               }}
             >
@@ -932,7 +922,7 @@ export default function DiseaseEarlyDetectionTimeline({
               style={{
                 background: "var(--bg-surface, #FFFFFF)",
                 border: "1px solid var(--border-default, #E2E8F0)",
-                borderRadius: "8px",
+                borderRadius: "0px",
                 padding: "12px",
               }}
             >
@@ -950,12 +940,12 @@ export default function DiseaseEarlyDetectionTimeline({
               style={{
                 background: "var(--bg-surface, #FFFFFF)",
                 border: "1px solid var(--border-default, #E2E8F0)",
-                borderRadius: "8px",
+                borderRadius: "0px",
                 padding: "12px",
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.68rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", marginBottom: "4px" }}>
-                <Zap size={13} color="var(--primary, #0284C7)" />
+                <Zap size={13} color="#0052FF" />
                 <span>{t("early_detection.detection_engine_title", "Quantum AI Detection Engine")}</span>
               </div>
               <p style={{ fontSize: "0.75rem", color: "var(--text-primary)", margin: 0, lineHeight: 1.4 }}>
@@ -968,7 +958,7 @@ export default function DiseaseEarlyDetectionTimeline({
               style={{
                 background: "var(--bg-surface, #FFFFFF)",
                 border: "1px solid var(--border-default, #E2E8F0)",
-                borderRadius: "8px",
+                borderRadius: "0px",
                 padding: "12px",
               }}
             >
@@ -988,13 +978,13 @@ export default function DiseaseEarlyDetectionTimeline({
       {currentEarlyDet.preventiveActions && currentEarlyDet.preventiveActions.length > 0 && (
         <div
           style={{
-            background: "rgba(2, 132, 199, 0.04)",
-            border: "1px solid rgba(2, 132, 199, 0.2)",
-            borderRadius: "8px",
+            background: "rgba(0, 82, 255, 0.04)",
+            border: "1px solid rgba(0, 82, 255, 0.18)",
+            borderRadius: "0px",
             padding: "12px 14px",
           }}
         >
-          <div style={{ fontSize: "0.70rem", fontWeight: 800, color: "var(--primary, #0284C7)", textTransform: "uppercase", marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px" }}>
+          <div style={{ fontSize: "0.70rem", fontWeight: 800, color: "#0052FF", textTransform: "uppercase", marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px" }}>
             <Compass size={14} />
             <span>{t("early_detection.prevention_rules_title", "Key Research-Backed Prevention Rules:")}</span>
           </div>
@@ -1023,7 +1013,7 @@ export default function DiseaseEarlyDetectionTimeline({
               background: activeDisease.accentColor,
               color: "#FFFFFF",
               border: "none",
-              borderRadius: "6px",
+              borderRadius: "0px",
               padding: "9px 18px",
               fontSize: "0.82rem",
               fontWeight: 700,
