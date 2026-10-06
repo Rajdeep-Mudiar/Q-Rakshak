@@ -12,6 +12,7 @@ import {
   Play,
   CheckCircle2,
   Atom,
+  ExternalLink,
 } from "lucide-react";
 import { animateModalOpen } from "../../utils/motion";
 import { useLanguage } from "../../context/LanguageContext";
@@ -51,6 +52,54 @@ export default function UserGuideModal({ isOpen, onClose }) {
               <strong style={{ color: "var(--accent-teal)", fontSize: "0.80rem", display: "block" }}>DPDP & HIPAA Security</strong>
               <span>Your medical data is encrypted and protected with complete data privacy controls.</span>
             </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      badge: "Video Walkthrough",
+      title: "Watch Interactive Platform Tour",
+      subtitle: "Official YouTube Demonstration Playlist • 4K HD",
+      icon: Play,
+      iconColor: "#DC2626",
+      content: (
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div style={{ position: "relative", width: "100%", background: "#09090B", border: "1px solid var(--border-default)", overflow: "hidden" }}>
+            <div style={{ position: "relative", paddingBottom: "52%", height: 0, overflow: "hidden" }}>
+              <iframe
+                src="https://www.youtube-nocookie.com/embed/videoseries?list=PLCPZnDFwe2SE&rel=0&modestbranding=1"
+                title="Q-Rakshak Platform Video Guide"
+                style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: 0 }}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            </div>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "6px" }}>
+            <span style={{ fontSize: "0.72rem", color: "var(--text-secondary)" }}>
+              Includes 3D Twin Walkthrough, Quantum VQC Model Analysis, & E-Prescription demos.
+            </span>
+            <a
+              href="https://www.youtube.com/playlist?list=PLCPZnDFwe2SE"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "5px",
+                fontSize: "0.70rem",
+                fontWeight: 800,
+                color: "#DC2626",
+                textDecoration: "none",
+                fontFamily: "var(--font-mono, monospace)",
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+              </svg>
+              <span>Open in YouTube</span>
+              <ExternalLink size={11} />
+            </a>
           </div>
         </div>
       ),
@@ -152,7 +201,7 @@ export default function UserGuideModal({ isOpen, onClose }) {
         className="modal-content"
         onClick={(e) => e.stopPropagation()}
         style={{
-          maxWidth: "640px",
+          maxWidth: "740px",
           padding: "28px",
           borderRadius: "var(--radius-sm)",
           border: "1px solid var(--border-default)",

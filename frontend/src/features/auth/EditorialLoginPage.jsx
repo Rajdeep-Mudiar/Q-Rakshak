@@ -20,10 +20,12 @@ import {
   Stethoscope,
   Heart,
   Zap,
-  ArrowRight
+  ArrowRight,
+  Play
 } from "lucide-react";
 import { animateErrorShake } from "../../utils/motion.js";
 import ModelEvaluationShowcase from "./components/ModelEvaluationShowcase.jsx";
+import VideoWalkthroughModal from "../../components/common/VideoWalkthroughModal.jsx";
 import { authApi } from "../../api/auth.js";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 
@@ -35,6 +37,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
   const { language, setLanguage, availableLanguages, t } = useLanguage();
   const [gisLoading, setGisLoading] = useState(false);
   const [localError, setLocalError] = useState(null);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState("login"); // 'login' | 'register'
   const [selectedRole, setSelectedRole] = useState("patient"); // 'patient' | 'doctor' | 'admin'
   const [username, setUsername] = useState("alex.patient");
@@ -415,6 +418,48 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            <button
+              type="button"
+              onClick={() => setIsVideoModalOpen(true)}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "7px",
+                padding: "6px 14px",
+                background: "#FFFFFF",
+                color: "#0052FF",
+                border: "1px solid #BFDBFE",
+                fontSize: "0.70rem",
+                fontWeight: 800,
+                cursor: "pointer",
+                fontFamily: "var(--font-mono, monospace)",
+                letterSpacing: "0.04em",
+                textTransform: "uppercase",
+                boxShadow: "0 1px 4px rgba(0, 82, 255, 0.08)",
+                transition: "all 0.18s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = "#0052FF";
+                e.currentTarget.style.background = "#EFF6FF";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "#BFDBFE";
+                e.currentTarget.style.background = "#FFFFFF";
+              }}
+            >
+              <span
+                style={{
+                  width: "6px",
+                  height: "6px",
+                  borderRadius: "50%",
+                  background: "#DC2626",
+                  display: "inline-block",
+                  animation: "pulsePip 1.4s infinite ease-in-out",
+                }}
+              />
+              <Play size={12} fill="#0052FF" color="#0052FF" />
+              <span>Video Guide</span>
+            </button>
             <a
               href="#CLASSICALvsQUANTUMN"
               style={{
@@ -718,6 +763,102 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
               >
                 <Cpu size={12} color="#0052FF" />
                 <span>8-Qubit VQC Engine</span>
+              </div>
+            </div>
+
+            {/* ── Sexy Video Walkthrough Preview Card ── */}
+            <div
+              className="video-walkthrough-preview-card"
+              onClick={() => setIsVideoModalOpen(true)}
+              style={{
+                background: "#FFFFFF",
+                border: "1px solid #E4E4E7",
+                borderLeft: "3px solid #0052FF",
+                padding: "10px 14px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "12px",
+                boxShadow: "0 2px 8px rgba(0, 82, 255, 0.04)",
+                transition: "all 0.18s cubic-bezier(0.16, 1, 0.3, 1)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = "#0052FF";
+                e.currentTarget.style.transform = "translateY(-1px)";
+                e.currentTarget.style.boxShadow = "0 6px 20px rgba(0, 82, 255, 0.10)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "#E4E4E7";
+                e.currentTarget.style.borderLeft = "3px solid #0052FF";
+                e.currentTarget.style.transform = "none";
+                e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 82, 255, 0.04)";
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <div
+                  style={{
+                    width: "34px",
+                    height: "34px",
+                    background: "#0052FF",
+                    color: "#FFFFFF",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                    boxShadow: "0 2px 6px rgba(0, 82, 255, 0.3)",
+                  }}
+                >
+                  <Play size={14} fill="#FFFFFF" style={{ marginLeft: "2px" }} />
+                </div>
+                <div style={{ textAlign: "left" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span
+                      style={{
+                        fontSize: "0.60rem",
+                        fontWeight: 900,
+                        color: "#0052FF",
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
+                        fontFamily: "var(--font-mono, monospace)",
+                      }}
+                    >
+                      PLATFORM VIDEO GUIDE
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "0.56rem",
+                        background: "#EFF6FF",
+                        color: "#0052FF",
+                        padding: "1px 5px",
+                        fontWeight: 800,
+                        fontFamily: "var(--font-mono, monospace)",
+                      }}
+                    >
+                      4 EPISODES • 4K
+                    </span>
+                  </div>
+                  <div style={{ fontSize: "0.78rem", fontWeight: 800, color: "#18181B", lineHeight: 1.25 }}>
+                    Interactive System & 3D Twin Walkthrough
+                  </div>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "4px",
+                  fontSize: "0.68rem",
+                  fontWeight: 800,
+                  color: "#0052FF",
+                  fontFamily: "var(--font-mono, monospace)",
+                  textTransform: "uppercase",
+                  flexShrink: 0,
+                }}
+              >
+                <span>Watch</span>
+                <ArrowRight size={12} />
               </div>
             </div>
           </div>
@@ -1673,6 +1814,13 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
           <span>Governance & Terms</span>
         </div>
       </footer>
+
+      {/* ── Official Video Walkthrough YouTube Playlist Lightbox Modal ── */}
+      <VideoWalkthroughModal
+        isOpen={isVideoModalOpen}
+        onClose={() => setIsVideoModalOpen(false)}
+        playlistId="PLCPZnDFwe2SE"
+      />
     </div>
   );
 }

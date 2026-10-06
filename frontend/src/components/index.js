@@ -3,6 +3,7 @@ export { default as AuthModal } from "./common/AuthModal.jsx";
 export { default as ProfileSettingsModal } from "./common/ProfileSettingsModal.jsx";
 export { default as UserGuideModal } from "./common/UserGuideModal.jsx";
 export { default as SectionGuideModal } from "./common/SectionGuideModal.jsx";
+export { default as VideoWalkthroughModal } from "./common/VideoWalkthroughModal.jsx";
 
 // Visualizations
 export { default as DigitalTwin3D } from "./visualizations/DigitalTwin3D.jsx";
