@@ -723,6 +723,7 @@
   "login": {
     "title": "Sign in to Q-RAKSHAK",
     "create_account": "Create Q-RAKSHAK Account",
+    "tab_create_account": "Create Account",
     "sign_in": "Sign In",
     "register": "Register New Account",
     "username_label": "Username or Identifier",

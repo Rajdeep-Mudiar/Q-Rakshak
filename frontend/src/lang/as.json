@@ -723,6 +723,7 @@
   "login": {
     "title": "Q-RAKSHAK লৈ ছাইন ইন কৰক",
     "create_account": "Q-RAKSHAK একাউণ্ট সৃষ্টি কৰক",
+    "tab_create_account": "একাউণ্ট সৃষ্টি কৰক",
     "sign_in": "ছাইন ইন কৰক",
     "register": "নতুন একাউণ্ট পঞ্জীয়ন কৰক",
     "username_label": "ব্যৱহাৰকাৰীৰ নাম বা পৰিচয়ক",

@@ -1027,7 +1027,7 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                   transition: "all 0.18s ease",
                 }}
               >
-                {t("login.create_account", "Register")}
+                {t("login.tab_create_account", "Create Account")}
               </button>
             </div>
 
@@ -1072,13 +1072,14 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                       key={roleItem.id}
                       type="button"
                       onClick={() => handleRoleSelect(roleItem.id)}
-                      className="planar-role-tile"
+                      className={`planar-role-tile ${isSelected ? "active" : ""}`}
                       style={{
+                        position: "relative",
                         border: isSelected ? "1.5px solid #0052FF" : "1px solid #E4E4E7",
                         background: isSelected ? "#FFFFFF" : "#F8FAFC",
                         color: isSelected ? "#0052FF" : "#52525B",
                         padding: "8px 4px",
-                        boxShadow: isSelected ? "0 2px 8px rgba(0, 82, 255, 0.08)" : "none",
+                        boxShadow: isSelected ? "0 2px 10px rgba(0, 82, 255, 0.10)" : "none",
                       }}
                     >
                       {/* Top Accent Strip on Selected Tile */}
@@ -1143,26 +1144,8 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                       placeholder="e.g. alex.patient"
                       autoComplete="username"
                       required
-                      style={{
-                        width: "100%",
-                        padding: "10px 12px 10px 36px",
-                        border: "1px solid #E4E4E7",
-                        fontSize: "0.88rem",
-                        color: "#18181B",
-                        background: "#FFFFFF",
-                        boxSizing: "border-box",
-                        outline: "none",
-                        fontFamily: "var(--font-mono, monospace)",
-                        transition: "border-color 0.15s ease",
-                      }}
-                      onFocus={(e) => {
-                        e.target.style.borderColor = "#0052FF";
-                        e.target.style.outline = "1px solid #0052FF";
-                      }}
-                      onBlur={(e) => {
-                        e.target.style.borderColor = "#E4E4E7";
-                        e.target.style.outline = "none";
-                      }}
+                      className="editorial-auth-input"
+                      style={{ paddingLeft: "36px", paddingRight: "12px" }}
                     />
                     <User size={15} color="#A1A1AA" style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)" }} />
                   </div>
@@ -1193,25 +1176,8 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                       placeholder="Enter password"
                       autoComplete="current-password"
                       required
-                      style={{
-                        width: "100%",
-                        padding: "10px 36px 10px 36px",
-                        border: "1px solid #E4E4E7",
-                        fontSize: "0.88rem",
-                        color: "#18181B",
-                        background: "#FFFFFF",
-                        boxSizing: "border-box",
-                        outline: "none",
-                        transition: "border-color 0.15s ease",
-                      }}
-                      onFocus={(e) => {
-                        e.target.style.borderColor = "#0052FF";
-                        e.target.style.outline = "1px solid #0052FF";
-                      }}
-                      onBlur={(e) => {
-                        e.target.style.borderColor = "#E4E4E7";
-                        e.target.style.outline = "none";
-                      }}
+                      className="editorial-auth-input"
+                      style={{ paddingLeft: "36px", paddingRight: "36px" }}
                     />
                     <KeyRound size={15} color="#A1A1AA" style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)" }} />
                     <button
@@ -1276,7 +1242,8 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                     onChange={(e) => setRegName(e.target.value)}
                     placeholder="e.g. Dr. Maya Patel / Alex Roy"
                     required
-                    style={{ width: "100%", padding: "9px 12px", border: "1px solid #E4E4E7", fontSize: "0.85rem", boxSizing: "border-box", outline: "none" }}
+                    className="editorial-auth-input"
+                    style={{ padding: "0 12px" }}
                   />
                 </div>
 
@@ -1290,7 +1257,8 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                     onChange={(e) => setRegEmail(e.target.value)}
                     placeholder="name@hospital.org"
                     required
-                    style={{ width: "100%", padding: "9px 12px", border: "1px solid #E4E4E7", fontSize: "0.85rem", boxSizing: "border-box", outline: "none" }}
+                    className="editorial-auth-input"
+                    style={{ padding: "0 12px" }}
                   />
                 </div>
 
@@ -1305,7 +1273,8 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                       onChange={(e) => setRegUsername(e.target.value)}
                       placeholder="handle"
                       required
-                      style={{ width: "100%", padding: "9px 10px", border: "1px solid #E4E4E7", fontSize: "0.85rem", boxSizing: "border-box", outline: "none", fontFamily: "var(--font-mono, monospace)" }}
+                      className="editorial-auth-input"
+                      style={{ padding: "0 10px" }}
                     />
                   </div>
                   <div style={{ textAlign: "left" }}>
@@ -1318,7 +1287,8 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                       onChange={(e) => setRegPassword(e.target.value)}
                       placeholder="••••••••"
                       required
-                      style={{ width: "100%", padding: "9px 10px", border: "1px solid #E4E4E7", fontSize: "0.85rem", boxSizing: "border-box", outline: "none" }}
+                      className="editorial-auth-input"
+                      style={{ padding: "0 10px" }}
                     />
                   </div>
                 </div>
@@ -1332,7 +1302,8 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                     value={regPhone}
                     onChange={(e) => setRegPhone(e.target.value)}
                     placeholder="+91 98XXX XXXXX"
-                    style={{ width: "100%", padding: "9px 12px", border: "1px solid #E4E4E7", fontSize: "0.85rem", boxSizing: "border-box", outline: "none", fontFamily: "var(--font-mono, monospace)" }}
+                    className="editorial-auth-input"
+                    style={{ padding: "0 12px" }}
                   />
                 </div>
 
@@ -1420,18 +1391,19 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
             <div
               style={{
                 marginTop: "14px",
-                padding: "8px 10px",
+                padding: "8px 12px",
                 background: "#F8FAFC",
                 border: "1px solid #E4E4E7",
                 width: "100%",
                 boxSizing: "border-box",
                 display: "flex",
                 alignItems: "center",
+                justifyContent: "center",
                 gap: "8px",
               }}
             >
               <Lock size={12} color="#0052FF" style={{ flexShrink: 0 }} />
-              <span style={{ fontSize: "0.70rem", color: "#71717A", lineHeight: 1.35, fontFamily: "var(--font-mono, monospace)" }}>
+              <span style={{ fontSize: "0.68rem", color: "#71717A", letterSpacing: "0.02em", fontFamily: "var(--font-mono, monospace)" }}>
                 End-to-end encrypted session with cryptographic clinical audit logging.
               </span>
             </div>
