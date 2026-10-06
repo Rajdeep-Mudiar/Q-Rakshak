@@ -10,8 +10,8 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
   const modalRef = useRef(null);
   const [authMode, setAuthMode] = useState("login"); // 'login' | 'register'
   const [selectedRole, setSelectedRole] = useState("patient"); // 'patient' | 'doctor' | 'admin'
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("alex.patient");
+  const [password, setPassword] = useState("patient123");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -101,7 +101,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
       if (onLoginSuccess) onLoginSuccess(data.user);
       onClose();
     } catch (err) {
-      setError(err.message || "Registration failed. Username may already be in use.");
+      setError(err.message || "Registration failed. Please check your inputs.");
     } finally {
       setLoading(false);
     }
@@ -117,37 +117,37 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
         aria-labelledby="auth-modal-title"
         onClick={(e) => e.stopPropagation()}
         style={{
-          maxWidth: "640px",
+          maxWidth: "600px",
           padding: "24px 28px",
-          borderRadius: "14px",
-          border: "1px solid var(--border-default)",
-          boxShadow: "var(--shadow-modal)",
-          background: "var(--bg-surface)",
+          borderRadius: "0px",
+          border: "1px solid #E4E4E7",
+          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.08)",
+          background: "#FFFFFF",
         }}
       >
         {/* Header */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px", borderBottom: "1px solid var(--border-default)", paddingBottom: "10px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px", borderBottom: "1px solid #E4E4E7", paddingBottom: "10px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "var(--primary)", color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <KeyRound size={18} />
+            <div style={{ width: "30px", height: "30px", borderRadius: "0px", background: "#0052FF", color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <KeyRound size={16} />
             </div>
             <div>
-              <div style={{ fontSize: "0.64rem", fontWeight: 700, color: "var(--primary)", letterSpacing: "0.06em", textTransform: "uppercase", fontFamily: "var(--font-mono)" }}>
-                CLINICAL ACCESS
+              <div style={{ fontSize: "0.62rem", fontWeight: 800, color: "#0052FF", letterSpacing: "0.08em", textTransform: "uppercase", fontFamily: "var(--font-mono, monospace)" }}>
+                CLINICAL ACCESS GATEWAY
               </div>
-              <h2 id="auth-modal-title" style={{ fontSize: "1.15rem", fontWeight: 700, color: "var(--text-primary)", margin: "2px 0 0 0", letterSpacing: "-0.01em" }}>
+              <h2 id="auth-modal-title" style={{ fontSize: "1.10rem", fontWeight: 800, color: "#18181B", margin: "2px 0 0 0", letterSpacing: "-0.01em", textTransform: "uppercase" }}>
                 {authMode === "register" ? t("login.create_account", "Register Account") : t("login.sign_in", "Sign In")}
               </h2>
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             {/* Language Switcher */}
-            <div style={{ display: "inline-flex", alignItems: "center", gap: "2px", background: "var(--bg-surface-alt)", padding: "2px 4px", borderRadius: "6px" }}>
-              <Languages size={13} color="var(--text-muted)" style={{ marginRight: "2px" }} />
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "2px", background: "#F4F4F5", padding: "2px", borderRadius: "0px", border: "1px solid #E4E4E7" }}>
+              <Languages size={12} color="#71717A" style={{ marginLeft: "4px", marginRight: "2px" }} />
               {(availableLanguages || [
-                { code: "en", label: "English", nativeName: "EN" },
-                { code: "hi", label: "Hindi", nativeName: "हिं" },
-                { code: "as", label: "Assamese", nativeName: "অ" },
+                { code: "en", label: "EN", nativeName: "EN" },
+                { code: "hi", label: "HI", nativeName: "HI" },
+                { code: "as", label: "AS", nativeName: "AS" },
               ]).map((lang) => {
                 const isActive = language === lang.code;
                 return (
@@ -158,15 +158,16 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                     style={{
                       padding: "2px 6px",
                       fontSize: "0.68rem",
-                      fontWeight: isActive ? 700 : 500,
-                      borderRadius: "4px",
+                      fontWeight: isActive ? 800 : 600,
+                      borderRadius: "0px",
                       border: "none",
-                      background: isActive ? "var(--primary)" : "transparent",
-                      color: isActive ? "#FFFFFF" : "var(--text-secondary)",
+                      fontFamily: "var(--font-mono, monospace)",
+                      background: isActive ? "#0052FF" : "transparent",
+                      color: isActive ? "#FFFFFF" : "#71717A",
                       cursor: "pointer",
                     }}
                   >
-                    {lang.nativeName || lang.label}
+                    {lang.code.toUpperCase()}
                   </button>
                 );
               })}
@@ -175,28 +176,31 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
             <button
               type="button"
               onClick={onClose}
-              style={{ background: "transparent", border: 0, cursor: "pointer", color: "var(--text-muted)", padding: "4px" }}
+              style={{ background: "transparent", border: 0, cursor: "pointer", color: "#71717A", padding: "4px" }}
               title="Close"
             >
-              <X size={20} />
+              <X size={18} />
             </button>
           </div>
         </div>
 
         {/* Mode Switcher Tabs */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px", marginBottom: "12px", background: "var(--bg-surface-alt)", padding: "4px", borderRadius: "9px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px", marginBottom: "12px", background: "#F4F4F5", padding: "2px", borderRadius: "0px", border: "1px solid #E4E4E7" }}>
           <button
             type="button"
             onClick={() => setAuthMode("login")}
             style={{
-              padding: "8px 10px",
+              padding: "7px 10px",
               background: authMode === "login" ? "#FFFFFF" : "transparent",
-              color: authMode === "login" ? "var(--primary)" : "var(--text-secondary)",
+              color: authMode === "login" ? "#0052FF" : "#71717A",
               border: 0,
-              borderRadius: "7px",
-              boxShadow: authMode === "login" ? "0 1px 3px rgba(15, 23, 42, 0.08)" : "none",
+              borderRadius: "0px",
+              boxShadow: authMode === "login" ? "0 1px 3px rgba(0, 0, 0, 0.06)" : "none",
               fontSize: "0.76rem",
-              fontWeight: 600,
+              fontWeight: 800,
+              fontFamily: "var(--font-mono, monospace)",
+              letterSpacing: "0.04em",
+              textTransform: "uppercase",
               cursor: "pointer",
               transition: "all 0.16s ease",
             }}
@@ -208,14 +212,17 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
             type="button"
             onClick={() => setAuthMode("register")}
             style={{
-              padding: "8px 10px",
+              padding: "7px 10px",
               background: authMode === "register" ? "#FFFFFF" : "transparent",
-              color: authMode === "register" ? "var(--primary)" : "var(--text-secondary)",
+              color: authMode === "register" ? "#0052FF" : "#71717A",
               border: 0,
-              borderRadius: "7px",
-              boxShadow: authMode === "register" ? "0 1px 3px rgba(15, 23, 42, 0.08)" : "none",
+              borderRadius: "0px",
+              boxShadow: authMode === "register" ? "0 1px 3px rgba(0, 0, 0, 0.06)" : "none",
               fontSize: "0.76rem",
-              fontWeight: 600,
+              fontWeight: 800,
+              fontFamily: "var(--font-mono, monospace)",
+              letterSpacing: "0.04em",
+              textTransform: "uppercase",
               cursor: "pointer",
               transition: "all 0.16s ease",
               display: "flex",
@@ -228,13 +235,13 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
           </button>
         </div>
 
-        {/* Role Switcher Option (Patient, Doctor, Admin) */}
-        <div style={{ marginBottom: "14px" }}>
+        {/* Persona Selector (Patient, Doctor, Admin) */}
+        <div style={{ marginBottom: "12px" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "6px" }}>
             {[
-              { id: "patient", label: t("login.role_patient", "Patient"), icon: User, desc: "Health" },
-              { id: "doctor", label: t("login.role_doctor", "Doctor"), icon: Stethoscope, desc: "OPD" },
-              { id: "admin", label: t("login.role_admin", "Admin"), icon: Shield, desc: "Admin" },
+              { id: "patient", label: t("login.role_patient", "Patient"), icon: User, desc: "3D Twin" },
+              { id: "doctor", label: t("login.role_doctor", "Doctor"), icon: Stethoscope, desc: "OPD & Rx" },
+              { id: "admin", label: t("login.role_admin", "Admin"), icon: Shield, desc: "Audit" },
             ].map((roleItem) => {
               const isSelected = selectedRole === roleItem.id;
               const Icon = roleItem.icon;
@@ -245,22 +252,29 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   onClick={() => handleRoleSelect(roleItem.id)}
                   style={{
                     display: "flex",
+                    flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
-                    gap: "6px",
-                    padding: "7px 4px",
-                    borderRadius: "7px",
-                    border: isSelected ? "1.5px solid var(--primary)" : "1px solid var(--border-default)",
-                    background: isSelected ? "var(--primary-subtle, #F0FDF4)" : "var(--bg-surface-alt)",
-                    color: isSelected ? "var(--primary)" : "var(--text-secondary)",
+                    padding: "8px 4px",
+                    borderRadius: "0px",
+                    border: isSelected ? "1.5px solid #0052FF" : "1px solid #E4E4E7",
+                    background: isSelected ? "#FFFFFF" : "#F8FAFC",
+                    color: isSelected ? "#0052FF" : "#52525B",
                     cursor: "pointer",
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
+                    position: "relative",
                     transition: "all 0.15s ease",
                   }}
                 >
-                  <Icon size={13} />
-                  <span>{roleItem.label}</span>
+                  {isSelected && (
+                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "2px", background: "#0052FF" }} />
+                  )}
+                  <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                    <Icon size={13} color={isSelected ? "#0052FF" : "#71717A"} />
+                    <span style={{ fontSize: "0.76rem", fontWeight: 800 }}>{roleItem.label}</span>
+                  </div>
+                  <span style={{ fontSize: "0.62rem", color: isSelected ? "#0052FF" : "#A1A1AA", marginTop: "2px", fontFamily: "var(--font-mono, monospace)" }}>
+                    {roleItem.desc}
+                  </span>
                 </button>
               );
             })}
@@ -270,8 +284,8 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
         {/* MODE: Sign In Form */}
         {authMode === "login" && (
           <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-              <label style={{ fontSize: "0.70rem", fontWeight: 700, color: "var(--text-secondary)" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px", textAlign: "left" }}>
+              <label style={{ fontSize: "0.68rem", fontWeight: 800, color: "#71717A", textTransform: "uppercase", fontFamily: "var(--font-mono, monospace)" }}>
                 Username or Registered Email
               </label>
               <input
@@ -279,14 +293,14 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 autoComplete="username"
-                placeholder="Enter username or email address"
-                style={{ width: "100%", padding: "8px 10px", border: "1px solid var(--border-default)", fontSize: "0.80rem" }}
+                placeholder="Enter username or email"
+                style={{ width: "100%", padding: "9px 10px", border: "1px solid #E4E4E7", borderRadius: "0px", fontSize: "0.84rem", fontFamily: "var(--font-mono, monospace)", outline: "none", boxSizing: "border-box" }}
                 required
               />
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-              <label style={{ fontSize: "0.70rem", fontWeight: 700, color: "var(--text-secondary)" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px", textAlign: "left" }}>
+              <label style={{ fontSize: "0.68rem", fontWeight: 800, color: "#71717A", textTransform: "uppercase", fontFamily: "var(--font-mono, monospace)" }}>
                 Password
               </label>
               <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
@@ -296,38 +310,56 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete="current-password"
                   placeholder="Enter your password"
-                  style={{ width: "100%", padding: "8px 36px 8px 10px", border: "1px solid var(--border-default)", fontSize: "0.80rem" }}
+                  style={{ width: "100%", padding: "9px 36px 9px 10px", border: "1px solid #E4E4E7", borderRadius: "0px", fontSize: "0.84rem", outline: "none", boxSizing: "border-box" }}
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  style={{ position: "absolute", right: "8px", background: "transparent", border: 0, cursor: "pointer", color: "var(--text-muted)" }}
+                  style={{ position: "absolute", right: "8px", background: "transparent", border: 0, cursor: "pointer", color: "#A1A1AA" }}
                   title={showPassword ? "Hide password" : "Show password"}
                 >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
             </div>
 
             <button
               type="submit"
-              className="btn-primary"
               disabled={loading}
-              style={{ width: "100%", padding: "10px", marginTop: "4px", minHeight: "38px" }}
+              style={{
+                width: "100%",
+                padding: "10px",
+                marginTop: "4px",
+                minHeight: "38px",
+                background: "#0052FF",
+                color: "#FFFFFF",
+                border: "none",
+                borderRadius: "0px",
+                fontWeight: 800,
+                fontSize: "0.84rem",
+                fontFamily: "var(--font-mono, monospace)",
+                letterSpacing: "0.04em",
+                textTransform: "uppercase",
+                cursor: loading ? "not-allowed" : "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+              }}
             >
               <LogIn size={15} />
-              <span>{loading ? "Signing In..." : "Sign In"}</span>
+              <span>{loading ? "Authenticating..." : "Authenticate Session"}</span>
             </button>
           </form>
         )}
 
-        {/* MODE 3: Create Account Form */}
+        {/* MODE: Create Account Form */}
         {authMode === "register" && (
-          <form onSubmit={handleRegister} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+          <form onSubmit={handleRegister} style={{ display: "flex", flexDirection: "column", gap: "8px", textAlign: "left" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
               <div>
-                <label style={{ fontSize: "0.70rem", fontWeight: 700, color: "var(--text-secondary)", display: "block", marginBottom: "3px" }}>
+                <label style={{ fontSize: "0.68rem", fontWeight: 800, color: "#71717A", textTransform: "uppercase", fontFamily: "var(--font-mono, monospace)", display: "block", marginBottom: "3px" }}>
                   Full Name *
                 </label>
                 <input
@@ -336,13 +368,13 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   onChange={(e) => setRegName(e.target.value)}
                   autoComplete="name"
                   placeholder="e.g. Dr. Maya Patel"
-                  style={{ width: "100%", padding: "8px 10px", border: "1px solid var(--border-default)", fontSize: "0.78rem" }}
+                  style={{ width: "100%", padding: "8px 10px", border: "1px solid #E4E4E7", borderRadius: "0px", fontSize: "0.82rem", outline: "none", boxSizing: "border-box" }}
                   required
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: "0.70rem", fontWeight: 700, color: "var(--text-secondary)", display: "block", marginBottom: "3px" }}>
+                <label style={{ fontSize: "0.68rem", fontWeight: 800, color: "#71717A", textTransform: "uppercase", fontFamily: "var(--font-mono, monospace)", display: "block", marginBottom: "3px" }}>
                   Username *
                 </label>
                 <input
@@ -350,16 +382,16 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   value={regUsername}
                   onChange={(e) => setRegUsername(e.target.value)}
                   autoComplete="username"
-                  placeholder="e.g. maya.patel"
-                  style={{ width: "100%", padding: "8px 10px", border: "1px solid var(--border-default)", fontSize: "0.78rem" }}
+                  placeholder="handle"
+                  style={{ width: "100%", padding: "8px 10px", border: "1px solid #E4E4E7", borderRadius: "0px", fontSize: "0.82rem", fontFamily: "var(--font-mono, monospace)", outline: "none", boxSizing: "border-box" }}
                   required
                 />
               </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
               <div>
-                <label style={{ fontSize: "0.70rem", fontWeight: 700, color: "var(--text-secondary)", display: "block", marginBottom: "3px" }}>
+                <label style={{ fontSize: "0.68rem", fontWeight: 800, color: "#71717A", textTransform: "uppercase", fontFamily: "var(--font-mono, monospace)", display: "block", marginBottom: "3px" }}>
                   Email Address *
                 </label>
                 <input
@@ -367,14 +399,14 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   value={regEmail}
                   onChange={(e) => setRegEmail(e.target.value)}
                   autoComplete="email"
-                  placeholder="maya@example.com"
-                  style={{ width: "100%", padding: "8px 10px", border: "1px solid var(--border-default)", fontSize: "0.78rem" }}
+                  placeholder="name@hospital.org"
+                  style={{ width: "100%", padding: "8px 10px", border: "1px solid #E4E4E7", borderRadius: "0px", fontSize: "0.82rem", outline: "none", boxSizing: "border-box" }}
                   required
                 />
               </div>
 
               <div>
-                <label style={{ fontSize: "0.70rem", fontWeight: 700, color: "var(--text-secondary)", display: "block", marginBottom: "3px" }}>
+                <label style={{ fontSize: "0.68rem", fontWeight: 800, color: "#71717A", textTransform: "uppercase", fontFamily: "var(--font-mono, monospace)", display: "block", marginBottom: "3px" }}>
                   Password *
                 </label>
                 <input
@@ -383,31 +415,31 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   onChange={(e) => setRegPassword(e.target.value)}
                   autoComplete="new-password"
                   placeholder="••••••••"
-                  style={{ width: "100%", padding: "8px 10px", border: "1px solid var(--border-default)", fontSize: "0.78rem" }}
+                  style={{ width: "100%", padding: "8px 10px", border: "1px solid #E4E4E7", borderRadius: "0px", fontSize: "0.82rem", outline: "none", boxSizing: "border-box" }}
                   required
                 />
               </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
               <div>
-                <label style={{ fontSize: "0.70rem", fontWeight: 700, color: "var(--text-secondary)", display: "block", marginBottom: "3px" }}>
-                  I am registering as: *
+                <label style={{ fontSize: "0.68rem", fontWeight: 800, color: "#71717A", textTransform: "uppercase", fontFamily: "var(--font-mono, monospace)", display: "block", marginBottom: "3px" }}>
+                  Account Role *
                 </label>
                 <select
                   value={regRole}
                   onChange={(e) => setRegRole(e.target.value)}
-                  style={{ width: "100%", padding: "8px 10px", border: "1px solid var(--border-default)", fontSize: "0.78rem" }}
+                  style={{ width: "100%", padding: "8px 10px", border: "1px solid #E4E4E7", borderRadius: "0px", fontSize: "0.82rem", outline: "none", boxSizing: "border-box", background: "#FFFFFF" }}
                 >
-                  <option value="patient">Patient (Personal Health & Checkups)</option>
-                  <option value="doctor">Doctor / Clinician (Clinical Diagnosis & Consultations)</option>
-                  <option value="admin">Administrator (Security & Audits)</option>
+                  <option value="patient">Patient (Health Checkups & 3D Twin)</option>
+                  <option value="doctor">Doctor / Clinician (Clinical OPD & Telemedicine)</option>
+                  <option value="admin">Administrator (Governance & Audits)</option>
                 </select>
               </div>
 
               <div>
-                <label style={{ fontSize: "0.70rem", fontWeight: 700, color: "var(--text-secondary)", display: "block", marginBottom: "3px" }}>
-                  Phone Number (Optional)
+                <label style={{ fontSize: "0.68rem", fontWeight: 800, color: "#71717A", textTransform: "uppercase", fontFamily: "var(--font-mono, monospace)", display: "block", marginBottom: "3px" }}>
+                  Phone Number
                 </label>
                 <input
                   type="text"
@@ -415,27 +447,27 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   onChange={(e) => setRegPhone(e.target.value)}
                   autoComplete="tel"
                   placeholder="+91 98XXX XXXXX"
-                  style={{ width: "100%", padding: "8px 10px", border: "1px solid var(--border-default)", fontSize: "0.78rem" }}
+                  style={{ width: "100%", padding: "8px 10px", border: "1px solid #E4E4E7", borderRadius: "0px", fontSize: "0.82rem", outline: "none", boxSizing: "border-box" }}
                 />
               </div>
             </div>
 
             {/* Doctor Profile Specific Fields */}
             {regRole === "doctor" && (
-              <div style={{ background: "var(--bg-canvas)", border: "1px solid var(--border-default)", borderLeft: "3px solid var(--accent-blue)", padding: "10px 12px", display: "flex", flexDirection: "column", gap: "8px" }}>
-                <div style={{ fontSize: "0.68rem", fontWeight: 800, color: "var(--gold)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
-                  Clinical Practice Details (Appears in Find Doctors & Consultations)
+              <div style={{ background: "#F8FAFC", border: "1px solid #E4E4E7", borderLeft: "3px solid #0052FF", padding: "10px 12px", display: "flex", flexDirection: "column", gap: "8px", marginTop: "2px" }}>
+                <div style={{ fontSize: "0.66rem", fontWeight: 800, color: "#0052FF", letterSpacing: "0.06em", textTransform: "uppercase", fontFamily: "var(--font-mono, monospace)" }}>
+                  Clinical Practice Details
                 </div>
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
                   <div>
-                    <label style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--text-secondary)", display: "block", marginBottom: "2px" }}>
+                    <label style={{ fontSize: "0.66rem", fontWeight: 800, color: "#71717A", display: "block", marginBottom: "2px", textTransform: "uppercase", fontFamily: "var(--font-mono, monospace)" }}>
                       Medical Specialty *
                     </label>
                     <select
                       value={regSpecialty}
                       onChange={(e) => setRegSpecialty(e.target.value)}
-                      style={{ width: "100%", padding: "7px 8px", border: "1px solid var(--border-default)", fontSize: "0.74rem" }}
+                      style={{ width: "100%", padding: "7px 8px", border: "1px solid #E4E4E7", borderRadius: "0px", fontSize: "0.76rem", outline: "none", background: "#FFFFFF" }}
                     >
                       <option value="General Medicine & Clinical AI">General Medicine & Clinical AI</option>
                       <option value="Cardiology & Preventive Medicine">Cardiology & Preventive Medicine</option>
@@ -443,50 +475,19 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                       <option value="Pulmonary & Respiratory Medicine">Pulmonary & Respiratory Medicine</option>
                       <option value="Dermatology & Skin Lesions">Dermatology & Skin Lesions</option>
                       <option value="Neurology & Neuro-imaging">Neurology & Neuro-imaging</option>
-                      <option value="Endocrinology & Diabetes">Endocrinology & Diabetes</option>
-                      <option value="Orthopedics & Joint Care">Orthopedics & Joint Care</option>
-                      <option value="Pediatrics & Child Health">Pediatrics & Child Health</option>
                     </select>
                   </div>
 
                   <div>
-                    <label style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--text-secondary)", display: "block", marginBottom: "2px" }}>
-                      Hospital / Clinic Affiliation
+                    <label style={{ fontSize: "0.66rem", fontWeight: 800, color: "#71717A", display: "block", marginBottom: "2px", textTransform: "uppercase", fontFamily: "var(--font-mono, monospace)" }}>
+                      Hospital Affiliation
                     </label>
                     <input
                       type="text"
                       value={regAffiliation}
                       onChange={(e) => setRegAffiliation(e.target.value)}
                       placeholder="e.g. Q-Rakshak"
-                      style={{ width: "100%", padding: "7px 8px", border: "1px solid var(--border-default)", fontSize: "0.74rem" }}
-                    />
-                  </div>
-                </div>
-
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
-                  <div>
-                    <label style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--text-secondary)", display: "block", marginBottom: "2px" }}>
-                      Consultation Fee (INR)
-                    </label>
-                    <input
-                      type="number"
-                      value={regFee}
-                      onChange={(e) => setRegFee(e.target.value)}
-                      placeholder="600"
-                      style={{ width: "100%", padding: "7px 8px", border: "1px solid var(--border-default)", fontSize: "0.74rem" }}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: "0.68rem", fontWeight: 700, color: "var(--text-secondary)", display: "block", marginBottom: "2px" }}>
-                      Experience (Years)
-                    </label>
-                    <input
-                      type="number"
-                      value={regExp}
-                      onChange={(e) => setRegExp(e.target.value)}
-                      placeholder="6"
-                      style={{ width: "100%", padding: "7px 8px", border: "1px solid var(--border-default)", fontSize: "0.74rem" }}
+                      style={{ width: "100%", padding: "7px 8px", border: "1px solid #E4E4E7", borderRadius: "0px", fontSize: "0.76rem", outline: "none" }}
                     />
                   </div>
                 </div>
@@ -495,18 +496,36 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
 
             <button
               type="submit"
-              className="btn-primary"
               disabled={loading}
-              style={{ width: "100%", padding: "10px", marginTop: "4px", minHeight: "38px" }}
+              style={{
+                width: "100%",
+                padding: "10px",
+                marginTop: "4px",
+                minHeight: "38px",
+                background: "#0052FF",
+                color: "#FFFFFF",
+                border: "none",
+                borderRadius: "0px",
+                fontWeight: 800,
+                fontSize: "0.84rem",
+                fontFamily: "var(--font-mono, monospace)",
+                letterSpacing: "0.04em",
+                textTransform: "uppercase",
+                cursor: loading ? "not-allowed" : "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+              }}
             >
               <UserPlus size={15} />
-              <span>{loading ? "Creating Account..." : `Create ${regRole.toUpperCase()} Account & Sign In`}</span>
+              <span>{loading ? "Registering..." : `Register ${regRole.toUpperCase()} & Sign In`}</span>
             </button>
           </form>
         )}
 
         {error && (
-          <div style={{ background: "var(--risk-high-bg)", color: "var(--risk-high)", border: "1px solid rgba(220, 38, 38, 0.4)", padding: "8px 12px", fontSize: "0.72rem", marginTop: "10px", fontWeight: 600 }}>
+          <div style={{ background: "#FEF2F2", color: "#DC2626", border: "1px solid #FECACA", padding: "8px 12px", fontSize: "0.74rem", marginTop: "10px", fontWeight: 600, textAlign: "left", borderRadius: "0px" }}>
             {error}
           </div>
         )}
