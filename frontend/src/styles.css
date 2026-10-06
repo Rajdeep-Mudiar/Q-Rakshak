@@ -5323,3 +5323,91 @@ button, a, input, select, textarea,
   border-radius: 0px !important;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   HIGH-PERFORMANCE GPU-ACCELERATED QUANTUM AMBIENT CANVAS (60FPS)
+   Compositor-only translate3d & scale transforms. Zero repaint overhead.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.quantum-ambient-canvas {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.quantum-orb {
+  position: absolute;
+  border-radius: 50% !important;
+  filter: blur(85px);
+  opacity: 0.30;
+  will-change: transform;
+}
+
+.quantum-orb-1 {
+  width: 580px;
+  height: 580px;
+  top: -140px;
+  left: -120px;
+  background: radial-gradient(circle, rgba(0, 82, 255, 0.24) 0%, rgba(0, 82, 255, 0.05) 60%, transparent 80%);
+  animation: orbDrift1 20s ease-in-out infinite alternate;
+}
+
+.quantum-orb-2 {
+  width: 520px;
+  height: 520px;
+  top: 25%;
+  right: -100px;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.20) 0%, rgba(56, 189, 248, 0.04) 60%, transparent 80%);
+  animation: orbDrift2 24s ease-in-out infinite alternate;
+}
+
+.quantum-orb-3 {
+  width: 440px;
+  height: 440px;
+  bottom: 5%;
+  left: 20%;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.16) 0%, rgba(99, 102, 241, 0.03) 60%, transparent 80%);
+  animation: orbDrift3 22s ease-in-out infinite alternate;
+}
+
+.quantum-scan-beam {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 35%;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, #0052FF, #38BDF8, transparent);
+  opacity: 0.75;
+  animation: scanBeamSweep 9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes orbDrift1 {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(90px, 60px, 0) scale(1.14); }
+  100% { transform: translate3d(40px, 110px, 0) scale(0.95); }
+}
+
+@keyframes orbDrift2 {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-80px, -50px, 0) scale(1.18); }
+  100% { transform: translate3d(-50px, 70px, 0) scale(0.92); }
+}
+
+@keyframes orbDrift3 {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(70px, -60px, 0) scale(1.1); }
+  100% { transform: translate3d(-60px, -40px, 0) scale(1.04); }
+}
+
+@keyframes scanBeamSweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quantum-orb, .quantum-scan-beam {
+    animation: none !important;
+  }
+}
+
+
