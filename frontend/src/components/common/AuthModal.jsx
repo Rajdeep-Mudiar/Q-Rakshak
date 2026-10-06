@@ -21,7 +21,6 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
   const [regUsername, setRegUsername] = useState("");
   const [regEmail, setRegEmail] = useState("");
   const [regPassword, setRegPassword] = useState("");
-  const [regRole, setRegRole] = useState("patient");
   const [regPhone, setRegPhone] = useState("");
   const [regAffiliation, setRegAffiliation] = useState("");
   const [regSpecialty, setRegSpecialty] = useState("General Medicine & Clinical AI");
@@ -30,7 +29,6 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
 
   function handleRoleSelect(role) {
     setSelectedRole(role);
-    setRegRole(role);
     setError(null);
     if (authMode === "login") {
       if (role === "patient") {
@@ -79,9 +77,9 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
     setError(null);
     try {
       const ts = Date.now().toString().slice(-5);
-      const defaultLicense = regRole === "doctor"
+      const defaultLicense = selectedRole === "doctor"
         ? `DOC-LIC-${ts}`
-        : regRole === "admin"
+        : selectedRole === "admin"
         ? `ADM-SEC-${ts}`
         : `PT-REC-${ts}`;
 
@@ -90,13 +88,13 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
         password: regPassword,
         name: regName.trim(),
         email: regEmail.trim(),
-        role: regRole,
+        role: selectedRole,
         emergency_phone: regPhone ? regPhone.trim() : "",
-        hospital_affiliation: regAffiliation || (regRole === "doctor" ? "Q-Rakshak" : "Community Hospital"),
+        hospital_affiliation: regAffiliation || (selectedRole === "doctor" ? "Q-Rakshak" : "Community Hospital"),
         license_number: defaultLicense,
-        specialty: regRole === "doctor" ? (regSpecialty || "General Medicine & Clinical AI") : undefined,
-        fee_inr: regRole === "doctor" ? (parseFloat(regFee) || 600.0) : undefined,
-        experience_years: regRole === "doctor" ? (parseInt(regExp, 10) || 6) : undefined,
+        specialty: selectedRole === "doctor" ? (regSpecialty || "General Medicine & Clinical AI") : undefined,
+        fee_inr: selectedRole === "doctor" ? (parseFloat(regFee) || 600.0) : undefined,
+        experience_years: selectedRole === "doctor" ? (parseInt(regExp, 10) || 6) : undefined,
       });
       if (onLoginSuccess) onLoginSuccess(data.user);
       onClose();
@@ -421,39 +419,22 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
               </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
-              <div>
-                <label style={{ fontSize: "0.68rem", fontWeight: 800, color: "#71717A", textTransform: "uppercase", fontFamily: "var(--font-mono, monospace)", display: "block", marginBottom: "3px" }}>
-                  Account Role *
-                </label>
-                <select
-                  value={regRole}
-                  onChange={(e) => setRegRole(e.target.value)}
-                  style={{ width: "100%", padding: "8px 10px", border: "1px solid #E4E4E7", borderRadius: "0px", fontSize: "0.82rem", outline: "none", boxSizing: "border-box", background: "#FFFFFF" }}
-                >
-                  <option value="patient">Patient (Health Checkups & 3D Twin)</option>
-                  <option value="doctor">Doctor / Clinician (Clinical OPD & Telemedicine)</option>
-                  <option value="admin">Administrator (Governance & Audits)</option>
-                </select>
-              </div>
-
-              <div>
-                <label style={{ fontSize: "0.68rem", fontWeight: 800, color: "#71717A", textTransform: "uppercase", fontFamily: "var(--font-mono, monospace)", display: "block", marginBottom: "3px" }}>
-                  Phone Number
-                </label>
-                <input
-                  type="text"
-                  value={regPhone}
-                  onChange={(e) => setRegPhone(e.target.value)}
-                  autoComplete="tel"
-                  placeholder="+91 98XXX XXXXX"
-                  style={{ width: "100%", padding: "8px 10px", border: "1px solid #E4E4E7", borderRadius: "0px", fontSize: "0.82rem", outline: "none", boxSizing: "border-box" }}
-                />
-              </div>
+            <div>
+              <label style={{ fontSize: "0.68rem", fontWeight: 800, color: "#71717A", textTransform: "uppercase", fontFamily: "var(--font-mono, monospace)", display: "block", marginBottom: "3px" }}>
+                Phone Number (Optional)
+              </label>
+              <input
+                type="text"
+                value={regPhone}
+                onChange={(e) => setRegPhone(e.target.value)}
+                autoComplete="tel"
+                placeholder="+91 98XXX XXXXX"
+                style={{ width: "100%", padding: "8px 10px", border: "1px solid #E4E4E7", borderRadius: "0px", fontSize: "0.82rem", outline: "none", boxSizing: "border-box" }}
+              />
             </div>
 
             {/* Doctor Profile Specific Fields */}
-            {regRole === "doctor" && (
+            {selectedRole === "doctor" && (
               <div style={{ background: "#F8FAFC", border: "1px solid #E4E4E7", borderLeft: "3px solid #0052FF", padding: "10px 12px", display: "flex", flexDirection: "column", gap: "8px", marginTop: "2px" }}>
                 <div style={{ fontSize: "0.66rem", fontWeight: 800, color: "#0052FF", letterSpacing: "0.06em", textTransform: "uppercase", fontFamily: "var(--font-mono, monospace)" }}>
                   Clinical Practice Details
@@ -519,7 +500,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
               }}
             >
               <UserPlus size={15} />
-              <span>{loading ? "Registering..." : `Register ${regRole.toUpperCase()} & Sign In`}</span>
+              <span>{loading ? "Registering..." : `Register ${selectedRole.toUpperCase()} & Sign In`}</span>
             </button>
           </form>
         )}

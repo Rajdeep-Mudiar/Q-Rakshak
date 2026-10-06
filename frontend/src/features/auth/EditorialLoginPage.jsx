@@ -48,11 +48,9 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
   const [regUsername, setRegUsername] = useState("");
   const [regPassword, setRegPassword] = useState("");
   const [regPhone, setRegPhone] = useState("");
-  const [regRole, setRegRole] = useState("patient");
 
   function handleRoleSelect(role) {
     setSelectedRole(role);
-    setRegRole(role);
     setLocalError(null);
     if (authMode === "login") {
       if (role === "patient") {
@@ -276,9 +274,9 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
     setLocalError(null);
     try {
       const ts = Date.now().toString().slice(-5);
-      const defaultLicense = regRole === "doctor"
+      const defaultLicense = selectedRole === "doctor"
         ? `DOC-LIC-${ts}`
-        : regRole === "admin"
+        : selectedRole === "admin"
         ? `ADM-SEC-${ts}`
         : `PT-REC-${ts}`;
 
@@ -287,11 +285,11 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
         email: regEmail.trim(),
         username: regUsername.trim().toLowerCase(),
         password: regPassword,
-        role: regRole,
+        role: selectedRole,
         emergency_phone: regPhone ? regPhone.trim() : "",
-        hospital_affiliation: regRole === "doctor" ? "Q-Rakshak" : "Community Healthcare",
+        hospital_affiliation: selectedRole === "doctor" ? "Q-Rakshak" : "Community Healthcare",
         license_number: defaultLicense,
-        specialty: regRole === "doctor" ? "General Medicine & Clinical AI" : undefined,
+        specialty: selectedRole === "doctor" ? "General Medicine & Clinical AI" : undefined,
       });
       if (data?.user) {
         if (onLoginSuccess) onLoginSuccess(data.user);
@@ -905,14 +903,12 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
                     letterSpacing: "0.06em",
                   }}
                 >
-                  {t("login.select_role", "Select Persona")}
+                  {authMode === "register" ? t("login.register_as", "Register Account As") : t("login.select_role", "Select Persona")}
                 </label>
                 <span style={{ fontSize: "0.66rem", color: "#0052FF", fontWeight: 700, fontFamily: "var(--font-mono, monospace)" }}>
-                  {selectedRole === "patient"
-                    ? "PT: alex.patient"
-                    : selectedRole === "doctor"
-                    ? "DR: dr.aryan"
-                    : "ADM: admin"}
+                  {authMode === "register"
+                    ? (selectedRole === "patient" ? "ROLE: Patient" : selectedRole === "doctor" ? "ROLE: Doctor / Clinician" : "ROLE: Admin")
+                    : (selectedRole === "patient" ? "PT: alex.patient" : selectedRole === "doctor" ? "DR: dr.aryan" : "ADM: admin")}
                 </span>
               </div>
 
@@ -1188,26 +1184,15 @@ export default function EditorialLoginPage({ onGoogleLogin, onGoogleVerifySucces
 
                 <div style={{ textAlign: "left" }}>
                   <label style={{ display: "block", fontSize: "0.68rem", fontWeight: 800, color: "#71717A", textTransform: "uppercase", fontFamily: "var(--font-mono, monospace)", marginBottom: "4px" }}>
-                    Account Role
+                    Emergency / Contact Phone (Optional)
                   </label>
-                  <select
-                    value={regRole}
-                    onChange={(e) => setRegRole(e.target.value)}
-                    style={{
-                      width: "100%",
-                      padding: "9px 12px",
-                      border: "1px solid #E4E4E7",
-                      fontSize: "0.85rem",
-                      background: "#FFFFFF",
-                      color: "#18181B",
-                      boxSizing: "border-box",
-                      outline: "none",
-                    }}
-                  >
-                    <option value="patient">Patient (Health Checkups & 3D Twin)</option>
-                    <option value="doctor">Doctor / Clinician (Clinical OPD & Telemedicine)</option>
-                    <option value="admin">Administrator (Governance & Audits)</option>
-                  </select>
+                  <input
+                    type="tel"
+                    value={regPhone}
+                    onChange={(e) => setRegPhone(e.target.value)}
+                    placeholder="+91 98XXX XXXXX"
+                    style={{ width: "100%", padding: "9px 12px", border: "1px solid #E4E4E7", fontSize: "0.85rem", boxSizing: "border-box", outline: "none", fontFamily: "var(--font-mono, monospace)" }}
+                  />
                 </div>
 
                 <button
