@@ -85,6 +85,20 @@ export default function EmergencyCardView({ patientId = null }) {
 
   const card3DInnerRef = useRef(null);
 
+  const rawPrimary = data?.emergency_contacts?.find((c) => c.is_primary && c.phone && c.phone !== '—') ||
+    data?.emergency_contacts?.find((c) => c.phone && c.phone !== '—') ||
+    data?.emergency_contacts?.[0];
+
+  const primaryFallbackPhone = data?.emergency_contact || data?.emergency_phone || data?.phone || storedUser?.emergency_phone || storedUser?.phone || '';
+
+  const primaryContact = {
+    name: rawPrimary?.name || data?.emergency_contact_name || (data?.emergency_contact ? 'Emergency Contact' : '—'),
+    phone: (rawPrimary?.phone && rawPrimary.phone !== '—') ? rawPrimary.phone : primaryFallbackPhone,
+    relation: rawPrimary?.relation || data?.emergency_contact_relation || 'Next of Kin',
+  };
+
+  const secondaryContact = data?.emergency_contacts?.length > 1 ? data.emergency_contacts[1] : null;
+
   // Reactive cross-tab and cross-component auto-sync listener
   useEffect(() => {
     function handleSyncEvent(e) {
@@ -373,19 +387,6 @@ export default function EmergencyCardView({ patientId = null }) {
       loadData(true);
     }
   }, [effectivePatientId]);
-
-  const primaryContact = data?.emergency_contacts?.find((c) => c.is_primary && c.phone && c.phone !== '—') ||
-    data?.emergency_contacts?.find((c) => c.phone && c.phone !== '—') ||
-    data?.emergency_contacts?.[0] || {
-      name: data?.emergency_contact_name || (data?.emergency_contact ? 'Emergency Contact' : '—'),
-      phone: data?.emergency_contact || data?.emergency_phone || data?.phone || storedUser?.emergency_phone || storedUser?.phone || '',
-      relation: data?.emergency_contact_relation || 'Next of Kin',
-    };
-  if (!primaryContact.phone || primaryContact.phone === '—') {
-    primaryContact.phone = data?.emergency_contact || data?.emergency_phone || data?.phone || storedUser?.emergency_phone || '';
-  }
-
-  const secondaryContact = data?.emergency_contacts?.length > 1 ? data.emergency_contacts[1] : null;
 
   const INDIA_HELPLINES = [
     { code: '108', title: 'Ambulance / EMS', desc: 'National Medical Service', icon: Siren, color: '#DC2626' },
